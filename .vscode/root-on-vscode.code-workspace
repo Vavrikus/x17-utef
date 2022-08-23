@@ -1,0 +1,32 @@
+{
+	"folders": [
+    {
+      "path": ".."
+    },
+    {
+      "path": "../../root_install/include"
+    },
+    {
+      "path": "../../garfield/Include"
+    }
+  ],
+  "settings": {
+    "files.associations": {
+      "iostream": "cpp",
+      "pseudo_exp.C": "cpp",
+      "get_prob.C": "cpp",
+      "disc_pot.C": "cpp"
+    },
+    "C_Cpp.default.includePath": [
+      "${default}",
+      "/home/vavrik/work/root_install/include",
+      "/home/vavrik/work/garfield/Include"
+    ]
+  },
+  "extensions": {
+    "recommendations": [
+      "albertopdrf.root-file-viewer",
+      "ms-vscode.cpptools"
+    ]
+  }
+}
