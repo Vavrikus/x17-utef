@@ -13,9 +13,7 @@
   "settings": {
     "files.associations": {
       "iostream": "cpp",
-      "pseudo_exp.C": "cpp",
-      "get_prob.C": "cpp",
-      "disc_pot.C": "cpp"
+      "bfield.C": "cpp"
     },
     "C_Cpp.default.includePath": [
       "${default}",

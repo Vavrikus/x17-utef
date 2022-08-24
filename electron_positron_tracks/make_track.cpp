@@ -134,7 +134,7 @@ int main(int argc, char * argv[]){
       electrons.Fill();
       k++;
     }
-    if(k == 50) break;
+    // if(k == 50) break;
   }
 
   std::cout << "total electron generated: "<< k <<std::endl;
