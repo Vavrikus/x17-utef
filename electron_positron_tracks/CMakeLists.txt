@@ -7,6 +7,18 @@ if(NOT TARGET Garfield::Garfield)
 endif()
 # ########################################################################################
 
+# ---Root------------------------------------------------------------------------
+find_package(ROOT REQUIRED)
+
+set(CMAKE_CXX_FLAGS "${ROOT_CXX_FLAGS}")
+
+include(${ROOT_USE_FILE})
+include_directories(${ROOT_INCLUDE_DIRS})
+link_directories(${ROOT_LIBRARY_DIR})
+
 # ---Build executable------------------------------------------------------------
 add_executable(make_track make_track.cpp)
-target_link_libraries(make_track Garfield::Garfield)
+target_link_libraries(make_track 
+                      Garfield::Garfield 
+                      ${ROOT_LIBRARIES}
+                      )

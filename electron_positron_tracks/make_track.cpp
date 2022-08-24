@@ -4,7 +4,9 @@
 #include <TApplication.h>
 #include <TCanvas.h>
 #include <TH1D.h>
+#include <TFile.h>
 #include <TGraph2D.h>
+#include <TTree.h>
 
 #include "Garfield/ViewField.hh"
 #include "Garfield/ViewDrift.hh"
@@ -28,8 +30,24 @@ int main(int argc, char * argv[]){
   MediumMagboltz gas;
   gas.SetComposition("ar", 90., "co2", 10.);
 
-  ofstream myfile;
-  myfile.open ("electrons.txt"); //name of the file to save data
+  // ofstream myfile;
+  // myfile.open ("electrons.txt"); //name of the file to save data
+  TFile outFile("electrons.root","RECREATE","Electrons from ionization track");
+  TTree electrons("electrons","Tree of initial and final points of electrons");
+
+  double x0, y0, z0, t0, e0;
+  double x1, y1, z1, t1, e1;
+  electrons.Branch("x0",&x0);
+  electrons.Branch("y0",&y0);
+  electrons.Branch("z0",&z0);
+  electrons.Branch("t0",&t0);
+  electrons.Branch("e0",&e0);
+  electrons.Branch("x1",&x1);
+  electrons.Branch("y1",&y1);
+  electrons.Branch("z1",&z1);
+  electrons.Branch("t1",&t1);
+  electrons.Branch("e1",&e1);
+
   
   ComponentGrid grid;
   const double m2cm = 100.;
@@ -102,7 +120,7 @@ int main(int argc, char * argv[]){
   int nc;
   while (track.GetCluster(xc, yc, zc, tc, nc, ec, extra)) 
   {
-    cout << "distance to origin " << sqrt(xc*xc+yc*yc+zc*zc) << "\n";
+    cout << "distance to origin " << sqrt(xc*xc+yc*yc+zc*zc) << "  time " << tc << "  number " << k << "\n";
     for (int j = 0; j < nc; ++j) 
     {
       double xe, ye, ze, te, ee, dxe, dye, dze;
@@ -110,14 +128,13 @@ int main(int argc, char * argv[]){
       // Simulate the drift/avalanche of this electron.
       aval.AvalancheElectron(xe, ye, ze, te, 0.1, dxe, dye, dze);
       // Move electrons that hit the mesh plane into the amplification gap.
-      double x0, y0, z0, t0, e0;
-      double x1, y1, z1, t1, e1;
       int status;
       aval.GetElectronEndpoint(0, x0, y0, z0, t0, e0, 
                                   x1, y1, z1, t1, e1, status);
-      myfile <<j<<" "<<x0 <<" "<<y0<<" "<<z0<<" "<<t0<<" "<<e0<<" "<< x1<<" "<<y1<<" "<<z1<<" "<<t1<<" "<<e1<<" "<<status<<endl;
+      electrons.Fill();
       k++;
     }
+    if(k == 50) break;
   }
 
   std::cout << "total electron generated: "<< k <<std::endl;
@@ -161,8 +178,14 @@ int main(int argc, char * argv[]){
   gr1->Draw("P");
   c5->SaveAs("trajectory.pdf");  
   }
-  myfile.close();
-  //~ app.Run(true);
+
+  electrons.Print();
+  outFile.Write();
+  outFile.Close();
+
+  // TCanvas* c6 = new TCanvas("c6", "", 800, 800);
+  // electrons.Draw("z0:t1","","ap");
+  app.Run(true);
   return 0;
 
 }
