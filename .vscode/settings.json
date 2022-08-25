@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        //"lcoincidences/skyfit.C": "cpp"
-    }
+        "electron_positron_tracks/reco_track.cpp": "cpp"
+    },
+    "cmake.configureOnOpen": false
 }

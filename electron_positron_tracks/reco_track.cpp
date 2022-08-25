@@ -3,14 +3,121 @@
 #include <TFile.h>
 #include <TGraph.h>
 #include <TH1F.h>
+#include <TH2F.h>
 #include <TLegend.h>
 #include <TTree.h>
 
+#include <fstream>
 #include <iostream>
+#include <vector>
 
 #include "../NSplines.h"
 
 using namespace std;
+
+struct Vector
+{
+    double vx,vy,vz;
+};
+
+
+struct VectorField
+{
+    double xmin,ymin,zmin,xmax,ymax,zmax;
+    double step;
+    int ximax,yimax,zimax;
+
+    vector<vector<vector<Vector>>> field;
+
+    VectorField(double xmin,double xmax,double ymin, double ymax, double zmin, double zmax, double step)
+    : xmin(xmin),xmax(xmax),ymin(ymin),ymax(ymax),zmin(zmin),zmax(zmax),step(step)
+    {        
+        for (int i = 0; i <= floor((xmax-xmin)/step); i++)
+        {
+            vector<vector<Vector>> v1;
+            for (int j = 0; j <= floor((ymax-ymin)/step); j++)
+            {
+                vector<Vector> v2;
+                for (int k = 0; k <= floor((zmax-zmin)/step); k++)
+                {
+                    v2.push_back({0,0,0});
+                }
+                v1.push_back(v2);
+            }
+            field.push_back(v1);
+        }
+
+        this->GetVectorIndexes(xmax,ymax,zmax,ximax,yimax,zimax);
+    }
+
+    void GetVectorIndexes(double x, double y, double z, int& xi, int& yi, int& zi)
+    {
+        if(x<xmin||x>xmax||y<ymin||y>ymax||z<zmin||z>zmax)
+            cerr << "Cannot read field out of bounds.\n";
+        
+        xi = floor((x-xmin)/step);
+        yi = floor((y-ymin)/step);
+        zi = floor((z-zmin)/step);
+        // cout << xi << " " << yi << " " << zi << "\n";
+    }
+
+    Vector* GetVector(double x, double y, double z)
+    {
+        int xi,yi,zi;
+        this->GetVectorIndexes(x,y,z,xi,yi,zi);
+
+        return &(field[xi][yi][zi]);
+    }
+
+    void LoadField(const char* filename)
+    {
+        std::ifstream inf {filename};
+
+        int lines_read = 0;
+        int lines_processed = 0;
+        int lines_expected = floor((xmax-xmin)/step)*floor((ymax-ymin)/step)*floor((ymax-ymin)/step);
+
+        while (inf)
+        {
+            std::string X,Y,Z,VX,VY,VZ;
+            inf >> X; inf >> Y; inf >> Z; inf >> VX; inf >> VY; inf >> VZ;
+            lines_read++;
+            
+            if (X != "")
+            {
+                double x,y,z,vx,vy,vz;
+                x = stod(X); y = stod(Y); z = stod(Z);
+                vx = stod(VX); vy = stod(VY); vz = stod(VZ);
+
+                *(this->GetVector(x,y,z)) = Vector{vx,vy,vz};
+                lines_processed++;
+            }
+        }
+
+        cout << "Lines read: " << lines_read << " processed: " << lines_processed << " expected: " << lines_expected << "\n";
+    }
+
+    Vector GetField(double x, double y, double z)
+    {
+        int xi,yi,zi;
+        this->GetVectorIndexes(x,y,z,xi,yi,zi);
+        
+        int xi2,yi2,zi2;
+        if(x-(xmin+step*xi)<0) xi2 = xi-1; else xi2 = xi + 1; if(xi2>ximax) xi2=xi;
+        if(y-(ymin+step*yi)<0) yi2 = yi-1; else yi2 = yi + 1; if(yi2>yimax) yi2=yi;
+        if(z-(zmin+step*zi)<0) zi2 = zi-1; else zi2 = zi + 1; if(zi2>zimax) zi2=zi;
+
+        double dx = abs((x-(xmin+step*xi))/step);
+        double dy = abs((y-(ymin+step*yi))/step);
+        double dz = abs((z-(zmin+step*zi))/step);
+        
+        double vx = (1-dx)*field[xi][yi][zi].vx+dx*field[xi2][yi][zi].vx;
+        double vy = (1-dy)*field[xi][yi][zi].vy+dy*field[xi][yi2][zi].vy;
+        double vz = (1-dz)*field[xi][yi][zi].vz+dz*field[xi][yi][zi2].vz;
+
+        return Vector{vx,vy,vz};
+    }
+};
 
 int reco_track()
 {
@@ -88,7 +195,22 @@ int reco_track()
     }
 
     TCanvas* c3 = new TCanvas("c3","Residues");
-    residues->Draw();    
+    residues->Draw();
+
+    TH2F* field = new TH2F("h_field","XZ magnetic field plot",121,-0.3,0.3,81,-0.2,0.2);
+    VectorField* magfield = new VectorField(-0.3,0.3,-0.3,0.3,-0.2,0.2,0.005);
+    magfield->LoadField("/home/vavrik/work/X17/electron_positron_tracks/build/VecB.txt");
+
+    for(int i = 0; i < 121; i++)
+        for(int j = 0; j < 81; j++)
+        {
+            Vector b = magfield->GetField(-0.3+i*0.005,0.0,-0.2+j*0.005);//magfield->field[i][60][j];//
+            double bmag = sqrt(b.vx*b.vx+b.vy*b.vy+b.vz*b.vz);
+            field->SetBinContent(i,j,bmag);
+        }
+    
+    TCanvas* c4 = new TCanvas("c4","Magnetic field XZ plane");
+    field->Draw("cont1");
 
     return 0;
 }

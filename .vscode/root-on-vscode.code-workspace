@@ -13,7 +13,8 @@
   "settings": {
     "files.associations": {
       "iostream": "cpp",
-      "bfield.C": "cpp"
+      "bfield.C": "cpp",
+      "electron_positron_tracks/reco_track.cpp": "cpp"
     },
     "C_Cpp.default.includePath": [
       "${default}",

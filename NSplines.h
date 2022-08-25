@@ -1,4 +1,5 @@
 #pragma once
+#include <TSpline.h>
 
 template<int N>
 class NSpline 
