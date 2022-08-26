@@ -32,13 +32,13 @@ struct VectorField
     VectorField(double xmin,double xmax,double ymin, double ymax, double zmin, double zmax, double step)
     : xmin(xmin),xmax(xmax),ymin(ymin),ymax(ymax),zmin(zmin),zmax(zmax),step(step)
     {        
-        for (int i = 0; i <= floor((xmax-xmin)/step); i++)
+        for (int i = 0; i <= round((xmax-xmin)/step); i++)
         {
             vector<vector<Vector>> v1;
-            for (int j = 0; j <= floor((ymax-ymin)/step); j++)
+            for (int j = 0; j <= round((ymax-ymin)/step); j++)
             {
                 vector<Vector> v2;
-                for (int k = 0; k <= floor((zmax-zmin)/step); k++)
+                for (int k = 0; k <= round((zmax-zmin)/step); k++)
                 {
                     v2.push_back({0,0,0});
                 }
@@ -55,10 +55,9 @@ struct VectorField
         if(x<xmin||x>xmax||y<ymin||y>ymax||z<zmin||z>zmax)
             cerr << "Cannot read field out of bounds.\n";
         
-        xi = floor((x-xmin)/step);
-        yi = floor((y-ymin)/step);
-        zi = floor((z-zmin)/step);
-        // cout << xi << " " << yi << " " << zi << "\n";
+        xi = round((x-xmin)/step);
+        yi = round((y-ymin)/step);
+        zi = round((z-zmin)/step);
     }
 
     Vector* GetVector(double x, double y, double z)
@@ -75,7 +74,7 @@ struct VectorField
 
         int lines_read = 0;
         int lines_processed = 0;
-        int lines_expected = floor((xmax-xmin)/step)*floor((ymax-ymin)/step)*floor((ymax-ymin)/step);
+        int lines_expected = round((xmax-xmin)/step+1)*round((ymax-ymin)/step+1)*round((zmax-zmin)/step+1);
 
         while (inf)
         {
