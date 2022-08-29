@@ -20,6 +20,20 @@ struct Vector
     double vx,vy,vz;
 };
 
+Vector operator+(const Vector& v1,const Vector& v2)
+{
+    return Vector{v1.vx+v2.vx,v1.vy+v2.vy,v1.vz+v2.vz};
+}
+
+Vector operator-(const Vector& v1,const Vector& v2)
+{
+    return Vector{v1.vx-v2.vx,v1.vy-v2.vy,v1.vz-v2.vz};
+}
+
+Vector operator*(const double& d,const Vector& v)
+{
+    return Vector{d*v.vx,d*v.vy,d*v.vz};
+}
 
 struct VectorField
 {
@@ -109,12 +123,25 @@ struct VectorField
         double dx = abs((x-(xmin+step*xi))/step);
         double dy = abs((y-(ymin+step*yi))/step);
         double dz = abs((z-(zmin+step*zi))/step);
-        
-        double vx = (1-dx)*field[xi][yi][zi].vx+dx*field[xi2][yi][zi].vx;
-        double vy = (1-dy)*field[xi][yi][zi].vy+dy*field[xi][yi2][zi].vy;
-        double vz = (1-dz)*field[xi][yi][zi].vz+dz*field[xi][yi][zi2].vz;
 
-        return Vector{vx,vy,vz};
+        Vector& c000 = field[xi][yi][zi];
+        Vector& c001 = field[xi][yi][zi2];
+        Vector& c010 = field[xi][yi2][zi];
+        Vector& c011 = field[xi][yi2][zi2];
+        Vector& c100 = field[xi2][yi][zi];
+        Vector& c101 = field[xi2][yi][zi2];
+        Vector& c110 = field[xi2][yi2][zi];
+        Vector& c111 = field[xi2][yi2][zi2];
+
+        Vector c00 = (1-dx)*c000+dx*c100;
+        Vector c01 = (1-dx)*c001+dx*c101;
+        Vector c10 = (1-dx)*c010+dx*c110;
+        Vector c11 = (1-dx)*c011+dx*c111;
+
+        Vector c0 = (1-dy)*c00+dy*c10;
+        Vector c1 = (1-dy)*c01+dy*c11;
+
+        return (1-dz)*c0+dz*c1;
     }
 };
 
@@ -175,14 +202,25 @@ int reco_track()
     leg->AddEntry(zy_reco,"reconstructed");
     leg->Draw("same");
 
-    const int nodes = 5;
+    const int nodes = 10;
     double min = 0;
     double max = 15;
-    NSpline<nodes>* s = new NSpline<nodes>(min,max);
-    s->SetDer1(0);
+
+    double node_pos[nodes];
+    for (int i = 0; i < nodes; i++) node_pos[i] = min+(i/(nodes-1.0))*(max-min);
+
+    NSpline<nodes>* s = new NSpline<nodes>(node_pos);
+    //s->SetDer1(0);
 
     TF1* zy_fit = new TF1("zz_fit",s->GetEval(),min,max,2*nodes+2);
     zy->Fit(zy_fit,"M","",min,max);
+
+    double* fit_pars = zy_fit->GetParameters();
+    double nodes_y[nodes];
+    for(int i = nodes; i < 2*nodes; i++) nodes_y[i-nodes]=fit_pars[i];
+    double beg1 = fit_pars[2*nodes];
+    double end1 = fit_pars[2*nodes+1];
+    TSpline3 sp_fit("sp3",node_pos,nodes_y,nodes,"b1e1",beg1,end1);
 
     TH1F* residues = new TH1F("h_residues","Residues",50,-0.5,0.5);
 
@@ -193,23 +231,69 @@ int reco_track()
         residues->Fill(y-zy_fit->Eval(x));
     }
 
-    TCanvas* c3 = new TCanvas("c3","Residues");
-    residues->Draw();
-
-    TH2F* field = new TH2F("h_field","XZ magnetic field plot",121,-0.3,0.3,81,-0.2,0.2);
     VectorField* magfield = new VectorField(-0.3,0.3,-0.3,0.3,-0.2,0.2,0.005);
     magfield->LoadField("/home/vavrik/work/X17/electron_positron_tracks/build/VecB.txt");
+    
+    TGraph* energy_x = new TGraph();
+    TGraph* radius_x = new TGraph();
+    TGraph* magnetic_x = new TGraph();
 
-    for(int i = 0; i < 121; i++)
-        for(int j = 0; j < 81; j++)
+    double step = 0.1;
+    for (double x = min; x <= max; x += step)
+    {
+        int i_node = sp_fit.FindX(x);
+        double xnode,ynode,b,c,d;
+        sp_fit.GetCoeff(i_node,xnode,ynode,b,c,d);
+        double dx = x-xnode;
+        double der  = b+dx*(2*c+3*d*dx);
+        double der2 = 2*c+6*d*dx;
+        double r = 0.01*pow(1+der*der,1.5)/der2;
+        const double clight = 299792458;
+        const double E0 = 510998.95;
+        Vector B = magfield->GetField(0,(8-sp_fit.Eval(x))/100,x/100);
+        double betasq = 1/(1+pow((E0/(clight*r*B.vx)),2));
+        double Ekin = E0*(1/sqrt(1-betasq)-1);
+        if (x > 4) energy_x->AddPoint(x,Ekin/1e6);
+        if (r < 1 && r > 0) radius_x->AddPoint(x,r*100);
+        magnetic_x->AddPoint(x,B.vx);
+        //cout << "Kinetic energy at x = " << x << ": " << Ekin << " radius: " << r << "\n";
+        //cout << "comp: " << der << " retr: " << sp_fit.Derivative(x) << "\n";
+    }
+
+    TCanvas* c_energy = new TCanvas("c_energy","Reconstructed energy");
+    energy_x->SetTitle("Reconstructed energy;z [cm]; Energy [MeV]");
+    energy_x->SetMarkerStyle(2);
+    energy_x->SetMarkerSize(0.4);
+    energy_x->Draw("ap");
+
+    TCanvas* c_radius = new TCanvas("c_radius","Reconstructed radius");
+    radius_x->SetTitle("Reconstructed radius;z [cm]; Radius [cm]");
+    radius_x->SetMarkerStyle(2);
+    radius_x->SetMarkerSize(0.4);
+    radius_x->Draw("ap");
+    
+    TCanvas* c_magnetic = new TCanvas("c_magnetic","Perpendicular magnetic field");
+    magnetic_x->SetTitle("Perpendicular magnetic field;z [cm]; B [T]");
+    magnetic_x->SetMarkerStyle(2);
+    magnetic_x->SetMarkerSize(0.4);
+    magnetic_x->Draw("ap");
+
+    double xbins = 121;
+    double zbins = 81;
+
+    TH2F* field = new TH2F("h_field","XZ magnetic field plot",xbins,-0.3,0.3,zbins,-0.2,0.2);
+
+    for(int i = 0; i < xbins; i++)
+        for(int j = 0; j < zbins; j++)
         {
             Vector b = magfield->GetField(-0.3+i*0.005,0.0,-0.2+j*0.005);//magfield->field[i][60][j];//
             double bmag = sqrt(b.vx*b.vx+b.vy*b.vy+b.vz*b.vz);
-            field->SetBinContent(i,j,bmag);
+            field->SetBinContent(i,j,b.vz);
         }
     
     TCanvas* c4 = new TCanvas("c4","Magnetic field XZ plane");
-    field->Draw("cont1");
+    gStyle->SetPalette(1.);
+    field->Draw("colz");
 
     return 0;
 }
@@ -227,7 +311,7 @@ int main()
     // electrons->Draw("t1:8-y0>>h","y1>7.0","colz");
     // h->Fit("pol1","","",8.1,11);
 
-//spline fit of zz graph-------------------------------------------------------------
+// spline fit of zz graph------------------------------------------------------------
     // TCanvas* c2 = new TCanvas();
     // electrons->Draw("z0-z1:z1","y1>7.0");
     // TGraph* zz = new TGraph(electrons->GetSelectedRows(), electrons->GetV2(), electrons->GetV1());
@@ -241,3 +325,20 @@ int main()
 
     // TF1* zz_fit = new TF1("zz_fit",s->GetEval(),min,max,2*nodes+2);
     // zz->Fit(zz_fit,"M","",min,max);
+
+// plotting magnetic field magnitude on XZ plane
+    // TCanvas* c3 = new TCanvas("c3","Residues");
+    // residues->Draw();
+
+    // TH2F* field = new TH2F("h_field","XZ magnetic field plot",121,-0.3,0.3,81,-0.2,0.2);
+
+    // for(int i = 0; i < 121; i++)
+    //     for(int j = 0; j < 81; j++)
+    //     {
+    //         Vector b = magfield->GetField(-0.3+i*0.005,0.0,-0.2+j*0.005);//magfield->field[i][60][j];//
+    //         double bmag = sqrt(b.vx*b.vx+b.vy*b.vy+b.vz*b.vz);
+    //         field->SetBinContent(i,j,bmag);
+    //     }
+    
+    // TCanvas* c4 = new TCanvas("c4","Magnetic field XZ plane");
+    // field->Draw("cont1");
