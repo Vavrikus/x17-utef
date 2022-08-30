@@ -8,6 +8,9 @@
     },
     {
       "path": "../../garfield/Include"
+    },
+    {
+      "path": "../../garfield/Source"
     }
   ],
   "settings": {

@@ -22,3 +22,8 @@ target_link_libraries(make_track
                       Garfield::Garfield 
                       ${ROOT_LIBRARIES}
                       )
+add_executable(ion_electrons ion_electrons.cpp)
+target_link_libraries(ion_electrons 
+                      Garfield::Garfield 
+                      ${ROOT_LIBRARIES}
+                      )
