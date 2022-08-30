@@ -64,3 +64,23 @@ public:
 	}
 
 };
+
+template<int nodes>
+TSpline3* FitSplines(TGraph* graph, const double& min, const double& max)
+{
+    double node_pos[nodes];
+    for (int i = 0; i < nodes; i++) node_pos[i] = min+(i/(nodes-1.0))*(max-min);
+
+    NSpline<nodes>* s = new NSpline<nodes>(node_pos);
+
+    TF1* fit = new TF1("fit",s->GetEval(),min,max,2*nodes+2);
+    graph->Fit(fit,"M","",min,max);
+
+    double* fit_pars = fit->GetParameters();
+    double nodes_y[nodes];
+    for(int i = nodes; i < 2*nodes; i++) nodes_y[i-nodes]=fit_pars[i];
+    double beg1 = fit_pars[2*nodes];
+    double end1 = fit_pars[2*nodes+1];
+    
+    return new TSpline3("sp3",node_pos,nodes_y,nodes,"b1e1",beg1,end1);
+}
