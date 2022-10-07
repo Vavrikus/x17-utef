@@ -1,4 +1,5 @@
 /tests/
+/electron_positron_tracks/data/
 /electron_positron_tracks/pictures/
 */build/
 *.d
