@@ -46,7 +46,9 @@ int main(int argc, char * argv[])
     id     = stoi(argv[2]);
     step   = stod(argv[3]);
 
-    if (id > max_id) {cerr << "ERROR: Parameter id cannot be bigger than max_id.\n"; return 2;}
+    if (id <= 0) {cerr << "ERROR: Parameter id has to be positive.\n";return 2;}
+    if (id > max_id) {cerr << "ERROR: Parameter id cannot be bigger than max_id.\n"; return 3;}
+    cout << "Running with parameters:\n" << "max_id: " << max_id << ", id: " << id << ", step (cm): " << step << "\n";
 
     //range for simulating electrons, 1st sector condition (x-sqrt(3)*z<=0)&&(x+sqrt(3)*z>0) has to be satisfied later
     double xmin,xmax,ymin,ymax,zmin,zmax;
@@ -65,8 +67,11 @@ int main(int argc, char * argv[])
         }
     }
 
-    int min_electron = floor(((id-1)/(max_id*1.0))*n_electrons); //minimal (exclusive) index of electron simulated in job with this id
+    int min_electron = ceil(((id-1)/(max_id*1.0))*n_electrons);  //minimal (exclusive) index of electron simulated in job with this id
     int max_electron = ceil((id/(max_id*1.0))*n_electrons);      //maximal (inclusive) index of electron simulated in job with this id
+
+    cout << "Expecting " << n_electrons << " electrons across all simulations.\n";
+    cout << "Simulating electrons from " << min_electron << " to " << max_electron << ".\n";
 
     //set output file, name dependent on id
     string filename = "ion" + to_string(id) + ".root";
@@ -136,7 +141,7 @@ int main(int argc, char * argv[])
                 {
                     i++;
                     //if this electron is supposed to be simulated by job with this id
-                    if ((i > min_electron)&&(i>=max_electron))
+                    if ((i > min_electron)&&(i<=max_electron))
                     {
                         int status;
                         aval.AvalancheElectron(x, y, z, 0, 0.1, 0, 0, 0);
