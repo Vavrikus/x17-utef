@@ -16,6 +16,8 @@ include(${ROOT_USE_FILE})
 include_directories(${ROOT_INCLUDE_DIRS})
 link_directories(${ROOT_LIBRARY_DIR})
 
+find_package(GSL REQUIRED)
+
 # ---Build executable------------------------------------------------------------
 add_executable(make_track make_track.cpp)
 target_link_libraries(make_track 

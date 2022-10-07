@@ -6,5 +6,6 @@ cd $(dirname $0) #Makes sure you are in the directory of this script.
 
 for i in $(seq 1 $1)
 do
-   qsub -- ion_single.sh $1 $i $2
+   #qsub -- ion_single.sh $1 $i $2
+   qsub -v PAR1=$1,PAR2=$i,PAR3=$2 ion_single.sh
 done
