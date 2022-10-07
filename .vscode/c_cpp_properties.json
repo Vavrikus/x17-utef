@@ -4,8 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${default}",
-                "/home/vavrik/work/root_install/include",
-                "/home/vavrik/work/garfield/Include"
+                "/home/vavrik/work/source/root/root_install/include",
+                "/home/vavrik/work/source/garfield/Include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
