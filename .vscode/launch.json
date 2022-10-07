@@ -5,7 +5,7 @@
       "name": "(gdb) Launch",
       "type": "cppdbg",
       "request": "launch",
-      "program": "/home/vavrik/work/root_install/bin/root.exe",
+      "program": "/home/vavrik/work/source/root/root_install/bin/root.exe",
       "args": [
         "-l",
         "-q",

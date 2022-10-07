@@ -1,16 +1,20 @@
 {
 	"folders": [
     {
+      "name": "X17",
       "path": ".."
     },
     {
-      "path": "../../root_install/include"
+      "name": "include",
+      "path": "../../source/root/root_install/include"
     },
     {
-      "path": "../../garfield/Include"
+      "name": "Garfield",
+      "path": "../../source/garfield/Include/Garfield"
     },
     {
-      "path": "../../garfield/Source"
+      "name": "Source",
+      "path": "../../source/garfield/Source"
     }
   ],
   "settings": {
@@ -21,8 +25,8 @@
     },
     "C_Cpp.default.includePath": [
       "${default}",
-      "/home/vavrik/work/root_install/include",
-      "/home/vavrik/work/garfield/Include"
+      "/home/vavrik/work/source/root/root_install/include",
+      "/home/vavrik/work/source/garfield/Include"
     ]
   },
   "extensions": {
