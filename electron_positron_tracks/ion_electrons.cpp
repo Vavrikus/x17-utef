@@ -28,9 +28,9 @@ using namespace std;
 
 struct Job
 {
-    // most important parameters are jobs id, maximal id in given run
-    // and step in centimeters
-    int id, max_id;
+    // most important parameters are jobs id, maximal id in given run,
+    // step in centimeters and number of iterations per position
+    int id, max_id, iterations;
     double step;
 
     // ranges for simulation
@@ -56,16 +56,20 @@ struct Job
             cerr << "ERROR: Missing arguments in ion_electrons. Correct arguments: max_id, id, step (cm).\n";
         }
 
+        if (argc < 5) iterations = 1;
+        else          iterations = stoi(argv[4]);
+
         // set parameters of program
         max_id = stoi(argv[1]);
         id     = stoi(argv[2]);
         step   = stod(argv[3]);
 
-        if (id <= 0)     cerr << "ERROR: Parameter id has to be positive.\n";
-        if (id > max_id) cerr << "ERROR: Parameter id cannot be bigger than max_id.\n";
-        if (step <= 0.0) cerr << "ERROR: Parameter step has to be positive.\n";
+        if (id <= 0)         cerr << "ERROR: Parameter id has to be positive.\n";
+        if (id > max_id)     cerr << "ERROR: Parameter id cannot be bigger than max_id.\n";
+        if (step <= 0.0)     cerr << "ERROR: Parameter step has to be positive.\n";
+        if (iterations <= 0) cerr << "ERROR: Parameter iterations has to be positive.\n";
 
-        cout << "Running with parameters:\n" << "max_id: " << max_id << ", id: " << id << ", step (cm): " << step << "\n";
+        cout << "Running with parameters:\n" << "max_id: " << max_id << ", id: " << id << ", step (cm): " << step << ", iterations: " << iterations << ".\n";
     }
 
     void SetElectronBounds()
@@ -74,12 +78,12 @@ struct Job
         n_el = ny*nxz;
         ysum = (ymax-ymin)*nxz*ny-nxz*step*ny*(ny-1)/2;
 
-        cout << "Expecting " << n_el << " electrons across all simulations, total propagation distance " << ysum << ".\n";
+        cout << "Expecting " << n_el << " electrons across all simulations, total propagation distance (per iteration) " << ysum << ".\n";
 
         min_el = f_Noptimal(id-1)+1;
         max_el = f_Noptimal(id);
 
-        cout << "Simulating electrons from " << min_el << " to " << max_el << ", total propagation " << f_Ysum(max_el)-f_Ysum(min_el-1) << ".\n";
+        cout << "Simulating electrons from " << min_el << " to " << max_el << ", total propagation (per iteration) " << f_Ysum(max_el)-f_Ysum(min_el-1) << ".\n";
     }
 
 private:
@@ -211,10 +215,13 @@ int main(int argc, char* argv[])
                     //if this electron is supposed to be simulated by job with this id
                     if (!((i < job.min_el)&&(i > job.max_el)))
                     {
-                        int status;
-                        aval.AvalancheElectron(x, y, z, 0, 0.1, 0, 0, 0);
-                        aval.GetElectronEndpoint(0,x0,y0,z0,t0,e0,x1,y1,z1,t1,e1,status);
-                        electrons.Fill();
+                        for (int i = 0; i < job.iterations; i++)
+                        {                        
+                            int status;
+                            aval.AvalancheElectron(x, y, z, 0, 0.1, 0, 0, 0);
+                            aval.GetElectronEndpoint(0,x0,y0,z0,t0,e0,x1,y1,z1,t1,e1,status);
+                            electrons.Fill();
+                        }
                     }
                 }
             }

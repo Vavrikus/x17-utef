@@ -9,6 +9,7 @@ cd $(dirname $0) #Makes sure you are in the directory of this script.
 [ -z $PAR1 ] && echo "Parameter 1 (max_id) is missing." && exit 5
 [ -z $PAR2 ] && echo "Parameter 2 (id) is missing." && exit 5
 [ -z $PAR3 ] && echo "Parameter 3 (step (cm)) is missing." && exit 5
+[ -z $PAR4 ] && echo "Parameter 4 (iterations) is missing." && exit 5
 
 # define a DATADIR variable: directory where the input files are taken from and where output will be copied to
 DATADIR=/storage/projects/utefx17/martin/electron_positron_tracks/data # substitute username and path to to your real username and path
@@ -37,7 +38,7 @@ cd $SCRATCHDIR
 
 # run Gaussian 03 with h2o.com as input and save the results into h2o.out file
 # if the calculation ends with an error, issue error message an exit
-./ion_electrons $PAR1 $PAR2 $PAR3 >ion$PAR2.out || { echo >&2 "Calculation ended up erroneously (with a code $?) !!"; exit 3; }
+./ion_electrons $PAR1 $PAR2 $PAR3 $PAR4 >ion$PAR2.out || { echo >&2 "Calculation ended up erroneously (with a code $?) !!"; exit 3; }
 
 # move the output to user's DATADIR or exit in case of failure
 (cp ion$PAR2.out $DATADIR/ && cp ion$PAR2.root $DATADIR/) || { echo >&2 "Result file(s) copying failed (with a code $?) !!"; exit 4; }
