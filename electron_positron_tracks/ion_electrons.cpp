@@ -201,7 +201,7 @@ int main(int argc, char* argv[])
     aval.EnableExcitationMarkers();
     aval.EnableIonisationMarkers();
 
-    int i = 0;
+    int i_el = 0; // index of electron
     for (double y = job.ymin; y <= job.ymax; y+=job.step)
     {
         for (double x = job.xmin; x <= job.xmax; x+=job.step)
@@ -211,16 +211,19 @@ int main(int argc, char* argv[])
                 //only inside 1 sector
                 if((x-sqrt(3)*z<=0)&&(x+sqrt(3)*z>0))
                 {
-                    i++;
+                    i_el++;
+
                     //if this electron is supposed to be simulated by job with this id
-                    if (!((i < job.min_el)&&(i > job.max_el)))
+                    if (!((i_el < job.min_el)||(i_el > job.max_el)))
                     {
-                        for (int i = 0; i < job.iterations; i++)
+                        for (int j = 0; j < job.iterations; j++)
                         {                        
                             int status;
                             aval.AvalancheElectron(x, y, z, 0, 0.1, 0, 0, 0);
                             aval.GetElectronEndpoint(0,x0,y0,z0,t0,e0,x1,y1,z1,t1,e1,status);
                             electrons.Fill();
+
+                            //cout << "x: " << x << " y: " << y << " z: " << z << " i_el: " << i_el << "\n";
                         }
                     }
                 }
