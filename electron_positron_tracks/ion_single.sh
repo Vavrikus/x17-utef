@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N ionElectronTracks
-#PBS -l select=1:ncpus=1:mem=4gb:scratch_local=500mb
-#PBS -l walltime=1:00:00 
+#PBS -l select=1:ncpus=1:mem=8gb:scratch_local=500mb
+#PBS -l walltime=12:00:00 
 #(((PBS -m ae)))
 # The 4 lines above are options for scheduling system: job will run 1 hour at maximum, 1 machine with 4 processors + 4gb RAM memory + 10gb scratch memory are requested, email notification will be sent when the job aborts (a) or ends (e)
 cd $(dirname $0) #Makes sure you are in the directory of this script.

@@ -151,3 +151,129 @@ struct VectorField
         return (1-dz)*c0+dz*c1;
     }
 };
+
+
+struct SensorData
+{
+    double x1,y1,z1,t1;
+
+    void operator+=(const SensorData& s)
+    {
+        this->x1 += s.x1;
+        this->y1 += s.y1;
+        this->z1 += s.z1;
+        this->t1 += s.t1;
+    }   
+};
+
+SensorData operator+(const SensorData& s1,const SensorData& s2)
+{
+    return SensorData{s1.x1+s2.x1,s1.y1+s2.y1,s1.z1+s2.z1,s1.t1+s2.t1};
+}
+
+SensorData operator-(const SensorData& s1,const SensorData& s2)
+{
+    return SensorData{s1.x1-s2.x1,s1.y1-s2.y1,s1.z1-s2.z1,s1.t1-s2.t1};
+}
+
+SensorData operator*(const double& d,const SensorData& s)
+{
+    return SensorData{d*s.x1,d*s.y1,d*s.z1,d*s.t1};
+}
+
+template<typename T>
+struct Field
+{
+    double xmin,ymin,zmin,xmax,ymax,zmax;
+    double step;
+    T def;
+
+    int ximax,yimax,zimax;
+    vector<vector<vector<T>>> field;
+
+    void SetDefault(T def) {this->def = def;}
+    void InitField(double xmin,double xmax,double ymin, double ymax, double zmin, double zmax, double step)
+    {
+        this->xmin = xmin;
+        this->xmax = xmax;
+        this->ymin = ymin;
+        this->ymax = ymax;
+        this->zmin = zmin;
+        this->zmax = zmax;
+        this->step = step;
+
+        for (int i = 0; i <= round((xmax-xmin)/step); i++)
+        {
+            vector<vector<T>> v1;
+            for (int j = 0; j <= round((ymax-ymin)/step); j++)
+            {
+                vector<T> v2;
+                for (int k = 0; k <= round((zmax-zmin)/step); k++)
+                {
+                    v2.push_back(def);
+                }
+                v1.push_back(v2);
+            }
+            field.push_back(v1);
+        }
+
+        this->GetPointIndexes(xmax,ymax,zmax,ximax,yimax,zimax);
+    }
+    
+    void GetPointIndexes(double x, double y, double z, int& xi, int& yi, int& zi)
+    {
+        if(x<xmin||x>xmax||y<ymin||y>ymax||z<zmin||z>zmax)
+            cerr << "Cannot read field out of bounds.\n";
+        
+        xi = round((x-xmin)/step);
+        yi = round((y-ymin)/step);
+        zi = round((z-zmin)/step);
+    }
+
+    T* GetPoint(double x, double y, double z)
+    {
+        int xi,yi,zi;
+        this->GetPointIndexes(x,y,z,xi,yi,zi);
+
+        return &(field[xi][yi][zi]);
+    }
+
+    void SetPoint(double x, double y, double z, T new_value)
+    {
+        *(this->GetPoint(x,y,z)) = new_value;
+    }
+
+    T GetField(double x, double y, double z)
+    {
+        int xi,yi,zi;
+        this->GetPointIndexes(x,y,z,xi,yi,zi);
+        
+        int xi2,yi2,zi2;
+        if(x-(xmin+step*xi)<0) xi2 = xi-1; else xi2 = xi + 1; if(xi2>ximax) xi2=xi;
+        if(y-(ymin+step*yi)<0) yi2 = yi-1; else yi2 = yi + 1; if(yi2>yimax) yi2=yi;
+        if(z-(zmin+step*zi)<0) zi2 = zi-1; else zi2 = zi + 1; if(zi2>zimax) zi2=zi;
+
+        double dx = abs((x-(xmin+step*xi))/step);
+        double dy = abs((y-(ymin+step*yi))/step);
+        double dz = abs((z-(zmin+step*zi))/step);
+
+        T& c000 = field[xi][yi][zi];
+        T& c001 = field[xi][yi][zi2];
+        T& c010 = field[xi][yi2][zi];
+        T& c011 = field[xi][yi2][zi2];
+        T& c100 = field[xi2][yi][zi];
+        T& c101 = field[xi2][yi][zi2];
+        T& c110 = field[xi2][yi2][zi];
+        T& c111 = field[xi2][yi2][zi2];
+
+        T c00 = (1-dx)*c000+dx*c100;
+        T c01 = (1-dx)*c001+dx*c101;
+        T c10 = (1-dx)*c010+dx*c110;
+        T c11 = (1-dx)*c011+dx*c111;
+
+        T c0 = (1-dy)*c00+dy*c10;
+        T c1 = (1-dy)*c01+dy*c11;
+
+        return (1-dz)*c0+dz*c1;
+    }
+};
