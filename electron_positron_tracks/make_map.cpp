@@ -75,7 +75,7 @@ int make_map()
         {
             x1_avg /= same_prev; y1_avg /= same_prev; z1_avg /= same_prev;
             if(i != 0) 
-                map.SetPoint(x0_prev,y0_prev,z0_prev,{x1,y1,z1,t1});
+                map.SetPoint(x0_prev,y0_prev,z0_prev,{x1_avg,y1_avg,z1_avg,t1});
             // cout << "same_prev: " << same_prev << " x0_prev: " << x0_prev << " y0_prev: " << y0_prev  << " z0_prev: " << z0_prev << "\n";
             // cout << "x1_avg: " << x1_avg << " y1_avg: " << y1_avg  << " z1_avg: " << z1_avg << " t1_avg: " << t1_avg << "\n";
 
