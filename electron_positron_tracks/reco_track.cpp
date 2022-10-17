@@ -109,11 +109,84 @@ void RecoEnergy(TF1* fit, VectorField* magfield, TGraph* magnetic, double min, d
     cout << sqrt(betasq) << "\n";
 }
 
+// estimates difference between two points with given values in map
+double Offset(SensorData s, double x1, double z1, double t1)
+{
+    constexpr double tfact = 0.00327; // time is measured at different scale, it needs weight
+    return sqrt(pow(x1-s.x1,2)+pow(z1-s.z1,2)+pow(tfact*(t1-s.t1),2));
+}
+
+SensorData RecoPoint(Field<SensorData>* map, double x1, double z1, double t1, double max_err)
+{
+    // start looking at the same position
+    double x = x1;
+    double y = (map->ymax+map->ymin)/2;
+    double z = z1;
+    double step = map->step/10;
+
+    double offset;      // metric of distance between points
+    int iterations = 0; // number of iterations should not exceed 100
+    double damp = 0.1;  // damping coefficient
+
+    // loop for offset minimization
+    do
+    {
+        // calculate offset gradient
+        SensorData xa = map->GetField(x+step,y,z);
+        SensorData xb = map->GetField(x-step,y,z);
+        SensorData ya = map->GetField(x,y+step,z);
+        SensorData yb = map->GetField(x,y-step,z);
+        SensorData za = map->GetField(x,y,z+step);
+        SensorData zb = map->GetField(x,y,z-step);
+
+        double oxa = Offset(xa,x1,z1,t1);
+        double oxb = Offset(xb,x1,z1,t1);
+        double oya = Offset(ya,x1,z1,t1);
+        double oyb = Offset(yb,x1,z1,t1);
+        double oza = Offset(za,x1,z1,t1);
+        double ozb = Offset(zb,x1,z1,t1);
+
+        double gradx = (oxa-oxb)/(2*step);
+        double grady = (oya-oyb)/(2*step);
+        double gradz = (oza-ozb)/(2*step);
+
+        //adjust current guess by minus gradient
+        x -= damp*gradx; y -= damp*grady; z -= damp*gradz;
+
+        //check bounds
+        if (x < map->xmin) x = map->xmin;
+        if (x > map->xmax) x = map->xmax;
+        if (y < map->ymin) y = map->ymin;
+        if (y > map->ymax) y = map->ymax;
+        if (z < map->zmin) z = map->zmin;
+        if (z > map->zmax) z = map->zmax;
+        //cout << "gradx: " << x << " grady: " << y << " gradz: " << z << "\n";
+
+        // calculate values at current position
+        SensorData cur = map->GetField(x,y,z);
+        offset = Offset(cur,x1,z1,t1);
+
+        //make sure step isn't too high
+        if(offset < 10*step) step /= 10;
+
+        iterations++;
+        // cout << "iter: " << iterations << "\n";        
+        if (iterations == 1000) cout << "1000 iterations.\n";
+    }
+    while ((offset > max_err) && (iterations < 1000));
+
+    return {x,y,z,0};
+}
+
 int reco_track()
 {
     //file with Garfield simulation output
     TFile* inFile = new TFile("build/electrons.root");
     TTree* electrons = (TTree*)inFile->Get("electrons");
+
+    //file with ionization electrons map
+    TFile* inFile2 = new TFile("map.root");
+    Field<SensorData>* map = (Field<SensorData>*)inFile2->Get("map");
 
     //plotting drift time vs distance to readout + linear fit
     TCanvas* c_drift = new TCanvas("c_drift","Drift time");
@@ -143,17 +216,21 @@ int reco_track()
     electrons->SetBranchAddress("z1",&z1);
     electrons->SetBranchAddress("t1",&t1);
 
-    //zy (track) plot from original track and reconstructed from drif time
+    //zy (track) plot from original track and reconstructed from drift time
     TGraph* zy = new TGraph();
     TGraph* zy_reco = new TGraph();
 
     for (int i = 0; i < electrons->GetEntries(); ++i)
     {
+        cout << "i: " << i << " out of " << electrons->GetEntries() << "\n";
+        //if ((10000*i)%electrons->GetEntries() == 0) cout << 100*i/electrons->GetEntries() << " \%\n";
         electrons->GetEntry(i);
         if (y1 > 7.0) 
         {
             zy->AddPoint(z0,8-y0);
-            zy_reco->AddPoint(z1,b0+b1*t1);
+            SensorData reco = RecoPoint(map,x1,z1,t1,0.001);
+            zy_reco->AddPoint(reco.z1,8-reco.y1);
+            //zy_reco->AddPoint(z1,b0+b1*t1);
         }
     }
 
@@ -193,16 +270,16 @@ int reco_track()
     RecoEnergy(circle_fit,magfield,magnetic_x,min,max,step);
     RecoEnergy(circle_fit2,magfield,magnetic_x2,min,max,step);
     
-    TCanvas* c_magnetic = new TCanvas("c_magnetic","Perpendicular magnetic field");
-    magnetic_x->SetTitle("Perpendicular magnetic field;z [cm]; B [T]");
-    magnetic_x->SetMarkerStyle(2);
-    magnetic_x->SetMarkerSize(0.4);
-    magnetic_x->SetMarkerColor(2);
-    magnetic_x->Draw("ap");
+    // TCanvas* c_magnetic = new TCanvas("c_magnetic","Perpendicular magnetic field");
+    // magnetic_x->SetTitle("Perpendicular magnetic field;z [cm]; B [T]");
+    // magnetic_x->SetMarkerStyle(2);
+    // magnetic_x->SetMarkerSize(0.4);
+    // magnetic_x->SetMarkerColor(2);
+    // magnetic_x->Draw("ap");
 
-    magnetic_x2->SetMarkerStyle(2);
-    magnetic_x2->SetMarkerSize(0.4);
-    magnetic_x2->Draw("p same");
+    // magnetic_x2->SetMarkerStyle(2);
+    // magnetic_x2->SetMarkerSize(0.4);
+    // magnetic_x2->Draw("p same");
 
     return 0;
 }
