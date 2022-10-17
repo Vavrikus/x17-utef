@@ -224,6 +224,13 @@ struct Field
     {
         if(x<xmin||x>xmax||y<ymin||y>ymax||z<zmin||z>zmax)
             cerr << "Cannot read field out of bounds.\n";
+
+        if (x < xmin) xi = 0;
+        else if (x > xmax) xi = ximax;
+        if (y < ymin) yi = 0;
+        else if (y > ymax) yi = yimax;
+        if (z < zmin) zi = 0;
+        else if (z > zmax) zi = zimax;        
         
         xi = round((x-xmin)/step);
         yi = round((y-ymin)/step);
