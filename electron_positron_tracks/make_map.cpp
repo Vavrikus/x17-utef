@@ -4,10 +4,15 @@
 // C++ dependencies
 #include <iostream>
 #include <string>
+#include <vector>
 
 // ROOT dependencies
+#include "TCanvas.h"
 #include "TChain.h"
 #include "TFile.h"
+#include "TGraph.h"
+#include "TH2F.h"
+#include "TStyle.h"
 
 using namespace std;
 
@@ -90,7 +95,77 @@ int make_map()
     // output
     TFile* outfile = new TFile("map.root","RECREATE");
     outfile->WriteObject(&map,"map");
-    outfile->Close();
+    // outfile->Close();
+
+    // plotting
+    bool MakePlots = true;
+
+    if(MakePlots)
+    {
+        vector<TH2F*> v_xz_dx;
+        vector<TH2F*> v_xz_dz;
+        vector<TGraph*> v_g_xz;
+
+        TH2F* yz_t1 = new TH2F("h_yz_t1","YZ plane t1;z [cm];y [cm]",map.zimax,map.zmin,map.zmax,map.yimax,map.ymin,map.ymax);
+
+        gStyle->SetOptStat(0);
+
+        double y_xz = 7;
+        double x_yz = 0;
+
+        int y_xzi = round(y_xz-map.ymin)/map.step;
+        int x_yzi = round(x_yz-map.xmin)/map.step;
+        for (int y_xzi = 0; y_xzi <= map.yimax; y_xzi++)
+        {
+            double y = map.ymin + y_xzi*map.step;
+            string h_dx_name = "h_xz_dx_" + to_string(y);
+            string h_dz_name = "h_xz_dz_" + to_string(y);
+            string g_xz_name = "g_xz_" + to_string(y);
+            string h_dx_title = "XZ plane dx (y = " + to_string(y) + ");x [cm];z [cm]";
+            string h_dz_title = "XZ plane dx (y = " + to_string(y) + ");x [cm];z [cm]";
+            string g_xz_title = "Map of electron readout positions, y = " + to_string(y);
+
+            v_xz_dx.push_back(new TH2F(h_dx_name.c_str(),h_dx_title.c_str(),map.ximax,map.xmin,map.xmax,map.zimax,map.zmin,map.zmax));
+            v_xz_dz.push_back(new TH2F(h_dz_name.c_str(),h_dz_title.c_str(),map.ximax,map.xmin,map.xmax,map.zimax,map.zmin,map.zmax));
+            v_g_xz.push_back(new TGraph());
+
+            v_g_xz[y_xzi]->SetName(g_xz_name.c_str());
+            v_g_xz[y_xzi]->SetTitle(g_xz_title.c_str());
+            v_g_xz[y_xzi]->SetMarkerColor(2);
+            v_g_xz[y_xzi]->SetMarkerStyle(6);
+            v_g_xz[y_xzi]->GetXaxis()->SetTitle("x [cm]");
+            v_g_xz[y_xzi]->GetYaxis()->SetTitle("z [cm]");
+
+            for (int zi = 0; zi <= map.zimax; zi++)
+            {
+                double z = map.zmin+zi*map.step;
+
+                for (int xi = 0; xi <= map.ximax; xi++)
+                {
+                    double x = map.xmin+xi*map.step;
+                    
+                    if(map.field[xi][y_xzi][zi].x1 != 0) v_xz_dx[y_xzi]->Fill(x,z,map.field[xi][y_xzi][zi].x1-x);
+                    if(map.field[xi][y_xzi][zi].z1 != 0) v_xz_dz[y_xzi]->Fill(x,z,map.field[xi][y_xzi][zi].z1-z);
+                    if((map.field[xi][y_xzi][zi].x1 != 0) && (map.field[xi][y_xzi][zi].z1 != 0))
+                        v_g_xz[y_xzi]->AddPoint(map.field[xi][y_xzi][zi].x1,map.field[xi][y_xzi][zi].z1);
+                }
+            }
+        }
+
+        for (int zi = 0; zi <= map.zimax; zi++)
+        {
+            double z = map.zmin+zi*map.step;
+            for (int yi = 0; yi <= map.yimax; yi++)
+            {
+                double y = map.ymin+yi*map.step;
+                yz_t1->Fill(z,y,map.field[x_yzi][yi][zi].t1);
+            }
+        }
+        yz_t1->Write();
+        for(TH2F* h : v_xz_dx) h->Write();
+        for(TH2F* h : v_xz_dz) h->Write();
+        for(TGraph* g : v_g_xz) g->Write();
+    }
 
     return 0;
 }
