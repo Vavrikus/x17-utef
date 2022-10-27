@@ -50,6 +50,19 @@ double stdev(vector<double> values, double average)
     return sqrt(sqdev_sum/values.size());
 }
 
+// draws lines around approximate sensitive area
+void DrawTrapezoid()
+{
+    TLine* l1 = new TLine(-7.45,14.61,7.45,14.61);
+    TLine* l2 = new TLine(-2.25,6.51,2.25,6.51);
+    TLine* l3 = new TLine(-7.45,14.61,-2.25,6.51);
+    TLine* l4 = new TLine(7.45,14.61,2.25,6.51);
+    l1->Draw();
+    l2->Draw();
+    l3->Draw();
+    l4->Draw();
+}
+
 int make_map()
 {
     // load data from all files (results of individual jobs)
@@ -137,6 +150,32 @@ int make_map()
         vector<TGraph*> v_g_xz;
         vector<vector<TArrow*>> vv_g_xz_arrows;
 
+        TGraph* g_yz = new TGraph();
+        vector<TArrow*> v_g_yz_arrows;
+        TGraph* g_zt = new TGraph();
+        TGraph* g_yt = new TGraph();
+
+        g_yz->SetName("g_yz");
+        g_yz->SetTitle("Map of electron displacement (x = 0)");
+        g_yz->SetMarkerColor(2);
+        g_yz->SetMarkerStyle(6);
+        g_yz->GetXaxis()->SetTitle("z [cm]");
+        g_yz->GetYaxis()->SetTitle("y [cm]");
+
+        g_zt->SetName("g_zt");
+        g_zt->SetTitle("Map of drift times (x = 0)");
+        g_zt->SetMarkerColor(2);
+        g_zt->SetMarkerStyle(6);
+        g_zt->GetXaxis()->SetTitle("z [cm]");
+        g_zt->GetYaxis()->SetTitle("t [ns]");
+
+        g_yt->SetName("g_yt");
+        g_yt->SetTitle("Original height vs drift time");
+        g_yt->SetMarkerColor(2);
+        g_yt->SetMarkerStyle(6);
+        g_yt->GetXaxis()->SetTitle("y [cm]");
+        g_yt->GetYaxis()->SetTitle("t [ns]");
+
         TH2F* yz_t1 = new TH2F("h_yz_t1","YZ plane t1;z [cm];y [cm]",map.zimax,map.zmin,map.zmax,map.yimax,map.ymin,map.ymax);
 
         gStyle->SetOptStat(0);
@@ -185,6 +224,7 @@ int make_map()
                         TArrow* arrow = new TArrow(x,z,s_curr.x1,s_curr.z1);
                         arrows.push_back(arrow);
                     }
+                    g_yt->AddPoint(y,s_curr.t1);
                 }
             }
 
@@ -197,7 +237,15 @@ int make_map()
             for (int yi = 0; yi <= map.yimax; yi++)
             {
                 double y = map.ymin+yi*map.step;
-                yz_t1->Fill(z,y,map.field[x_yzi][yi][zi].t1);
+
+                SensorData& s_curr = map.field[x_yzi][yi][zi];
+
+                yz_t1->Fill(z,y,s_curr.t1);
+                g_yz->AddPoint(s_curr.z1,y);
+                g_zt->AddPoint(s_curr.z1,s_curr.t1);
+
+                TArrow* arrow = new TArrow(z,y,s_curr.z1,y);
+                v_g_yz_arrows.push_back(arrow);
             }
         }
         yz_t1->Write();
@@ -214,14 +262,8 @@ int make_map()
             v_g_xz[i]->GetXaxis()->SetRangeUser(xmin,xmax);
             v_g_xz[i]->GetYaxis()->SetRangeUser(zmin,zmax);
             v_g_xz[i]->Draw("AP");
-            TLine* l1 = new TLine(-7.45,14.61,7.45,14.61);
-            TLine* l2 = new TLine(-2.25,6.51,2.25,6.51);
-            TLine* l3 = new TLine(-7.45,14.61,-2.25,6.51);
-            TLine* l4 = new TLine(7.45,14.61,2.25,6.51);
-            l1->Draw();
-            l2->Draw();
-            l3->Draw();
-            l4->Draw();
+            DrawTrapezoid();
+
             for(TArrow* arr : vv_g_xz_arrows[i]) 
             {
                 if(arr->GetX2() > xmin && arr->GetX2() < xmax && arr->GetY2() > zmin && arr->GetY2() < zmax)
@@ -232,6 +274,25 @@ int make_map()
             }
         }
         c_g_xz->Write();
+
+        TCanvas* c_g_yz = new TCanvas("c_g_yz","Map of ionization electron displacement");
+        g_yz->Draw("AP");
+        TLine* lleft  = new TLine(6.51,8,6.51,-8);
+        TLine* lright = new TLine(14.61,8,14.61,-8);
+        lleft->Draw();lright->Draw();
+        for(TArrow* arr : v_g_yz_arrows) {arr->SetArrowSize(0.01); arr->Draw();}
+        c_g_yz->Write();
+
+        TCanvas* c_g_zt = new TCanvas("c_g_zt","Map of ionization electron drift times");
+        g_zt->Draw("AP");
+        lleft  = new TLine(6.51,0,6.51,5000);
+        lright = new TLine(14.61,0,14.61,5000);
+        lleft->Draw();lright->Draw();
+        c_g_zt->Write();
+
+        TCanvas* c_g_yt = new TCanvas("c_g_yt","Original height vs drift time");
+        g_yt->Draw("AP");
+        c_g_yt->Write();
         
     }
 
