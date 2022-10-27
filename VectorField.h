@@ -156,6 +156,7 @@ struct VectorField
 struct SensorData
 {
     double x1,y1,z1,t1;
+    double x1dev,y1dev,z1dev,t1dev;
 
     void operator+=(const SensorData& s)
     {
@@ -168,17 +169,17 @@ struct SensorData
 
 SensorData operator+(const SensorData& s1,const SensorData& s2)
 {
-    return SensorData{s1.x1+s2.x1,s1.y1+s2.y1,s1.z1+s2.z1,s1.t1+s2.t1};
+    return SensorData{s1.x1+s2.x1,s1.y1+s2.y1,s1.z1+s2.z1,s1.t1+s2.t1,0,0,0,0};
 }
 
 SensorData operator-(const SensorData& s1,const SensorData& s2)
 {
-    return SensorData{s1.x1-s2.x1,s1.y1-s2.y1,s1.z1-s2.z1,s1.t1-s2.t1};
+    return SensorData{s1.x1-s2.x1,s1.y1-s2.y1,s1.z1-s2.z1,s1.t1-s2.t1,0,0,0,0};
 }
 
 SensorData operator*(const double& d,const SensorData& s)
 {
-    return SensorData{d*s.x1,d*s.y1,d*s.z1,d*s.t1};
+    return SensorData{d*s.x1,d*s.y1,d*s.z1,d*s.t1,0,0,0,0};
 }
 
 template<typename T>
