@@ -12,6 +12,7 @@
 #include "TChain.h"
 #include "TFile.h"
 #include "TGraph.h"
+#include "TGraphErrors.h"
 #include "TH2F.h"
 #include "TStyle.h"
 
@@ -97,7 +98,7 @@ int make_map()
     double x1_avg = 0; double y1_avg = 0; double z1_avg = 0; double t1_avg = 0; // variables for averages
     vector<double> x1_vec,y1_vec,z1_vec,t1_vec;                                 // variables for data from each point
     
-    // calculate averages and standart deviations
+    // calculate averages and standard deviations
     for (int i = 0; i < map_data_in->GetEntries(); i++)
     {
         map_data_in->GetEntry(i);
@@ -147,12 +148,12 @@ int make_map()
     {
         vector<TH2F*> v_xz_dx;
         vector<TH2F*> v_xz_dz;
-        vector<TGraph*> v_g_xz;
+        vector<TGraphErrors*> v_g_xz;
         vector<vector<TArrow*>> vv_g_xz_arrows;
 
-        TGraph* g_yz = new TGraph();
+        TGraphErrors* g_yz = new TGraphErrors();
         vector<TArrow*> v_g_yz_arrows;
-        TGraph* g_zt = new TGraph();
+        TGraphErrors* g_zt = new TGraphErrors();
         TGraph* g_yt = new TGraph();
 
         g_yz->SetName("g_yz");
@@ -197,7 +198,7 @@ int make_map()
 
             v_xz_dx.push_back(new TH2F(h_dx_name.c_str(),h_dx_title.c_str(),map.ximax,map.xmin,map.xmax,map.zimax,map.zmin,map.zmax));
             v_xz_dz.push_back(new TH2F(h_dz_name.c_str(),h_dz_title.c_str(),map.ximax,map.xmin,map.xmax,map.zimax,map.zmin,map.zmax));
-            v_g_xz.push_back(new TGraph());
+            v_g_xz.push_back(new TGraphErrors());
 
             v_g_xz[y_xzi]->SetName(g_xz_name.c_str());
             v_g_xz[y_xzi]->SetTitle(g_xz_title.c_str());
@@ -221,6 +222,7 @@ int make_map()
                     if((s_curr.x1 != 0) && (s_curr.z1 != 0))
                     {
                         v_g_xz[y_xzi]->AddPoint(s_curr.x1,s_curr.z1);
+                        v_g_xz[y_xzi]->SetPointError(v_g_xz[y_xzi]->GetN()-1,s_curr.x1dev,s_curr.z1dev);
                         TArrow* arrow = new TArrow(x,z,s_curr.x1,s_curr.z1);
                         arrows.push_back(arrow);
                     }
@@ -242,7 +244,9 @@ int make_map()
 
                 yz_t1->Fill(z,y,s_curr.t1);
                 g_yz->AddPoint(s_curr.z1,y);
+                g_yz->SetPointError(g_yz->GetN()-1,s_curr.z1dev,0);
                 g_zt->AddPoint(s_curr.z1,s_curr.t1);
+                g_zt->SetPointError(g_zt->GetN()-1,s_curr.z1dev,s_curr.t1dev);
 
                 TArrow* arrow = new TArrow(z,y,s_curr.z1,y);
                 v_g_yz_arrows.push_back(arrow);
@@ -280,7 +284,7 @@ int make_map()
         TLine* lleft  = new TLine(6.51,8,6.51,-8);
         TLine* lright = new TLine(14.61,8,14.61,-8);
         lleft->Draw();lright->Draw();
-        for(TArrow* arr : v_g_yz_arrows) {arr->SetArrowSize(0.01); arr->Draw();}
+        for(TArrow* arr : v_g_yz_arrows) {arr->SetArrowSize(0.004); arr->Draw();}
         c_g_yz->Write();
 
         TCanvas* c_g_zt = new TCanvas("c_g_zt","Map of ionization electron drift times");
