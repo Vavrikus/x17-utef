@@ -150,6 +150,7 @@ int make_map()
         vector<TH2F*> v_xz_dz;
         vector<TGraphErrors*> v_g_xz;
         vector<vector<TArrow*>> vv_g_xz_arrows;
+        vector<TH2F*> v_xz_t1;
 
         TGraphErrors* g_yz = new TGraphErrors();
         vector<TArrow*> v_g_yz_arrows;
@@ -191,13 +192,16 @@ int make_map()
             double y = map.ymin + y_xzi*map.step;
             string h_dx_name = "h_xz_dx_" + to_string(y);
             string h_dz_name = "h_xz_dz_" + to_string(y);
+            string h_t1_name = "h_xz_t1_" + to_string(y);
             string g_xz_name = "g_xz_" + to_string(y);
             string h_dx_title = "XZ plane dx (y = " + to_string(y) + ");x [cm];z [cm]";
             string h_dz_title = "XZ plane dx (y = " + to_string(y) + ");x [cm];z [cm]";
+            string h_t1_title = "XZ plane t1 (y = " + to_string(y) + ");x [cm];z [cm]";
             string g_xz_title = "Map of electron readout positions, y = " + to_string(y);
 
             v_xz_dx.push_back(new TH2F(h_dx_name.c_str(),h_dx_title.c_str(),map.ximax,map.xmin,map.xmax,map.zimax,map.zmin,map.zmax));
             v_xz_dz.push_back(new TH2F(h_dz_name.c_str(),h_dz_title.c_str(),map.ximax,map.xmin,map.xmax,map.zimax,map.zmin,map.zmax));
+            v_xz_t1.push_back(new TH2F(h_t1_name.c_str(),h_t1_title.c_str(),map.ximax,map.xmin,map.xmax,map.zimax,map.zmin,map.zmax));
             v_g_xz.push_back(new TGraphErrors());
 
             v_g_xz[y_xzi]->SetName(g_xz_name.c_str());
@@ -219,6 +223,7 @@ int make_map()
                     SensorData& s_curr = map.field[xi][y_xzi][zi];
                     if(s_curr.x1 != 0) v_xz_dx[y_xzi]->Fill(x,z,s_curr.x1-x);
                     if(s_curr.z1 != 0) v_xz_dz[y_xzi]->Fill(x,z,s_curr.z1-z);
+                    if(s_curr.t1 != 0) v_xz_t1[y_xzi]->Fill(x,z,s_curr.t1);
                     if((s_curr.x1 != 0) && (s_curr.z1 != 0))
                     {
                         v_g_xz[y_xzi]->AddPoint(s_curr.x1,s_curr.z1);
@@ -245,7 +250,7 @@ int make_map()
                 yz_t1->Fill(z,y,s_curr.t1);
                 g_yz->AddPoint(s_curr.z1,y);
                 g_yz->SetPointError(g_yz->GetN()-1,s_curr.z1dev,0);
-                g_zt->AddPoint(s_curr.z1,s_curr.t1);
+                g_zt->AddPoint(z,s_curr.t1);
                 g_zt->SetPointError(g_zt->GetN()-1,s_curr.z1dev,s_curr.t1dev);
 
                 TArrow* arrow = new TArrow(z,y,s_curr.z1,y);
@@ -278,6 +283,21 @@ int make_map()
             }
         }
         c_g_xz->Write();
+
+        TCanvas* c_xz_t1 = new TCanvas("c_xz_t1","Map of drift times");
+        c_xz_t1->Divide(4,4);
+        for (int i = 0; i < v_xz_t1.size()-1; i++)
+        {
+            c_xz_t1->cd(i+1);
+            v_xz_t1[i]->GetXaxis()->SetRangeUser(xmin,xmax);
+            v_xz_t1[i]->GetYaxis()->SetRangeUser(zmin,zmax);
+            v_xz_t1[i]->Draw("colz");
+            double min_percent = 0.8+0.13*(v_xz_t1.size()-1-i)/(v_xz_t1.size()-1); //how high is minimum compared to maximum
+            v_xz_t1[i]->SetMinimum(min_percent*v_xz_t1[i]->GetMaximum());
+            v_xz_t1[i]->SetMaximum(min_percent*v_xz_t1[i]->GetMaximum()+500);
+            DrawTrapezoid();
+        }
+        c_xz_t1->Write();
 
         TCanvas* c_g_yz = new TCanvas("c_g_yz","Map of ionization electron displacement");
         g_yz->Draw("AP");

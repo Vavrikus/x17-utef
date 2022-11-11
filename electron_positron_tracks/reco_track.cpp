@@ -5,6 +5,7 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TLegend.h>
+#include <TLine.h>
 #include <TTree.h>
 
 #include <fstream>
@@ -217,8 +218,12 @@ int reco_track()
     electrons->SetBranchAddress("t1",&t1);
 
     //zy (track) plot from original track and reconstructed from drift time
-    TGraph* zy = new TGraph();
+    TGraph* zy      = new TGraph();
     TGraph* zy_reco = new TGraph();
+
+    //xz (track) plot from original and reconstructed tracks
+    TGraph* xz      = new TGraph();
+    TGraph* xz_reco = new TGraph();
 
     for (int i = 0; i < electrons->GetEntries(); ++i)
     {
@@ -227,15 +232,18 @@ int reco_track()
         electrons->GetEntry(i);
         if (y1 > 7.0) 
         {
-            zy->AddPoint(z0,8-y0);
             SensorData reco = RecoPoint(map,x1,z1,t1,0.001);
+            zy->AddPoint(z0,8-y0);
             zy_reco->AddPoint(reco.z1,8-reco.y1);
             //zy_reco->AddPoint(z1,b0+b1*t1);
+
+            xz->AddPoint(x0,z0);
+            xz_reco->AddPoint(reco.x1,reco.z1);
         }
     }
 
     //setting up track plots (original + reconstructed)
-    TCanvas* c_track = new TCanvas("c_track","Electron track reconstruction");
+    TCanvas* c_track_zy = new TCanvas("c_track_zy","Electron track reconstruction");
     
     zy_reco->SetTitle("Electron track reconstruction;z [cm]; distance to readout [cm]");
     zy_reco->SetMarkerStyle(2);
@@ -247,10 +255,36 @@ int reco_track()
     zy->SetMarkerSize(1.2);
     zy->Draw("p same");
 
-    TLegend* leg = new TLegend(0.129,0.786,0.360,0.887);
-    leg->AddEntry(zy,"original");
-    leg->AddEntry(zy_reco,"reconstructed");
-    leg->Draw("same");
+    TLegend* leg_zy = new TLegend(0.129,0.786,0.360,0.887);
+    leg_zy->AddEntry(zy,"original");
+    leg_zy->AddEntry(zy_reco,"reconstructed");
+    leg_zy->Draw("same");
+
+    TCanvas* c_track_xz = new TCanvas("c_track_xz","Electron track reconstruction");
+    
+    xz_reco->SetTitle("Electron track reconstruction;x [cm]; z [cm]");
+    xz_reco->SetMarkerStyle(2);
+    xz_reco->SetMarkerSize(0.4);
+    xz_reco->Draw("ap");
+
+    xz->SetMarkerColor(2);
+    xz->SetMarkerStyle(7);
+    xz->SetMarkerSize(1.2);
+    xz->Draw("p same");
+
+    TLine* l1 = new TLine(-7.45,14.61,7.45,14.61);
+    TLine* l2 = new TLine(-2.25,6.51,2.25,6.51);
+    TLine* l3 = new TLine(-7.45,14.61,-2.25,6.51);
+    TLine* l4 = new TLine(7.45,14.61,2.25,6.51);
+    l1->Draw();
+    l2->Draw();
+    l3->Draw();
+    l4->Draw();
+
+    TLegend* leg_xz = new TLegend(0.129,0.786,0.360,0.887);
+    leg_xz->AddEntry(xz,"original");
+    leg_xz->AddEntry(xz_reco,"reconstructed");
+    leg_xz->Draw("same");
 
     double min = 0;//7
     double max = 15;//10.5
