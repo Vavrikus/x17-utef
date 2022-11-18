@@ -14,6 +14,7 @@
 
 #include "../NSplines.h"
 #include "../VectorField.h"
+#include "../X17Utilities.h"
 
 TF1* FitCircle(TGraph* graph, const double& min, const double& max)
 {
@@ -296,6 +297,17 @@ int reco_track()
     //loading magnetic field from txt file (units = meters)
     VectorField* magfield = new VectorField(-0.3,0.3,-0.3,0.3,-0.2,0.2,0.005);
     magfield->LoadField("/home/vavrik/work/X17/electron_positron_tracks/build/VecB.txt");
+    
+    double minfield,maxfield,minangle,maxangle;
+    X17::GetMinMaxField(*magfield,minfield,maxfield);
+    X17::GetMinMaxFieldAngle(*magfield,minangle,maxangle);
+    cout << "At least 0.0 cm from TPC walls: minimal magnetic field: " << minfield << " maximal: " << maxfield << " minimal angle to electric field: " << minangle << " maximal: " << maxangle << "\n";
+    X17::GetMinMaxField(*magfield,minfield,maxfield,0.5);
+    X17::GetMinMaxFieldAngle(*magfield,minangle,maxangle,0.5);
+    cout << "At least 0.5 cm from TPC walls: Minimal magnetic field: " << minfield << " maximal: " << maxfield << " minimal angle to electric field: " << minangle << " maximal: " << maxangle << "\n";
+    X17::GetMinMaxField(*magfield,minfield,maxfield,1);
+    X17::GetMinMaxFieldAngle(*magfield,minangle,maxangle,1);
+    cout << "At least 1.0 cm from TPC walls: Minimal magnetic field: " << minfield << " maximal: " << maxfield << " minimal angle to electric field: " << minangle << " maximal: " << maxangle << "\n";
     
     TGraph* magnetic_x  = new TGraph();
     TGraph* magnetic_x2 = new TGraph();

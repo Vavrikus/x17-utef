@@ -22,7 +22,8 @@
       "iostream": "cpp",
       "bfield.C": "cpp",
       "electron_positron_tracks/reco_track.cpp": "cpp",
-      "cmath": "cpp"
+      "cmath": "cpp",
+      "charges.C": "cpp"
     },
     "C_Cpp.default.includePath": [
       "${default}",

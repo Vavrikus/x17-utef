@@ -17,6 +17,13 @@ struct Vector
         this->vy += v.vy;
         this->vz += v.vz;
     }
+
+    double SqMagnitude() const {return vx*vx+vy*vy+vz*vz;}
+    double Magnitude() const {return sqrt(this->SqMagnitude());}
+    double Angle(const Vector& other) const
+    {
+        return acos((vx*other.vx+vy*other.vy+vz*other.vz)/(this->Magnitude()*other.Magnitude()));
+    }
 };
 
 Vector operator+(const Vector& v1,const Vector& v2)
