@@ -8,16 +8,18 @@
 #include <TGraph2D.h>
 #include <TTree.h>
 
-#include "Garfield/ViewField.hh"
-#include "Garfield/ViewDrift.hh"
-#include "Garfield/ViewSignal.hh"
-#include "Garfield/MediumMagboltz.hh"
+#include "Garfield/AvalancheMC.hh"
+#include "Garfield/AvalancheMicroscopic.hh"
 #include "Garfield/ComponentAnalyticField.hh"
+#include "Garfield/ComponentGrid.hh"
+#include "Garfield/DriftLineRKF.hh"
+#include "Garfield/MediumMagboltz.hh"
+#include "Garfield/Plotting.hh"
 #include "Garfield/Sensor.hh"
 #include "Garfield/TrackHeed.hh"
-#include "Garfield/AvalancheMicroscopic.hh"
-#include "Garfield/Plotting.hh"
-#include "Garfield/ComponentGrid.hh"
+#include "Garfield/ViewDrift.hh"
+#include "Garfield/ViewField.hh"
+#include "Garfield/ViewSignal.hh"
 
 using namespace Garfield;
 using namespace std;
@@ -28,7 +30,8 @@ int main(int argc, char * argv[]){
 
   // Set the gas mixture.
   MediumMagboltz gas;
-  gas.SetComposition("ar", 90., "co2", 10.);
+  // gas.SetComposition("ar", 70., "co2", 30.);
+  gas.LoadGasFile("Ar_70_CO2_30_M2A3_noTM.gas");
 
   // ofstream myfile;
   // myfile.open ("electrons.txt"); //name of the file to save data
@@ -72,6 +75,16 @@ int main(int argc, char * argv[]){
   // Switch on signal calculation. 
   aval.EnableSignalCalculation(); 
   aval.EnableMagneticField();
+
+
+  // Simulate electron/hole drift lines using MC integration.
+  AvalancheMC drift;
+  drift.SetSensor(&sensor);
+  // Use steps of 1 micron.
+  // drift.SetDistanceSteps(1.e-4);
+  drift.EnableSignalCalculation();
+  // drift.EnableVelocityMap(false);
+  // drift.EnableDebugging();
   
   //~ // Simulate an ionizing particle (negative pion) using Heed.
   TrackHeed track;
@@ -88,6 +101,7 @@ int main(int argc, char * argv[]){
   ViewDrift driftView;
   track.EnablePlotting(&driftView);
   aval.EnablePlotting(&driftView);
+  drift.EnablePlotting(&driftView);
   aval.EnableExcitationMarkers(false);
   aval.EnableIonisationMarkers(false);
   //~ // Get the default parameters.
@@ -126,11 +140,18 @@ int main(int argc, char * argv[]){
       double xe, ye, ze, te, ee, dxe, dye, dze;
       track.GetElectron(j, xe, ye, ze, te, ee, dxe, dye, dze);
       // Simulate the drift/avalanche of this electron.
-      aval.AvalancheElectron(xe, ye, ze, te, 0.1, dxe, dye, dze);
-      // Move electrons that hit the mesh plane into the amplification gap.
+      // aval.AvalancheElectron(xe, ye, ze, te, 0.1, dxe, dye, dze);
+      // // Move electrons that hit the mesh plane into the amplification gap.
       int status;
-      aval.GetElectronEndpoint(0, x0, y0, z0, t0, e0, 
-                                  x1, y1, z1, t1, e1, status);
+      // aval.GetElectronEndpoint(0, x0, y0, z0, t0, e0, 
+      //                             x1, y1, z1, t1, e1, status);
+
+      // drift.AddElectron(xe,ye,ze,te);
+      // drift.AvalancheElectron(xe,ye,ze,te);
+      x0 = xe; y0 = ye; z0 = ze; t0 = te; e0 = ee;
+      drift.DriftElectron(xe,ye,ze,te);
+      drift.GetElectronEndpoint(0,x0,y0,z0,t0,x1,y1,z1,t1,status);
+      // drift.GetEndPoint(x1,y1,z1,t1,status); e1 = 0;
       electrons.Fill();
       k++;
     }

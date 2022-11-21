@@ -24,11 +24,11 @@ namespace X17
     /// @param x x coordinate [cm]
     /// @param y y coordinate [cm]
     /// @param z z coordinate [cm]
-    /// @param dist specifies minimal distance from within the TPC walls (makes volume smaller)
+    /// @param dist specifies minimal distance from within the TPC walls except the bottom anode wall (makes volume smaller)
     /// @return 
     bool IsInSector(const double& x, const double& y, const double& z, const double& dist = 0)
     {
-        if (y < X17::ymin+dist || y > X17::ymax-dist) return false;
+        if (y < X17::ymin      || y > X17::ymax-dist) return false;
         if (x < X17::xmin+dist || x > X17::xmax-dist) return false;
         double dz = dist/std::sqrt(1+1/zxslope); // change of allowed z (absolute value) for slanted surface
         if (std::abs(z)+dz > X17::zxslope*x+X17::zintersect) return false;
