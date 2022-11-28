@@ -123,6 +123,17 @@ namespace X17
         out_max = max_angle;
     }
 
+    /// @brief Triangle number
+    /// @param n Side of triangle
+    /// @return n-th triangle number
+    int triangle(int n) {return n*(n+1)/2;}
+
+    /// @brief Triangle with base as the first row
+    /// @param columns The total number of columns in the triangle
+    /// @param index The index of element
+    /// @return The number of row of element with given index 
+    int triangle_row(int columns,int index){return ceil((2*columns+1-sqrt(pow((2*columns+1),2)-8*index))/2);}
+
     /// @brief Returns coordinates of top right and bottom left corners of ith pad
     /// @param i Number of pad (channel) between 1 and 128
     /// @param out_xlow Coordinate x of bottom left corner
@@ -135,22 +146,28 @@ namespace X17
         
         int column; // Column number of given pad (0 corresponds to 12)
         int row;    // Row (diagonal) number of given pad
+        
+        int triangle_row1   = 7;  // first row with smaller number of columns
+        int triangle_row2   = 10; // first row breaking the first triangle
+        int part1_channels  = (triangle_row1-1)*columns;
+        int part12_channels = part1_channels+triangle(columns-1)-triangle(columns-1-triangle_row2+triangle_row1);
 
         // Part with same length rows (first six rows)
-        if (i < 73)  {row = (i-1)/columns+1; column = i%columns;}
+        if (i <= part1_channels)  {row = (i-1)/columns+1; column = i%columns;}
 
         // First triangular part (rows 7-9)
-        else if (i < 103)
+        else if (i <= part12_channels)
         {
-            row = 6+ceil((2*(columns-1)+1-sqrt(pow((2*(columns-1)+1),2)-8*(i-72)))/2); // Maximal number in row r is diference of c-th and (c-r)th triangulae number
-            column = (i-72) - (pow(11,2)+11)/2 + (pow(11+7-row,2)+11+7-row)/2; // Column number is the offset of channel from difference of c-th and r-th Tn
+            row = triangle_row1-1+triangle_row(columns-1,i-part1_channels); // Maximal number in row r is diference of c-th and (c-r)th triangulae number
+            column = (i-part1_channels) - triangle(columns-1) + triangle(columns-1+triangle_row1-row); // Column number is the offset of channel from difference of c-th and r-th Tn
         }
 
         // Second triangular part (rows 10-15, missing number in last row does not matter)
         else
         {
-            row = 9+ceil((2*(columns-5)+1-sqrt(pow((2*(columns-5)+1),2)-8*(i-102)))/2);
-            column = (i-102) - (pow(7,2)+7)/2 + (pow(7+10-row,2)+7+10-row)/2;
+            int max_cols_p3 = columns-2-triangle_row2+triangle_row1;
+            row = triangle_row2-1+triangle_row(max_cols_p3,i-part12_channels);
+            column = (i-part12_channels) - triangle(columns-2-triangle_row2+triangle_row1) + triangle(max_cols_p3+triangle_row2-row);
         }
 
         if (column == 0) column = 12; // Number 0 corresponds to 12th column
@@ -161,8 +178,6 @@ namespace X17
         if (i == 102) i_pad_height = pad_height2;
         if (i == 124) i_pad_height = pad_height2;
         if (i == 127) i_pad_height = pad_height3;
-        
-        cout << "i: " << i << " row: " << row << " column: " << column << endl;
 
         out_xhigh = xmax - (column-1)*(pad_width+pad_offset);
         out_zhigh = zhigh - (row-1)*(pad_height+pad_offset)-(column-1)*pad_stag;
