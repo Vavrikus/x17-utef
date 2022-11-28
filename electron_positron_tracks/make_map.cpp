@@ -1,5 +1,6 @@
 // my dependencies
 #include "../VectorField.h"
+#include "../X17Utilities.h"
 
 // C++ dependencies
 #include <iostream>
@@ -54,10 +55,10 @@ double stdev(vector<double> values, double average)
 // draws lines around approximate sensitive area
 void DrawTrapezoid()
 {
-    TLine* l1 = new TLine(-7.45,14.61,7.45,14.61);
-    TLine* l2 = new TLine(-2.25,6.51,2.25,6.51);
-    TLine* l3 = new TLine(-7.45,14.61,-2.25,6.51);
-    TLine* l4 = new TLine(7.45,14.61,2.25,6.51);
+    TLine* l1 = new TLine(-X17::zhigh,X17::xmax, X17::zhigh,X17::xmax);
+    TLine* l2 = new TLine(-X17::zlow ,X17::xmin, X17::zlow ,X17::xmin);
+    TLine* l3 = new TLine(-X17::zhigh,X17::xmax,-X17::zlow ,X17::xmin);
+    TLine* l4 = new TLine( X17::zhigh,X17::xmax, X17::zlow ,X17::xmin);
     l1->Draw();
     l2->Draw();
     l3->Draw();

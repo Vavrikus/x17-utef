@@ -1,4 +1,10 @@
 #include <cmath>
+#include <iostream>
+#include <string.h>
+
+#include "TCanvas.h"
+#include "TLine.h"
+#include "TText.h"
 
 #include "VectorField.h"
 
@@ -6,19 +12,32 @@
 namespace X17
 {
     // TPC first sector (contains positive x axis) boundaries
-    constexpr double ymin  = -8;    // TPC minimal height [cm]
-    constexpr double ymax  =  8;    // TPC maximal height [cm]
-    constexpr double xmin  = 6.51;  // TPC minimal x [cm]
-    constexpr double xmax  = 14.61; // TPC maximal x [cm]
-    constexpr double zlow  = 2.25;  // TPC z of positive corner closer to center [cm]
-    constexpr double zhigh = 7.45;  // TPC z of positive corner further from center [cm]
+        constexpr double ymin  = -8;    // TPC minimal height [cm]
+        constexpr double ymax  =  8;    // TPC maximal height [cm]
+        constexpr double xmin  = 6.51;  // TPC minimal x [cm]
+        constexpr double xmax  = 14.61; // TPC maximal x [cm]
+        constexpr double zlow  = 2.25;  // TPC z of positive corner closer to center [cm]
+        constexpr double zhigh = 7.45;  // TPC z of positive corner further from center [cm]
 
     // TPC first sector derived parameters
-    constexpr double zxslope    = (zhigh-zlow)/(xmax-xmin); // TPC Δz/Δx slanted side (z positive)
-    constexpr double zintersect = zlow-zxslope*xmin;        // TPC slanted side (z positive) z-axis intersection (extrapolated) [cm]
+        constexpr double zxslope    = (zhigh-zlow)/(xmax-xmin); // TPC Δz/Δx slanted side (z positive)
+        constexpr double zintersect = zlow-zxslope*xmin;        // TPC slanted side (z positive) z-axis intersection (extrapolated) [cm]
 
     // TPC assumed electric field [V/cm]
-    constexpr Vector efield = {0,-400,0};
+        constexpr Vector efield = {0,-400,0};
+
+    // TPC readout pads (counting rows and columns from top right corner)
+        constexpr double pad_width   =  0.6;   // Pad width (horizontal) [cm]
+        constexpr double pad_height  =  0.9;   // Pad height (vertical)  [cm]
+        constexpr double pad_height2 =  0.6;   // Pad height [cm] last pad in 4th and 9th column (9th and 13th diagonal row)
+        constexpr double pad_height3 = 0.509;  // Pad height [cm] last pad in 3rd column (14th diagonal row)
+        constexpr double pad1_offset = -0.1;   // Vertical offset [cm] of corner of first pad from top right corner of trapezoid
+        constexpr double pad_offset  = 0.08;   // Shortest distance between neighboring pads [cm]
+        constexpr double pad_stag    = 0.3946; // Vertical offset [cm] of topmost pads of neighboring columns
+
+        constexpr int rows     = 15;  // Number of pad rows (diagonal)
+        constexpr int columns  = 12;  // Number of pad columns
+        constexpr int channels = 128; // Number of pads (channels)
 
     /// @brief Returns true if given point is in the first sector (containing positive x-axis) of the detector (trapezoidal prism).
     /// @param x x coordinate [cm]
@@ -40,7 +59,7 @@ namespace X17
     /// @param bfield Magnetic field
     /// @param out_min Output for minimal field [T]
     /// @param out_max Output for maximal field [T]
-    /// @param dist specifies minimal distance from within the TPC walls (makes volume smaller)
+    /// @param dist specifies minimal distance from within the TPC walls except the bottom anode wall (makes volume smaller)
     /// @return 
     void GetMinMaxField(const VectorField& bfield, double& out_min, double& out_max, const double& dist = 0)
     {
@@ -74,7 +93,7 @@ namespace X17
     /// @param bfield Magnetic field
     /// @param out_min Output for minimal angle [rad]
     /// @param out_max Output for maximal angle [rad]
-    /// @param dist specifies minimal distance from within the TPC walls (makes volume smaller)
+    /// @param dist specifies minimal distance from within the TPC walls except the bottom anode wall (makes volume smaller)
     /// @return 
     void GetMinMaxFieldAngle(const VectorField& bfield, double& out_min, double& out_max, const double& dist = 0)
     {
@@ -102,5 +121,80 @@ namespace X17
 
         out_min = min_angle;
         out_max = max_angle;
+    }
+
+    /// @brief Returns coordinates of top right and bottom left corners of ith pad
+    /// @param i Number of pad (channel) between 1 and 128
+    /// @param out_xlow Coordinate x of bottom left corner
+    /// @param out_zlow Coordinate z of bottom left corner
+    /// @param out_xhigh Coordinate x of top right corner
+    /// @param out_zhigh Coordinate z of top right corner
+    void GetPadCorners(const int& i, double& out_xlow, double& out_zlow, double& out_xhigh, double& out_zhigh)
+    {
+        if(i < 1 || i > channels) std::cerr << "ERROR: Invalid channel number " << i << " (must be between 1 and " << channels << ").";
+        
+        int column; // Column number of given pad (0 corresponds to 12)
+        int row;    // Row (diagonal) number of given pad
+
+        // Part with same length rows (first six rows)
+        if (i < 73)  {row = (i-1)/columns+1; column = i%columns;}
+
+        // First triangular part (rows 7-9)
+        else if (i < 103)
+        {
+            row = 6+ceil((2*(columns-1)+1-sqrt(pow((2*(columns-1)+1),2)-8*(i-72)))/2); // Maximal number in row r is diference of c-th and (c-r)th triangulae number
+            column = (i-72) - (pow(11,2)+11)/2 + (pow(11+7-row,2)+11+7-row)/2; // Column number is the offset of channel from difference of c-th and r-th Tn
+        }
+
+        // Second triangular part (rows 10-15, missing number in last row does not matter)
+        else
+        {
+            row = 9+ceil((2*(columns-5)+1-sqrt(pow((2*(columns-5)+1),2)-8*(i-102)))/2);
+            column = (i-102) - (pow(7,2)+7)/2 + (pow(7+10-row,2)+7+10-row)/2;
+        }
+
+        if (column == 0) column = 12; // Number 0 corresponds to 12th column
+
+        double i_pad_height = pad_height;
+        
+        // Special cases for height
+        if (i == 102) i_pad_height = pad_height2;
+        if (i == 124) i_pad_height = pad_height2;
+        if (i == 127) i_pad_height = pad_height3;
+        
+        cout << "i: " << i << " row: " << row << " column: " << column << endl;
+
+        out_xhigh = xmax - (column-1)*(pad_width+pad_offset);
+        out_zhigh = zhigh - (row-1)*(pad_height+pad_offset)-(column-1)*pad_stag;
+        out_xlow  = out_xhigh - pad_width;
+        out_zlow  = out_zhigh - i_pad_height;
+    }
+
+    /// @brief Control function for drawing the pads
+    void DrawPads()
+    {
+        TCanvas* c = new TCanvas("c_pads","GEM readout pads",600,600*2*(zhigh+1)/(xmax-xmin+2));
+        vector<TLine*> pad_lines;
+        vector<TText*> pad_numbers;
+
+        for (int i = 1; i <= channels; i++)
+        {
+            double x1,z1,x2,z2;
+            GetPadCorners(i,x1,z1,x2,z2);
+
+            pad_lines.push_back(new TLine(x1,z1,x1,z2)); // left
+            pad_lines.push_back(new TLine(x2,z1,x2,z2)); // right
+            pad_lines.push_back(new TLine(x1,z1,x2,z1)); // bottom
+            pad_lines.push_back(new TLine(x1,z2,x2,z2)); // top
+
+            TText* pad_number = new TText((x1+x2)/2,(z1+z2)/2,to_string(i).c_str());
+            pad_number->SetTextAlign(22);
+            pad_number->SetTextSize(0.035);
+            pad_numbers.push_back(pad_number);
+        }
+        
+        c->Range(xmin-1,-zhigh-1,xmax+1,zhigh+1);
+        for(auto l : pad_lines)   l->Draw("AL");
+        for(auto t : pad_numbers) t->Draw("same");
     }
 } // namespace X17
