@@ -185,6 +185,22 @@ namespace X17
         out_zlow  = out_zhigh - i_pad_height;
     }
 
+    /// @brief Function for retrieving the number of a pad (channel) for given position (currently slow approach, may need optimization in future)
+    /// @param x x coordinate [cm]
+    /// @param z z coordinate [cm]
+    /// @return Number of pad containing the given point (-1 if no pad contains this point)
+    int GetPad(const double& x, const double& z)
+    {
+        for (int i = 1; i < channels; i++)
+        {
+            double xlow,zlow,xhigh,zhigh;
+            GetPadCorners(i,xlow,zlow,xhigh,zhigh);
+            if(x > xlow && x < xhigh && z > zlow && z < zhigh) return i;
+        }
+
+        return -1;        
+    }
+
     /// @brief Control function for drawing the pads
     void DrawPads()
     {
