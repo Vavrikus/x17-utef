@@ -16,6 +16,11 @@
 #include "../VectorField.h"
 #include "../X17Utilities.h"
 
+/// @brief Function for simple circlular arc fit (using function for half of circle, curves up)
+/// @param graph Graph to be fitted
+/// @param min Lower bound of the fit
+/// @param max Upper bound of the fit
+/// @return The fitted function
 TF1* FitCircle(TGraph* graph, const double& min, const double& max)
 {
     TF1* circle = new TF1("circle","[2]-sqrt([0]^2-(x-[1])^2)",min,max);
@@ -26,6 +31,10 @@ TF1* FitCircle(TGraph* graph, const double& min, const double& max)
     return circle;
 }
 
+/// @brief Function for circular arc with smoothly attached lines at endpoints (nodes)
+/// @param x Variable x
+/// @param par Set of parameters (radius of the circle, 1st and 2nd node x and y coordinates)
+/// @return The value at x
 double circle_func(double* x, double* par)
 {
     double& xx       = x[0];
@@ -53,6 +62,11 @@ double circle_func(double* x, double* par)
     return y0 - sqrt(pow(radius,2)-pow(xx-x0,2));
 }
 
+/// @brief Function for fitting with circular arc with smoothly attached lines at endpoints
+/// @param graph Graph to be fitted
+/// @param min Lower bound of the fit
+/// @param max Upper bound of the fit
+/// @return The fitted function
 TF1* FitCircle2(TGraph* graph, const double& min, const double& max)
 {
     TF1* circle = new TF1("circle",circle_func,min,max,5);
@@ -66,6 +80,15 @@ TF1* FitCircle2(TGraph* graph, const double& min, const double& max)
     return circle;
 }
 
+/// @brief Function for energy reconstruction from spline fit
+/// @param sp_fit Fitted splines
+/// @param magfield Magnetic data
+/// @param energy Output graph for reconstructed energy as function of coordinate
+/// @param radius Output graph for reconstructed radius as function of coordinate
+/// @param magnetic Output graph for magnetic field along fitted trajectory
+/// @param min Lower bound
+/// @param max Upper bound
+/// @param step Step between iterations
 void RecoEnergy(TSpline3* sp_fit, VectorField* magfield, TGraph* energy, TGraph* radius, TGraph* magnetic, double min, double max, double step)
 {
     for (double x = min; x <= max; x += step)
@@ -89,13 +112,20 @@ void RecoEnergy(TSpline3* sp_fit, VectorField* magfield, TGraph* energy, TGraph*
     }
 }
 
+/// @brief Function for energy reconstruction from circle with lines fit
+/// @param fit Fitted circle with lines function
+/// @param magfield Magnetic data
+/// @param magnetic Output graph for magnetic field along fitted trajectory
+/// @param min Lower bound
+/// @param max Upper bound
+/// @param step Step between iterations
 void RecoEnergy(TF1* fit, VectorField* magfield, TGraph* magnetic, double min, double max, double step)
 {
     double r = fit->GetParameter(0)/100;
     const double clight = 299792458;
     const double E0 = 510998.95;
 
-    //mean magnetic field
+    // mean magnetic field
     Vector B = magfield->GetField(0,(8-fit->Eval((max+min)/2))/100,(max+min)/200);
 
     for (double x = min; x <= max; x += step)
@@ -113,15 +143,15 @@ void RecoEnergy(TF1* fit, VectorField* magfield, TGraph* magnetic, double min, d
 
 int reco_track()
 {
-    //file with Garfield simulation output
+    // file with Garfield simulation output
     TFile* inFile = new TFile("build/electrons.root");
     TTree* electrons = (TTree*)inFile->Get("electrons");
 
-    //file with ionization electrons map
+    // file with ionization electrons map
     TFile* inFile2 = new TFile("map.root");
     Field<SensorData>* map = (Field<SensorData>*)inFile2->Get("map");
 
-    //plotting drift time vs distance to readout + linear fit
+    // plotting drift time vs distance to readout + linear fit
     TCanvas* c_drift = new TCanvas("c_drift","Drift time");
     electrons->Draw("t1:8-y0","y1>7.0");
     TGraph* ty = new TGraph(electrons->GetSelectedRows(), electrons->GetV2(), electrons->GetV1());
@@ -131,14 +161,14 @@ int reco_track()
     ty->Draw("ap");
     ty->Fit("pol1","","",8.05,11);
 
-    //getting fit parameters
+    // getting fit parameters
     TF1* ty_fit = (TF1*) ty->GetListOfFunctions()->FindObject("pol1");
     double a0 = ty_fit->GetParameter(0);
     double a1 = ty_fit->GetParameter(1);
     double b0 = -a0/a1; //inverse polynomial param
     double b1 = 1.0/a1; //inverse polynomial param
 
-    //setting variables from TTree
+    // setting variables from TTree
     double x0,y0,z0,t0,x1,y1,z1,t1;
     electrons->SetBranchAddress("x0",&x0);
     electrons->SetBranchAddress("y0",&y0);
@@ -149,11 +179,11 @@ int reco_track()
     electrons->SetBranchAddress("z1",&z1);
     electrons->SetBranchAddress("t1",&t1);
 
-    //zy (track) plot from original track and reconstructed from drift time
+    // zy (track) plot from original track and reconstructed from drift time
     TGraph* zy      = new TGraph();
     TGraph* zy_reco = new TGraph();
 
-    //xz (track) plot from original and reconstructed tracks
+    // xz (track) plot from original and reconstructed tracks
     TGraph* xz      = new TGraph();
     TGraph* xz_reco = new TGraph();
 
@@ -174,7 +204,7 @@ int reco_track()
         }
     }
 
-    //setting up track plots (original + reconstructed)
+    // setting up track plots (original + reconstructed)
     TCanvas* c_track_zy = new TCanvas("c_track_zy","Electron track reconstruction");
     
     zy_reco->SetTitle("Electron track reconstruction;z [cm]; distance to readout [cm]");
@@ -221,11 +251,11 @@ int reco_track()
     double min = 0;//7
     double max = 15;//10.5
 
-    //fitting both tracks with circles
+    // fitting both tracks with circles
     TF1* circle_fit  = FitCircle2(zy,min,max);
     TF1* circle_fit2 = FitCircle2(zy_reco,min,max);
 
-    //loading magnetic field from txt file (units = meters)
+    // loading magnetic field from txt file (units = meters)
     VectorField* magfield = new VectorField(-0.3,0.3,-0.3,0.3,-0.2,0.2,0.005);
     magfield->LoadField("/home/vavrik/work/X17/electron_positron_tracks/build/VecB.txt");
     
