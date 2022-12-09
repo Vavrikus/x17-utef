@@ -268,6 +268,9 @@ struct Field
         if(y-(ymin+step*yi)<0) yi2 = yi-1; else yi2 = yi + 1; if(yi2>yimax) yi2=yi;
         if(z-(zmin+step*zi)<0) zi2 = zi-1; else zi2 = zi + 1; if(zi2>zimax) zi2=zi;
 
+        if(xi2 < 0) xi2 = 0; if(yi2 < 0) yi2 = 0; if(zi2 < 0) zi2 = 0;
+
+        // trilinear interpolation
         double dx = abs((x-(xmin+step*xi))/step);
         double dy = abs((y-(ymin+step*yi))/step);
         double dz = abs((z-(zmin+step*zi))/step);
@@ -291,7 +294,121 @@ struct Field
 
         return (1-dz)*c0+dz*c1;
     }
+
+    T Invert(double,double,double){return nullptr;} // Only for SensorData
 };
+
+template<>
+SensorData Field<SensorData>::Invert(double x1, double z1, double t1)
+{
+    // Find 8 closest points using binary search (assuming ordering)
+        int ximin = 0;               // Starting minimal search x index
+        int ximax = this->ximax;     // Starting maximal search x index
+        int yimin = this->yimax;     // Starting minimal search y index
+        int yimax = 0;               // Starting maximal search y index
+        int zimin = 0;               // Starting minimal search z index
+        int zimax = this->zimax;     // Starting maximal search z index
+
+        int  ximid = (ximin+ximax)/2; // x midpoint variable
+        int  yimid = (yimin+yimax)/2; // y midpoint variable
+        int  zimid = (zimin+zimax)/2; // z midpoint variable
+        bool ximid_is_max,yimid_is_max,zimid_is_max; // Do midpoint variables contain higher value?
+
+        // z index search
+        while ((zimin+1<zimax))
+        {
+            zimid = (zimin+zimax)/2;
+
+            double z1low  = field[ximid][yimid][zimin].z1;
+            double z1high = field[ximid][yimid][zimax].z1;
+            double z1mid  = field[ximid][yimid][zimid].z1;
+
+            if(z1mid < z1low || z1mid > z1high) cerr << "WARNING: Ordering mistake in binary search (z).\n";
+            if(z1 <= z1mid) {zimax = zimid; zimid_is_max = true;}
+            if(z1 >  z1mid) {zimin = zimid; zimid_is_max = false;}
+        }
+
+        // Some part of the field is initialized with zeros and isn't therefore ordered
+        if(zimid != 0)
+        {
+            while(field[ximin][yimid][zimid].x1 == 0) ximin++;
+            while(field[ximax][yimid][zimid].x1 == 0) ximax--;
+        }
+
+        // x index search
+        while ((ximin+1<ximax))
+        {
+            ximid = (ximin+ximax)/2;
+
+            double x1low  = field[ximin][yimid][zimid].x1;
+            double x1high = field[ximax][yimid][zimid].x1;
+            double x1mid  = field[ximid][yimid][zimid].x1;
+
+            if(x1mid < x1low || x1mid > x1high) cerr << "WARNING: Ordering mistake in binary search (x).\n";
+            if(x1 <= x1mid) {ximax = ximid; ximid_is_max = true;}
+            if(x1 >  x1mid) {ximin = ximid; ximid_is_max = false;}
+        }
+
+        // y index search
+        while ((yimin>yimax+1))
+        {
+            yimid = (yimin+yimax)/2;
+
+            double t1low  = field[ximid][yimin][zimid].t1;
+            double t1high = field[ximid][yimax][zimid].t1;
+            double t1mid  = field[ximid][yimid][zimid].t1;
+
+            if(t1mid < t1low || t1mid > t1high) cerr << "WARNING: Ordering mistake in binary search (y).\n";
+            if(t1 <= t1mid) {yimax = yimid; yimid_is_max = true;}
+            if(t1 >  t1mid) {yimin = yimid; yimid_is_max = false;}
+        }
+
+        // Set up actual min/max variables for the cube
+        if(ximid_is_max) {ximax = ximid; ximin = ximax-1;}
+        else             {ximin = ximid; ximax = ximin+1;}
+        if(yimid_is_max) {yimax = yimid; yimin = yimax+1;}
+        else             {yimin = yimid; yimax = yimin-1;}
+        if(zimid_is_max) {zimax = zimid; zimin = zimax-1;}
+        else             {zimin = zimid; zimax = zimin+1;}
+
+        // Sanity check
+            cout << "Cube for (x1,z1,t1) = (" << x1 << "," << z1 << "," << t1 << "): \n";
+            cout << "000: [" << ximin << "][" << yimin << "][" << zimin << "], (x,z,t) = (" << field[ximin][yimin][zimin].x1 << "," << field[ximin][yimin][zimin].z1 << "," << field[ximin][yimin][zimin].t1 << ")\n";
+            cout << "001: [" << ximin << "][" << yimin << "][" << zimax << "], (x,z,t) = (" << field[ximin][yimin][zimax].x1 << "," << field[ximin][yimin][zimax].z1 << "," << field[ximin][yimin][zimax].t1 << ")\n";
+            cout << "010: [" << ximin << "][" << yimax << "][" << zimin << "], (x,z,t) = (" << field[ximin][yimax][zimin].x1 << "," << field[ximin][yimax][zimin].z1 << "," << field[ximin][yimax][zimin].t1 << ")\n";
+            cout << "011: [" << ximin << "][" << yimax << "][" << zimax << "], (x,z,t) = (" << field[ximin][yimax][zimax].x1 << "," << field[ximin][yimax][zimax].z1 << "," << field[ximin][yimax][zimax].t1 << ")\n";
+            cout << "100: [" << ximax << "][" << yimin << "][" << zimin << "], (x,z,t) = (" << field[ximax][yimin][zimin].x1 << "," << field[ximax][yimin][zimin].z1 << "," << field[ximax][yimin][zimin].t1 << ")\n";
+            cout << "101: [" << ximax << "][" << yimin << "][" << zimax << "], (x,z,t) = (" << field[ximax][yimin][zimax].x1 << "," << field[ximax][yimin][zimax].z1 << "," << field[ximax][yimin][zimax].t1 << ")\n";
+            cout << "110: [" << ximax << "][" << yimax << "][" << zimin << "], (x,z,t) = (" << field[ximax][yimax][zimin].x1 << "," << field[ximax][yimax][zimin].z1 << "," << field[ximax][yimax][zimin].t1 << ")\n";
+            cout << "111: [" << ximax << "][" << yimax << "][" << zimax << "], (x,z,t) = (" << field[ximax][yimax][zimax].x1 << "," << field[ximax][yimax][zimax].z1 << "," << field[ximax][yimax][zimax].t1 << ")\n\n";
+
+            if(field[ximin][yimin][zimin].x1 > x1 || field[ximin][yimin][zimax].x1 > x1 ||
+               field[ximin][yimax][zimin].x1 > x1 || field[ximin][yimax][zimax].x1 > x1)
+                    cerr << "ERROR: Minimal x bound not minimal.\n";
+            if(field[ximax][yimin][zimin].x1 < x1 || field[ximax][yimin][zimax].x1 < x1 ||
+               field[ximax][yimax][zimin].x1 < x1 || field[ximax][yimax][zimax].x1 < x1)
+                    cerr << "ERROR: Maximal x bound not maximal.\n";
+
+            if(field[ximin][yimin][zimin].t1 > t1 || field[ximin][yimin][zimax].t1 > t1 ||
+               field[ximax][yimin][zimin].t1 > t1 || field[ximax][yimin][zimax].t1 > t1)
+                    cerr << "ERROR: Minimal y bound not minimal.\n";
+            if(field[ximin][yimax][zimin].t1 < t1 || field[ximin][yimax][zimax].t1 < t1 ||
+               field[ximin][yimax][zimin].t1 < t1 || field[ximin][yimax][zimax].t1 < t1)
+                    cerr << "ERROR: Maximal y bound not maximal.\n";
+
+            if(field[ximin][yimin][zimin].z1 > z1 || field[ximax][yimin][zimin].z1 > z1 ||
+               field[ximin][yimax][zimin].z1 > z1 || field[ximax][yimax][zimin].z1 > z1)
+                    cerr << "ERROR: Minimal z bound not minimal.\n";
+            if(field[ximin][yimin][zimax].z1 < z1 || field[ximax][yimin][zimax].z1 < z1 ||
+               field[ximin][yimax][zimax].z1 < z1 || field[ximax][yimax][zimax].z1 < z1)
+                    cerr << "ERROR: Maximal z bound not maximal.\n";
+
+
+
+    // Solve system of 8 linear equations to get the interpolating polynomial
+
+    return {};
+}
 
 // estimates difference between two points with given values in map
 double Offset(SensorData s, double x1, double z1, double t1)
@@ -310,7 +427,7 @@ SensorData RecoPoint(Field<SensorData>* map, double x1, double z1, double t1, do
 
     double offset;      // metric of distance between points
     int iterations = 0; // number of iterations should not exceed 100
-    double damp = 0.1;  // damping coefficient
+    double damp = 0.005;  // damping coefficient
 
     // loop for offset minimization
     do
@@ -355,7 +472,7 @@ SensorData RecoPoint(Field<SensorData>* map, double x1, double z1, double t1, do
 
         iterations++;
         // cout << "iter: " << iterations << "\n";        
-        if (iterations == 1000) cout << "1000 iterations.\n";
+        if (iterations == 10000) cout << "1000 iterations.\n";
     }
     while ((offset > max_err) && (iterations < 1000));
 
