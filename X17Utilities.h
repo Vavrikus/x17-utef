@@ -19,7 +19,7 @@ namespace X17
         constexpr double ymax  =  8;    // TPC maximal height [cm]
         constexpr double xmin  = 6.51;  // TPC minimal x [cm]
         constexpr double xmax  = 14.61; // TPC maximal x [cm]
-        constexpr double zlow  = 2.25;  // TPC z of positive corner closer to center [cm]
+        constexpr double zlow  = 2.75;  // TPC z of positive corner closer to center [cm]
         constexpr double zhigh = 7.45;  // TPC z of positive corner further from center [cm]
 
     // TPC first sector derived parameters
