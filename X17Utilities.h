@@ -1,8 +1,11 @@
+#pragma once
+
 #include <cmath>
 #include <iostream>
 #include <string.h>
 
 #include "TCanvas.h"
+#include "TFile.h"
 #include "TLine.h"
 #include "TText.h"
 
@@ -191,7 +194,7 @@ namespace X17
     /// @return Number of pad containing the given point (-1 if no pad contains this point)
     int GetPad(const double& x, const double& z)
     {
-        for (int i = 1; i < channels; i++)
+        for (int i = 1; i <= channels; i++)
         {
             double xlow,zlow,xhigh,zhigh;
             GetPadCorners(i,xlow,zlow,xhigh,zhigh);
@@ -227,5 +230,38 @@ namespace X17
         c->Range(xmin-1,-zhigh-1,xmax+1,zhigh+1);
         for(auto l : pad_lines)   l->Draw("AL");
         for(auto t : pad_numbers) t->Draw("same");
+    }
+
+    /// @brief Draw pads using coordinates of electrons ending up in the corners
+    /// @param y y coordinate of plane (reverse propagation)
+    void DrawPadsDistortion(const double& y)
+    {
+        // Get map from initial to final electron positions from file
+        TFile* inFile2 = new TFile("map.root");
+        Field<SensorData>* map = (Field<SensorData>*)inFile2->Get("map");
+
+        TCanvas* c = new TCanvas("c_pads_distorted","GEM readout pads distorted 4000 ns",600*2*(zhigh+1)/(xmax-xmin+2),600);
+        vector<TLine*> pad_lines;
+
+        for (int i = 1; i <= channels; i++)
+        {
+            double x1,z1,x2,z2;
+            GetPadCorners(i,x1,z1,x2,z2);
+
+            SensorData bottomleft  = map->Invert(z1,x1,4000);//RecoPoint(map,x1,z1,5000,0.01);
+            SensorData bottomright = map->Invert(z1,x2,4000);//RecoPoint(map,x2,z1,5000,0.01);
+            SensorData topleft     = map->Invert(z2,x1,4000);//RecoPoint(map,x1,z2,5000,0.01);
+            SensorData topright    = map->Invert(z2,x2,4000);//RecoPoint(map,x2,z2,5000,0.01);
+            
+
+            pad_lines.push_back(new TLine(bottomleft.x1,  bottomleft.z1,  topleft.x1,     topleft.z1)); // left
+            pad_lines.push_back(new TLine(bottomright.x1, bottomright.z1, topright.x1,    topright.z1)); // right
+            pad_lines.push_back(new TLine(bottomleft.x1,  bottomleft.z1,  bottomright.x1, bottomright.z1)); // bottom
+            pad_lines.push_back(new TLine(topleft.x1,     topleft.z1,     topright.x1,    topright.z1)); // top
+        }
+        
+
+        c->Range(-zhigh-1,xmin-1,zhigh+1,xmax+1);
+        for(auto l : pad_lines)   l->Draw("AL");
     }
 } // namespace X17

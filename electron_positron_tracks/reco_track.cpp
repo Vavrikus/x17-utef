@@ -151,6 +151,26 @@ int reco_track()
     TFile* inFile2 = new TFile("map.root");
     Field<SensorData>* map = (Field<SensorData>*)inFile2->Get("map");
 
+    X17::DrawPads();
+    X17::DrawPadsDistortion(0);
+
+    // for (int i = map->yimax; i > -1; i--)
+    // {
+    //     cout << "LAYER " << i << "\n";
+    //     cout << "=================================================================\n";
+
+    //     for (int j = map->zimax; j > -1; j--)
+    //     {
+    //         for (int k = 0; k <= map->ximax; k++)
+    //         {
+    //             cout << map->field[k][i][j].t1 << " ";
+    //         }
+    //         cout << "\n";
+    //     }
+
+    //     cout << "\n\n";
+    // }
+
     // plotting drift time vs distance to readout + linear fit
     TCanvas* c_drift = new TCanvas("c_drift","Drift time");
     electrons->Draw("t1:8-y0","y1>7.0");
@@ -189,18 +209,19 @@ int reco_track()
 
     for (int i = 0; i < electrons->GetEntries(); ++i)
     {
-        cout << "i: " << i << " out of " << electrons->GetEntries() << "\n";
+        //cout << "\n\ni: " << i << " out of " << electrons->GetEntries() << "\n";
         //if ((10000*i)%electrons->GetEntries() == 0) cout << 100*i/electrons->GetEntries() << " \%\n";
         electrons->GetEntry(i);
-        if (y1 > 7.0) 
+        if (y1 > 7.0 && X17::IsInSector(x0,y0,z0)) 
         {
-            SensorData reco = RecoPoint(map,x1,z1,t1,0.001);
+            // SensorData reco = RecoPoint(map,x1,z1,t1,0.001);
+            SensorData reco = map->Invert(x1,z1,t1);
             zy->AddPoint(z0,8-y0);
             zy_reco->AddPoint(reco.z1,8-reco.y1);
-            //zy_reco->AddPoint(z1,b0+b1*t1);
+            zy_reco->AddPoint(z1,b0+b1*t1);
 
             xz->AddPoint(x0,z0);
-            xz_reco->AddPoint(reco.x1,reco.z1);
+            // xz_reco->AddPoint(reco.x1,reco.z1);
         }
     }
 

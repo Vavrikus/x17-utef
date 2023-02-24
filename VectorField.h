@@ -1,8 +1,11 @@
 #pragma once
 
+#include <array>
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <stack>
+#include <tuple>
 #include <vector>
 
 using namespace std;
@@ -39,6 +42,124 @@ Vector operator-(const Vector& v1,const Vector& v2)
 Vector operator*(const double& d,const Vector& v)
 {
     return Vector{d*v.vx,d*v.vy,d*v.vz};
+}
+
+template <int M, int N>
+struct Matrix
+{
+    double elements[M*N]; // rows before columns
+
+    Matrix() = default;
+
+    Matrix(double (&arr)[M*N])
+    {
+        copy(std::begin(arr),std::end(arr),std::begin(elements));
+        // cout << "NEW MATRIX:\n"; this->Print();
+    }
+
+    double& at(int row, int column)
+    {
+        if(row > -1 && row < M && column > -1 && column < N) return elements[row*N+column];
+        else cerr << "ERROR: Invalid matrix element (" << row << "," << column << ") of " << M << "x" << N << " matrix.\n";
+        return elements[0];
+    }
+
+    vector<double> GetColumn(int c)
+    {
+        if(c > -1 && c < N)
+        {
+            vector<double> column;
+            for (int r = 0; r < M; r++) column.push_back(this->at(r,c));
+            return column;
+        }
+        else cerr << "ERROR: Invalid matrix column index.\n";
+        return vector<double>();
+    }
+
+    void Print()
+    {
+        for (int r = 0; r < M; r++)
+        {
+            for (int c = 0; c < N; c++)
+            {
+                cout << this->at(r,c) << " ";
+            }
+            cout << "\n";
+        }        
+    }
+
+    void SwitchRows(int row1, int row2)
+    {
+        if (row1 > -1 && row1 < M && row2 > -1 && row2 < M)
+        {
+            for (int c = 0; c < N; c++)
+            {
+                double temp = this->at(row1,c);
+                this->at(row1,c) = this->at(row2,c);
+                this->at(row2,c) = temp;
+            }            
+        }
+
+        else cerr << "ERROR: Invalid matrix row number.\n";        
+    }
+
+    void Reduce()
+    {
+        for (int c = 0; c < M; c++)
+        {
+            // Find row with non zero c-th element
+            bool not_zero = false;
+            for (int r = c; r < M; r++)
+            {
+                if (this->at(r,c) != 0)
+                {
+                    not_zero = true;
+                    if (r != c) 
+                        this->SwitchRows(r,c);
+                    break;
+                }
+            }            
+            if (!not_zero) cerr << "WARNING: Singular matrix.\n";
+
+            // Normalize selected row
+            double first = this->at(c,c);
+            if(first == 0) continue;
+            for (int c2 = c; c2 < N; c2++) this->at(c,c2) /= first;            
+
+            // Subtracting rows
+            for (int r = 0; r < M; r++)
+            {
+                if (r != c)
+                {
+                    double factor = this->at(r,c);
+                    for (int c2 = c; c2 < N; c2++)
+                    {
+                        this->at(r,c2) -= factor*this->at(c,c2);
+                    }
+                }
+            }
+            // cout << "REDUCTION OF MATRIX IN PROGRESS:\n"; this->Print();
+        }
+
+        // cout << "REDUCED MATRIX:\n"; this->Print();
+    }
+};
+
+template<int M,int N,int P>
+Matrix<M,P> operator*(Matrix<M,N> A,Matrix<N,P> B)
+{
+    Matrix<M,P> result;
+    for (int r = 0; r < M; r++)
+    {
+        for (int c = 0; c < P; c++)
+        {
+            double sum = 0;
+            for (int i = 0; i < N; i++) sum += A.at(r,i)*B.at(i,c);
+            result.at(r,c) = sum;
+        }        
+    }
+    
+    return result;
 }
 
 struct VectorField
@@ -295,8 +416,98 @@ struct Field
         return (1-dz)*c0+dz*c1;
     }
 
-    T Invert(double,double,double){return nullptr;} // Only for SensorData
+    T Invert(double,double,double){return nullptr;} // Only for SensorData      
 };
+
+vector<vector<double>> GetInterpolCoef(Field<SensorData>& map, int (&&indexes)[6])
+{
+    double xmin = indexes[0]*map.step+map.xmin;
+    double xmax = indexes[1]*map.step+map.xmin;
+    double ymin = indexes[2]*map.step+map.ymin;
+    double ymax = indexes[3]*map.step+map.ymin;
+    double zmin = indexes[4]*map.step+map.zmin;
+    double zmax = indexes[5]*map.step+map.zmin;
+
+    vector<double> xvalues;
+    xvalues.push_back(map.field[indexes[0]][indexes[2]][indexes[4]].x1);
+    xvalues.push_back(map.field[indexes[0]][indexes[2]][indexes[5]].x1);
+    xvalues.push_back(map.field[indexes[0]][indexes[3]][indexes[4]].x1);
+    xvalues.push_back(map.field[indexes[0]][indexes[3]][indexes[5]].x1);
+    xvalues.push_back(map.field[indexes[1]][indexes[2]][indexes[4]].x1);
+    xvalues.push_back(map.field[indexes[1]][indexes[2]][indexes[5]].x1);
+    xvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[4]].x1);
+    xvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[5]].x1);
+
+    vector<double> zvalues;
+    zvalues.push_back(map.field[indexes[0]][indexes[2]][indexes[4]].z1);
+    zvalues.push_back(map.field[indexes[0]][indexes[2]][indexes[5]].z1);
+    zvalues.push_back(map.field[indexes[0]][indexes[3]][indexes[4]].z1);
+    zvalues.push_back(map.field[indexes[0]][indexes[3]][indexes[5]].z1);
+    zvalues.push_back(map.field[indexes[1]][indexes[2]][indexes[4]].z1);
+    zvalues.push_back(map.field[indexes[1]][indexes[2]][indexes[5]].z1);
+    zvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[4]].z1);
+    zvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[5]].z1);
+
+    vector<double> tvalues;
+    tvalues.push_back(map.field[indexes[0]][indexes[2]][indexes[4]].t1);
+    tvalues.push_back(map.field[indexes[0]][indexes[2]][indexes[5]].t1);
+    tvalues.push_back(map.field[indexes[0]][indexes[3]][indexes[4]].t1);
+    tvalues.push_back(map.field[indexes[0]][indexes[3]][indexes[5]].t1);
+    tvalues.push_back(map.field[indexes[1]][indexes[2]][indexes[4]].t1);
+    tvalues.push_back(map.field[indexes[1]][indexes[2]][indexes[5]].t1);
+    tvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[4]].t1);
+    tvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[5]].t1);
+
+    double xarr[] = {1, xvalues[0], zvalues[0], tvalues[0], xvalues[0]*zvalues[0], xvalues[0]*tvalues[0], zvalues[0]*tvalues[0], xvalues[0]*zvalues[0]*tvalues[0], xmin,
+                     1, xvalues[1], zvalues[1], tvalues[1], xvalues[1]*zvalues[1], xvalues[1]*tvalues[1], zvalues[1]*tvalues[1], xvalues[1]*zvalues[1]*tvalues[1], xmin,
+                     1, xvalues[2], zvalues[2], tvalues[2], xvalues[2]*zvalues[2], xvalues[2]*tvalues[2], zvalues[2]*tvalues[2], xvalues[2]*zvalues[2]*tvalues[2], xmin,
+                     1, xvalues[3], zvalues[3], tvalues[3], xvalues[3]*zvalues[3], xvalues[3]*tvalues[3], zvalues[3]*tvalues[3], xvalues[3]*zvalues[3]*tvalues[3], xmin,
+                     1, xvalues[4], zvalues[4], tvalues[4], xvalues[4]*zvalues[4], xvalues[4]*tvalues[4], zvalues[4]*tvalues[4], xvalues[4]*zvalues[4]*tvalues[4], xmax,
+                     1, xvalues[5], zvalues[5], tvalues[5], xvalues[5]*zvalues[5], xvalues[5]*tvalues[5], zvalues[5]*tvalues[5], xvalues[5]*zvalues[5]*tvalues[5], xmax,
+                     1, xvalues[6], zvalues[6], tvalues[6], xvalues[6]*zvalues[6], xvalues[6]*tvalues[6], zvalues[6]*tvalues[6], xvalues[6]*zvalues[6]*tvalues[6], xmax,
+                     1, xvalues[7], zvalues[7], tvalues[7], xvalues[7]*zvalues[7], xvalues[7]*tvalues[7], zvalues[7]*tvalues[7], xvalues[7]*zvalues[7]*tvalues[7], xmax};
+    Matrix<8,9> xmatrix = Matrix<8,9>(xarr);
+    Matrix<8,9> xmatrixoriginal = Matrix<8,9>(xarr);
+    xmatrix.Reduce();
+
+    double yarr[] = {1, xvalues[0], zvalues[0], tvalues[0], xvalues[0]*zvalues[0], xvalues[0]*tvalues[0], zvalues[0]*tvalues[0], xvalues[0]*zvalues[0]*tvalues[0], ymin,
+                     1, xvalues[1], zvalues[1], tvalues[1], xvalues[1]*zvalues[1], xvalues[1]*tvalues[1], zvalues[1]*tvalues[1], xvalues[1]*zvalues[1]*tvalues[1], ymin,
+                     1, xvalues[2], zvalues[2], tvalues[2], xvalues[2]*zvalues[2], xvalues[2]*tvalues[2], zvalues[2]*tvalues[2], xvalues[2]*zvalues[2]*tvalues[2], ymax,
+                     1, xvalues[3], zvalues[3], tvalues[3], xvalues[3]*zvalues[3], xvalues[3]*tvalues[3], zvalues[3]*tvalues[3], xvalues[3]*zvalues[3]*tvalues[3], ymax,
+                     1, xvalues[4], zvalues[4], tvalues[4], xvalues[4]*zvalues[4], xvalues[4]*tvalues[4], zvalues[4]*tvalues[4], xvalues[4]*zvalues[4]*tvalues[4], ymin,
+                     1, xvalues[5], zvalues[5], tvalues[5], xvalues[5]*zvalues[5], xvalues[5]*tvalues[5], zvalues[5]*tvalues[5], xvalues[5]*zvalues[5]*tvalues[5], ymin,
+                     1, xvalues[6], zvalues[6], tvalues[6], xvalues[6]*zvalues[6], xvalues[6]*tvalues[6], zvalues[6]*tvalues[6], xvalues[6]*zvalues[6]*tvalues[6], ymax,
+                     1, xvalues[7], zvalues[7], tvalues[7], xvalues[7]*zvalues[7], xvalues[7]*tvalues[7], zvalues[7]*tvalues[7], xvalues[7]*zvalues[7]*tvalues[7], ymax};
+    Matrix<8,9> ymatrix = Matrix<8,9>(yarr);
+    ymatrix.Reduce();
+
+    double zarr[] = {1, xvalues[0], zvalues[0], tvalues[0], xvalues[0]*zvalues[0], xvalues[0]*tvalues[0], zvalues[0]*tvalues[0], xvalues[0]*zvalues[0]*tvalues[0], zmin,
+                     1, xvalues[1], zvalues[1], tvalues[1], xvalues[1]*zvalues[1], xvalues[1]*tvalues[1], zvalues[1]*tvalues[1], xvalues[1]*zvalues[1]*tvalues[1], zmax,
+                     1, xvalues[2], zvalues[2], tvalues[2], xvalues[2]*zvalues[2], xvalues[2]*tvalues[2], zvalues[2]*tvalues[2], xvalues[2]*zvalues[2]*tvalues[2], zmin,
+                     1, xvalues[3], zvalues[3], tvalues[3], xvalues[3]*zvalues[3], xvalues[3]*tvalues[3], zvalues[3]*tvalues[3], xvalues[3]*zvalues[3]*tvalues[3], zmax,
+                     1, xvalues[4], zvalues[4], tvalues[4], xvalues[4]*zvalues[4], xvalues[4]*tvalues[4], zvalues[4]*tvalues[4], xvalues[4]*zvalues[4]*tvalues[4], zmin,
+                     1, xvalues[5], zvalues[5], tvalues[5], xvalues[5]*zvalues[5], xvalues[5]*tvalues[5], zvalues[5]*tvalues[5], xvalues[5]*zvalues[5]*tvalues[5], zmax,
+                     1, xvalues[6], zvalues[6], tvalues[6], xvalues[6]*zvalues[6], xvalues[6]*tvalues[6], zvalues[6]*tvalues[6], xvalues[6]*zvalues[6]*tvalues[6], zmin,
+                     1, xvalues[7], zvalues[7], tvalues[7], xvalues[7]*zvalues[7], xvalues[7]*tvalues[7], zvalues[7]*tvalues[7], xvalues[7]*zvalues[7]*tvalues[7], zmax};
+    Matrix<8,9> zmatrix = Matrix<8,9>(zarr);
+    zmatrix.Reduce();
+
+    vector<double> xresults = xmatrix.GetColumn(8);
+    vector<double> yresults = ymatrix.GetColumn(8);
+    vector<double> zresults = zmatrix.GetColumn(8);
+    vector<vector<double>> output = {xresults,yresults,zresults};
+
+    Matrix<9,1> xres;
+    for(int i = 0; i < 8; i++) xres.at(i,0) = xresults[i];
+    xres.at(8,0) = 0;
+    auto m = xmatrixoriginal*xres;
+    cout << "xmatrix:\n";
+    xmatrixoriginal.Print();
+    cout << "m:\n";
+    m.Print();
+
+    return output;
+}  
 
 template<>
 SensorData Field<SensorData>::Invert(double x1, double z1, double t1)
@@ -405,9 +616,13 @@ SensorData Field<SensorData>::Invert(double x1, double z1, double t1)
 
 
 
-    // Solve system of 8 linear equations to get the interpolating polynomial
+    vector<vector<double>> interpol = GetInterpolCoef(*this,{ximin,ximax,yimin,yimax,zimin,zimax});
 
-    return {};
+    double xout = interpol[0][0]+interpol[0][1]*x1+interpol[0][2]*z1+interpol[0][3]*t1+interpol[0][4]*x1*z1+interpol[0][5]*x1*t1+interpol[0][6]*z1*t1+interpol[0][7]*x1*z1*t1;
+    double yout = interpol[1][0]+interpol[1][1]*x1+interpol[1][2]*z1+interpol[1][3]*t1+interpol[1][4]*x1*z1+interpol[1][5]*x1*t1+interpol[1][6]*z1*t1+interpol[1][7]*x1*z1*t1;
+    double zout = interpol[2][0]+interpol[2][1]*x1+interpol[2][2]*z1+interpol[2][3]*t1+interpol[2][4]*x1*z1+interpol[2][5]*x1*t1+interpol[2][6]*z1*t1+interpol[2][7]*x1*z1*t1;
+
+    return {xout,yout,zout};
 }
 
 // estimates difference between two points with given values in map
