@@ -103,12 +103,12 @@ void RecoEnergy(TSpline3* sp_fit, VectorField* magfield, TGraph* energy, TGraph*
         double r = 0.01*pow(1+der*der,1.5)/der2;
         const double clight = 299792458;
         const double E0 = 510998.95;
-        Vector B = magfield->GetField(0,(8-sp_fit->Eval(x))/100,x/100);
+        Vector B = magfield->GetField(x/100,0,(8-sp_fit->Eval(x))/100);
         double betasq = 1/(1+pow((E0/(clight*r*B.vx)),2));
         double Ekin = E0*(1/sqrt(1-betasq)-1);
         if (x > 4) energy->AddPoint(x,Ekin/1e6);
         if (r < 1 && r > 0) radius->AddPoint(x,r*100);
-        magnetic->AddPoint(x,B.vx);
+        magnetic->AddPoint(x,B.vy);
     }
 }
 
@@ -126,12 +126,12 @@ void RecoEnergy(TF1* fit, VectorField* magfield, TGraph* magnetic, double min, d
     const double E0 = 510998.95;
 
     // mean magnetic field
-    Vector B = magfield->GetField(0,(8-fit->Eval((max+min)/2))/100,(max+min)/200);
+    Vector B = magfield->GetField((max+min)/200,0,(8-fit->Eval((max+min)/2))/100);
 
     for (double x = min; x <= max; x += step)
     {
-        Vector B2 = magfield->GetField(0,(8-fit->Eval(x))/100,x/100);
-        magnetic->AddPoint(x,B2.vx);
+        Vector B2 = magfield->GetField(x/100,0,(8-fit->Eval(x))/100);
+        magnetic->AddPoint(x,B2.vy);
     }
     
     double betasq = 1/(1+pow((E0/(clight*r*B.vx)),2));
@@ -152,7 +152,7 @@ int reco_track()
     Field<SensorData>* map = (Field<SensorData>*)inFile2->Get("map");
 
     X17::DrawPads();
-    X17::DrawPadsDistortion(0);
+    X17::DrawPadsDistortion(2000);
 
     // for (int i = map->yimax; i > -1; i--)
     // {
@@ -173,20 +173,20 @@ int reco_track()
 
     // plotting drift time vs distance to readout + linear fit
     TCanvas* c_drift = new TCanvas("c_drift","Drift time");
-    electrons->Draw("t1:8-y0","y1>7.0");
-    TGraph* ty = new TGraph(electrons->GetSelectedRows(), electrons->GetV2(), electrons->GetV1());
-    ty->SetTitle("Drift time as function of distance;distance to readout [cm]; time [ns]");
-    ty->SetMarkerStyle(2);
-    ty->SetMarkerSize(0.4);
-    ty->Draw("ap");
-    ty->Fit("pol1","","",8.05,11);
+    electrons->Draw("t1:8-z0","z1>7.0");
+    TGraph* tz = new TGraph(electrons->GetSelectedRows(), electrons->GetV2(), electrons->GetV1());
+    tz->SetTitle("Drift time as function of distance;distance to readout [cm]; time [ns]");
+    tz->SetMarkerStyle(2);
+    tz->SetMarkerSize(0.4);
+    // tz->Draw("ap");
+    tz->Fit("pol1","","",8.05,11);
 
     // getting fit parameters
-    TF1* ty_fit = (TF1*) ty->GetListOfFunctions()->FindObject("pol1");
-    double a0 = ty_fit->GetParameter(0);
-    double a1 = ty_fit->GetParameter(1);
-    double b0 = -a0/a1; //inverse polynomial param
-    double b1 = 1.0/a1; //inverse polynomial param
+    // TF1* tz_fit = (TF1*) tz->GetListOfFunctions()->FindObject("pol1");
+    // double a0 = tz_fit->GetParameter(0);
+    // double a1 = tz_fit->GetParameter(1);
+    // double b0 = -a0/a1; //inverse polynomial param
+    // double b1 = 1.0/a1; //inverse polynomial param
 
     // setting variables from TTree
     double x0,y0,z0,t0,x1,y1,z1,t1;
@@ -199,53 +199,36 @@ int reco_track()
     electrons->SetBranchAddress("z1",&z1);
     electrons->SetBranchAddress("t1",&t1);
 
-    // zy (track) plot from original track and reconstructed from drift time
-    TGraph* zy      = new TGraph();
-    TGraph* zy_reco = new TGraph();
-
-    // xz (track) plot from original and reconstructed tracks
+    // xz (track) plot from original track and reconstructed from drift time
     TGraph* xz      = new TGraph();
     TGraph* xz_reco = new TGraph();
+
+    // xy (track) plot from original and reconstructed tracks
+    TGraph* xy      = new TGraph();
+    TGraph* xy_reco = new TGraph();
 
     for (int i = 0; i < electrons->GetEntries(); ++i)
     {
         //cout << "\n\ni: " << i << " out of " << electrons->GetEntries() << "\n";
         //if ((10000*i)%electrons->GetEntries() == 0) cout << 100*i/electrons->GetEntries() << " \%\n";
         electrons->GetEntry(i);
-        if (y1 > 7.0 && X17::IsInSector(x0,y0,z0)) 
+        if (z1 > 7.0 && X17::IsInSector(x0,y0,z0)) 
         {
             // SensorData reco = RecoPoint(map,x1,z1,t1,0.001);
-            SensorData reco = map->Invert(x1,z1,t1);
-            zy->AddPoint(z0,8-y0);
-            zy_reco->AddPoint(reco.z1,8-reco.y1);
-            zy_reco->AddPoint(z1,b0+b1*t1);
+            SensorData reco = map->Invert(x1,y1,t1);
+            xz->AddPoint(x0,8-z0);
+            xz_reco->AddPoint(reco.x1,8-reco.z1);
+            // xz_reco->AddPoint(z1,b0+b1*t1);
 
-            xz->AddPoint(x0,z0);
-            // xz_reco->AddPoint(reco.x1,reco.z1);
+            xy->AddPoint(x0,y0);
+            // xy_reco->AddPoint(reco.x1,reco.y1);
         }
     }
 
     // setting up track plots (original + reconstructed)
-    TCanvas* c_track_zy = new TCanvas("c_track_zy","Electron track reconstruction");
-    
-    zy_reco->SetTitle("Electron track reconstruction;z [cm]; distance to readout [cm]");
-    zy_reco->SetMarkerStyle(2);
-    zy_reco->SetMarkerSize(0.4);
-    zy_reco->Draw("ap");
-
-    zy->SetMarkerColor(2);
-    zy->SetMarkerStyle(7);
-    zy->SetMarkerSize(1.2);
-    zy->Draw("p same");
-
-    TLegend* leg_zy = new TLegend(0.129,0.786,0.360,0.887);
-    leg_zy->AddEntry(zy,"original");
-    leg_zy->AddEntry(zy_reco,"reconstructed");
-    leg_zy->Draw("same");
-
     TCanvas* c_track_xz = new TCanvas("c_track_xz","Electron track reconstruction");
     
-    xz_reco->SetTitle("Electron track reconstruction;x [cm]; z [cm]");
+    xz_reco->SetTitle("Electron track reconstruction;z [cm]; distance to readout [cm]");
     xz_reco->SetMarkerStyle(2);
     xz_reco->SetMarkerSize(0.4);
     xz_reco->Draw("ap");
@@ -254,6 +237,23 @@ int reco_track()
     xz->SetMarkerStyle(7);
     xz->SetMarkerSize(1.2);
     xz->Draw("p same");
+
+    TLegend* leg_xz = new TLegend(0.129,0.786,0.360,0.887);
+    leg_xz->AddEntry(xz,"original");
+    leg_xz->AddEntry(xz_reco,"reconstructed");
+    leg_xz->Draw("same");
+
+    TCanvas* c_track_xy = new TCanvas("c_track_xy","Electron track reconstruction");
+    
+    xy_reco->SetTitle("Electron track reconstruction;x [cm]; y [cm]");
+    xy_reco->SetMarkerStyle(2);
+    xy_reco->SetMarkerSize(0.4);
+    xy_reco->Draw("ap");
+
+    xy->SetMarkerColor(2);
+    xy->SetMarkerStyle(7);
+    xy->SetMarkerSize(1.2);
+    xy->Draw("p same");
 
     TLine* l1 = new TLine(-7.45,14.61,7.45,14.61);
     TLine* l2 = new TLine(-2.25,6.51,2.25,6.51);
@@ -264,20 +264,20 @@ int reco_track()
     l3->Draw();
     l4->Draw();
 
-    TLegend* leg_xz = new TLegend(0.129,0.786,0.360,0.887);
-    leg_xz->AddEntry(xz,"original");
-    leg_xz->AddEntry(xz_reco,"reconstructed");
-    leg_xz->Draw("same");
+    TLegend* leg_xy = new TLegend(0.129,0.786,0.360,0.887);
+    leg_xy->AddEntry(xy,"original");
+    leg_xy->AddEntry(xy_reco,"reconstructed");
+    leg_xy->Draw("same");
 
     double min = 0;//7
     double max = 15;//10.5
 
     // fitting both tracks with circles
-    TF1* circle_fit  = FitCircle2(zy,min,max);
-    TF1* circle_fit2 = FitCircle2(zy_reco,min,max);
+    TF1* circle_fit  = FitCircle2(xz,min,max);
+    TF1* circle_fit2 = FitCircle2(xz_reco,min,max);
 
     // loading magnetic field from txt file (units = meters)
-    VectorField* magfield = new VectorField(-0.3,0.3,-0.3,0.3,-0.2,0.2,0.005);
+    VectorField* magfield = new VectorField(-0.2,0.2,-0.3,0.3,-0.3,0.3,0.005);
     magfield->LoadField("/home/vavrik/work/X17/electron_positron_tracks/build/VecB.txt");
     
     double minfield,maxfield,minangle,maxangle;
@@ -378,9 +378,9 @@ int main()
 // plot residues of reconstructed track
     // TH1F* residues = new TH1F("h_residues","Residues",50,-0.5,0.5);
 
-    // for (int i = 0; i < zy_reco->GetN(); i++)
+    // for (int i = 0; i < xz_reco->GetN(); i++)
     // {
     //     double x,y;
-    //     zy_reco->GetPoint(i,x,y);
+    //     xz_reco->GetPoint(i,x,y);
     //     residues->Fill(y-sp_fit->Eval(x));
     // }

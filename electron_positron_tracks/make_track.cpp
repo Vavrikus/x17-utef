@@ -60,13 +60,13 @@ int main(int argc, char * argv[]){
 
   
   // 8 cm drift gap.
-  constexpr double yDrift = 8;
+  constexpr double zDrift = 8;
 
 
   // Assemble a sensor.
   Sensor sensor;
   sensor.AddComponent(&grid); 
-  sensor.SetArea(-1, -yDrift, -15, 1, yDrift, 15.);
+  sensor.SetArea(-15, -1, -zDrift, 15, 1, zDrift);
 
 
   //~ // We use microscopic tracking for simulating the electron avalanche.
@@ -121,12 +121,12 @@ int main(int argc, char * argv[]){
   double yt = 0.0;
   double zt = 0.0;
   double ti = 0;
-  double px = 0;
+  double px = 1;
   double py = 0;
-  double pz = 1;
+  double pz = 0;
   int k=0;
 
-  // Now simulate a track, with p0 = ẑ
+  // Now simulate a track, with p0 = x̂
 
   track.NewTrack(xt, yt, zt, ti, px, py, pz);
   // Loop over the clusters.

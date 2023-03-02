@@ -15,16 +15,16 @@
 namespace X17
 {
     // TPC first sector (contains positive x axis) boundaries
-        constexpr double ymin  = -8;    // TPC minimal height [cm]
-        constexpr double ymax  =  8;    // TPC maximal height [cm]
+        constexpr double zmin  = -8;    // TPC minimal height [cm]
+        constexpr double zmax  =  8;    // TPC maximal height [cm]
         constexpr double xmin  = 6.51;  // TPC minimal x [cm]
         constexpr double xmax  = 14.61; // TPC maximal x [cm]
-        constexpr double zlow  = 2.75;  // TPC z of positive corner closer to center [cm]
-        constexpr double zhigh = 7.45;  // TPC z of positive corner further from center [cm]
+        constexpr double ylow  = 2.75;  // TPC y of positive corner closer to center [cm]
+        constexpr double yhigh = 7.45;  // TPC y of positive corner further from center [cm]
 
     // TPC first sector derived parameters
-        constexpr double zxslope    = (zhigh-zlow)/(xmax-xmin); // TPC Δz/Δx slanted side (z positive)
-        constexpr double zintersect = zlow-zxslope*xmin;        // TPC slanted side (z positive) z-axis intersection (extrapolated) [cm]
+        constexpr double yxslope    = (yhigh-ylow)/(xmax-xmin); // TPC Δy/Δx slanted side (y positive)
+        constexpr double yintersect = ylow-yxslope*xmin;        // TPC slanted side (y positive) y-axis intersection (extrapolated) [cm]
 
     // TPC assumed electric field [V/cm]
         constexpr Vector efield = {0,-400,0};
@@ -50,10 +50,10 @@ namespace X17
     /// @return 
     bool IsInSector(const double& x, const double& y, const double& z, const double& dist = 0)
     {
-        if (y < X17::ymin      || y > X17::ymax-dist) return false;
+        if (z < X17::zmin      || z > X17::zmax-dist) return false;
         if (x < X17::xmin+dist || x > X17::xmax-dist) return false;
-        double dz = dist/std::sqrt(1+1/zxslope); // change of allowed z (absolute value) for slanted surface
-        if (std::abs(z)+dz > X17::zxslope*x+X17::zintersect) return false;
+        double dy = dist/std::sqrt(1+1/yxslope); // change of allowed y (absolute value) for slanted surface
+        if (std::abs(y)+dy > X17::yxslope*x+X17::yintersect) return false;
         
         return true;   
     }
@@ -135,15 +135,15 @@ namespace X17
     /// @param columns The total number of columns in the triangle
     /// @param index The index of element
     /// @return The number of row of element with given index 
-    int triangle_row(int columns,int index){return ceil((2*columns+1-sqrt(pow((2*columns+1),2)-8*index))/2);}
+    int triangle_row(int columns,int index) {return ceil((2*columns+1-sqrt(pow((2*columns+1),2)-8*index))/2);}
 
     /// @brief Returns coordinates of top right and bottom left corners of ith pad
     /// @param i Number of pad (channel) between 1 and 128
     /// @param out_xlow Coordinate x of bottom left corner
-    /// @param out_zlow Coordinate z of bottom left corner
+    /// @param out_ylow Coordinate y of bottom left corner
     /// @param out_xhigh Coordinate x of top right corner
-    /// @param out_zhigh Coordinate z of top right corner
-    void GetPadCorners(const int& i, double& out_xlow, double& out_zlow, double& out_xhigh, double& out_zhigh)
+    /// @param out_yhigh Coordinate y of top right corner
+    void GetPadCorners(const int& i, double& out_xlow, double& out_ylow, double& out_xhigh, double& out_yhigh)
     {
         if(i < 1 || i > channels) std::cerr << "ERROR: Invalid channel number " << i << " (must be between 1 and " << channels << ").";
         
@@ -161,7 +161,7 @@ namespace X17
         // First triangular part (rows 7-9)
         else if (i <= part12_channels)
         {
-            row = triangle_row1-1+triangle_row(columns-1,i-part1_channels); // Maximal number in row r is diference of c-th and (c-r)th triangulae number
+            row = triangle_row1-1+triangle_row(columns-1,i-part1_channels); // Maximal number in row r is diference of c-th and (c-r)th triangular number
             column = (i-part1_channels) - triangle(columns-1) + triangle(columns-1+triangle_row1-row); // Column number is the offset of channel from difference of c-th and r-th Tn
         }
 
@@ -183,85 +183,118 @@ namespace X17
         if (i == 127) i_pad_height = pad_height3;
 
         out_xhigh = xmax - (column-1)*(pad_width+pad_offset);
-        out_zhigh = zhigh - (row-1)*(pad_height+pad_offset)-(column-1)*pad_stag;
+        out_yhigh = yhigh - (row-1)*(pad_height+pad_offset)-(column-1)*pad_stag;
         out_xlow  = out_xhigh - pad_width;
-        out_zlow  = out_zhigh - i_pad_height;
+        out_ylow  = out_yhigh - i_pad_height;
     }
 
     /// @brief Function for retrieving the number of a pad (channel) for given position (currently slow approach, may need optimization in future)
     /// @param x x coordinate [cm]
-    /// @param z z coordinate [cm]
+    /// @param y y coordinate [cm]
     /// @return Number of pad containing the given point (-1 if no pad contains this point)
-    int GetPad(const double& x, const double& z)
+    int GetPad(const double& x, const double& y)
     {
         for (int i = 1; i <= channels; i++)
         {
-            double xlow,zlow,xhigh,zhigh;
-            GetPadCorners(i,xlow,zlow,xhigh,zhigh);
-            if(x > xlow && x < xhigh && z > zlow && z < zhigh) return i;
+            double xlow,ylow,xhigh,yhigh;
+            GetPadCorners(i,xlow,ylow,xhigh,yhigh);
+            if(x > xlow && x < xhigh && y > ylow && y < yhigh) return i;
         }
 
         return -1;        
     }
 
+/// @brief Draws lines around approximate sensitive area (walls of TPC)
+/// @param yxformat If true, y coordinate is drawn on x axis and vice versa
+void DrawTrapezoid(bool yxformat = true)
+{
+    TLine* l1;
+    TLine* l2;
+    TLine* l3;
+    TLine* l4;
+
+    if (yxformat)
+    {
+        l1 = new TLine(-X17::yhigh,X17::xmax, X17::yhigh,X17::xmax);
+        l2 = new TLine(-X17::ylow ,X17::xmin, X17::ylow ,X17::xmin);
+        l3 = new TLine(-X17::yhigh,X17::xmax,-X17::ylow ,X17::xmin);
+        l4 = new TLine( X17::yhigh,X17::xmax, X17::ylow ,X17::xmin);
+    }
+    else
+    {
+        l1 = new TLine(X17::xmax,-X17::yhigh,X17::xmax, X17::yhigh);
+        l2 = new TLine(X17::xmin,-X17::ylow ,X17::xmin, X17::ylow );
+        l3 = new TLine(X17::xmax,-X17::yhigh,X17::xmin,-X17::ylow );
+        l4 = new TLine(X17::xmax, X17::yhigh,X17::xmin, X17::ylow );
+    }
+
+    l1->Draw("same");
+    l2->Draw("same");
+    l3->Draw("same");
+    l4->Draw("same");
+}
     /// @brief Control function for drawing the pads
     void DrawPads()
     {
-        TCanvas* c = new TCanvas("c_pads","GEM readout pads",600,600*2*(zhigh+1)/(xmax-xmin+2));
+        TCanvas* c = new TCanvas("c_pads","GEM readout pads",600,600*2*(yhigh+1)/(xmax-xmin+2));
         vector<TLine*> pad_lines;
         vector<TText*> pad_numbers;
 
         for (int i = 1; i <= channels; i++)
         {
-            double x1,z1,x2,z2;
-            GetPadCorners(i,x1,z1,x2,z2);
+            double x1,y1,x2,y2;
+            GetPadCorners(i,x1,y1,x2,y2);
 
-            pad_lines.push_back(new TLine(x1,z1,x1,z2)); // left
-            pad_lines.push_back(new TLine(x2,z1,x2,z2)); // right
-            pad_lines.push_back(new TLine(x1,z1,x2,z1)); // bottom
-            pad_lines.push_back(new TLine(x1,z2,x2,z2)); // top
+            pad_lines.push_back(new TLine(x1,y1,x1,y2)); // left
+            pad_lines.push_back(new TLine(x2,y1,x2,y2)); // right
+            pad_lines.push_back(new TLine(x1,y1,x2,y1)); // bottom
+            pad_lines.push_back(new TLine(x1,y2,x2,y2)); // top
 
-            TText* pad_number = new TText((x1+x2)/2,(z1+z2)/2,to_string(i).c_str());
+            TText* pad_number = new TText((x1+x2)/2,(y1+y2)/2,to_string(i).c_str());
             pad_number->SetTextAlign(22);
             pad_number->SetTextSize(0.035);
             pad_numbers.push_back(pad_number);
         }
         
-        c->Range(xmin-1,-zhigh-1,xmax+1,zhigh+1);
+        c->Range(xmin-1,-yhigh-1,xmax+1,yhigh+1);
         for(auto l : pad_lines)   l->Draw("AL");
         for(auto t : pad_numbers) t->Draw("same");
+
+        DrawTrapezoid(false);
     }
 
+
     /// @brief Draw pads using coordinates of electrons ending up in the corners
-    /// @param y y coordinate of plane (reverse propagation)
-    void DrawPadsDistortion(const double& y)
+    /// @param time time to propagate [ns]
+    void DrawPadsDistortion(const double& time)
     {
         // Get map from initial to final electron positions from file
         TFile* inFile2 = new TFile("map.root");
         Field<SensorData>* map = (Field<SensorData>*)inFile2->Get("map");
 
-        TCanvas* c = new TCanvas("c_pads_distorted","GEM readout pads distorted 4000 ns",600*2*(zhigh+1)/(xmax-xmin+2),600);
+        TCanvas* c = new TCanvas("c_pads_distorted","GEM readout pads distorted 4000 ns",600*2*(yhigh+1)/(xmax-xmin+2),600);
         vector<TLine*> pad_lines;
 
         for (int i = 1; i <= channels; i++)
         {
-            double x1,z1,x2,z2;
-            GetPadCorners(i,x1,z1,x2,z2);
+            double x1,y1,x2,y2;
+            GetPadCorners(i,x1,y1,x2,y2);
 
-            SensorData bottomleft  = map->Invert(z1,x1,4000);//RecoPoint(map,x1,z1,5000,0.01);
-            SensorData bottomright = map->Invert(z1,x2,4000);//RecoPoint(map,x2,z1,5000,0.01);
-            SensorData topleft     = map->Invert(z2,x1,4000);//RecoPoint(map,x1,z2,5000,0.01);
-            SensorData topright    = map->Invert(z2,x2,4000);//RecoPoint(map,x2,z2,5000,0.01);
+            SensorData bottomleft  = map->Invert(x1,y1,time);//RecoPoint(map,x1,y1,5000,0.01);
+            SensorData bottomright = map->Invert(x1,y2,time);//RecoPoint(map,x2,y1,5000,0.01);
+            SensorData topleft     = map->Invert(x2,y1,time);//RecoPoint(map,x1,y2,5000,0.01);
+            SensorData topright    = map->Invert(x2,y2,time);//RecoPoint(map,x2,y2,5000,0.01);
             
 
-            pad_lines.push_back(new TLine(bottomleft.x1,  bottomleft.z1,  topleft.x1,     topleft.z1)); // left
-            pad_lines.push_back(new TLine(bottomright.x1, bottomright.z1, topright.x1,    topright.z1)); // right
-            pad_lines.push_back(new TLine(bottomleft.x1,  bottomleft.z1,  bottomright.x1, bottomright.z1)); // bottom
-            pad_lines.push_back(new TLine(topleft.x1,     topleft.z1,     topright.x1,    topright.z1)); // top
+            pad_lines.push_back(new TLine(bottomleft.y1,  bottomleft.x1,  topleft.y1,     topleft.x1));     // left
+            pad_lines.push_back(new TLine(bottomright.y1, bottomright.x1, topright.y1,    topright.x1));    // right
+            pad_lines.push_back(new TLine(bottomleft.y1,  bottomleft.x1,  bottomright.y1, bottomright.x1)); // bottom
+            pad_lines.push_back(new TLine(topleft.y1,     topleft.x1,     topright.y1,    topright.x1));    // top
         }
         
 
-        c->Range(-zhigh-1,xmin-1,zhigh+1,xmax+1);
+        c->Range(-yhigh-1,xmin-1,yhigh+1,xmax+1);
         for(auto l : pad_lines)   l->Draw("AL");
+        DrawTrapezoid();
     }
 } // namespace X17

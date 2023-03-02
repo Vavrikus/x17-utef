@@ -228,8 +228,11 @@ struct VectorField
                 if (X != "")
                 {
                     double x,y,z,vx,vy,vz;
-                    x = stod(X); y = stod(Y); z = stod(Z);
-                    vx = stod(VX); vy = stod(VY); vz = stod(VZ);
+                    // changing coordinate system from magnetic simulation (x,y,z) --> (y,z,x)
+                    x = stod(Z); y = stod(X); z = stod(Y);
+                    vx = stod(VZ); vy = stod(VX); vz = stod(VY);
+                    // x = stod(X); y = stod(Y); z = stod(Z);
+                    // vx = stod(VX); vy = stod(VY); vz = stod(VZ);
 
                     *(this->GetVector(x,y,z)) = Vector{vx,vy,vz};
                     lines_processed++;
@@ -438,15 +441,15 @@ vector<vector<double>> GetInterpolCoef(Field<SensorData>& map, int (&&indexes)[6
     xvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[4]].x1);
     xvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[5]].x1);
 
-    vector<double> zvalues;
-    zvalues.push_back(map.field[indexes[0]][indexes[2]][indexes[4]].z1);
-    zvalues.push_back(map.field[indexes[0]][indexes[2]][indexes[5]].z1);
-    zvalues.push_back(map.field[indexes[0]][indexes[3]][indexes[4]].z1);
-    zvalues.push_back(map.field[indexes[0]][indexes[3]][indexes[5]].z1);
-    zvalues.push_back(map.field[indexes[1]][indexes[2]][indexes[4]].z1);
-    zvalues.push_back(map.field[indexes[1]][indexes[2]][indexes[5]].z1);
-    zvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[4]].z1);
-    zvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[5]].z1);
+    vector<double> yvalues;
+    yvalues.push_back(map.field[indexes[0]][indexes[2]][indexes[4]].y1);
+    yvalues.push_back(map.field[indexes[0]][indexes[2]][indexes[5]].y1);
+    yvalues.push_back(map.field[indexes[0]][indexes[3]][indexes[4]].y1);
+    yvalues.push_back(map.field[indexes[0]][indexes[3]][indexes[5]].y1);
+    yvalues.push_back(map.field[indexes[1]][indexes[2]][indexes[4]].y1);
+    yvalues.push_back(map.field[indexes[1]][indexes[2]][indexes[5]].y1);
+    yvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[4]].y1);
+    yvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[5]].y1);
 
     vector<double> tvalues;
     tvalues.push_back(map.field[indexes[0]][indexes[2]][indexes[4]].t1);
@@ -458,37 +461,37 @@ vector<vector<double>> GetInterpolCoef(Field<SensorData>& map, int (&&indexes)[6
     tvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[4]].t1);
     tvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[5]].t1);
 
-    double xarr[] = {1, xvalues[0], zvalues[0], tvalues[0], xvalues[0]*zvalues[0], xvalues[0]*tvalues[0], zvalues[0]*tvalues[0], xvalues[0]*zvalues[0]*tvalues[0], xmin,
-                     1, xvalues[1], zvalues[1], tvalues[1], xvalues[1]*zvalues[1], xvalues[1]*tvalues[1], zvalues[1]*tvalues[1], xvalues[1]*zvalues[1]*tvalues[1], xmin,
-                     1, xvalues[2], zvalues[2], tvalues[2], xvalues[2]*zvalues[2], xvalues[2]*tvalues[2], zvalues[2]*tvalues[2], xvalues[2]*zvalues[2]*tvalues[2], xmin,
-                     1, xvalues[3], zvalues[3], tvalues[3], xvalues[3]*zvalues[3], xvalues[3]*tvalues[3], zvalues[3]*tvalues[3], xvalues[3]*zvalues[3]*tvalues[3], xmin,
-                     1, xvalues[4], zvalues[4], tvalues[4], xvalues[4]*zvalues[4], xvalues[4]*tvalues[4], zvalues[4]*tvalues[4], xvalues[4]*zvalues[4]*tvalues[4], xmax,
-                     1, xvalues[5], zvalues[5], tvalues[5], xvalues[5]*zvalues[5], xvalues[5]*tvalues[5], zvalues[5]*tvalues[5], xvalues[5]*zvalues[5]*tvalues[5], xmax,
-                     1, xvalues[6], zvalues[6], tvalues[6], xvalues[6]*zvalues[6], xvalues[6]*tvalues[6], zvalues[6]*tvalues[6], xvalues[6]*zvalues[6]*tvalues[6], xmax,
-                     1, xvalues[7], zvalues[7], tvalues[7], xvalues[7]*zvalues[7], xvalues[7]*tvalues[7], zvalues[7]*tvalues[7], xvalues[7]*zvalues[7]*tvalues[7], xmax};
+    double xarr[] = {1, xvalues[0], yvalues[0], tvalues[0], xvalues[0]*yvalues[0], xvalues[0]*tvalues[0], yvalues[0]*tvalues[0], xvalues[0]*yvalues[0]*tvalues[0], xmin,
+                     1, xvalues[1], yvalues[1], tvalues[1], xvalues[1]*yvalues[1], xvalues[1]*tvalues[1], yvalues[1]*tvalues[1], xvalues[1]*yvalues[1]*tvalues[1], xmin,
+                     1, xvalues[2], yvalues[2], tvalues[2], xvalues[2]*yvalues[2], xvalues[2]*tvalues[2], yvalues[2]*tvalues[2], xvalues[2]*yvalues[2]*tvalues[2], xmin,
+                     1, xvalues[3], yvalues[3], tvalues[3], xvalues[3]*yvalues[3], xvalues[3]*tvalues[3], yvalues[3]*tvalues[3], xvalues[3]*yvalues[3]*tvalues[3], xmin,
+                     1, xvalues[4], yvalues[4], tvalues[4], xvalues[4]*yvalues[4], xvalues[4]*tvalues[4], yvalues[4]*tvalues[4], xvalues[4]*yvalues[4]*tvalues[4], xmax,
+                     1, xvalues[5], yvalues[5], tvalues[5], xvalues[5]*yvalues[5], xvalues[5]*tvalues[5], yvalues[5]*tvalues[5], xvalues[5]*yvalues[5]*tvalues[5], xmax,
+                     1, xvalues[6], yvalues[6], tvalues[6], xvalues[6]*yvalues[6], xvalues[6]*tvalues[6], yvalues[6]*tvalues[6], xvalues[6]*yvalues[6]*tvalues[6], xmax,
+                     1, xvalues[7], yvalues[7], tvalues[7], xvalues[7]*yvalues[7], xvalues[7]*tvalues[7], yvalues[7]*tvalues[7], xvalues[7]*yvalues[7]*tvalues[7], xmax};
     Matrix<8,9> xmatrix = Matrix<8,9>(xarr);
     Matrix<8,9> xmatrixoriginal = Matrix<8,9>(xarr);
     xmatrix.Reduce();
 
-    double yarr[] = {1, xvalues[0], zvalues[0], tvalues[0], xvalues[0]*zvalues[0], xvalues[0]*tvalues[0], zvalues[0]*tvalues[0], xvalues[0]*zvalues[0]*tvalues[0], ymin,
-                     1, xvalues[1], zvalues[1], tvalues[1], xvalues[1]*zvalues[1], xvalues[1]*tvalues[1], zvalues[1]*tvalues[1], xvalues[1]*zvalues[1]*tvalues[1], ymin,
-                     1, xvalues[2], zvalues[2], tvalues[2], xvalues[2]*zvalues[2], xvalues[2]*tvalues[2], zvalues[2]*tvalues[2], xvalues[2]*zvalues[2]*tvalues[2], ymax,
-                     1, xvalues[3], zvalues[3], tvalues[3], xvalues[3]*zvalues[3], xvalues[3]*tvalues[3], zvalues[3]*tvalues[3], xvalues[3]*zvalues[3]*tvalues[3], ymax,
-                     1, xvalues[4], zvalues[4], tvalues[4], xvalues[4]*zvalues[4], xvalues[4]*tvalues[4], zvalues[4]*tvalues[4], xvalues[4]*zvalues[4]*tvalues[4], ymin,
-                     1, xvalues[5], zvalues[5], tvalues[5], xvalues[5]*zvalues[5], xvalues[5]*tvalues[5], zvalues[5]*tvalues[5], xvalues[5]*zvalues[5]*tvalues[5], ymin,
-                     1, xvalues[6], zvalues[6], tvalues[6], xvalues[6]*zvalues[6], xvalues[6]*tvalues[6], zvalues[6]*tvalues[6], xvalues[6]*zvalues[6]*tvalues[6], ymax,
-                     1, xvalues[7], zvalues[7], tvalues[7], xvalues[7]*zvalues[7], xvalues[7]*tvalues[7], zvalues[7]*tvalues[7], xvalues[7]*zvalues[7]*tvalues[7], ymax};
+    double yarr[] = {1, xvalues[0], yvalues[0], tvalues[0], xvalues[0]*yvalues[0], xvalues[0]*tvalues[0], yvalues[0]*tvalues[0], xvalues[0]*yvalues[0]*tvalues[0], ymin,
+                     1, xvalues[1], yvalues[1], tvalues[1], xvalues[1]*yvalues[1], xvalues[1]*tvalues[1], yvalues[1]*tvalues[1], xvalues[1]*yvalues[1]*tvalues[1], ymin,
+                     1, xvalues[2], yvalues[2], tvalues[2], xvalues[2]*yvalues[2], xvalues[2]*tvalues[2], yvalues[2]*tvalues[2], xvalues[2]*yvalues[2]*tvalues[2], ymax,
+                     1, xvalues[3], yvalues[3], tvalues[3], xvalues[3]*yvalues[3], xvalues[3]*tvalues[3], yvalues[3]*tvalues[3], xvalues[3]*yvalues[3]*tvalues[3], ymax,
+                     1, xvalues[4], yvalues[4], tvalues[4], xvalues[4]*yvalues[4], xvalues[4]*tvalues[4], yvalues[4]*tvalues[4], xvalues[4]*yvalues[4]*tvalues[4], ymin,
+                     1, xvalues[5], yvalues[5], tvalues[5], xvalues[5]*yvalues[5], xvalues[5]*tvalues[5], yvalues[5]*tvalues[5], xvalues[5]*yvalues[5]*tvalues[5], ymin,
+                     1, xvalues[6], yvalues[6], tvalues[6], xvalues[6]*yvalues[6], xvalues[6]*tvalues[6], yvalues[6]*tvalues[6], xvalues[6]*yvalues[6]*tvalues[6], ymax,
+                     1, xvalues[7], yvalues[7], tvalues[7], xvalues[7]*yvalues[7], xvalues[7]*tvalues[7], yvalues[7]*tvalues[7], xvalues[7]*yvalues[7]*tvalues[7], ymax};
     Matrix<8,9> ymatrix = Matrix<8,9>(yarr);
     ymatrix.Reduce();
 
-    double zarr[] = {1, xvalues[0], zvalues[0], tvalues[0], xvalues[0]*zvalues[0], xvalues[0]*tvalues[0], zvalues[0]*tvalues[0], xvalues[0]*zvalues[0]*tvalues[0], zmin,
-                     1, xvalues[1], zvalues[1], tvalues[1], xvalues[1]*zvalues[1], xvalues[1]*tvalues[1], zvalues[1]*tvalues[1], xvalues[1]*zvalues[1]*tvalues[1], zmax,
-                     1, xvalues[2], zvalues[2], tvalues[2], xvalues[2]*zvalues[2], xvalues[2]*tvalues[2], zvalues[2]*tvalues[2], xvalues[2]*zvalues[2]*tvalues[2], zmin,
-                     1, xvalues[3], zvalues[3], tvalues[3], xvalues[3]*zvalues[3], xvalues[3]*tvalues[3], zvalues[3]*tvalues[3], xvalues[3]*zvalues[3]*tvalues[3], zmax,
-                     1, xvalues[4], zvalues[4], tvalues[4], xvalues[4]*zvalues[4], xvalues[4]*tvalues[4], zvalues[4]*tvalues[4], xvalues[4]*zvalues[4]*tvalues[4], zmin,
-                     1, xvalues[5], zvalues[5], tvalues[5], xvalues[5]*zvalues[5], xvalues[5]*tvalues[5], zvalues[5]*tvalues[5], xvalues[5]*zvalues[5]*tvalues[5], zmax,
-                     1, xvalues[6], zvalues[6], tvalues[6], xvalues[6]*zvalues[6], xvalues[6]*tvalues[6], zvalues[6]*tvalues[6], xvalues[6]*zvalues[6]*tvalues[6], zmin,
-                     1, xvalues[7], zvalues[7], tvalues[7], xvalues[7]*zvalues[7], xvalues[7]*tvalues[7], zvalues[7]*tvalues[7], xvalues[7]*zvalues[7]*tvalues[7], zmax};
+    double zarr[] = {1, xvalues[0], yvalues[0], tvalues[0], xvalues[0]*yvalues[0], xvalues[0]*tvalues[0], yvalues[0]*tvalues[0], xvalues[0]*yvalues[0]*tvalues[0], zmin,
+                     1, xvalues[1], yvalues[1], tvalues[1], xvalues[1]*yvalues[1], xvalues[1]*tvalues[1], yvalues[1]*tvalues[1], xvalues[1]*yvalues[1]*tvalues[1], zmax,
+                     1, xvalues[2], yvalues[2], tvalues[2], xvalues[2]*yvalues[2], xvalues[2]*tvalues[2], yvalues[2]*tvalues[2], xvalues[2]*yvalues[2]*tvalues[2], zmin,
+                     1, xvalues[3], yvalues[3], tvalues[3], xvalues[3]*yvalues[3], xvalues[3]*tvalues[3], yvalues[3]*tvalues[3], xvalues[3]*yvalues[3]*tvalues[3], zmax,
+                     1, xvalues[4], yvalues[4], tvalues[4], xvalues[4]*yvalues[4], xvalues[4]*tvalues[4], yvalues[4]*tvalues[4], xvalues[4]*yvalues[4]*tvalues[4], zmin,
+                     1, xvalues[5], yvalues[5], tvalues[5], xvalues[5]*yvalues[5], xvalues[5]*tvalues[5], yvalues[5]*tvalues[5], xvalues[5]*yvalues[5]*tvalues[5], zmax,
+                     1, xvalues[6], yvalues[6], tvalues[6], xvalues[6]*yvalues[6], xvalues[6]*tvalues[6], yvalues[6]*tvalues[6], xvalues[6]*yvalues[6]*tvalues[6], zmin,
+                     1, xvalues[7], yvalues[7], tvalues[7], xvalues[7]*yvalues[7], xvalues[7]*tvalues[7], yvalues[7]*tvalues[7], xvalues[7]*yvalues[7]*tvalues[7], zmax};
     Matrix<8,9> zmatrix = Matrix<8,9>(zarr);
     zmatrix.Reduce();
 
@@ -497,54 +500,34 @@ vector<vector<double>> GetInterpolCoef(Field<SensorData>& map, int (&&indexes)[6
     vector<double> zresults = zmatrix.GetColumn(8);
     vector<vector<double>> output = {xresults,yresults,zresults};
 
-    Matrix<9,1> xres;
-    for(int i = 0; i < 8; i++) xres.at(i,0) = xresults[i];
-    xres.at(8,0) = 0;
-    auto m = xmatrixoriginal*xres;
-    cout << "xmatrix:\n";
-    xmatrixoriginal.Print();
-    cout << "m:\n";
-    m.Print();
+    // Sanity check
+        // Matrix<9,1> xres;
+        // for(int i = 0; i < 8; i++) xres.at(i,0) = xresults[i];
+        // xres.at(8,0) = 0;
+        // auto m = xmatrixoriginal*xres;
+        // cout << "xmatrix:\n";
+        // xmatrixoriginal.Print();
+        // cout << "m:\n";
+        // m.Print();
 
     return output;
 }  
 
 template<>
-SensorData Field<SensorData>::Invert(double x1, double z1, double t1)
+SensorData Field<SensorData>::Invert(double x1, double y1, double t1)
 {
     // Find 8 closest points using binary search (assuming ordering)
         int ximin = 0;               // Starting minimal search x index
         int ximax = this->ximax;     // Starting maximal search x index
-        int yimin = this->yimax;     // Starting minimal search y index
-        int yimax = 0;               // Starting maximal search y index
-        int zimin = 0;               // Starting minimal search z index
-        int zimax = this->zimax;     // Starting maximal search z index
+        int yimin = 0;               // Starting minimal search y index
+        int yimax = this->yimax;     // Starting maximal search y index
+        int zimin = this->zimax;     // Starting minimal search z index (inverted - time is maximal for z minimal)
+        int zimax = 0;               // Starting maximal search z index (inverted - time is maximal for z minimal)
 
         int  ximid = (ximin+ximax)/2; // x midpoint variable
         int  yimid = (yimin+yimax)/2; // y midpoint variable
         int  zimid = (zimin+zimax)/2; // z midpoint variable
         bool ximid_is_max,yimid_is_max,zimid_is_max; // Do midpoint variables contain higher value?
-
-        // z index search
-        while ((zimin+1<zimax))
-        {
-            zimid = (zimin+zimax)/2;
-
-            double z1low  = field[ximid][yimid][zimin].z1;
-            double z1high = field[ximid][yimid][zimax].z1;
-            double z1mid  = field[ximid][yimid][zimid].z1;
-
-            if(z1mid < z1low || z1mid > z1high) cerr << "WARNING: Ordering mistake in binary search (z).\n";
-            if(z1 <= z1mid) {zimax = zimid; zimid_is_max = true;}
-            if(z1 >  z1mid) {zimin = zimid; zimid_is_max = false;}
-        }
-
-        // Some part of the field is initialized with zeros and isn't therefore ordered
-        if(zimid != 0)
-        {
-            while(field[ximin][yimid][zimid].x1 == 0) ximin++;
-            while(field[ximax][yimid][zimid].x1 == 0) ximax--;
-        }
 
         // x index search
         while ((ximin+1<ximax))
@@ -560,38 +543,59 @@ SensorData Field<SensorData>::Invert(double x1, double z1, double t1)
             if(x1 >  x1mid) {ximin = ximid; ximid_is_max = false;}
         }
 
+        // Some part of the field is initialized with zeros and isn't therefore ordered
+        if(ximid != 0)
+        {
+            while(field[ximid][yimin][zimid].y1 == 0) yimin++;
+            while(field[ximid][yimax][zimid].y1 == 0) yimax--;
+        }
+
         // y index search
-        while ((yimin>yimax+1))
+        while ((yimin+1<yimax))
         {
             yimid = (yimin+yimax)/2;
 
-            double t1low  = field[ximid][yimin][zimid].t1;
-            double t1high = field[ximid][yimax][zimid].t1;
+            double y1low  = field[ximid][yimin][zimid].y1;
+            double y1high = field[ximid][yimax][zimid].y1;
+            double y1mid  = field[ximid][yimid][zimid].y1;
+
+            if(y1mid < y1low || y1mid > y1high) cerr << "WARNING: Ordering mistake in binary search (y).\n";
+            if(y1 <= y1mid) {yimax = yimid; yimid_is_max = true;}
+            if(y1 >  y1mid) {yimin = yimid; yimid_is_max = false;}
+        }
+
+        // z index search
+        while ((zimin>zimax+1))
+        {
+            zimid = (zimin+zimax)/2;
+
+            double t1low  = field[ximid][yimid][zimin].t1;
+            double t1high = field[ximid][yimid][zimax].t1;
             double t1mid  = field[ximid][yimid][zimid].t1;
 
-            if(t1mid < t1low || t1mid > t1high) cerr << "WARNING: Ordering mistake in binary search (y).\n";
-            if(t1 <= t1mid) {yimax = yimid; yimid_is_max = true;}
-            if(t1 >  t1mid) {yimin = yimid; yimid_is_max = false;}
+            if(t1mid < t1low || t1mid > t1high) cerr << "WARNING: Ordering mistake in binary search (z).\n";
+            if(t1 <= t1mid) {zimax = zimid; zimid_is_max = true;}
+            if(t1 >  t1mid) {zimin = zimid; zimid_is_max = false;}
         }
 
         // Set up actual min/max variables for the cube
         if(ximid_is_max) {ximax = ximid; ximin = ximax-1;}
         else             {ximin = ximid; ximax = ximin+1;}
-        if(yimid_is_max) {yimax = yimid; yimin = yimax+1;}
-        else             {yimin = yimid; yimax = yimin-1;}
-        if(zimid_is_max) {zimax = zimid; zimin = zimax-1;}
-        else             {zimin = zimid; zimax = zimin+1;}
+        if(yimid_is_max) {yimax = yimid; yimin = yimax-1;}
+        else             {yimin = yimid; yimax = yimin+1;}
+        if(zimid_is_max) {zimax = zimid; zimin = zimax+1;}
+        else             {zimin = zimid; zimax = zimin-1;}
 
         // Sanity check
-            cout << "Cube for (x1,z1,t1) = (" << x1 << "," << z1 << "," << t1 << "): \n";
-            cout << "000: [" << ximin << "][" << yimin << "][" << zimin << "], (x,z,t) = (" << field[ximin][yimin][zimin].x1 << "," << field[ximin][yimin][zimin].z1 << "," << field[ximin][yimin][zimin].t1 << ")\n";
-            cout << "001: [" << ximin << "][" << yimin << "][" << zimax << "], (x,z,t) = (" << field[ximin][yimin][zimax].x1 << "," << field[ximin][yimin][zimax].z1 << "," << field[ximin][yimin][zimax].t1 << ")\n";
-            cout << "010: [" << ximin << "][" << yimax << "][" << zimin << "], (x,z,t) = (" << field[ximin][yimax][zimin].x1 << "," << field[ximin][yimax][zimin].z1 << "," << field[ximin][yimax][zimin].t1 << ")\n";
-            cout << "011: [" << ximin << "][" << yimax << "][" << zimax << "], (x,z,t) = (" << field[ximin][yimax][zimax].x1 << "," << field[ximin][yimax][zimax].z1 << "," << field[ximin][yimax][zimax].t1 << ")\n";
-            cout << "100: [" << ximax << "][" << yimin << "][" << zimin << "], (x,z,t) = (" << field[ximax][yimin][zimin].x1 << "," << field[ximax][yimin][zimin].z1 << "," << field[ximax][yimin][zimin].t1 << ")\n";
-            cout << "101: [" << ximax << "][" << yimin << "][" << zimax << "], (x,z,t) = (" << field[ximax][yimin][zimax].x1 << "," << field[ximax][yimin][zimax].z1 << "," << field[ximax][yimin][zimax].t1 << ")\n";
-            cout << "110: [" << ximax << "][" << yimax << "][" << zimin << "], (x,z,t) = (" << field[ximax][yimax][zimin].x1 << "," << field[ximax][yimax][zimin].z1 << "," << field[ximax][yimax][zimin].t1 << ")\n";
-            cout << "111: [" << ximax << "][" << yimax << "][" << zimax << "], (x,z,t) = (" << field[ximax][yimax][zimax].x1 << "," << field[ximax][yimax][zimax].z1 << "," << field[ximax][yimax][zimax].t1 << ")\n\n";
+            cout << "Cube for (x1,y1,t1) = (" << x1 << "," << y1 << "," << t1 << "): \n";
+            cout << "000: [" << ximin << "][" << yimin << "][" << zimin << "], (x,y,t) = (" << field[ximin][yimin][zimin].x1 << "," << field[ximin][yimin][zimin].y1 << "," << field[ximin][yimin][zimin].t1 << ")\n";
+            cout << "001: [" << ximax << "][" << yimin << "][" << zimin << "], (x,y,t) = (" << field[ximax][yimin][zimin].x1 << "," << field[ximax][yimin][zimin].y1 << "," << field[ximax][yimin][zimin].t1 << ")\n";
+            cout << "010: [" << ximin << "][" << yimin << "][" << zimax << "], (x,y,t) = (" << field[ximin][yimin][zimax].x1 << "," << field[ximin][yimin][zimax].y1 << "," << field[ximin][yimin][zimax].t1 << ")\n";
+            cout << "011: [" << ximax << "][" << yimin << "][" << zimax << "], (x,y,t) = (" << field[ximax][yimin][zimax].x1 << "," << field[ximax][yimin][zimax].y1 << "," << field[ximax][yimin][zimax].t1 << ")\n";
+            cout << "100: [" << ximin << "][" << yimax << "][" << zimin << "], (x,y,t) = (" << field[ximin][yimax][zimin].x1 << "," << field[ximin][yimax][zimin].y1 << "," << field[ximin][yimax][zimin].t1 << ")\n";
+            cout << "101: [" << ximax << "][" << yimax << "][" << zimin << "], (x,y,t) = (" << field[ximax][yimax][zimin].x1 << "," << field[ximax][yimax][zimin].y1 << "," << field[ximax][yimax][zimin].t1 << ")\n";
+            cout << "110: [" << ximin << "][" << yimax << "][" << zimax << "], (x,y,t) = (" << field[ximin][yimax][zimax].x1 << "," << field[ximin][yimax][zimax].y1 << "," << field[ximin][yimax][zimax].t1 << ")\n";
+            cout << "111: [" << ximax << "][" << yimax << "][" << zimax << "], (x,y,t) = (" << field[ximax][yimax][zimax].x1 << "," << field[ximax][yimax][zimax].y1 << "," << field[ximax][yimax][zimax].t1 << ")\n\n";
 
             if(field[ximin][yimin][zimin].x1 > x1 || field[ximin][yimin][zimax].x1 > x1 ||
                field[ximin][yimax][zimin].x1 > x1 || field[ximin][yimax][zimax].x1 > x1)
@@ -600,44 +604,44 @@ SensorData Field<SensorData>::Invert(double x1, double z1, double t1)
                field[ximax][yimax][zimin].x1 < x1 || field[ximax][yimax][zimax].x1 < x1)
                     cerr << "ERROR: Maximal x bound not maximal.\n";
 
-            if(field[ximin][yimin][zimin].t1 > t1 || field[ximin][yimin][zimax].t1 > t1 ||
-               field[ximax][yimin][zimin].t1 > t1 || field[ximax][yimin][zimax].t1 > t1)
+            if(field[ximin][yimin][zimin].y1 > y1 || field[ximin][yimin][zimax].y1 > y1 ||
+               field[ximax][yimin][zimin].y1 > y1 || field[ximax][yimin][zimax].y1 > y1)
                     cerr << "ERROR: Minimal y bound not minimal.\n";
-            if(field[ximin][yimax][zimin].t1 < t1 || field[ximin][yimax][zimax].t1 < t1 ||
-               field[ximin][yimax][zimin].t1 < t1 || field[ximin][yimax][zimax].t1 < t1)
+            if(field[ximin][yimax][zimin].y1 < y1 || field[ximin][yimax][zimax].y1 < y1 ||
+               field[ximin][yimax][zimin].y1 < y1 || field[ximin][yimax][zimax].y1 < y1)
                     cerr << "ERROR: Maximal y bound not maximal.\n";
 
-            if(field[ximin][yimin][zimin].z1 > z1 || field[ximax][yimin][zimin].z1 > z1 ||
-               field[ximin][yimax][zimin].z1 > z1 || field[ximax][yimax][zimin].z1 > z1)
+            if(field[ximin][yimin][zimin].t1 > t1 || field[ximax][yimin][zimin].t1 > t1 ||
+               field[ximin][yimax][zimin].t1 > t1 || field[ximax][yimax][zimin].t1 > t1)
                     cerr << "ERROR: Minimal z bound not minimal.\n";
-            if(field[ximin][yimin][zimax].z1 < z1 || field[ximax][yimin][zimax].z1 < z1 ||
-               field[ximin][yimax][zimax].z1 < z1 || field[ximax][yimax][zimax].z1 < z1)
+            if(field[ximin][yimin][zimax].t1 < t1 || field[ximax][yimin][zimax].t1 < t1 ||
+               field[ximin][yimax][zimax].t1 < t1 || field[ximax][yimax][zimax].t1 < t1)
                     cerr << "ERROR: Maximal z bound not maximal.\n";
 
 
 
     vector<vector<double>> interpol = GetInterpolCoef(*this,{ximin,ximax,yimin,yimax,zimin,zimax});
 
-    double xout = interpol[0][0]+interpol[0][1]*x1+interpol[0][2]*z1+interpol[0][3]*t1+interpol[0][4]*x1*z1+interpol[0][5]*x1*t1+interpol[0][6]*z1*t1+interpol[0][7]*x1*z1*t1;
-    double yout = interpol[1][0]+interpol[1][1]*x1+interpol[1][2]*z1+interpol[1][3]*t1+interpol[1][4]*x1*z1+interpol[1][5]*x1*t1+interpol[1][6]*z1*t1+interpol[1][7]*x1*z1*t1;
-    double zout = interpol[2][0]+interpol[2][1]*x1+interpol[2][2]*z1+interpol[2][3]*t1+interpol[2][4]*x1*z1+interpol[2][5]*x1*t1+interpol[2][6]*z1*t1+interpol[2][7]*x1*z1*t1;
+    double xout = interpol[0][0]+interpol[0][1]*x1+interpol[0][2]*y1+interpol[0][3]*t1+interpol[0][4]*x1*y1+interpol[0][5]*x1*t1+interpol[0][6]*y1*t1+interpol[0][7]*x1*y1*t1;
+    double yout = interpol[1][0]+interpol[1][1]*x1+interpol[1][2]*y1+interpol[1][3]*t1+interpol[1][4]*x1*y1+interpol[1][5]*x1*t1+interpol[1][6]*y1*t1+interpol[1][7]*x1*y1*t1;
+    double zout = interpol[2][0]+interpol[2][1]*x1+interpol[2][2]*y1+interpol[2][3]*t1+interpol[2][4]*x1*y1+interpol[2][5]*x1*t1+interpol[2][6]*y1*t1+interpol[2][7]*x1*y1*t1;
 
     return {xout,yout,zout};
 }
 
 // estimates difference between two points with given values in map
-double Offset(SensorData s, double x1, double z1, double t1)
+double Offset(SensorData s, double x1, double y1, double t1)
 {
     constexpr double tfact = 0.00327; // time is measured at different scale, it needs weight
-    return sqrt(pow(x1-s.x1,2)+pow(z1-s.z1,2)+pow(tfact*(t1-s.t1),2));
+    return sqrt(pow(x1-s.x1,2)+pow(y1-s.y1,2)+pow(tfact*(t1-s.t1),2));
 }
 
-SensorData RecoPoint(Field<SensorData>* map, double x1, double z1, double t1, double max_err)
+SensorData RecoPoint(Field<SensorData>* map, double x1, double y1, double t1, double max_err)
 {
     // start looking at the same position
     double x = x1;
-    double y = (map->ymax+map->ymin)/2;
-    double z = z1;
+    double y = y1;
+    double z = (map->zmax+map->zmin)/2;
     double step = map->step/10;
 
     double offset;      // metric of distance between points
@@ -655,21 +659,21 @@ SensorData RecoPoint(Field<SensorData>* map, double x1, double z1, double t1, do
         SensorData za = map->GetField(x,y,z+step);
         SensorData zb = map->GetField(x,y,z-step);
 
-        double oxa = Offset(xa,x1,z1,t1);
-        double oxb = Offset(xb,x1,z1,t1);
-        double oya = Offset(ya,x1,z1,t1);
-        double oyb = Offset(yb,x1,z1,t1);
-        double oza = Offset(za,x1,z1,t1);
-        double ozb = Offset(zb,x1,z1,t1);
+        double oxa = Offset(xa,x1,y1,t1);
+        double oxb = Offset(xb,x1,y1,t1);
+        double oya = Offset(ya,x1,y1,t1);
+        double oyb = Offset(yb,x1,y1,t1);
+        double oza = Offset(za,x1,y1,t1);
+        double ozb = Offset(zb,x1,y1,t1);
 
         double gradx = (oxa-oxb)/(2*step);
         double grady = (oya-oyb)/(2*step);
         double gradz = (oza-ozb)/(2*step);
 
-        //adjust current guess by minus gradient
+        // adjust current guess by minus gradient
         x -= damp*gradx; y -= damp*grady; z -= damp*gradz;
 
-        //check bounds
+        // check bounds
         if (x < map->xmin) x = map->xmin;
         if (x > map->xmax) x = map->xmax;
         if (y < map->ymin) y = map->ymin;
@@ -680,9 +684,9 @@ SensorData RecoPoint(Field<SensorData>* map, double x1, double z1, double t1, do
 
         // calculate values at current position
         SensorData cur = map->GetField(x,y,z);
-        offset = Offset(cur,x1,z1,t1);
+        offset = Offset(cur,x1,y1,t1);
 
-        //make sure step isn't too high
+        // make sure step isn't too high
         if(offset < 10*step) step /= 10;
 
         iterations++;

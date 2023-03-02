@@ -52,19 +52,6 @@ double stdev(vector<double> values, double average)
     return sqrt(sqdev_sum/values.size());
 }
 
-// draws lines around approximate sensitive area
-void DrawTrapezoid()
-{
-    TLine* l1 = new TLine(-X17::zhigh,X17::xmax, X17::zhigh,X17::xmax);
-    TLine* l2 = new TLine(-X17::zlow ,X17::xmin, X17::zlow ,X17::xmin);
-    TLine* l3 = new TLine(-X17::zhigh,X17::xmax,-X17::zlow ,X17::xmin);
-    TLine* l4 = new TLine( X17::zhigh,X17::xmax, X17::zlow ,X17::xmin);
-    l1->Draw();
-    l2->Draw();
-    l3->Draw();
-    l4->Draw();
-}
-
 int make_map()
 {
     // load data from all files (results of individual jobs)
@@ -74,23 +61,24 @@ int make_map()
     cout << "\n\nEntries: " << map_data_in->GetEntries() << "\n";
 
     // set branches for tchain containing data
+    // ADJUSTED FOR OLD COORDINATES ONLY!!!!!!!
     double x0, y0, z0, t0, e0;
     double x1, y1, z1, t1, e1;
-    map_data_in->SetBranchAddress("x0",&x0);
-    map_data_in->SetBranchAddress("y0",&y0);
-    map_data_in->SetBranchAddress("z0",&z0);
+    map_data_in->SetBranchAddress("z0",&x0);
+    map_data_in->SetBranchAddress("x0",&y0);
+    map_data_in->SetBranchAddress("y0",&z0);
     map_data_in->SetBranchAddress("t0",&t0);
     map_data_in->SetBranchAddress("e0",&e0);
-    map_data_in->SetBranchAddress("x1",&x1);
-    map_data_in->SetBranchAddress("y1",&y1);
-    map_data_in->SetBranchAddress("z1",&z1);
+    map_data_in->SetBranchAddress("z1",&x1);
+    map_data_in->SetBranchAddress("x1",&y1);
+    map_data_in->SetBranchAddress("y1",&z1);
     map_data_in->SetBranchAddress("t1",&t1);
     map_data_in->SetBranchAddress("e1",&e1);
 
     // prepare field for output
     Field<SensorData> map;
     map.SetDefault({0,0,0,0,0,0,0,0});
-    map.InitField(-30,30,-8,8,0,15,1);
+    map.InitField(0,15,-30,30,-8,8,1);
 
     // variables for checking with the previous position
     double x0_prev = 0; double y0_prev = 0; double z0_prev = 0;
@@ -147,177 +135,177 @@ int make_map()
 
     if(MakePlots)
     {
-        vector<TH2F*> v_xz_dx;
-        vector<TH2F*> v_xz_dz;
-        vector<TGraphErrors*> v_g_xz;
-        vector<vector<TArrow*>> vv_g_xz_arrows;
-        vector<TH2F*> v_xz_t1;
+        vector<TH2F*> v_yx_dx;
+        vector<TH2F*> v_yx_dy;
+        vector<TGraphErrors*> v_g_yx;
+        vector<vector<TArrow*>> vv_g_yx_arrows;
+        vector<TH2F*> v_yx_t1;
 
-        TGraphErrors* g_yz = new TGraphErrors();
-        vector<TArrow*> v_g_yz_arrows;
-        TGraphErrors* g_zt = new TGraphErrors();
-        TGraph* g_yt = new TGraph();
+        TGraphErrors* g_xz = new TGraphErrors();
+        vector<TArrow*> v_g_xz_arrows;
+        TGraphErrors* g_xt = new TGraphErrors();
+        TGraph* g_zt = new TGraph();
 
-        g_yz->SetName("g_yz");
-        g_yz->SetTitle("Map of electron displacement (x = 0)");
-        g_yz->SetMarkerColor(2);
-        g_yz->SetMarkerStyle(6);
-        g_yz->GetXaxis()->SetTitle("z [cm]");
-        g_yz->GetYaxis()->SetTitle("y [cm]");
+        g_xz->SetName("g_xz");
+        g_xz->SetTitle("Map of electron displacement (x = 0)");
+        g_xz->SetMarkerColor(2);
+        g_xz->SetMarkerStyle(6);
+        g_xz->GetXaxis()->SetTitle("x [cm]");
+        g_xz->GetYaxis()->SetTitle("z [cm]");
+
+        g_xt->SetName("g_xt");
+        g_xt->SetTitle("Map of drift times (y = 0)");
+        g_xt->SetMarkerColor(2);
+        g_xt->SetMarkerStyle(6);
+        g_xt->GetXaxis()->SetTitle("x [cm]");
+        g_xt->GetYaxis()->SetTitle("t [ns]");
 
         g_zt->SetName("g_zt");
-        g_zt->SetTitle("Map of drift times (x = 0)");
+        g_zt->SetTitle("Original height vs drift time");
         g_zt->SetMarkerColor(2);
         g_zt->SetMarkerStyle(6);
         g_zt->GetXaxis()->SetTitle("z [cm]");
         g_zt->GetYaxis()->SetTitle("t [ns]");
 
-        g_yt->SetName("g_yt");
-        g_yt->SetTitle("Original height vs drift time");
-        g_yt->SetMarkerColor(2);
-        g_yt->SetMarkerStyle(6);
-        g_yt->GetXaxis()->SetTitle("y [cm]");
-        g_yt->GetYaxis()->SetTitle("t [ns]");
-
-        TH2F* yz_t1 = new TH2F("h_yz_t1","YZ plane t1;z [cm];y [cm]",map.zimax,map.zmin,map.zmax,map.yimax,map.ymin,map.ymax);
+        TH2F* xz_t1 = new TH2F("h_xz_t1","XZ plane t1;x [cm];z [cm]",map.ximax,map.xmin,map.xmax,map.zimax,map.zmin,map.zmax);
 
         gStyle->SetOptStat(0);
 
-        double y_xz = 7;
-        double x_yz = 0;
+        double z_xy = 7;
+        double y_xz = 0;
 
-        // int y_xzi = round(y_xz-map.ymin)/map.step;
-        int x_yzi = round(x_yz-map.xmin)/map.step;
-        for (int y_xzi = 0; y_xzi <= map.yimax; y_xzi++)
+        // int z_xyi = round(z_xy-map.zmin)/map.step;
+        int y_xzi = round(y_xz-map.ymin)/map.step;
+        for (int z_xyi = 0; z_xyi <= map.zimax; z_xyi++)
         {
-            double y = map.ymin + y_xzi*map.step;
-            string h_dx_name = "h_xz_dx_" + to_string(y);
-            string h_dz_name = "h_xz_dz_" + to_string(y);
-            string h_t1_name = "h_xz_t1_" + to_string(y);
-            string g_xz_name = "g_xz_" + to_string(y);
-            string h_dx_title = "XZ plane dx (y = " + to_string(y) + ");x [cm];z [cm]";
-            string h_dz_title = "XZ plane dx (y = " + to_string(y) + ");x [cm];z [cm]";
-            string h_t1_title = "XZ plane t1 (y = " + to_string(y) + ");x [cm];z [cm]";
-            string g_xz_title = "Map of electron readout positions, y = " + to_string(y);
+            double z = map.zmin + z_xyi*map.step;
+            string h_dx_name = "h_yx_dx_" + to_string(z);
+            string h_dy_name = "h_yx_dy_" + to_string(z);
+            string h_t1_name = "h_yx_t1_" + to_string(z);
+            string g_yx_name = "g_yx_" + to_string(z);
+            string h_dx_title = "XY plane dx (z = " + to_string(z) + ");x [cm];y [cm]";
+            string h_dy_title = "XY plane dy (z = " + to_string(z) + ");x [cm];y [cm]";
+            string h_t1_title = "XY plane t1 (z = " + to_string(z) + ");x [cm];y[cm]";
+            string g_yx_title = "Map of electron readout positions, z = " + to_string(z);
 
-            v_xz_dx.push_back(new TH2F(h_dx_name.c_str(),h_dx_title.c_str(),map.ximax,map.xmin,map.xmax,map.zimax,map.zmin,map.zmax));
-            v_xz_dz.push_back(new TH2F(h_dz_name.c_str(),h_dz_title.c_str(),map.ximax,map.xmin,map.xmax,map.zimax,map.zmin,map.zmax));
-            v_xz_t1.push_back(new TH2F(h_t1_name.c_str(),h_t1_title.c_str(),map.ximax,map.xmin,map.xmax,map.zimax,map.zmin,map.zmax));
-            v_g_xz.push_back(new TGraphErrors());
+            v_yx_dx.push_back(new TH2F(h_dx_name.c_str(),h_dx_title.c_str(),map.yimax,map.ymin,map.ymax,map.ximax,map.xmin,map.xmax));
+            v_yx_dy.push_back(new TH2F(h_dy_name.c_str(),h_dy_title.c_str(),map.yimax,map.ymin,map.ymax,map.ximax,map.xmin,map.xmax));
+            v_yx_t1.push_back(new TH2F(h_t1_name.c_str(),h_t1_title.c_str(),map.yimax,map.ymin,map.ymax,map.ximax,map.xmin,map.xmax));
+            v_g_yx.push_back(new TGraphErrors());
 
-            v_g_xz[y_xzi]->SetName(g_xz_name.c_str());
-            v_g_xz[y_xzi]->SetTitle(g_xz_title.c_str());
-            v_g_xz[y_xzi]->SetMarkerColor(2);
-            v_g_xz[y_xzi]->SetMarkerStyle(6);
-            v_g_xz[y_xzi]->GetXaxis()->SetTitle("x [cm]");
-            v_g_xz[y_xzi]->GetYaxis()->SetTitle("z [cm]");
+            v_g_yx[z_xyi]->SetName(g_yx_name.c_str());
+            v_g_yx[z_xyi]->SetTitle(g_yx_title.c_str());
+            v_g_yx[z_xyi]->SetMarkerColor(2);
+            v_g_yx[z_xyi]->SetMarkerStyle(6);
+            v_g_yx[z_xyi]->GetXaxis()->SetTitle("y [cm]");
+            v_g_yx[z_xyi]->GetYaxis()->SetTitle("x [cm]");
 
             vector<TArrow*> arrows;
 
+            for (int xi = 0; xi <= map.ximax; xi++)
+            {
+                double x = map.xmin+xi*map.step;
+
+                for (int yi = 0; yi <= map.yimax; yi++)
+                {
+                    double y = map.ymin+yi*map.step;
+                    SensorData& s_curr = map.field[xi][yi][z_xyi];
+                    if(s_curr.x1 != 0) v_yx_dx[z_xyi]->Fill(y,x,s_curr.x1-x);
+                    if(s_curr.y1 != 0) v_yx_dy[z_xyi]->Fill(y,x,s_curr.y1-y);
+                    if(s_curr.t1 != 0) v_yx_t1[z_xyi]->Fill(y,x,s_curr.t1);
+                    if((s_curr.x1 != 0) && (s_curr.y1 != 0))
+                    {
+                        v_g_yx[z_xyi]->AddPoint(s_curr.y1,s_curr.x1);
+                        v_g_yx[z_xyi]->SetPointError(v_g_yx[z_xyi]->GetN()-1,s_curr.y1dev,s_curr.x1dev);
+                        TArrow* arrow = new TArrow(y,x,s_curr.y1,s_curr.x1);
+                        arrows.push_back(arrow);
+                    }
+                    g_zt->AddPoint(z,s_curr.t1);
+                }
+            }
+
+            vv_g_yx_arrows.push_back(arrows);
+        }
+
+        for (int xi = 0; xi <= map.ximax; xi++)
+        {
+            double x = map.xmin+xi*map.step;
             for (int zi = 0; zi <= map.zimax; zi++)
             {
                 double z = map.zmin+zi*map.step;
 
-                for (int xi = 0; xi <= map.ximax; xi++)
-                {
-                    double x = map.xmin+xi*map.step;
-                    SensorData& s_curr = map.field[xi][y_xzi][zi];
-                    if(s_curr.x1 != 0) v_xz_dx[y_xzi]->Fill(x,z,s_curr.x1-x);
-                    if(s_curr.z1 != 0) v_xz_dz[y_xzi]->Fill(x,z,s_curr.z1-z);
-                    if(s_curr.t1 != 0) v_xz_t1[y_xzi]->Fill(x,z,s_curr.t1);
-                    if((s_curr.x1 != 0) && (s_curr.z1 != 0))
-                    {
-                        v_g_xz[y_xzi]->AddPoint(s_curr.x1,s_curr.z1);
-                        v_g_xz[y_xzi]->SetPointError(v_g_xz[y_xzi]->GetN()-1,s_curr.x1dev,s_curr.z1dev);
-                        TArrow* arrow = new TArrow(x,z,s_curr.x1,s_curr.z1);
-                        arrows.push_back(arrow);
-                    }
-                    g_yt->AddPoint(y,s_curr.t1);
-                }
-            }
+                SensorData& s_curr = map.field[xi][y_xzi][zi];
 
-            vv_g_xz_arrows.push_back(arrows);
-        }
+                xz_t1->Fill(x,z,s_curr.t1);
+                g_xz->AddPoint(s_curr.x1,z);
+                g_xz->SetPointError(g_xz->GetN()-1,s_curr.x1dev,0);
+                g_xt->AddPoint(x,s_curr.t1);
+                g_xt->SetPointError(g_xt->GetN()-1,s_curr.x1dev,s_curr.t1dev);
 
-        for (int zi = 0; zi <= map.zimax; zi++)
-        {
-            double z = map.zmin+zi*map.step;
-            for (int yi = 0; yi <= map.yimax; yi++)
-            {
-                double y = map.ymin+yi*map.step;
-
-                SensorData& s_curr = map.field[x_yzi][yi][zi];
-
-                yz_t1->Fill(z,y,s_curr.t1);
-                g_yz->AddPoint(s_curr.z1,y);
-                g_yz->SetPointError(g_yz->GetN()-1,s_curr.z1dev,0);
-                g_zt->AddPoint(z,s_curr.t1);
-                g_zt->SetPointError(g_zt->GetN()-1,s_curr.z1dev,s_curr.t1dev);
-
-                TArrow* arrow = new TArrow(z,y,s_curr.z1,y);
-                v_g_yz_arrows.push_back(arrow);
+                TArrow* arrow = new TArrow(x,z,s_curr.x1,z);
+                v_g_xz_arrows.push_back(arrow);
             }
         }
-        yz_t1->Write();
-        for(TH2F* h : v_xz_dx) h->Write();
-        for(TH2F* h : v_xz_dz) h->Write();
-        // for(TGraph* g : v_g_xz) g->Write();
+        xz_t1->Write();
+        for(TH2F* h : v_yx_dx) h->Write();
+        for(TH2F* h : v_yx_dy) h->Write();
+        // for(TGraph* g : v_g_xy) g->Write();
 
-        TCanvas* c_g_xz = new TCanvas("c_g_xz","Map of electron readout positions");
-        double xmin = -10; double xmax = 10; double zmin = 5; double zmax = 16;
-        c_g_xz->Divide(4,4);
-        for (int i = 0; i < v_g_xz.size()-1; i++)
+        TCanvas* c_g_yx = new TCanvas("c_g_yx","Map of electron readout positions");
+        double ymin = -10; double ymax = 10; double xmin = 5; double xmax = 16;
+        c_g_yx->Divide(4,4);
+        for (int i = 0; i < v_g_yx.size()-1; i++)
         {
-            c_g_xz->cd(i+1);
-            v_g_xz[i]->GetXaxis()->SetRangeUser(xmin,xmax);
-            v_g_xz[i]->GetYaxis()->SetRangeUser(zmin,zmax);
-            v_g_xz[i]->Draw("AP");
-            DrawTrapezoid();
+            c_g_yx->cd(i+1);
+            v_g_yx[i]->GetXaxis()->SetRangeUser(ymin,ymax);
+            v_g_yx[i]->GetYaxis()->SetRangeUser(xmin,xmax);
+            v_g_yx[i]->Draw("AP");
+            X17::DrawTrapezoid();
 
-            for(TArrow* arr : vv_g_xz_arrows[i]) 
+            for(TArrow* arr : vv_g_yx_arrows[i]) 
             {
-                if(arr->GetX2() > xmin && arr->GetX2() < xmax && arr->GetY2() > zmin && arr->GetY2() < zmax)
+                if(arr->GetX2() > ymin && arr->GetX2() < ymax && arr->GetY2() > xmin && arr->GetY2() < xmax)
                 {
                     arr->SetArrowSize(0.002);
                     arr->Draw();
                 }
             }
         }
-        c_g_xz->Write();
+        c_g_yx->Write();
 
-        TCanvas* c_xz_t1 = new TCanvas("c_xz_t1","Map of drift times");
-        c_xz_t1->Divide(4,4);
-        for (int i = 0; i < v_xz_t1.size()-1; i++)
+        TCanvas* c_yx_t1 = new TCanvas("c_yx_t1","Map of drift times");
+        c_yx_t1->Divide(4,4);
+        for (int i = 0; i < v_yx_t1.size()-1; i++)
         {
-            c_xz_t1->cd(i+1);
-            v_xz_t1[i]->GetXaxis()->SetRangeUser(xmin,xmax);
-            v_xz_t1[i]->GetYaxis()->SetRangeUser(zmin,zmax);
-            v_xz_t1[i]->Draw("colz");
-            double min_percent = 0.8+0.13*(v_xz_t1.size()-1-i)/(v_xz_t1.size()-1); //how high is minimum compared to maximum
-            v_xz_t1[i]->SetMinimum(min_percent*v_xz_t1[i]->GetMaximum());
-            v_xz_t1[i]->SetMaximum(min_percent*v_xz_t1[i]->GetMaximum()+500);
-            DrawTrapezoid();
+            c_yx_t1->cd(i+1);
+            v_yx_t1[i]->GetXaxis()->SetRangeUser(ymin,ymax);
+            v_yx_t1[i]->GetYaxis()->SetRangeUser(xmin,xmax);
+            v_yx_t1[i]->Draw("colz");
+            double min_percent = 0.8+0.13*(v_yx_t1.size()-1-i)/(v_yx_t1.size()-1); //how high is minimum compared to maximum
+            v_yx_t1[i]->SetMinimum(min_percent*v_yx_t1[i]->GetMaximum());
+            v_yx_t1[i]->SetMaximum(min_percent*v_yx_t1[i]->GetMaximum()+500);
+            X17::DrawTrapezoid();
         }
-        c_xz_t1->Write();
+        c_yx_t1->Write();
 
-        TCanvas* c_g_yz = new TCanvas("c_g_yz","Map of ionization electron displacement");
-        g_yz->Draw("AP");
+        TCanvas* c_g_xz = new TCanvas("c_g_xz","Map of ionization electron displacement");
+        g_xz->Draw("AP");
         TLine* lleft  = new TLine(6.51,8,6.51,-8);
         TLine* lright = new TLine(14.61,8,14.61,-8);
         lleft->Draw();lright->Draw();
-        for(TArrow* arr : v_g_yz_arrows) {arr->SetArrowSize(0.004); arr->Draw();}
-        c_g_yz->Write();
+        for(TArrow* arr : v_g_xz_arrows) {arr->SetArrowSize(0.004); arr->Draw();}
+        c_g_xz->Write();
 
-        TCanvas* c_g_zt = new TCanvas("c_g_zt","Map of ionization electron drift times");
-        g_zt->Draw("AP");
+        TCanvas* c_g_xt = new TCanvas("c_g_xt","Map of ionization electron drift times");
+        g_xt->Draw("AP");
         lleft  = new TLine(6.51,0,6.51,5000);
         lright = new TLine(14.61,0,14.61,5000);
         lleft->Draw();lright->Draw();
-        c_g_zt->Write();
+        c_g_xt->Write();
 
-        TCanvas* c_g_yt = new TCanvas("c_g_yt","Original height vs drift time");
-        g_yt->Draw("AP");
-        c_g_yt->Write();
+        TCanvas* c_g_zt = new TCanvas("c_g_zt","Original height vs drift time");
+        g_zt->Draw("AP");
+        c_g_zt->Write();
         
     }
 
