@@ -229,10 +229,10 @@ struct VectorField
                 {
                     double x,y,z,vx,vy,vz;
                     // changing coordinate system from magnetic simulation (x,y,z) --> (y,z,x)
-                    x = stod(Z); y = stod(X); z = stod(Y);
-                    vx = stod(VZ); vy = stod(VX); vz = stod(VY);
-                    // x = stod(X); y = stod(Y); z = stod(Z);
-                    // vx = stod(VX); vy = stod(VY); vz = stod(VZ);
+                        // x = stod(Z); y = stod(X); z = stod(Y);
+                        // vx = stod(VZ); vy = stod(VX); vz = stod(VY);
+                    x = stod(X); y = stod(Y); z = stod(Z);
+                    vx = stod(VX); vy = stod(VY); vz = stod(VZ);
 
                     *(this->GetVector(x,y,z)) = Vector{vx,vy,vz};
                     lines_processed++;
@@ -587,36 +587,36 @@ SensorData Field<SensorData>::Invert(double x1, double y1, double t1)
         else             {zimin = zimid; zimax = zimin-1;}
 
         // Sanity check
-            cout << "Cube for (x1,y1,t1) = (" << x1 << "," << y1 << "," << t1 << "): \n";
-            cout << "000: [" << ximin << "][" << yimin << "][" << zimin << "], (x,y,t) = (" << field[ximin][yimin][zimin].x1 << "," << field[ximin][yimin][zimin].y1 << "," << field[ximin][yimin][zimin].t1 << ")\n";
-            cout << "001: [" << ximax << "][" << yimin << "][" << zimin << "], (x,y,t) = (" << field[ximax][yimin][zimin].x1 << "," << field[ximax][yimin][zimin].y1 << "," << field[ximax][yimin][zimin].t1 << ")\n";
-            cout << "010: [" << ximin << "][" << yimin << "][" << zimax << "], (x,y,t) = (" << field[ximin][yimin][zimax].x1 << "," << field[ximin][yimin][zimax].y1 << "," << field[ximin][yimin][zimax].t1 << ")\n";
-            cout << "011: [" << ximax << "][" << yimin << "][" << zimax << "], (x,y,t) = (" << field[ximax][yimin][zimax].x1 << "," << field[ximax][yimin][zimax].y1 << "," << field[ximax][yimin][zimax].t1 << ")\n";
-            cout << "100: [" << ximin << "][" << yimax << "][" << zimin << "], (x,y,t) = (" << field[ximin][yimax][zimin].x1 << "," << field[ximin][yimax][zimin].y1 << "," << field[ximin][yimax][zimin].t1 << ")\n";
-            cout << "101: [" << ximax << "][" << yimax << "][" << zimin << "], (x,y,t) = (" << field[ximax][yimax][zimin].x1 << "," << field[ximax][yimax][zimin].y1 << "," << field[ximax][yimax][zimin].t1 << ")\n";
-            cout << "110: [" << ximin << "][" << yimax << "][" << zimax << "], (x,y,t) = (" << field[ximin][yimax][zimax].x1 << "," << field[ximin][yimax][zimax].y1 << "," << field[ximin][yimax][zimax].t1 << ")\n";
-            cout << "111: [" << ximax << "][" << yimax << "][" << zimax << "], (x,y,t) = (" << field[ximax][yimax][zimax].x1 << "," << field[ximax][yimax][zimax].y1 << "," << field[ximax][yimax][zimax].t1 << ")\n\n";
+            // cout << "Cube for (x1,y1,t1) = (" << x1 << "," << y1 << "," << t1 << "): \n";
+            // cout << "000: [" << ximin << "][" << yimin << "][" << zimin << "], (x,y,t) = (" << field[ximin][yimin][zimin].x1 << "," << field[ximin][yimin][zimin].y1 << "," << field[ximin][yimin][zimin].t1 << ")\n";
+            // cout << "001: [" << ximax << "][" << yimin << "][" << zimin << "], (x,y,t) = (" << field[ximax][yimin][zimin].x1 << "," << field[ximax][yimin][zimin].y1 << "," << field[ximax][yimin][zimin].t1 << ")\n";
+            // cout << "010: [" << ximin << "][" << yimin << "][" << zimax << "], (x,y,t) = (" << field[ximin][yimin][zimax].x1 << "," << field[ximin][yimin][zimax].y1 << "," << field[ximin][yimin][zimax].t1 << ")\n";
+            // cout << "011: [" << ximax << "][" << yimin << "][" << zimax << "], (x,y,t) = (" << field[ximax][yimin][zimax].x1 << "," << field[ximax][yimin][zimax].y1 << "," << field[ximax][yimin][zimax].t1 << ")\n";
+            // cout << "100: [" << ximin << "][" << yimax << "][" << zimin << "], (x,y,t) = (" << field[ximin][yimax][zimin].x1 << "," << field[ximin][yimax][zimin].y1 << "," << field[ximin][yimax][zimin].t1 << ")\n";
+            // cout << "101: [" << ximax << "][" << yimax << "][" << zimin << "], (x,y,t) = (" << field[ximax][yimax][zimin].x1 << "," << field[ximax][yimax][zimin].y1 << "," << field[ximax][yimax][zimin].t1 << ")\n";
+            // cout << "110: [" << ximin << "][" << yimax << "][" << zimax << "], (x,y,t) = (" << field[ximin][yimax][zimax].x1 << "," << field[ximin][yimax][zimax].y1 << "," << field[ximin][yimax][zimax].t1 << ")\n";
+            // cout << "111: [" << ximax << "][" << yimax << "][" << zimax << "], (x,y,t) = (" << field[ximax][yimax][zimax].x1 << "," << field[ximax][yimax][zimax].y1 << "," << field[ximax][yimax][zimax].t1 << ")\n\n";
 
-            if(field[ximin][yimin][zimin].x1 > x1 || field[ximin][yimin][zimax].x1 > x1 ||
-               field[ximin][yimax][zimin].x1 > x1 || field[ximin][yimax][zimax].x1 > x1)
-                    cerr << "ERROR: Minimal x bound not minimal.\n";
-            if(field[ximax][yimin][zimin].x1 < x1 || field[ximax][yimin][zimax].x1 < x1 ||
-               field[ximax][yimax][zimin].x1 < x1 || field[ximax][yimax][zimax].x1 < x1)
-                    cerr << "ERROR: Maximal x bound not maximal.\n";
+            // if(field[ximin][yimin][zimin].x1 > x1 || field[ximin][yimin][zimax].x1 > x1 ||
+            //    field[ximin][yimax][zimin].x1 > x1 || field[ximin][yimax][zimax].x1 > x1)
+            //         cerr << "ERROR: Minimal x bound not minimal.\n";
+            // if(field[ximax][yimin][zimin].x1 < x1 || field[ximax][yimin][zimax].x1 < x1 ||
+            //    field[ximax][yimax][zimin].x1 < x1 || field[ximax][yimax][zimax].x1 < x1)
+            //         cerr << "ERROR: Maximal x bound not maximal.\n";
 
-            if(field[ximin][yimin][zimin].y1 > y1 || field[ximin][yimin][zimax].y1 > y1 ||
-               field[ximax][yimin][zimin].y1 > y1 || field[ximax][yimin][zimax].y1 > y1)
-                    cerr << "ERROR: Minimal y bound not minimal.\n";
-            if(field[ximin][yimax][zimin].y1 < y1 || field[ximin][yimax][zimax].y1 < y1 ||
-               field[ximin][yimax][zimin].y1 < y1 || field[ximin][yimax][zimax].y1 < y1)
-                    cerr << "ERROR: Maximal y bound not maximal.\n";
+            // if(field[ximin][yimin][zimin].y1 > y1 || field[ximin][yimin][zimax].y1 > y1 ||
+            //    field[ximax][yimin][zimin].y1 > y1 || field[ximax][yimin][zimax].y1 > y1)
+            //         cerr << "ERROR: Minimal y bound not minimal.\n";
+            // if(field[ximin][yimax][zimin].y1 < y1 || field[ximin][yimax][zimax].y1 < y1 ||
+            //    field[ximin][yimax][zimin].y1 < y1 || field[ximin][yimax][zimax].y1 < y1)
+            //         cerr << "ERROR: Maximal y bound not maximal.\n";
 
-            if(field[ximin][yimin][zimin].t1 > t1 || field[ximax][yimin][zimin].t1 > t1 ||
-               field[ximin][yimax][zimin].t1 > t1 || field[ximax][yimax][zimin].t1 > t1)
-                    cerr << "ERROR: Minimal z bound not minimal.\n";
-            if(field[ximin][yimin][zimax].t1 < t1 || field[ximax][yimin][zimax].t1 < t1 ||
-               field[ximin][yimax][zimax].t1 < t1 || field[ximax][yimax][zimax].t1 < t1)
-                    cerr << "ERROR: Maximal z bound not maximal.\n";
+            // if(field[ximin][yimin][zimin].t1 > t1 || field[ximax][yimin][zimin].t1 > t1 ||
+            //    field[ximin][yimax][zimin].t1 > t1 || field[ximax][yimax][zimin].t1 > t1)
+            //         cerr << "ERROR: Minimal z bound not minimal.\n";
+            // if(field[ximin][yimin][zimax].t1 < t1 || field[ximax][yimin][zimax].t1 < t1 ||
+            //    field[ximin][yimax][zimax].t1 < t1 || field[ximax][yimax][zimax].t1 < t1)
+            //         cerr << "ERROR: Maximal z bound not maximal.\n";
 
 
 
