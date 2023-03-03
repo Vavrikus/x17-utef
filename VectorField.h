@@ -295,7 +295,31 @@ struct SensorData
         this->y1 += s.y1;
         this->z1 += s.z1;
         this->t1 += s.t1;
-    }   
+    }
+
+    double operator[](int i)
+    {
+        switch (i)
+        {
+        case 0:
+            return this->x1;
+            break;
+        case 1:
+            return this->y1;
+            break;
+        case 2:
+            return this->z1;
+            break;
+        case 3:
+            return this->t1;
+            break;
+        
+        default:
+            cerr << "ERROR: SensorData[] index out of range.\n";
+            return -1;
+            break;
+        }
+    }
 };
 
 SensorData operator+(const SensorData& s1,const SensorData& s2)
@@ -422,93 +446,78 @@ struct Field
     T Invert(double,double,double){return nullptr;} // Only for SensorData      
 };
 
-vector<vector<double>> GetInterpolCoef(Field<SensorData>& map, int (&&indexes)[6])
+/// @brief Templated function for cube corners selection
+/// @tparam T Any number type
+/// @param indexes Array containing xmin,xmax,ymin,ymax,zmin,zmax in this order
+/// @param corner  Index of the corner (0-7 <----> xyz: 000 --> 111) 
+/// @return Tuple with x,y,z of corner in this order
+template<typename T>
+array<T,3> CubeCorner(const T (&indexes)[6], int corner)
 {
-    double xmin = indexes[0]*map.step+map.xmin;
-    double xmax = indexes[1]*map.step+map.xmin;
-    double ymin = indexes[2]*map.step+map.ymin;
-    double ymax = indexes[3]*map.step+map.ymin;
-    double zmin = indexes[4]*map.step+map.zmin;
-    double zmax = indexes[5]*map.step+map.zmin;
+    T x,y,z;
 
-    vector<double> xvalues;
-    xvalues.push_back(map.field[indexes[0]][indexes[2]][indexes[4]].x1);
-    xvalues.push_back(map.field[indexes[0]][indexes[2]][indexes[5]].x1);
-    xvalues.push_back(map.field[indexes[0]][indexes[3]][indexes[4]].x1);
-    xvalues.push_back(map.field[indexes[0]][indexes[3]][indexes[5]].x1);
-    xvalues.push_back(map.field[indexes[1]][indexes[2]][indexes[4]].x1);
-    xvalues.push_back(map.field[indexes[1]][indexes[2]][indexes[5]].x1);
-    xvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[4]].x1);
-    xvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[5]].x1);
+    if((int)corner/4 == 0)     x = indexes[0];
+    else                       x = indexes[1];
 
-    vector<double> yvalues;
-    yvalues.push_back(map.field[indexes[0]][indexes[2]][indexes[4]].y1);
-    yvalues.push_back(map.field[indexes[0]][indexes[2]][indexes[5]].y1);
-    yvalues.push_back(map.field[indexes[0]][indexes[3]][indexes[4]].y1);
-    yvalues.push_back(map.field[indexes[0]][indexes[3]][indexes[5]].y1);
-    yvalues.push_back(map.field[indexes[1]][indexes[2]][indexes[4]].y1);
-    yvalues.push_back(map.field[indexes[1]][indexes[2]][indexes[5]].y1);
-    yvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[4]].y1);
-    yvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[5]].y1);
+    if(((int)corner/2)%2 == 0) y = indexes[2];
+    else                       y = indexes[3];
 
-    vector<double> tvalues;
-    tvalues.push_back(map.field[indexes[0]][indexes[2]][indexes[4]].t1);
-    tvalues.push_back(map.field[indexes[0]][indexes[2]][indexes[5]].t1);
-    tvalues.push_back(map.field[indexes[0]][indexes[3]][indexes[4]].t1);
-    tvalues.push_back(map.field[indexes[0]][indexes[3]][indexes[5]].t1);
-    tvalues.push_back(map.field[indexes[1]][indexes[2]][indexes[4]].t1);
-    tvalues.push_back(map.field[indexes[1]][indexes[2]][indexes[5]].t1);
-    tvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[4]].t1);
-    tvalues.push_back(map.field[indexes[1]][indexes[3]][indexes[5]].t1);
+    if(corner % 2 == 0)        z = indexes[4];
+    else                       z = indexes[5];
 
-    double xarr[] = {1, xvalues[0], yvalues[0], tvalues[0], xvalues[0]*yvalues[0], xvalues[0]*tvalues[0], yvalues[0]*tvalues[0], xvalues[0]*yvalues[0]*tvalues[0], xmin,
-                     1, xvalues[1], yvalues[1], tvalues[1], xvalues[1]*yvalues[1], xvalues[1]*tvalues[1], yvalues[1]*tvalues[1], xvalues[1]*yvalues[1]*tvalues[1], xmin,
-                     1, xvalues[2], yvalues[2], tvalues[2], xvalues[2]*yvalues[2], xvalues[2]*tvalues[2], yvalues[2]*tvalues[2], xvalues[2]*yvalues[2]*tvalues[2], xmin,
-                     1, xvalues[3], yvalues[3], tvalues[3], xvalues[3]*yvalues[3], xvalues[3]*tvalues[3], yvalues[3]*tvalues[3], xvalues[3]*yvalues[3]*tvalues[3], xmin,
-                     1, xvalues[4], yvalues[4], tvalues[4], xvalues[4]*yvalues[4], xvalues[4]*tvalues[4], yvalues[4]*tvalues[4], xvalues[4]*yvalues[4]*tvalues[4], xmax,
-                     1, xvalues[5], yvalues[5], tvalues[5], xvalues[5]*yvalues[5], xvalues[5]*tvalues[5], yvalues[5]*tvalues[5], xvalues[5]*yvalues[5]*tvalues[5], xmax,
-                     1, xvalues[6], yvalues[6], tvalues[6], xvalues[6]*yvalues[6], xvalues[6]*tvalues[6], yvalues[6]*tvalues[6], xvalues[6]*yvalues[6]*tvalues[6], xmax,
-                     1, xvalues[7], yvalues[7], tvalues[7], xvalues[7]*yvalues[7], xvalues[7]*tvalues[7], yvalues[7]*tvalues[7], xvalues[7]*yvalues[7]*tvalues[7], xmax};
-    Matrix<8,9> xmatrix = Matrix<8,9>(xarr);
-    Matrix<8,9> xmatrixoriginal = Matrix<8,9>(xarr);
-    xmatrix.Reduce();
+    return {x,y,z};
+}
 
-    double yarr[] = {1, xvalues[0], yvalues[0], tvalues[0], xvalues[0]*yvalues[0], xvalues[0]*tvalues[0], yvalues[0]*tvalues[0], xvalues[0]*yvalues[0]*tvalues[0], ymin,
-                     1, xvalues[1], yvalues[1], tvalues[1], xvalues[1]*yvalues[1], xvalues[1]*tvalues[1], yvalues[1]*tvalues[1], xvalues[1]*yvalues[1]*tvalues[1], ymin,
-                     1, xvalues[2], yvalues[2], tvalues[2], xvalues[2]*yvalues[2], xvalues[2]*tvalues[2], yvalues[2]*tvalues[2], xvalues[2]*yvalues[2]*tvalues[2], ymax,
-                     1, xvalues[3], yvalues[3], tvalues[3], xvalues[3]*yvalues[3], xvalues[3]*tvalues[3], yvalues[3]*tvalues[3], xvalues[3]*yvalues[3]*tvalues[3], ymax,
-                     1, xvalues[4], yvalues[4], tvalues[4], xvalues[4]*yvalues[4], xvalues[4]*tvalues[4], yvalues[4]*tvalues[4], xvalues[4]*yvalues[4]*tvalues[4], ymin,
-                     1, xvalues[5], yvalues[5], tvalues[5], xvalues[5]*yvalues[5], xvalues[5]*tvalues[5], yvalues[5]*tvalues[5], xvalues[5]*yvalues[5]*tvalues[5], ymin,
-                     1, xvalues[6], yvalues[6], tvalues[6], xvalues[6]*yvalues[6], xvalues[6]*tvalues[6], yvalues[6]*tvalues[6], xvalues[6]*yvalues[6]*tvalues[6], ymax,
-                     1, xvalues[7], yvalues[7], tvalues[7], xvalues[7]*yvalues[7], xvalues[7]*tvalues[7], yvalues[7]*tvalues[7], xvalues[7]*yvalues[7]*tvalues[7], ymax};
-    Matrix<8,9> ymatrix = Matrix<8,9>(yarr);
-    ymatrix.Reduce();
+vector<vector<double>> GetInterpolCoef(Field<SensorData>& map, const int (&indexes)[6])
+{
+    double bounds[6]; // {xmin, xmax, ymin, ymax, zmin, zmax}
 
-    double zarr[] = {1, xvalues[0], yvalues[0], tvalues[0], xvalues[0]*yvalues[0], xvalues[0]*tvalues[0], yvalues[0]*tvalues[0], xvalues[0]*yvalues[0]*tvalues[0], zmin,
-                     1, xvalues[1], yvalues[1], tvalues[1], xvalues[1]*yvalues[1], xvalues[1]*tvalues[1], yvalues[1]*tvalues[1], xvalues[1]*yvalues[1]*tvalues[1], zmax,
-                     1, xvalues[2], yvalues[2], tvalues[2], xvalues[2]*yvalues[2], xvalues[2]*tvalues[2], yvalues[2]*tvalues[2], xvalues[2]*yvalues[2]*tvalues[2], zmin,
-                     1, xvalues[3], yvalues[3], tvalues[3], xvalues[3]*yvalues[3], xvalues[3]*tvalues[3], yvalues[3]*tvalues[3], xvalues[3]*yvalues[3]*tvalues[3], zmax,
-                     1, xvalues[4], yvalues[4], tvalues[4], xvalues[4]*yvalues[4], xvalues[4]*tvalues[4], yvalues[4]*tvalues[4], xvalues[4]*yvalues[4]*tvalues[4], zmin,
-                     1, xvalues[5], yvalues[5], tvalues[5], xvalues[5]*yvalues[5], xvalues[5]*tvalues[5], yvalues[5]*tvalues[5], xvalues[5]*yvalues[5]*tvalues[5], zmax,
-                     1, xvalues[6], yvalues[6], tvalues[6], xvalues[6]*yvalues[6], xvalues[6]*tvalues[6], yvalues[6]*tvalues[6], xvalues[6]*yvalues[6]*tvalues[6], zmin,
-                     1, xvalues[7], yvalues[7], tvalues[7], xvalues[7]*yvalues[7], xvalues[7]*tvalues[7], yvalues[7]*tvalues[7], xvalues[7]*yvalues[7]*tvalues[7], zmax};
-    Matrix<8,9> zmatrix = Matrix<8,9>(zarr);
-    zmatrix.Reduce();
+    bounds[0] = indexes[0]*map.step+map.xmin;
+    bounds[1] = indexes[1]*map.step+map.xmin;
 
-    vector<double> xresults = xmatrix.GetColumn(8);
-    vector<double> yresults = ymatrix.GetColumn(8);
-    vector<double> zresults = zmatrix.GetColumn(8);
-    vector<vector<double>> output = {xresults,yresults,zresults};
+    bounds[2] = indexes[2]*map.step+map.ymin;
+    bounds[3] = indexes[3]*map.step+map.ymin;
 
-    // Sanity check
-        // Matrix<9,1> xres;
-        // for(int i = 0; i < 8; i++) xres.at(i,0) = xresults[i];
-        // xres.at(8,0) = 0;
-        // auto m = xmatrixoriginal*xres;
-        // cout << "xmatrix:\n";
-        // xmatrixoriginal.Print();
-        // cout << "m:\n";
-        // m.Print();
+    bounds[4] = indexes[4]*map.step+map.zmin;
+    bounds[5] = indexes[5]*map.step+map.zmin;
+
+    const int coor_ids[] = {0,1,3}; // x, y and t coordinate indexes in SensorData (operator[])
+    vector<vector<double>> xytvalues;
+    vector<vector<double>> output;
+
+    for (int id : coor_ids)
+    {
+        vector<double> coor_values;
+        for (int i = 0; i < 8; i++)
+        {
+            const auto [xi,yi,zi] = CubeCorner(indexes,i);
+            coor_values.push_back(map.field[xi][yi][zi][id]);
+        }
+        xytvalues.push_back(coor_values);
+    }
+
+    for (int i = 0; i < 3; i++)
+    {
+        double arr[8*9];
+        for (int j = 0; j < 8; j++)
+        {
+            arr[9*j]   = 1;
+            arr[9*j+1] = xytvalues[0][j];
+            arr[9*j+2] = xytvalues[1][j];
+            arr[9*j+3] = xytvalues[2][j];
+            arr[9*j+4] = xytvalues[0][j]*xytvalues[1][j];
+            arr[9*j+5] = xytvalues[0][j]*xytvalues[2][j];
+            arr[9*j+6] = xytvalues[1][j]*xytvalues[2][j];
+            arr[9*j+7] = xytvalues[0][j]*xytvalues[1][j]*xytvalues[2][j];
+
+            const auto corner = CubeCorner(bounds,j);
+            arr[9*j+8] = corner[i];
+        }
+        
+        Matrix<8,9> matrix = Matrix<8,9>(arr);
+        matrix.Reduce();
+        output.push_back(matrix.GetColumn(8));
+    }
 
     return output;
 }  
