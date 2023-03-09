@@ -306,6 +306,21 @@ int make_map()
         TCanvas* c_g_zt = new TCanvas("c_g_zt","Original height vs drift time");
         g_zt->Draw("AP");
         c_g_zt->Write();
+
+        outfile->Close();
+
+        TFile* mapfile = new TFile("map.root");
+        Field<SensorData>* map = (Field<SensorData>*)mapfile->Get("map");
+        TCanvas* c_pads = new TCanvas("c_pads", "Pads distortion for different times.");
+        c_pads->Divide(4,4);
+        for (int i = 0; i < 16; i++)
+        {
+            c_pads->cd(i+1);
+            TGraph* gr = new TGraph(); gr->AddPoint(-X17::yhigh,X17::xmin);gr->AddPoint(X17::yhigh,X17::xmax);gr->Draw("AP");
+            X17::DrawPadsDistortion((i+1)*5000/16,c_pads,map);
+            //X17::DrawTrapezoid();
+        }
+        
         
     }
 

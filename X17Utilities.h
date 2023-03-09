@@ -266,13 +266,26 @@ void DrawTrapezoid(bool yxformat = true)
 
     /// @brief Draw pads using coordinates of electrons ending up in the corners
     /// @param time time to propagate [ns]
-    void DrawPadsDistortion(const double& time)
+    void DrawPadsDistortion(const double& time, TCanvas* c = nullptr,Field<SensorData>* map = nullptr)
     {
         // Get map from initial to final electron positions from file
-        TFile* inFile2 = new TFile("map.root");
-        Field<SensorData>* map = (Field<SensorData>*)inFile2->Get("map");
+        if (map == nullptr)
+        {
+            TFile* inFile2 = new TFile("map.root");
+            map = (Field<SensorData>*)inFile2->Get("map");
+        }
 
-        TCanvas* c = new TCanvas("c_pads_distorted","GEM readout pads distorted 4000 ns",600*2*(yhigh+1)/(xmax-xmin+2),600);
+        string c_title = "GEM readout pads distorted " + to_string(time) + " ns";
+
+        if (c == nullptr) 
+        {
+            c = new TCanvas("c_pads_distorted",c_title.c_str(),600*2*(yhigh+1)/(xmax-xmin+2),600);
+            c->Range(-yhigh-1,xmin-1,yhigh+1,xmax+1);
+        }
+        // else
+        // {
+        //     c->GetSelectedPad()->Range(-yhigh-1,xmin-1,yhigh+1,xmax+1);
+        // }
         vector<TLine*> pad_lines;
 
         for (int i = 1; i <= channels; i++)
@@ -284,17 +297,14 @@ void DrawTrapezoid(bool yxformat = true)
             SensorData bottomright = map->Invert(x1,y2,time);//RecoPoint(map,x2,y1,5000,0.01);
             SensorData topleft     = map->Invert(x2,y1,time);//RecoPoint(map,x1,y2,5000,0.01);
             SensorData topright    = map->Invert(x2,y2,time);//RecoPoint(map,x2,y2,5000,0.01);
-            
 
-            pad_lines.push_back(new TLine(bottomleft.y1,  bottomleft.x1,  topleft.y1,     topleft.x1));     // left
-            pad_lines.push_back(new TLine(bottomright.y1, bottomright.x1, topright.y1,    topright.x1));    // right
-            pad_lines.push_back(new TLine(bottomleft.y1,  bottomleft.x1,  bottomright.y1, bottomright.x1)); // bottom
-            pad_lines.push_back(new TLine(topleft.y1,     topleft.x1,     topright.y1,    topright.x1));    // top
+            pad_lines.push_back(new TLine(-bottomleft.y1,  bottomleft.x1,  -topleft.y1,     topleft.x1));     // left
+            pad_lines.push_back(new TLine(-bottomright.y1, bottomright.x1, -topright.y1,    topright.x1));    // right
+            pad_lines.push_back(new TLine(-bottomleft.y1,  bottomleft.x1,  -bottomright.y1, bottomright.x1)); // bottom
+            pad_lines.push_back(new TLine(-topleft.y1,     topleft.x1,     -topright.y1,    topright.x1));    // top
         }
         
-
-        c->Range(-yhigh-1,xmin-1,yhigh+1,xmax+1);
-        for(auto l : pad_lines)   l->Draw("AL");
+        for(auto l : pad_lines) l->Draw("same");
         DrawTrapezoid();
     }
 } // namespace X17

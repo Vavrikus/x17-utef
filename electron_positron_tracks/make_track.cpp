@@ -31,7 +31,8 @@ int main(int argc, char * argv[]){
   // Set the gas mixture.
   MediumMagboltz gas;
   // gas.SetComposition("ar", 70., "co2", 30.);
-  gas.LoadGasFile("Ar_70_CO2_30_M2A3_noTM.gas");
+  // gas.LoadGasFile("Ar_70_CO2_30_M2A3_noTM.gas");
+  gas.SetComposition("ar", 90., "co2", 10.);
 
   // ofstream myfile;
   // myfile.open ("electrons.txt"); //name of the file to save data
@@ -140,17 +141,17 @@ int main(int argc, char * argv[]){
       double xe, ye, ze, te, ee, dxe, dye, dze;
       track.GetElectron(j, xe, ye, ze, te, ee, dxe, dye, dze);
       // Simulate the drift/avalanche of this electron.
-      // aval.AvalancheElectron(xe, ye, ze, te, 0.1, dxe, dye, dze);
+      aval.AvalancheElectron(xe, ye, ze, te, 0.1, dxe, dye, dze);
       // // Move electrons that hit the mesh plane into the amplification gap.
       int status;
-      // aval.GetElectronEndpoint(0, x0, y0, z0, t0, e0, 
-      //                             x1, y1, z1, t1, e1, status);
+      aval.GetElectronEndpoint(0, x0, y0, z0, t0, e0, 
+                                  x1, y1, z1, t1, e1, status);
 
       // drift.AddElectron(xe,ye,ze,te);
       // drift.AvalancheElectron(xe,ye,ze,te);
-      x0 = xe; y0 = ye; z0 = ze; t0 = te; e0 = ee;
-      drift.DriftElectron(xe,ye,ze,te);
-      drift.GetElectronEndpoint(0,x0,y0,z0,t0,x1,y1,z1,t1,status);
+      // x0 = xe; y0 = ye; z0 = ze; t0 = te; e0 = ee;
+      // drift.DriftElectron(xe,ye,ze,te);
+      // drift.GetElectronEndpoint(0,x0,y0,z0,t0,x1,y1,z1,t1,status);
       // drift.GetEndPoint(x1,y1,z1,t1,status); e1 = 0;
       electrons.Fill();
       k++;
@@ -166,7 +167,7 @@ int main(int argc, char * argv[]){
   gStyle->SetPadRightMargin(0.15);
   TCanvas* c1 = new TCanvas("c1", "", 800, 800);
   driftView.SetPlane(1,0, 0, 0, 0, 0);
-  driftView.SetArea(-15, -8, 15, 8);
+  driftView.SetArea(-8, -1, 8, 1);
   driftView.SetCanvas(c1);
   constexpr bool twod = true;
   driftView.Plot(twod);
@@ -174,7 +175,7 @@ int main(int argc, char * argv[]){
   
   TCanvas* c2 = new TCanvas("c2", "", 800, 800);
   driftView.SetPlane(0,1,0, 0, 0, 0);
-  driftView.SetArea(-1, -15, 1, 15);
+  driftView.SetArea(-15, -8, 15, 8);
   driftView.SetCanvas(c2);
   constexpr bool twod2 = true;
   driftView.Plot(twod2);
@@ -182,7 +183,7 @@ int main(int argc, char * argv[]){
   
   TCanvas* c3 = new TCanvas("c3", "", 800, 800);
   driftView.SetPlane(0,0,1, 0, 0, 0);
-  driftView.SetArea(-1, -8, 1, 8);
+  driftView.SetArea(-15, -1, 15, 1);
   driftView.SetCanvas(c3);
   constexpr bool twod3 = true;
   driftView.Plot(twod3);

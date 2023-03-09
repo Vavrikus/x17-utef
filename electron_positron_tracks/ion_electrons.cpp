@@ -168,7 +168,7 @@ int main(int argc, char* argv[])
 
     // Set the gas mixture.
     MediumMagboltz gas;
-    gas.SetComposition("ar", 90., "co2", 10.);
+    gas.SetComposition("ar", 90., "co2", 10.); cout << "BAD GAS COMPOSITION!!!!\n";
 
     ComponentGrid grid;
     const double m2cm = 100.;

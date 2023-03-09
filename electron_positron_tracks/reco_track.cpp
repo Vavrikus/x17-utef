@@ -134,10 +134,10 @@ void RecoEnergy(TF1* fit, VectorField* magfield, TGraph* magnetic, double min, d
         magnetic->AddPoint(x,B2.vy);
     }
     
-    double betasq = 1/(1+pow((E0/(clight*r*B.vx)),2));
+    double betasq = 1/(1+pow((E0/(clight*r*B.vy)),2));
     double Ekin = E0*(1/sqrt(1-betasq)-1);
 
-    cout << "Kinetic energy: " << Ekin << " eV, Bx: " << B.vx << " T, beta: ";
+    cout << "Kinetic energy: " << Ekin << " eV, Bx: " << B.vy << " T, beta: ";
     cout << sqrt(betasq) << "\n";
 }
 
@@ -178,15 +178,15 @@ int reco_track()
     tz->SetTitle("Drift time as function of distance;distance to readout [cm]; time [ns]");
     tz->SetMarkerStyle(2);
     tz->SetMarkerSize(0.4);
-    // tz->Draw("ap");
+    tz->Draw("ap");
     tz->Fit("pol1","","",8.05,11);
 
     // getting fit parameters
-    // TF1* tz_fit = (TF1*) tz->GetListOfFunctions()->FindObject("pol1");
-    // double a0 = tz_fit->GetParameter(0);
-    // double a1 = tz_fit->GetParameter(1);
-    // double b0 = -a0/a1; //inverse polynomial param
-    // double b1 = 1.0/a1; //inverse polynomial param
+    TF1* tz_fit = (TF1*) tz->GetListOfFunctions()->FindObject("pol1");
+    double a0 = tz_fit->GetParameter(0);
+    double a1 = tz_fit->GetParameter(1);
+    double b0 = -a0/a1; //inverse polynomial param
+    double b1 = 1.0/a1; //inverse polynomial param
 
     // setting variables from TTree
     double x0,y0,z0,t0,x1,y1,z1,t1;
@@ -228,7 +228,7 @@ int reco_track()
     // setting up track plots (original + reconstructed)
     TCanvas* c_track_xz = new TCanvas("c_track_xz","Electron track reconstruction");
     
-    xz_reco->SetTitle("Electron track reconstruction;z [cm]; distance to readout [cm]");
+    xz_reco->SetTitle("Electron track reconstruction;x [cm]; distance to readout [cm]");
     xz_reco->SetMarkerStyle(2);
     xz_reco->SetMarkerSize(0.4);
     xz_reco->Draw("ap");
