@@ -137,58 +137,102 @@ namespace X17
     /// @return The number of row of element with given index 
     int triangle_row(int columns,int index) {return ceil((2*columns+1-sqrt(pow((2*columns+1),2)-8*index))/2);}
 
-    /// @brief Returns coordinates of top right and bottom left corners of ith pad
+    /// @brief Returns height of i-th pad.
     /// @param i Number of pad (channel) between 1 and 128
-    /// @param out_xlow Coordinate x of bottom left corner
-    /// @param out_ylow Coordinate y of bottom left corner
-    /// @param out_xhigh Coordinate x of top right corner
-    /// @param out_yhigh Coordinate y of top right corner
-    void GetPadCorners(const int& i, double& out_xlow, double& out_ylow, double& out_xhigh, double& out_yhigh)
+    /// @param effective If true, gap width will be added to the height
+    /// @return Height of i-th pad 
+    double GetPadHeight(const int& i, bool effective = false)
+    {
+        double height = pad_height;
+        
+        // Special cases for height
+        if (i == 102) height = pad_height2;
+        if (i == 124) height = pad_height2;
+        if (i == 127) height = pad_height3;
+
+        return height;
+    }
+
+    /// @brief Returns column, row and height of i-th pad (using input parameters)
+    /// @param i Number of pad (channel) between 1 and 128
+    /// @param out_column Column number of given pad
+    /// @param out_row Row (diagonal) number of given pad
+    /// @param out_height Height of given pad
+    void GetPadInfo(const int& i, int& out_column, int& out_row, double& out_height)
     {
         if(i < 1 || i > channels) std::cerr << "ERROR: Invalid channel number " << i << " (must be between 1 and " << channels << ").";
-        
-        int column; // Column number of given pad (0 corresponds to 12)
-        int row;    // Row (diagonal) number of given pad
-        
+
         int triangle_row1   = 7;  // first row with smaller number of columns
         int triangle_row2   = 10; // first row breaking the first triangle
         int part1_channels  = (triangle_row1-1)*columns;
         int part12_channels = part1_channels+triangle(columns-1)-triangle(columns-1-triangle_row2+triangle_row1);
 
         // Part with same length rows (first six rows)
-        if (i <= part1_channels)  {row = (i-1)/columns+1; column = i%columns;}
+        if (i <= part1_channels)  {out_row = (i-1)/columns+1; out_column = i%columns;}
 
         // First triangular part (rows 7-9)
         else if (i <= part12_channels)
         {
-            row = triangle_row1-1+triangle_row(columns-1,i-part1_channels); // Maximal number in row r is diference of c-th and (c-r)th triangular number
-            column = (i-part1_channels) - triangle(columns-1) + triangle(columns-1+triangle_row1-row); // Column number is the offset of channel from difference of c-th and r-th Tn
+            out_row = triangle_row1-1+triangle_row(columns-1,i-part1_channels); // Maximal number in row r is diference of c-th and (c-r)th triangular number
+            out_column = (i-part1_channels) - triangle(columns-1) + triangle(columns-1+triangle_row1-out_row); // Column number is the offset of channel from difference of c-th and r-th Tn
         }
 
         // Second triangular part (rows 10-15, missing number in last row does not matter)
         else
         {
             int max_cols_p3 = columns-2-triangle_row2+triangle_row1;
-            row = triangle_row2-1+triangle_row(max_cols_p3,i-part12_channels);
-            column = (i-part12_channels) - triangle(columns-2-triangle_row2+triangle_row1) + triangle(max_cols_p3+triangle_row2-row);
+            out_row = triangle_row2-1+triangle_row(max_cols_p3,i-part12_channels);
+            out_column = (i-part12_channels) - triangle(columns-2-triangle_row2+triangle_row1) + triangle(max_cols_p3+triangle_row2-out_row);
         }
 
-        if (column == 0) column = 12; // Number 0 corresponds to 12th column
+        if (out_column == 0) out_column = 12; // Number 0 corresponds to 12th column
 
-        double i_pad_height = pad_height;
-        
-        // Special cases for height
-        if (i == 102) i_pad_height = pad_height2;
-        if (i == 124) i_pad_height = pad_height2;
-        if (i == 127) i_pad_height = pad_height3;
-
-        out_xhigh = xmax - (column-1)*(pad_width+pad_offset);
-        out_yhigh = yhigh - (row-1)*(pad_height+pad_offset)-(column-1)*pad_stag;
-        out_xlow  = out_xhigh - pad_width;
-        out_ylow  = out_yhigh - i_pad_height;
+        out_height = GetPadHeight(i);
     }
 
-    /// @brief Function for retrieving the number of a pad (channel) for given position (currently slow approach, may need optimization in future)
+    /// @brief Returns coordinates of the center of i-th pad
+    /// @param i Number of pad (channel) between 1 and 128
+    /// @param out_x Coordinate x of center
+    /// @param out_y Coordinate y of center
+    void GetPadCenter(const int& i, double& out_x, double& out_y)
+    {
+        int column; // Column number of given pad (0 corresponds to 12)
+        int row;    // Row (diagonal) number of given pad
+
+        double i_pad_height; // Height of the i-th pad
+        
+        GetPadInfo(i,column,row,i_pad_height);
+
+        out_x = xmax - (column-1)*(pad_width+pad_offset) - pad_width/2;
+        out_y = -(yhigh + pad1_offset - (row-1)*(pad_height+pad_offset)-(column-1)*pad_stag - i_pad_height/2);
+    }
+
+    /// @brief Returns coordinates of top right and bottom left corners of i-th pad (using input parameters)
+    /// @param i Number of pad (channel) between 1 and 128
+    /// @param out_xlow Coordinate x of bottom left corner
+    /// @param out_ylow Coordinate y of bottom left corner
+    /// @param out_xhigh Coordinate x of top right corner
+    /// @param out_yhigh Coordinate y of top right corner
+    /// @param nogaps If true, gaps between pads are evenly divided between neighbouring pads
+    void GetPadCorners(const int& i, double& out_xlow, double& out_ylow, double& out_xhigh, double& out_yhigh, bool nogaps = false)
+    {        
+        double gaps_correction = 0; // removes gaps if nogaps is true
+        if(nogaps) gaps_correction = pad_offset/2.0;
+
+        int column; // Column number of given pad (0 corresponds to 12)
+        int row;    // Row (diagonal) number of given pad
+
+        double i_pad_height; // Height of the i-th pad
+        
+        GetPadInfo(i,column,row,i_pad_height);
+
+        out_xhigh = xmax - (column-1)*(pad_width+pad_offset) + gaps_correction;
+        out_ylow = -(yhigh + pad1_offset - (row-1)*(pad_height+pad_offset)-(column-1)*pad_stag + gaps_correction);
+        out_xlow  = out_xhigh - pad_width - 2*gaps_correction;
+        out_yhigh  = out_ylow - (-i_pad_height - 2*gaps_correction);
+    }
+
+    /// @brief Function for retrieving the number of a pad (channel) effective area hit for given position (currently slow approach, may need optimization in future)
     /// @param x x coordinate [cm]
     /// @param y y coordinate [cm]
     /// @return Number of pad containing the given point (-1 if no pad contains this point)
@@ -197,8 +241,8 @@ namespace X17
         for (int i = 1; i <= channels; i++)
         {
             double xlow,ylow,xhigh,yhigh;
-            GetPadCorners(i,xlow,ylow,xhigh,yhigh);
-            if(x > xlow && x < xhigh && y > ylow && y < yhigh) return i;
+            GetPadCorners(i,xlow,ylow,xhigh,yhigh,true);
+            if(x >= xlow && x < xhigh && y >= ylow && y < yhigh) return i;
         }
 
         return -1;        
@@ -235,7 +279,8 @@ namespace X17
     }
 
     /// @brief Test function for drawing the pads with their channel numbers
-    void DrawPads()
+    /// @param nogaps If true, gaps between pads are evenly divided between neighbouring pads
+    void DrawPads(bool nogaps = false)
     {
         TCanvas* c = new TCanvas("c_pads","GEM readout pads",600,600*2*(yhigh+1)/(xmax-xmin+2));
         vector<TLine*> pad_lines;
@@ -244,12 +289,19 @@ namespace X17
         for (int i = 1; i <= channels; i++)
         {
             double x1,y1,x2,y2;
-            GetPadCorners(i,x1,y1,x2,y2);
+            GetPadCorners(i,x1,y1,x2,y2,nogaps);
 
             pad_lines.push_back(new TLine(x1,y1,x1,y2)); // left
             pad_lines.push_back(new TLine(x2,y1,x2,y2)); // right
             pad_lines.push_back(new TLine(x1,y1,x2,y1)); // bottom
             pad_lines.push_back(new TLine(x1,y2,x2,y2)); // top
+
+            // double xc,yc;
+            // GetPadCenter(i,xc,yc);
+            // pad_lines.push_back(new TLine(x1,y1,xc,yc));
+            // pad_lines.push_back(new TLine(x1,y2,xc,yc));
+            // pad_lines.push_back(new TLine(x2,y1,xc,yc));
+            // pad_lines.push_back(new TLine(x2,y2,xc,yc));
 
             TText* pad_number = new TText((x1+x2)/2,(y1+y2)/2,to_string(i).c_str());
             pad_number->SetTextAlign(22);
