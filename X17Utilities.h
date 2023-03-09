@@ -11,7 +11,7 @@
 
 #include "VectorField.h"
 
-/// @brief Namespace for variables describing X17 detector
+/// @brief Namespace for variables describing X17 detector and related functions
 namespace X17
 {
     // TPC first sector (contains positive x axis) boundaries
@@ -27,7 +27,7 @@ namespace X17
         constexpr double yintersect = ylow-yxslope*xmin;        // TPC slanted side (y positive) y-axis intersection (extrapolated) [cm]
 
     // TPC assumed electric field [V/cm]
-        constexpr Vector efield = {0,-400,0};
+        constexpr Vector efield = {0,0,-400};
 
     // TPC readout pads (counting rows and columns from top right corner)
         constexpr double pad_width   =  0.6;   // Pad width (horizontal) [cm]
@@ -204,36 +204,37 @@ namespace X17
         return -1;        
     }
 
-/// @brief Draws lines around approximate sensitive area (walls of TPC)
-/// @param yxformat If true, y coordinate is drawn on x axis and vice versa
-void DrawTrapezoid(bool yxformat = true)
-{
-    TLine* l1;
-    TLine* l2;
-    TLine* l3;
-    TLine* l4;
-
-    if (yxformat)
+    /// @brief Draws lines around approximate sensitive area (walls of TPC)
+    /// @param yxformat If true, y coordinate is drawn on x axis and vice versa
+    void DrawTrapezoid(bool yxformat = true)
     {
-        l1 = new TLine(-X17::yhigh,X17::xmax, X17::yhigh,X17::xmax);
-        l2 = new TLine(-X17::ylow ,X17::xmin, X17::ylow ,X17::xmin);
-        l3 = new TLine(-X17::yhigh,X17::xmax,-X17::ylow ,X17::xmin);
-        l4 = new TLine( X17::yhigh,X17::xmax, X17::ylow ,X17::xmin);
-    }
-    else
-    {
-        l1 = new TLine(X17::xmax,-X17::yhigh,X17::xmax, X17::yhigh);
-        l2 = new TLine(X17::xmin,-X17::ylow ,X17::xmin, X17::ylow );
-        l3 = new TLine(X17::xmax,-X17::yhigh,X17::xmin,-X17::ylow );
-        l4 = new TLine(X17::xmax, X17::yhigh,X17::xmin, X17::ylow );
+        TLine* l1;
+        TLine* l2;
+        TLine* l3;
+        TLine* l4;
+
+        if (yxformat)
+        {
+            l1 = new TLine(-X17::yhigh,X17::xmax, X17::yhigh,X17::xmax);
+            l2 = new TLine(-X17::ylow ,X17::xmin, X17::ylow ,X17::xmin);
+            l3 = new TLine(-X17::yhigh,X17::xmax,-X17::ylow ,X17::xmin);
+            l4 = new TLine( X17::yhigh,X17::xmax, X17::ylow ,X17::xmin);
+        }
+        else
+        {
+            l1 = new TLine(X17::xmax,-X17::yhigh,X17::xmax, X17::yhigh);
+            l2 = new TLine(X17::xmin,-X17::ylow ,X17::xmin, X17::ylow );
+            l3 = new TLine(X17::xmax,-X17::yhigh,X17::xmin,-X17::ylow );
+            l4 = new TLine(X17::xmax, X17::yhigh,X17::xmin, X17::ylow );
+        }
+
+        l1->Draw("same");
+        l2->Draw("same");
+        l3->Draw("same");
+        l4->Draw("same");
     }
 
-    l1->Draw("same");
-    l2->Draw("same");
-    l3->Draw("same");
-    l4->Draw("same");
-}
-    /// @brief Control function for drawing the pads
+    /// @brief Test function for drawing the pads with their channel numbers
     void DrawPads()
     {
         TCanvas* c = new TCanvas("c_pads","GEM readout pads",600,600*2*(yhigh+1)/(xmax-xmin+2));

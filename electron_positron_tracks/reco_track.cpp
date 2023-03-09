@@ -137,7 +137,7 @@ void RecoEnergy(TF1* fit, VectorField* magfield, TGraph* magnetic, double min, d
     double betasq = 1/(1+pow((E0/(clight*r*B.vy)),2));
     double Ekin = E0*(1/sqrt(1-betasq)-1);
 
-    cout << "Kinetic energy: " << Ekin << " eV, Bx: " << B.vy << " T, beta: ";
+    cout << "Kinetic energy: " << Ekin << " eV, By: " << B.vy << " T, beta: ";
     cout << sqrt(betasq) << "\n";
 }
 
