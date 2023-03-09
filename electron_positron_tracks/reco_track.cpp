@@ -151,8 +151,8 @@ int reco_track()
     TFile* inFile2 = new TFile("map.root");
     Field<SensorData>* map = (Field<SensorData>*)inFile2->Get("map");
 
-    X17::DrawPads();
-    X17::DrawPadsDistortion(2000);
+    // X17::DrawPads();
+    // X17::DrawPadsDistortion(2000);
 
     // for (int i = map->yimax; i > -1; i--)
     // {
@@ -207,6 +207,18 @@ int reco_track()
     TGraph* xy      = new TGraph();
     TGraph* xy_reco = new TGraph();
 
+    //reconstruction residuals
+    TGraph* gx_res = new TGraph();
+    TGraph* gy_res = new TGraph();
+    TGraph* gz_res = new TGraph();
+    TGraph* gr_res = new TGraph();
+
+    TH1F* hx_res = new TH1F("hx_res","X residuals",25,-0.5,0.5);
+    TH1F* hy_res = new TH1F("hx_res","Y residuals",25,-0.5,0.5);
+    TH1F* hz_res = new TH1F("hx_res","Z residuals",25,-0.5,0.5);
+    TH1F* hr_res = new TH1F("hx_res","Residuals",25,0,1);
+
+    int n_electrons = 0;
     for (int i = 0; i < electrons->GetEntries(); ++i)
     {
         //cout << "\n\ni: " << i << " out of " << electrons->GetEntries() << "\n";
@@ -214,6 +226,8 @@ int reco_track()
         electrons->GetEntry(i);
         if (z1 > 7.0 && X17::IsInSector(x0,y0,z0)) 
         {
+            n_electrons++;
+
             // SensorData reco = RecoPoint(map,x1,z1,t1,0.001);
             SensorData reco = map->Invert(x1,y1,t1);
             xz->AddPoint(x0,8-z0);
@@ -221,9 +235,21 @@ int reco_track()
             // xz_reco->AddPoint(z1,b0+b1*t1);
 
             xy->AddPoint(x0,y0);
-            // xy_reco->AddPoint(reco.x1,reco.y1);
+            xy_reco->AddPoint(reco.x1,reco.y1);
+
+            gx_res->AddPoint(x0,reco.x1-x0);
+            gy_res->AddPoint(x0,reco.y1-y0);
+            gz_res->AddPoint(x0,reco.z1-z0);
+            gr_res->AddPoint(x0,sqrt(pow((reco.x1-x0),2)+pow((reco.y1-y0),2)+pow((reco.z1-z0),2)));
+
+            hx_res->Fill(reco.x1-x0);
+            hy_res->Fill(reco.y1-y0);
+            hz_res->Fill(reco.z1-z0);
+            hr_res->Fill(sqrt(pow((reco.x1-x0),2)+pow((reco.y1-y0),2)+pow((reco.z1-z0),2)));
         }
+
     }
+    cout << "\nNumber of electrons in the TPC region: " << n_electrons << "\n";
 
     // setting up track plots (original + reconstructed)
     TCanvas* c_track_xz = new TCanvas("c_track_xz","Electron track reconstruction");
@@ -255,19 +281,46 @@ int reco_track()
     xy->SetMarkerSize(1.2);
     xy->Draw("p same");
 
-    TLine* l1 = new TLine(-7.45,14.61,7.45,14.61);
-    TLine* l2 = new TLine(-2.25,6.51,2.25,6.51);
-    TLine* l3 = new TLine(-7.45,14.61,-2.25,6.51);
-    TLine* l4 = new TLine(7.45,14.61,2.25,6.51);
-    l1->Draw();
-    l2->Draw();
-    l3->Draw();
-    l4->Draw();
-
     TLegend* leg_xy = new TLegend(0.129,0.786,0.360,0.887);
     leg_xy->AddEntry(xy,"original");
     leg_xy->AddEntry(xy_reco,"reconstructed");
     leg_xy->Draw("same");
+
+
+    TCanvas* c_fit_res = new TCanvas("c_fit_res", "Reconstruction residuals");
+    c_fit_res->Divide(2,2);
+    
+    c_fit_res->cd(1);
+    gx_res->SetTitle("X residuals;x [cm];Δx [cm]");
+    gx_res->SetMarkerStyle(2);
+    gx_res->SetMarkerSize(0.4);
+    gx_res->Draw("ap");
+    
+    c_fit_res->cd(2);
+    gy_res->SetTitle("Y residuals;x [cm];Δy [cm]");
+    gy_res->SetMarkerStyle(2);
+    gy_res->SetMarkerSize(0.4);
+    gy_res->Draw("ap");
+    
+    c_fit_res->cd(3);
+    gz_res->SetTitle("Z residuals;x [cm];Δz [cm]");
+    gz_res->SetMarkerStyle(2);
+    gz_res->SetMarkerSize(0.4);
+    gz_res->Draw("ap");
+    
+    c_fit_res->cd(4);
+    gr_res->SetTitle("Residuals;x [cm];distance [cm]");
+    gr_res->SetMarkerStyle(2);
+    gr_res->SetMarkerSize(0.4);
+    gr_res->Draw("ap");
+
+
+    TCanvas* c_fit_res2 = new TCanvas("c_fit_res2", "Reconstruction residuals");
+    c_fit_res2->Divide(2,2);
+    c_fit_res2->cd(1); hx_res->Draw();
+    c_fit_res2->cd(2); hy_res->Draw();
+    c_fit_res2->cd(3); hz_res->Draw();
+    c_fit_res2->cd(4); hr_res->Draw();
 
     double min = 0;//7
     double max = 15;//10.5
