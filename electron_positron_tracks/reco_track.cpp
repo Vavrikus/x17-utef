@@ -2,10 +2,13 @@
 #include <TF1.h>
 #include <TFile.h>
 #include <TGraph.h>
+#include <TGraph2D.h>
 #include <TH1F.h>
 #include <TH2F.h>
+#include <TH3F.h>
 #include <TLegend.h>
 #include <TLine.h>
+#include <TPolyLine3D.h>
 #include <TTree.h>
 
 #include <fstream>
@@ -151,26 +154,6 @@ int reco_track()
     TFile* inFile2 = new TFile("map.root");
     Field<SensorData>* map = (Field<SensorData>*)inFile2->Get("map");
 
-    // X17::DrawPads();
-    // X17::DrawPadsDistortion(2000);
-
-    // for (int i = map->yimax; i > -1; i--)
-    // {
-    //     cout << "LAYER " << i << "\n";
-    //     cout << "=================================================================\n";
-
-    //     for (int j = map->zimax; j > -1; j--)
-    //     {
-    //         for (int k = 0; k <= map->ximax; k++)
-    //         {
-    //             cout << map->field[k][i][j].t1 << " ";
-    //         }
-    //         cout << "\n";
-    //     }
-
-    //     cout << "\n\n";
-    // }
-
     // plotting drift time vs distance to readout + linear fit
     TCanvas* c_drift = new TCanvas("c_drift","Drift time");
     electrons->Draw("t1:8-z0","z1>7.0");
@@ -207,7 +190,7 @@ int reco_track()
     TGraph* xy      = new TGraph();
     TGraph* xy_reco = new TGraph();
 
-    //reconstruction residuals
+    // reconstruction residuals
     TGraph* gx_res = new TGraph();
     TGraph* gy_res = new TGraph();
     TGraph* gz_res = new TGraph();
@@ -217,14 +200,24 @@ int reco_track()
     TH1F* hy_res = new TH1F("hx_res","Y residuals",25,-0.5,0.5);
     TH1F* hz_res = new TH1F("hx_res","Z residuals",25,-0.5,0.5);
     TH1F* hr_res = new TH1F("hx_res","Residuals",25,0,1);
+    
+    // Variables for reconstruction with pads
+    constexpr int timebins = 50;
+    int padhits[X17::channels][timebins];
+    for (int i = 0; i < X17::channels; i++) for (int j = 0; j < timebins; j++) {padhits[i][j] = 0;}
 
+    TGraph2D* g_xyz      = new TGraph2D();
+    TGraph2D* g_xyz_reco = new TGraph2D();
+    // TH3F* h_xyz_reco = new TH3F("h_xyz_reco","Electron track reconstruction;x [cm];y [cm];z [cm]",)
+
+    // looping through all electrons
     int n_electrons = 0;
     for (int i = 0; i < electrons->GetEntries(); ++i)
     {
         //cout << "\n\ni: " << i << " out of " << electrons->GetEntries() << "\n";
         //if ((10000*i)%electrons->GetEntries() == 0) cout << 100*i/electrons->GetEntries() << " \%\n";
         electrons->GetEntry(i);
-        if (z1 > 7.0 && X17::IsInSector(x0,y0,z0)) 
+        if (X17::IsInSector(x1,y1,0)) 
         {
             n_electrons++;
 
@@ -246,6 +239,13 @@ int reco_track()
             hy_res->Fill(reco.y1-y0);
             hz_res->Fill(reco.z1-z0);
             hr_res->Fill(sqrt(pow((reco.x1-x0),2)+pow((reco.y1-y0),2)+pow((reco.z1-z0),2)));
+
+            // reconstruction with pads
+            int channel = X17::GetPad(x1,y1);
+            int timebin = t1/100; if(timebin > timebins - 1) cerr << "ERROR: Invalid timebin: " << timebin << endl;
+            if(channel == -1) cerr << "ERROR: No pad hit found. Coordinates x,y: " << x1 << ", " << y1 << endl;
+            padhits[channel-1][timebin]++;
+            g_xyz->AddPoint(x0,y0,z0);
         }
 
     }
@@ -350,6 +350,60 @@ int reco_track()
     double step = 0.1;
     RecoEnergy(circle_fit,magfield,magnetic_x,min,max,step);
     RecoEnergy(circle_fit2,magfield,magnetic_x2,min,max,step);
+
+    // Reconstruction with pads
+    for (int i = 0; i < X17::channels; i++)
+    {
+        for (int j = 0; j < timebins; j++)
+        {
+            if(padhits[i][j] != 0)
+            {
+                double time = 100 * j + 50;
+                double xpad,ypad;
+                X17::GetPadCenter(i+1,xpad,ypad);
+
+                SensorData reco = map->Invert(xpad,ypad,time);
+                g_xyz_reco->AddPoint(reco.x1,reco.y1,reco.z1);
+            }
+        }        
+    }
+
+    TCanvas* c_track_xyz = new TCanvas("c_track_xyz","Electron track reconstruction with pads and time bins");
+    
+    // h_xyz_reco->Draw("box2");
+    g_xyz_reco->SetTitle("Electron track reconstruction;x [cm]; y [cm];z [cm]");
+    g_xyz_reco->SetMarkerStyle(2);
+    g_xyz_reco->SetMarkerSize(0.4);
+    g_xyz_reco->Draw("ap");
+
+    g_xyz->SetMarkerColor(2);
+    g_xyz->SetMarkerStyle(7);
+    g_xyz->SetMarkerSize(1.2);
+    g_xyz->Draw("p same");
+
+    TLegend* leg_xyz = new TLegend(0.129,0.786,0.360,0.887);
+    leg_xyz->AddEntry(g_xyz,"original");
+    leg_xyz->AddEntry(g_xyz_reco,"reconstructed");
+    leg_xyz->Draw("same");
+
+    vector<TPolyLine3D*> pad_lines;
+
+    for (int i = 1; i <= X17::channels; i++)
+    {
+        double x1,y1,x2,y2;
+        X17::GetPadCorners(i,x1,y1,x2,y2,true);
+
+        TPolyLine3D* pad = new TPolyLine3D(5);
+        pad->SetPoint(0,x1,y1,-2.5);
+        pad->SetPoint(1,x1,y2,-2.5);
+        pad->SetPoint(2,x2,y2,-2.5);
+        pad->SetPoint(3,x2,y1,-2.5);
+        pad->SetPoint(4,x1,y1,-2.5);
+
+        pad_lines.push_back(pad);
+    }
+    
+    for(auto l : pad_lines)   l->Draw("AL");
     
     // TCanvas* c_magnetic = new TCanvas("c_magnetic","Perpendicular magnetic field");
     // magnetic_x->SetTitle("Perpendicular magnetic field;z [cm]; B [T]");

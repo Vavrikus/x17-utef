@@ -51,7 +51,7 @@ struct Matrix
 
     Matrix() = default;
 
-    Matrix(double (&arr)[M*N])
+    Matrix(const double (&arr)[M*N])
     {
         copy(std::begin(arr),std::end(arr),std::begin(elements));
         // cout << "NEW MATRIX:\n"; this->Print();
@@ -443,8 +443,28 @@ struct Field
         return (1-dz)*c0+dz*c1;
     }
 
-    T Invert(double,double,double){return nullptr;} // Only for SensorData      
+    T Invert(double,double,double){return nullptr;} // Only for SensorData
 };
+
+void PrintMap(const Field<SensorData>* map)
+{
+    for (int i = map->yimax; i > -1; i--)
+    {
+        cout << "LAYER " << i << "\n";
+        cout << "=================================================================\n";
+
+        for (int j = map->zimax; j > -1; j--)
+        {
+            for (int k = 0; k <= map->ximax; k++)
+            {
+                cout << map->field[k][i][j].t1 << " ";
+            }
+            cout << "\n";
+        }
+
+        cout << "\n\n";
+    }
+}
 
 /// @brief Templated function for cube corners selection
 /// @tparam T Any number type

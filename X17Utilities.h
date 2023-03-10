@@ -280,9 +280,9 @@ namespace X17
 
     /// @brief Test function for drawing the pads with their channel numbers
     /// @param nogaps If true, gaps between pads are evenly divided between neighbouring pads
-    void DrawPads(bool nogaps = false)
+    void DrawPads(bool nogaps = false, TCanvas* c = nullptr)
     {
-        TCanvas* c = new TCanvas("c_pads","GEM readout pads",600,600*2*(yhigh+1)/(xmax-xmin+2));
+        if(c == nullptr) c = new TCanvas("c_pads","GEM readout pads",600,600*2*(yhigh+1)/(xmax-xmin+2));
         vector<TLine*> pad_lines;
         vector<TText*> pad_numbers;
 
