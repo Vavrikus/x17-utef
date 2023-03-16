@@ -13,6 +13,7 @@
 #include "TChain.h"
 #include "TFile.h"
 #include "TGraph.h"
+#include "TGraph2D.h"
 #include "TGraphErrors.h"
 #include "TH2F.h"
 #include "TStyle.h"
@@ -62,6 +63,7 @@ int make_map()
 
     // set branches for tchain containing data
     // ADJUSTED FOR OLD COORDINATES ONLY!!!!!!!
+    cout << "MAKE SURE TO CHANGE THE COORDINATE ASSIGNMENT IF USING NEW SIMULATIONS!!!!!!!\n";
     double x0, y0, z0, t0, e0;
     double x1, y1, z1, t1, e1;
     map_data_in->SetBranchAddress("z0",&x0);
@@ -115,6 +117,16 @@ int make_map()
             if(i != 0) 
             {
                 map.SetPoint(x0_prev,y0_prev,z0_prev,{x1_avg,y1_avg,z1_avg,t1_avg,stdev(x1_vec,x1_avg),stdev(y1_vec,y1_avg),stdev(z1_vec,z1_avg),stdev(t1_vec,t1_avg)});
+
+                // TCanvas* c = new TCanvas();
+                // TGraph2D* point_spread = new TGraph2D();
+                // string ps_title = "Point spread for x = " + to_string(x0_prev) + ", y = " + to_string(y0_prev) + ", z = " + to_string(z0_prev) + ";x [cm];y [cm];time [ns]";
+                // point_spread->SetTitle(ps_title.c_str());
+                // for (int i = 0; i < same_prev; i++) point_spread->AddPoint(x1_vec[i],y1_vec[i],t1_vec[i]);
+                // point_spread->Draw("P");
+                // point_spread->SetMarkerSize(2);
+                // point_spread->SetMarkerStyle(2);
+
                 x1_vec.clear();y1_vec.clear();z1_vec.clear();t1_vec.clear();
             }
 

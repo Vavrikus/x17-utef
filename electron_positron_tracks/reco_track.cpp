@@ -374,7 +374,7 @@ int reco_track()
     g_xyz_reco->SetTitle("Electron track reconstruction;x [cm]; y [cm];z [cm]");
     g_xyz_reco->SetMarkerStyle(2);
     g_xyz_reco->SetMarkerSize(0.4);
-    g_xyz_reco->Draw("ap");
+    g_xyz_reco->Draw("p");
 
     g_xyz->SetMarkerColor(2);
     g_xyz->SetMarkerStyle(7);
