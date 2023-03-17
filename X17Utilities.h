@@ -47,7 +47,7 @@ namespace X17
     /// @param y y coordinate [cm]
     /// @param z z coordinate [cm]
     /// @param dist specifies minimal distance from within the TPC walls except the bottom anode wall (makes volume smaller)
-    /// @return 
+    /// @return true/false
     bool IsInSector(const double& x, const double& y, const double& z, const double& dist = 0)
     {
         if (z < X17::zmin      || z > X17::zmax-dist) return false;
@@ -56,6 +56,15 @@ namespace X17
         if (std::abs(y)+dy > X17::yxslope*x+X17::yintersect) return false;
         
         return true;   
+    }
+
+    /// @brief True if vector is in the first sector (containing positive x-axis) of the detector (trapezoidal prism).
+    /// @param vec point in space (x,y,z) [cm]
+    /// @param dist specifies minimal distance from within the TPC walls except the bottom anode wall (makes volume smaller)
+    /// @return true/false
+    bool IsInSector(const Vector& vec, const double& dist = 0)
+    {
+        return IsInSector(vec.vx,vec.vy,vec.vz,dist);
     }
 
     /// @brief Returns minimal and maximal (magnetic) field inside first sector TPC volume.

@@ -23,6 +23,7 @@ struct Vector
 
     double SqMagnitude() const {return vx*vx+vy*vy+vz*vz;}
     double Magnitude() const {return sqrt(this->SqMagnitude());}
+    void Normalize();
     double Angle(const Vector& other) const
     {
         return acos((vx*other.vx+vy*other.vy+vz*other.vz)/(this->Magnitude()*other.Magnitude()));
@@ -43,6 +44,18 @@ Vector operator*(const double& d,const Vector& v)
 {
     return Vector{d*v.vx,d*v.vy,d*v.vz};
 }
+
+Vector operator/(const Vector& v,const double& d)
+{
+    return Vector{v.vx/d,v.vy/d,v.vz/d};
+}
+
+double operator*(const Vector& v1, const Vector& v2)
+{
+    return v1.vx*v2.vx+v1.vy*v2.vy+v1.vz*v2.vz;
+}
+
+void Vector::Normalize() {*this = (*this)/(this->Magnitude());}
 
 template <int M, int N>
 struct Matrix
@@ -280,6 +293,11 @@ struct VectorField
         Vector c1 = (1-dy)*c01+dy*c11;
 
         return (1-dz)*c0+dz*c1;
+    }
+
+    Vector GetField(const Vector& vec)
+    {
+        return GetField(vec.vx,vec.vy,vec.vz);
     }
 };
 
