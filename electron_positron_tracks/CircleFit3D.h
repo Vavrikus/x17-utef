@@ -76,7 +76,7 @@ private:
         double cos_varphi = cos(phi_max);
         double sin_varphi = sin(phi_max);
         orientation2 = Vector{sin_varphi*(cos_alpha*cos_theta*cos_phi-sin_alpha*sin_phi)+cos_varphi*sin_theta*cos_phi,
-                              sin_varphi*(cos_alpha*cos_theta*sin_phi+sin_alpha*cos_phi)+cos_varphi*sin_theta*cos_phi,
+                              sin_varphi*(cos_alpha*cos_theta*sin_phi+sin_alpha*cos_phi)+cos_varphi*sin_theta*sin_phi,
                               -sin_varphi*cos_alpha*sin_theta+cos_varphi*cos_theta};
     }
 
@@ -120,7 +120,7 @@ private:
     double SumSq()
     {
         double sum = 0;
-        for (DataPoint point : fit_data) sum += SqDistance(point);
+        for (DataPoint point : fit_data) sum += point.count*SqDistance(point);
         return sum;
     }
 
@@ -135,9 +135,9 @@ private:
         double cos_varphi = cos(varphi);
         double sin_varphi = sin(varphi);
 
-        return originc + Vector{(1-cos_varphi)*(cos_alpha*cos_theta*cos_phi-sin_alpha*sin_phi)+sin_varphi*sin_theta*cos_phi,
-                                (1-cos_varphi)*(cos_alpha*cos_theta*sin_phi+sin_alpha*cos_phi)+sin_varphi*sin_theta*cos_phi,
-                                -(1-cos_varphi)*cos_alpha*sin_theta+sin_varphi*cos_theta};
+        return originc + radius*Vector{(1-cos_varphi)*(cos_alpha*cos_theta*cos_phi-sin_alpha*sin_phi)+sin_varphi*sin_theta*cos_phi,
+                                       (1-cos_varphi)*(cos_alpha*cos_theta*sin_phi+sin_alpha*cos_phi)+sin_varphi*sin_theta*sin_phi,
+                                       -(1-cos_varphi)*cos_alpha*sin_theta+sin_varphi*cos_theta};
     }
 
     void EvalSumSq(int& npar, double* gin, double& sumsq, double* par, int iflag)
@@ -168,13 +168,33 @@ private:
             Vector cur_point = GetCirclePoint(param/radius);
             if(X17::IsInSector(cur_point))
             {
-                bfield += magfield->GetField(cur_point);
+                bfield += magfield->GetField(cur_point/100.0);
                 i++;
             }
             param += step;
         }
 
         return bfield/i;
+    }
+
+    Vector GetMiddleField(VectorField* magfield, double tolerance = 0.0001)
+    {
+        double xmiddle = (X17::xmax+X17::xmin)/2;
+        double low  = 0;
+        double high = phi_max;
+        double mid  = (low+high)/2;
+        Vector vmid = GetCirclePoint(mid);
+
+        while (abs(xmiddle-vmid.vx) > tolerance)
+        {
+            mid = (low+high)/2;
+            vmid  = GetCirclePoint(mid);
+
+            if (vmid.vx < xmiddle) low  = mid;
+            else                high = mid;
+        }
+        
+        return magfield->GetField(vmid/100.0);
     }
 
 public:
@@ -187,6 +207,7 @@ public:
     static CircleFit3D& NewCircleFit(Vector orig,Vector orient)
     {
         CircleFit3D& instance = GetCircleFit();
+        instance.fit_data.clear();
         instance.origin      = orig;
         instance.orientation = orient;
         instance.orientation.Normalize();
@@ -293,7 +314,7 @@ public:
     double GetEnergy(VectorField* magfield,bool middle = true)
     {
         Vector bfield;
-        if(middle) bfield = magfield->GetField(GetCirclePoint(phi_max/4.0));
+        if(middle) bfield = GetMiddleField(magfield); //magfield->GetField(GetCirclePoint(phi_max/2.0)/100.0);
         else       bfield = GetAvgField(magfield);
 
         double b_proj = normal*bfield;

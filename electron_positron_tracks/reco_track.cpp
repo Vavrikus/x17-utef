@@ -127,7 +127,7 @@ int reco_track()
             g_xyz->AddPoint(x0,y0,z0);
 
             // for circle fit
-            cfit3d.AddPoint(x0,y0,z0,0);
+            cfit3d.AddPoint(x0,y0,z0,1);
         }
 
     }
@@ -213,7 +213,7 @@ int reco_track()
 
     // loading magnetic field from txt file (units = meters)
     VectorField* magfield = new VectorField(-0.2,0.2,-0.3,0.3,-0.3,0.3,0.005);
-    magfield->LoadField("../../mag_data/VecB2.txt");
+    magfield->LoadField("../mag_data/VecB2.txt");
     
     double minfield,maxfield,minangle,maxangle;
     X17::GetMinMaxField(*magfield,minfield,maxfield);
@@ -287,23 +287,56 @@ int reco_track()
     cfit3d.FitCircle3D();
     cfit3d.PrintFitParams();
 
-    cout << "Reconstructed energy: " << cfit3d.GetEnergy(magfield,false) << " (middle field), " << cfit3d.GetEnergy(magfield,false) << " (average field).\n";
+    TGraph2D* g_cfit3d = cfit3d.GetGraph(0.1,-1);
+    g_cfit3d->SetLineColor(kGreen);
+    g_cfit3d->SetLineWidth(2);
+    g_cfit3d->Draw("LINE same");
+    // cout << "Plotting fit with " << g_cfit3d->GetN() << " points.\n";
 
-    TGraph2D* g_cfit3d = cfit3d.GetGraph(0.1,-5);
-    g_cfit3d->SetMarkerColor(3);
-    g_cfit3d->SetMarkerStyle(2);
-    g_cfit3d->Draw("p same");
-    cout << "Plotting fit with " << g_cfit3d->GetN() << " points.";
+    cout << "Reconstructed energy: " << cfit3d.GetEnergy(magfield,true) << " (middle field), " << cfit3d.GetEnergy(magfield,false) << " (average field).\n";
+    
+    CircleFit3D& cfit3d_reco = CircleFit3D::NewCircleFit({0,0,0},{1,0,0});
+
+    for (int i = 0; i < X17::channels; i++)
+    {
+        for (int j = 0; j < timebins; j++)
+        {
+            if(padhits[i][j] != 0)
+            {
+                double time = 100 * j + 50;
+                double xpad,ypad;
+                X17::GetPadCenter(i+1,xpad,ypad);
+
+                SensorData reco = map->Invert(xpad,ypad,time);
+                cfit3d_reco.AddPoint(reco.x1,reco.y1,reco.z1,padhits[i][j]);
+            }
+        }        
+    }
+
+    cfit3d_reco.Prefit();
+    cfit3d_reco.SetFitter(4);
+    cfit3d_reco.FitCircle3D();
+    cfit3d_reco.PrintFitParams();
+
+    TGraph2D* g_cfit3d_reco = cfit3d_reco.GetGraph(0.1,-1);
+    g_cfit3d_reco->SetLineColor(kBlue);
+    g_cfit3d_reco->SetLineWidth(2);
+    g_cfit3d_reco->Draw("LINE same");
+
+    cout << "Reconstructed energy: " << cfit3d_reco.GetEnergy(magfield,true) << " (middle field), " << cfit3d_reco.GetEnergy(magfield,false) << " (average field).\n";
+
     
     TLegend* leg_xyz = new TLegend(0.129,0.786,0.360,0.887);
     leg_xyz->AddEntry(g_xyz,"original");
-    leg_xyz->AddEntry(g_xyz_reco,"reconstructed");
     leg_xyz->AddEntry(g_cfit3d,"fit");
+    leg_xyz->AddEntry(g_xyz_reco,"reconstructed");
+    leg_xyz->AddEntry(g_cfit3d_reco,"fit");
     leg_xyz->Draw("same");
 
     TCanvas* c_fit3d = new TCanvas("c_fit3d","Fit 3D");
-    g_cfit3d->SetTitle("Fit 3D;x [cm]; y [cm];z [cm]");
-    g_cfit3d->Draw("p");
+    g_cfit3d_reco->SetTitle("Fit 3D;x [cm]; y [cm];z [cm]");
+    g_cfit3d_reco->Draw("LINE");
+    g_cfit3d->Draw("LINE same");
 
     // TCanvas* c_magnetic = new TCanvas("c_magnetic","Perpendicular magnetic field");
     // magnetic_x->SetTitle("Perpendicular magnetic field;z [cm]; B [T]");
