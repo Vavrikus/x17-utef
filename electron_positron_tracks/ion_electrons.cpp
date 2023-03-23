@@ -172,8 +172,8 @@ int main(int argc, char* argv[])
 
     ComponentGrid grid;
     const double m2cm = 100.;
-    grid.LoadMagneticField("VecB.txt", "xyz", m2cm); 
-    grid.LoadElectricField("VecE.txt", "xyz",false,false, m2cm);
+    grid.LoadMagneticField("VecB2.txt", "xyz", m2cm); 
+    grid.LoadElectricField("VecE2.txt", "xyz",false,false, m2cm);
     grid.SetMedium(&gas);
 
 

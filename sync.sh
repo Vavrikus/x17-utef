@@ -17,7 +17,5 @@ rsync bashrc.sh ${i}":~/.bashrc" --progress
 rsync bash_profile.sh ${i}":~/.bash_profile" --progress
 cd electron_positron_tracks
 rsync CMakeLists.txt ion_electrons.cpp make_track.cpp reco_track.cpp ion_single.sh ion_multi.sh ${i}":/storage/projects/utefx17/martin/electron_positron_tracks" --progress
-cd build
-rsync VecE.txt VecB.txt ${i}":/storage/projects/utefx17/martin/electron_positron_tracks/build" --progress
 cd ../../mag_data
-rsync VecE.txt VecB.txt ${i}":/storage/projects/utefx17/martin/mag_data" --progress
+rsync VecE.txt VecB.txt VecE2.txt VecB2.txt ${i}":/storage/projects/utefx17/martin/mag_data" --progress

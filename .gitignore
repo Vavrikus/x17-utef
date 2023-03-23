@@ -1,8 +1,9 @@
 /tests/
-/electron_positron_tracks/data/
+/electron_positron_tracks/data/sample*
+/electron_positron_tracks/data/track*
 /electron_positron_tracks/pictures/
 */build/
 *.d
 *.so
 *.pcm
-*.root
+*.out

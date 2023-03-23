@@ -36,7 +36,7 @@ int main(int argc, char * argv[]){
 
   // ofstream myfile;
   // myfile.open ("electrons.txt"); //name of the file to save data
-  TFile outFile("electrons.root","RECREATE","Electrons from ionization track");
+  TFile outFile("../electrons.root","RECREATE","Electrons from ionization track");
   TTree electrons("electrons","Tree of initial and final points of electrons");
 
   double x0, y0, z0, t0, e0;
@@ -55,8 +55,8 @@ int main(int argc, char * argv[]){
   
   ComponentGrid grid;
   const double m2cm = 100.;
-  grid.LoadMagneticField("VecB.txt", "xyz", m2cm); 
-  grid.LoadElectricField("VecE.txt", "xyz",false,false, m2cm);
+  grid.LoadMagneticField("../../mag_data/VecB2.txt", "xyz", m2cm); 
+  grid.LoadElectricField("../../mag_data/VecE2.txt", "xyz",false,false, m2cm);
   grid.SetMedium(&gas);
 
   

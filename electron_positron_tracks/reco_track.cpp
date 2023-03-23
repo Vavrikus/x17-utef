@@ -24,7 +24,7 @@
 int reco_track()
 {
     // file with Garfield simulation output
-    TFile* inFile = new TFile("build/electrons.root");
+    TFile* inFile = new TFile("electrons.root");
     TTree* electrons = (TTree*)inFile->Get("electrons");
 
     // file with ionization electrons map
@@ -213,7 +213,7 @@ int reco_track()
 
     // loading magnetic field from txt file (units = meters)
     VectorField* magfield = new VectorField(-0.2,0.2,-0.3,0.3,-0.3,0.3,0.005);
-    magfield->LoadField("/home/vavrik/work/X17/electron_positron_tracks/build/VecB.txt");
+    magfield->LoadField("../../mag_data/VecB2.txt");
     
     double minfield,maxfield,minangle,maxangle;
     X17::GetMinMaxField(*magfield,minfield,maxfield);

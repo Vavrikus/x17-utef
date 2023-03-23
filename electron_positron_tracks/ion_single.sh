@@ -14,6 +14,7 @@ cd $(dirname $0) #Makes sure you are in the directory of this script.
 # define a DATADIR variable: directory where the input files are taken from and where output will be copied to
 DATADIR=/storage/projects/utefx17/martin/electron_positron_tracks/data # substitute username and path to to your real username and path
 BUILDDIR=$DATADIR/../build
+MAGDIR=$DATADIR/../../mag_data
 
 # append a line to a file "jobs_info.txt" containing the ID of the job, the hostname of node it is run on and the path to a scratch directory
 # this information helps to find a scratch directory in case the job fails and you need to remove the scratch directory manually 
@@ -31,7 +32,7 @@ test -n "$SCRATCHDIR" || { echo >&2 "Variable SCRATCHDIR is not set!"; exit 1; }
 
 # copy input file "h2o.com" to scratch directory
 # if the copy operation fails, issue error message and exit
-cp $BUILDDIR/ion_electrons $BUILDDIR/VecE.txt $BUILDDIR/VecB.txt  $SCRATCHDIR || { echo >&2 "Error while copying input file(s)!"; exit 2; }
+cp $BUILDDIR/ion_electrons $MAGDIR/VecE2.txt $MAGDIR/VecB2.txt  $SCRATCHDIR || { echo >&2 "Error while copying input file(s)!"; exit 2; }
 
 # move into scratch directory
 cd $SCRATCHDIR

@@ -14,8 +14,8 @@ int main(int argc, char *argv[]) {
   // Load the field map.
   ComponentGrid grid;
   const double m2cm = 100.;
-  grid.LoadMagneticField("VecB.txt", "xyz", m2cm);
-  grid.LoadElectricField("VecE.txt", "xyz",false,false, m2cm);
+  grid.LoadMagneticField("../../mag_data/VecB.txt", "xyz", m2cm);
+  grid.LoadElectricField("../../mag_data/VecE.txt", "xyz",false,false, m2cm);
   //~ grid.GetElectricField(false);
 
   ViewField view;
