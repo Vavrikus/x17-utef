@@ -288,6 +288,7 @@ int reco_track()
     cfit3d.PrintFitParams();
 
     TGraph2D* g_cfit3d = cfit3d.GetGraph(0.1,-1);
+    TGraph* g_en = cfit3d.GetEnergyGraph(magfield);
     g_cfit3d->SetLineColor(kGreen);
     g_cfit3d->SetLineWidth(2);
     g_cfit3d->Draw("LINE same");
@@ -296,6 +297,7 @@ int reco_track()
     cout << "Reconstructed energy: " << cfit3d.GetEnergy(magfield,true) << " (middle field), " << cfit3d.GetEnergy(magfield,false) << " (average field).\n";
     
     CircleFit3D& cfit3d_reco = CircleFit3D::NewCircleFit({0,0,0},{1,0,0});
+    vector<DataPoint> reco_data;
 
     for (int i = 0; i < X17::channels; i++)
     {
@@ -309,9 +311,13 @@ int reco_track()
 
                 SensorData reco = map->Invert(xpad,ypad,time);
                 cfit3d_reco.AddPoint(reco.x1,reco.y1,reco.z1,padhits[i][j]);
+                reco_data.emplace_back(reco.x1,reco.y1,reco.z1,padhits[i][j]);
             }
         }        
     }
+
+    auto reco_markers = GetDataMarkers(reco_data);
+    for (auto m : reco_markers) m->Draw("same");
 
     cfit3d_reco.Prefit();
     cfit3d_reco.SetFitter(4);
@@ -319,6 +325,7 @@ int reco_track()
     cfit3d_reco.PrintFitParams();
 
     TGraph2D* g_cfit3d_reco = cfit3d_reco.GetGraph(0.1,-1);
+    TGraph* g_en_reco = cfit3d_reco.GetEnergyGraph(magfield);
     g_cfit3d_reco->SetLineColor(kBlue);
     g_cfit3d_reco->SetLineWidth(2);
     g_cfit3d_reco->Draw("LINE same");
@@ -337,6 +344,21 @@ int reco_track()
     g_cfit3d_reco->SetTitle("Fit 3D;x [cm]; y [cm];z [cm]");
     g_cfit3d_reco->Draw("LINE");
     g_cfit3d->Draw("LINE same");
+
+    TCanvas* c_energy = new TCanvas("c_energy","Energy along track");
+    g_en->SetMarkerColor(kRed);
+    g_en->SetMarkerSize(1);
+    g_en->SetMarkerStyle(2);
+    g_en->Draw("AP");
+    g_en_reco->SetMarkerColor(kBlue);
+    g_en_reco->SetMarkerSize(1);
+    g_en_reco->SetMarkerStyle(2);
+    g_en_reco->Draw("P same");
+
+    TLegend* leg_en = new TLegend(0.129,0.786,0.360,0.887);
+    leg_en->AddEntry(g_en,"fit original");
+    leg_en->AddEntry(g_en_reco,"fit reconstructed");
+    leg_en->Draw("same");
 
     // TCanvas* c_magnetic = new TCanvas("c_magnetic","Perpendicular magnetic field");
     // magnetic_x->SetTitle("Perpendicular magnetic field;z [cm]; B [T]");

@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "TGraph2D.h"
+#include "TMarker3DBox.h"
 #include "TVirtualFitter.h"
 
 #include "../VectorField.h"
@@ -25,6 +26,28 @@ struct DataPoint
     Vector ToVector() const {return {x,y,z};}
 };
 
+vector<TMarker3DBox*> GetDataMarkers(vector<DataPoint> data, double zbin_size = 0.3)
+{
+    vector<TMarker3DBox*> markers;
+    constexpr double max_size = 0.75;
+
+    // find maximal count
+    int max_count = 0;
+    for (DataPoint p : data) if (p.count > max_count) max_count = p.count;
+
+    // create markers
+    for (DataPoint p : data)
+    {
+        double rel_size = max_size*p.count/max_count;
+        double xlen = rel_size*X17::pad_width/2.0;
+        double ylen = rel_size*X17::pad_height/2.0;
+        double zlen = rel_size*zbin_size/2.0;
+
+        markers.push_back(new TMarker3DBox(p.x,p.y,p.z,xlen,ylen,zlen,0,0));
+    }
+    
+    return markers;
+}
 
 /// @brief class for fitting reconstructed track with circular arc with smoothly attached lines
 class CircleFit3D
@@ -325,5 +348,31 @@ public:
         double Ekin = E0*(1/sqrt(1-betasq)-1);
 
         return Ekin;
+    }
+
+    TGraph* GetEnergyGraph(VectorField* magfield, double step = 0.1)
+    {
+        TGraph* graph = new TGraph();
+        double param = 0;
+
+        while (param/radius < phi_max) 
+        {
+            Vector cur_point = GetCirclePoint(param/radius);
+            if(X17::IsInSector(cur_point))
+            {
+                Vector bfield = magfield->GetField(cur_point/100.0);
+                double b_proj = normal*bfield;
+                const double clight = 299792458;
+                const double E0 = 510998.95;
+
+                double betasq = 1/(1+pow((E0/(clight*(radius/100.0)*b_proj)),2));
+                double Ekin = E0*(1/sqrt(1-betasq)-1);
+                graph->AddPoint(param,Ekin);
+            }
+            param += step;
+        }
+        
+        graph->SetTitle("Energy along the track;Parameter [cm];Energy [eV]");
+        return graph;
     }
 };
