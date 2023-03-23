@@ -21,7 +21,7 @@
 using namespace std;
 
 // loads data (named ion(id).root) from folder
-TChain* LoadData(int max_id, string folder = "/home/vavrik/work/X17/electron_positron_tracks/data/")
+TChain* LoadData(int max_id, string folder = "/data/")
 {
     TChain* map_data = new TChain("map_data","Data from ionization electrons simulation.");
 
