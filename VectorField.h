@@ -70,6 +70,35 @@ struct Matrix
         // cout << "NEW MATRIX:\n"; this->Print();
     }
 
+    void operator+=(const Matrix<M,N>& A)
+    {
+        for (int r = 0; r < M; r++)
+        {
+            for (int c = 0; c < N; c++)
+            {
+                this->at(r,c) += A.at(r,c);
+            }        
+        }
+    }
+
+    void operator*=(const double& d)
+    {
+        for (int r = 0; r < M; r++)
+        {
+            for (int c = 0; c < N; c++)
+            {
+                this->at(r,c) *= d;
+            }        
+        }
+    }
+ 
+    const double& at(int row, int column) const
+    {
+        if(row > -1 && row < M && column > -1 && column < N) return elements[row*N+column];
+        else cerr << "ERROR: Invalid matrix element (" << row << "," << column << ") of " << M << "x" << N << " matrix.\n";
+        return elements[0];
+    }
+
     double& at(int row, int column)
     {
         if(row > -1 && row < M && column > -1 && column < N) return elements[row*N+column];
@@ -158,8 +187,41 @@ struct Matrix
     }
 };
 
+template <int M, int N>
+Matrix<M,N> operator+(const Matrix<M,N>& A, const Matrix<M,N>& B)
+{
+    Matrix<M,N> result;
+    for (int r = 0; r < M; r++)
+    {
+        for (int c = 0; c < N; c++)
+        {
+            result.at(r,c) = A.at(r,c)+B.at(r,c);
+        }        
+    }
+    
+    return result;
+}
+
+template <int M, int N>
+Matrix<M,N> operator*(const double& d, const Matrix<M,N>& A)
+{
+    Matrix<M,N> result;
+    for (int r = 0; r < M; r++) for (int c = 0; c < N; c++) result.at(r,c) = d*A.at(r,c);
+    
+    return result;
+}
+
+template <int M, int N>
+Matrix<M,N> operator/(const Matrix<M,N>& A,const double& d)
+{
+    Matrix<M,N> result;
+    for (int r = 0; r < M; r++) for (int c = 0; c < N; c++) result.at(r,c) = A.at(r,c)/d;
+    
+    return result;
+}
+
 template<int M,int N,int P>
-Matrix<M,P> operator*(Matrix<M,N> A,Matrix<N,P> B)
+Matrix<M,P> operator*(const Matrix<M,N>& A, const Matrix<N,P>& B)
 {
     Matrix<M,P> result;
     for (int r = 0; r < M; r++)

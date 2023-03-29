@@ -2,5 +2,6 @@
     "files.associations": {
         "electron_positron_tracks/reco_track.cpp": "cpp"
     },
-    "cmake.configureOnOpen": false
+    "cmake.configureOnOpen": false,
+    "cmake.sourceDirectory": "${workspaceFolder}/electron_positron_tracks"
 }

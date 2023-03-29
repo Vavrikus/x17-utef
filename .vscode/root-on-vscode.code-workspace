@@ -92,7 +92,8 @@
       "cfenv": "cpp",
       "typeinfo": "cpp",
       "valarray": "cpp",
-      "variant": "cpp"
+      "variant": "cpp",
+      "*.icc": "cpp"
     },
     "C_Cpp.default.includePath": [
       "${default}",

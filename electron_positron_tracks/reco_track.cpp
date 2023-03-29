@@ -17,6 +17,7 @@
 
 #include "CircleFit2D.h"
 #include "CircleFit3D.h"
+#include "RK4.h"
 #include "../NSplines.h"
 #include "../VectorField.h"
 #include "../X17Utilities.h"
@@ -332,18 +333,29 @@ int reco_track()
 
     cout << "Reconstructed energy: " << cfit3d_reco.GetEnergy(magfield,true) << " (middle field), " << cfit3d_reco.GetEnergy(magfield,false) << " (average field).\n";
 
-    
+    auto rk_track = GetTrackRK(magfield,true,1E-13,8000000-X17::E0,{0,0,0},{1,0,0});
+    rk_track->Run();
+
+    cout << "Simulated track with " << rk_track->GetSize() << " steps.\n";
+
+    TGraph2D* g_rk = GetGraphRK(rk_track);
+    g_rk->SetLineColor(kMagenta);
+    g_rk->SetLineWidth(2);
+    g_rk->Draw("LINE same");
+
     TLegend* leg_xyz = new TLegend(0.129,0.786,0.360,0.887);
     leg_xyz->AddEntry(g_xyz,"original");
     leg_xyz->AddEntry(g_cfit3d,"fit");
     leg_xyz->AddEntry(g_xyz_reco,"reconstructed");
     leg_xyz->AddEntry(g_cfit3d_reco,"fit");
+    leg_xyz->AddEntry(g_rk,"Runge Kutta 8 MeV");
     leg_xyz->Draw("same");
 
     TCanvas* c_fit3d = new TCanvas("c_fit3d","Fit 3D");
     g_cfit3d_reco->SetTitle("Fit 3D;x [cm]; y [cm];z [cm]");
     g_cfit3d_reco->Draw("LINE");
     g_cfit3d->Draw("LINE same");
+    g_rk->Draw("LINE same");
 
     TCanvas* c_energy = new TCanvas("c_energy","Energy along track");
     g_en->SetMarkerColor(kRed);
