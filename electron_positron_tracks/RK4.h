@@ -137,8 +137,12 @@ TGraph2D* GetGraphRK(const RK4<8>* rk_track)
     TGraph2D* output = new TGraph2D();
     auto results = rk_track->GetResults();
 
-    using namespace X17;
-    for (auto r : results) output->AddPoint(m2cm*r.at(1,0),m2cm*r.at(2,0),m2cm*r.at(3,0));
+    for (auto r : results)
+    {
+        using namespace X17;
+        Vector point = {m2cm*r.at(1,0),m2cm*r.at(2,0),m2cm*r.at(3,0)};
+        if (X17::IsInSector(point)) output->AddPoint(point.vx,point.vy,point.vz);
+    }
     return output;
 }
 

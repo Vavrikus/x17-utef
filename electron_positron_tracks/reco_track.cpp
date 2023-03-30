@@ -10,6 +10,7 @@
 #include <TLine.h>
 #include <TPolyLine3D.h>
 #include <TTree.h>
+#include <TStyle.h>
 
 #include <fstream>
 #include <iostream>
@@ -253,11 +254,18 @@ int reco_track()
 
     TCanvas* c_track_xyz = new TCanvas("c_track_xyz","Electron track reconstruction with pads and time bins");
     
+    // histogram for scalling axes
+    TH3F* scale = new TH3F("scale","Electron track reconstruction;x [cm]; y [cm];z [cm]",1,X17::xmin,X17::xmax,1,-X17::yhigh,X17::yhigh,1,-2.5,0);
+    scale->Draw("");
+    gStyle->SetOptStat(0);
+    scale->GetXaxis()->SetTitleOffset(1.5);
+    scale->GetZaxis()->SetTitleOffset(1.5);
+    
     // h_xyz_reco->Draw("box2");
     g_xyz_reco->SetTitle("Electron track reconstruction;x [cm]; y [cm];z [cm]");
     g_xyz_reco->SetMarkerStyle(2);
     g_xyz_reco->SetMarkerSize(0.4);
-    g_xyz_reco->Draw("p");
+    g_xyz_reco->Draw("p same");
 
     g_xyz->SetMarkerColor(2);
     g_xyz->SetMarkerStyle(7);
@@ -272,11 +280,12 @@ int reco_track()
         X17::GetPadCorners(i,x1,y1,x2,y2,true);
 
         TPolyLine3D* pad = new TPolyLine3D(5);
-        pad->SetPoint(0,x1,y1,-2.5);
-        pad->SetPoint(1,x1,y2,-2.5);
-        pad->SetPoint(2,x2,y2,-2.5);
-        pad->SetPoint(3,x2,y1,-2.5);
-        pad->SetPoint(4,x1,y1,-2.5);
+        double height = -2.5; //-2.5
+        pad->SetPoint(0,x1,y1,height);
+        pad->SetPoint(1,x1,y2,height);
+        pad->SetPoint(2,x2,y2,height);
+        pad->SetPoint(3,x2,y1,height);
+        pad->SetPoint(4,x1,y1,height);
 
         pad_lines.push_back(pad);
     }
@@ -288,7 +297,7 @@ int reco_track()
     cfit3d.FitCircle3D();
     cfit3d.PrintFitParams();
 
-    TGraph2D* g_cfit3d = cfit3d.GetGraph(0.1,-1);
+    TGraph2D* g_cfit3d = cfit3d.GetGraph(0.1,0);
     TGraph* g_en = cfit3d.GetEnergyGraph(magfield);
     g_cfit3d->SetLineColor(kGreen);
     g_cfit3d->SetLineWidth(2);
@@ -325,7 +334,7 @@ int reco_track()
     cfit3d_reco.FitCircle3D();
     cfit3d_reco.PrintFitParams();
 
-    TGraph2D* g_cfit3d_reco = cfit3d_reco.GetGraph(0.1,-1);
+    TGraph2D* g_cfit3d_reco = cfit3d_reco.GetGraph(0.1,0);
     TGraph* g_en_reco = cfit3d_reco.GetEnergyGraph(magfield);
     g_cfit3d_reco->SetLineColor(kBlue);
     g_cfit3d_reco->SetLineWidth(2);
@@ -368,6 +377,9 @@ int reco_track()
     g_cfit3d->Draw("LINE same");
     // g_rk->Draw("LINE same");
     g_rkfit->Draw("LINE same");
+    g_cfit3d_reco->GetYaxis()->SetNdivisions(508);
+    g_cfit3d_reco->GetXaxis()->SetTitleOffset(1.5);
+    g_cfit3d_reco->GetZaxis()->SetTitleOffset(1.5);
 
     TCanvas* c_energy = new TCanvas("c_energy","Energy along track");
     g_en->SetMarkerColor(kRed);

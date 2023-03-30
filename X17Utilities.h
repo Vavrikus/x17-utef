@@ -21,13 +21,17 @@ namespace X17
         constexpr double m0   = e*E0/(c*c);      // Electron rest mass [kg]
         constexpr double m2cm = 100.0;           // Conversion m --> cm
 
+    // TPC window parameters
+        constexpr double win_width  = 3.8; // TPC window width [cm]
+        constexpr double win_height = 4.0; // TPC window height [cm]
+
     // TPC first sector (contains positive x axis) boundaries
-        constexpr double zmin  = -8;    // TPC minimal height [cm]
-        constexpr double zmax  =  8;    // TPC maximal height [cm]
-        constexpr double xmin  = 6.51;  // TPC minimal x [cm]
-        constexpr double xmax  = 14.61; // TPC maximal x [cm]
-        constexpr double ylow  = 2.75;  // TPC y of positive corner closer to center [cm]
-        constexpr double yhigh = 7.45;  // TPC y of positive corner further from center [cm]
+        constexpr double zmin  = -8;     // TPC minimal height [cm]
+        constexpr double zmax  =  8;     // TPC maximal height [cm]
+        constexpr double xmin  =  6.51;  // TPC minimal x [cm]
+        constexpr double xmax  =  14.61; // TPC maximal x [cm]
+        constexpr double ylow  =  2.75;  // TPC y of positive corner closer to center [cm]
+        constexpr double yhigh =  7.45;  // TPC y of positive corner further from center [cm]
 
     // TPC first sector derived parameters
         constexpr double yxslope    = (yhigh-ylow)/(xmax-xmin); // TPC Δy/Δx slanted side (y positive)
