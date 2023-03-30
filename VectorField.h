@@ -28,6 +28,7 @@ struct Vector
     {
         return acos((vx*other.vx+vy*other.vy+vz*other.vz)/(this->Magnitude()*other.Magnitude()));
     }
+    double SqDist(const Vector& other) const {return pow(vx-other.vx,2)+pow(vy-other.vy,2)+pow(vz-other.vz,2);}
 };
 
 Vector operator+(const Vector& v1,const Vector& v2)
@@ -56,6 +57,18 @@ double operator*(const Vector& v1, const Vector& v2)
 }
 
 void Vector::Normalize() {*this = (*this)/(this->Magnitude());}
+
+double LineSqDist(const Vector& origin, Vector orientation, double max_param, const Vector& point)
+{
+    orientation.Normalize();
+    double t_close = orientation*(point-origin);
+    if (t_close > max_param) t_close = max_param;
+    if (t_close < 0)      t_close = 0;
+
+    Vector line_vector = origin+t_close*orientation-point;
+
+    return line_vector.SqMagnitude();
+}
 
 template <int M, int N>
 struct Matrix

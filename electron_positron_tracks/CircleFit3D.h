@@ -1,3 +1,5 @@
+#pragma once
+
 #include <algorithm>
 #include <vector>
 
@@ -227,7 +229,7 @@ public:
         return instance;
     }
 
-    static CircleFit3D& NewCircleFit(Vector orig,Vector orient)
+    static CircleFit3D& NewCircleFit(Vector orig, Vector orient)
     {
         CircleFit3D& instance = GetCircleFit();
         instance.fit_data.clear();
@@ -237,6 +239,8 @@ public:
 
         return instance;
     }
+
+    vector<DataPoint> GetData() {return fit_data;}
 
     void AddPoint(double x, double y, double z, int count) {fit_data.emplace_back(x,y,z,count);}
 
@@ -265,7 +269,7 @@ public:
         }
     }
 
-    void FitCircle3D(double max_iter = 500,double toleration = 0.001)
+    void FitCircle3D(double max_iter = 500, double toleration = 0.001)
     {
         Prefit();
         gFitter->SetParameter(0,"length",length,0.01,0,20);
@@ -334,7 +338,7 @@ public:
         return fit_graph;
     }
 
-    double GetEnergy(VectorField* magfield,bool middle = true)
+    double GetEnergy(VectorField* magfield, bool middle = true)
     {
         Vector bfield;
         if(middle) bfield = GetMiddleField(magfield); //magfield->GetField(GetCirclePoint(phi_max/2.0)/100.0);

@@ -15,10 +15,11 @@
 namespace X17
 {
     // Physical constants
-        constexpr double e  = 1.602176634E-19; // Elementary charge
-        constexpr double c  = 299792458;       // Light velocity in vacuum [m/s]
-        constexpr double E0 = 510998.95;       // Electron rest energy [eV]
-        constexpr double m0 = e*E0/(c*c);      // Electron rest mass [kg]
+        constexpr double e    = 1.602176634E-19; // Elementary charge
+        constexpr double c    = 299792458;       // Light velocity in vacuum [m/s]
+        constexpr double E0   = 510998.95;       // Electron rest energy [eV]
+        constexpr double m0   = e*E0/(c*c);      // Electron rest mass [kg]
+        constexpr double m2cm = 100.0;           // Conversion m --> cm
 
     // TPC first sector (contains positive x axis) boundaries
         constexpr double zmin  = -8;    // TPC minimal height [cm]
