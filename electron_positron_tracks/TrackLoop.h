@@ -4,6 +4,7 @@
 #include "TFile.h"
 #include "TTree.h"
 
+#include "Track.h"
 #include "../VectorField.h"
 #include "../X17Utilities.h"
 
@@ -57,16 +58,17 @@ private:
     IonElectron curr_electron;     // variable for electron positions ([cm] or [ns])
     SensorData curr_reco;          // current reconstructed electron [cm]
 
+    TTree* rk_tracks = nullptr; // information from Runge-Kutta tracks
+    TrackRK* curr_track;         // current Runge-Kutta track
+
+    /// @brief Reconstructs current electron coordinates
+    void RecoElectron() {curr_reco = map->Invert(curr_electron.x1,curr_electron.y1,curr_electron.t1);}
 
     /// @brief To be run before the electron looping
     void PreLoop() {for (Task* t : tasklist) t->PreLoop();}
 
     /// @brief To be run during the electron looping
-    void Loop()    
-    {
-        curr_reco = map->Invert(curr_electron.x1,curr_electron.y1,curr_electron.t1);
-        for (Task* t : tasklist) t->Loop();
-    }
+    void Loop()    {for (Task* t : tasklist) t->Loop();}
 
     /// @brief To be run after the electron looping
     void PostLoop() 
@@ -85,7 +87,7 @@ private:
     }
 
 public:
-    /// @brief Destructor.
+    /// @brief Destructor
     ~TrackLoop()
     {
         delete map;
@@ -108,6 +110,10 @@ public:
     /// @brief  Getter for current reconstructed electron information
     /// @return Reference to member curr_reco
     const SensorData& GetCurrentReco() {return curr_reco;}
+
+    /// @brief  Getter for current Runge-Kutta track
+    /// @return Member curr_track
+    const TrackRK* GetCurrentTrack() {return curr_track;}
 
     /// @brief  Getter for magnetic field
     /// @return Member magfield
@@ -155,14 +161,26 @@ public:
         // delete map_input;
     }
 
+    /// @brief Loads file with Runge-Kutta simulated tracks
+    /// @param path Path to file
+    void LoadRK(const char* path)
+    {
+        TFile* input = new TFile(path);
+        rk_tracks = (TTree*)input->Get("rk_tracks");
+        // delete input;
+    }
+
     /// @brief Loads single track simulation ROOT file
     /// @param path Path to file
     void LoadSingle(const char* path)
     {
-        TFile* input = new TFile("electrons.root");
+        TFile* input = new TFile(path);
         single_track = (TTree*)input->Get("electrons");
         // delete input;
     }
+
+    /// @brief Removes all tasks from task list
+    void ResetTasks() {tasklist.clear();}
 
     /// @brief Runs all tasks for single track
     void RunSingleLoop()
@@ -187,12 +205,32 @@ public:
             if (X17::IsInSector(curr_electron.x1,curr_electron.y1,0)) 
             {
                 n_electrons++;
+                RecoElectron();
                 Loop();
             }
         }
         cout << "\nNumber of electrons in the TPC region: " << n_electrons << "\n";
 
         PostLoop();
+    }
+
+    /// @brief Runs all tasks for Runge-Kutta simulated tracks
+    void RunRKLoop()
+    {
+        PreLoop();
+
+        rk_tracks->SetBranchAddress("track",&curr_track);
+        int n_tracks = rk_tracks->GetEntries();
+
+        for (int i = 0; i < n_tracks; i++)
+        {
+            rk_tracks->GetEntry(i);
+            if((100*i)%n_tracks == 0) std::cout << "Progress: " << 100*i/n_tracks << " \%\n";
+            std::cout << "Track " << i+1 << " out of " << n_tracks << ".\n";
+            Loop();
+        }
+
+        PostLoop();        
     }
 };
 

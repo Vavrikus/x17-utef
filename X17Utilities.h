@@ -8,6 +8,7 @@
 #include "TFile.h"
 #include "TLine.h"
 #include "TText.h"
+#include "TPolyLine3D.h"
 
 #include "VectorField.h"
 

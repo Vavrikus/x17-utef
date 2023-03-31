@@ -3,6 +3,7 @@
 #include "TGraph.h"
 #include "TGraph2D.h"
 #include "TH1F.h"
+#include "TH2F.h"
 #include "TH3F.h"
 #include "TLegend.h"
 #include "TPolyLine3D.h"
@@ -12,6 +13,7 @@
 #include "CircleFit2D.h"
 #include "CircleFit3D.h"
 #include "RK4.h"
+#include "TrackLoop.h"
 #include "../X17Utilities.h"
 
 // File included at the end of TrackLoop.h to avoid circular dependencies and extra translation units
@@ -311,7 +313,7 @@ public:
     RecoPadsTask(double pad_height = -2.5) : height(pad_height) {}
 };
 
-/// @brief Class for plotting drift time vs distance to readout with linear fit
+/// @brief Class for plotting circle and Runge-Kutta track fits
 class CircleAndRKFitTask : public PlotTask
 {
     CircleFit3D& cfit3d = CircleFit3D::NewCircleFit({0,0,0},{1,0,0});
@@ -425,4 +427,43 @@ class CircleAndRKFitTask : public PlotTask
 
 public:
     CircleAndRKFitTask(RecoPadsTask* t) : reco_task(t) {makeNewCanvas = false;}
+};
+
+/// @brief Class for plotting Runge-Kutta simulated energy vs circle fit reconstruction
+class CircleFitEnergyTask : public PlotTask
+{
+    std::string canvasName  = "c_cfit_energy";
+    std::string canvasTitle = "Original vs reconstructed energy";
+
+    TH2F* h_energy;
+    int bins;
+
+    void PreLoop()
+    {
+        const char* h_energy_title = "Original RK vs circle fit energy;RK energy [MeV];circle fit energy [MeV]";
+        h_energy = new TH2F("h_energy",h_energy_title,bins,4,12,bins,1,15);
+        CircleFit3D::GetCircleFit().SetFitter();
+    }
+
+    void Loop()
+    {
+        const TrackRK* track = loop->GetCurrentTrack();
+
+        CircleFit3D& cfit = CircleFit3D::NewCircleFit(track->origin,track->orientation);
+
+        for (auto p : track->points) cfit.AddPoint(p);
+        
+        cfit.Prefit();
+        cfit.FitCircle3D();
+
+        h_energy->Fill(track->kin_energy,cfit.GetEnergy(loop->GetMagField()));
+    }
+
+    void PostLoop()
+    {
+        h_energy->Draw("colz");
+    }
+
+public:
+    CircleFitEnergyTask(const int& bins = 100) : bins(bins) {}
 };

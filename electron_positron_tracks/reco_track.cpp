@@ -1,6 +1,6 @@
 #include "TrackLoop.h"
 
-int reco_track2()
+int reco_track()
 {
     TrackLoop* loop = new TrackLoop();
 
@@ -20,10 +20,16 @@ int reco_track2()
 
     loop->RunSingleLoop();
 
+    loop->ResetTasks();
+    loop->LoadRK("rk_tracks.root");
+    loop->AddTask(new CircleFitEnergyTask());
+
+    loop->RunRKLoop();
+
     return 0;
 }
 
 int main()
 {
-    return reco_track2();
+    return reco_track();
 }

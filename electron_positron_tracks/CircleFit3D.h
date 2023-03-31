@@ -245,6 +245,8 @@ public:
 
     void AddPoint(double x, double y, double z, int count) {fit_data.emplace_back(x,y,z,count);}
 
+    void AddPoint(DataPoint p) {fit_data.push_back(p);}
+
     void Prefit()
     {
         // preset free parameters here
@@ -257,7 +259,7 @@ public:
         this->UpdateCurve();
     }
     
-    void SetFitter(int parameters, bool print = true)
+    void SetFitter(int parameters = 4, bool print = true)
     {        
         gFitter = TVirtualFitter::Fitter(nullptr,parameters); // the second number is number of parameters
         gFitter->SetFCN(this->Eval);
