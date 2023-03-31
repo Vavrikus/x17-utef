@@ -202,7 +202,7 @@ public:
         for (int i = 0; i < single_track->GetEntries(); ++i)
         {
             single_track->GetEntry(i);
-            if (X17::IsInSector(curr_electron.x1,curr_electron.y1,0)) 
+            if (X17::IsInSector(curr_electron.x1,curr_electron.y1,0) && X17::IsInSector(curr_electron.x0,curr_electron.y0,curr_electron.z0,-0.01)) 
             {
                 n_electrons++;
                 RecoElectron();

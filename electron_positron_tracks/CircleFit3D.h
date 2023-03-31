@@ -383,3 +383,304 @@ public:
         return graph;
     }
 };
+
+
+////////////////////////////////////////////
+// FITTING CIRCLE ONLY, 6 FREE PARAMETERS //
+////////////////////////////////////////////
+//
+// class CircleFit3D
+// {
+//     typedef void(*EvalFn)(Int_t&, Double_t*, Double_t&, Double_t*, Int_t);
+//
+// private:
+//     vector<DataPoint> fit_data; // Contains recontructed points
+//     Vector origin,orientation;  // Parameters for the first line (to be fixed in the fit)
+//     double alpha;               // Rotation angle of the arc around the first line (if 0 curves towards negative z)
+//     double radius;              // Radius of the arc
+//     double y0;                  // Coordinate y on enterance to TPC
+//     double z0;                  // Coordinate z on enterance to TPC
+//     double theta;               // Angle from z-axis on enterance to TPC
+//     double phi;                 // XY plane angle from x-axis on enterance to TPC
+//
+//     double cos_theta,sin_theta,cos_phi,sin_phi,cos_alpha,sin_alpha; // angle sines and cosines
+//     Vector originc,center,normal; // Parameters calculated for the circle
+//
+//     TVirtualFitter* gFitter;
+//     double a_err,r_err,y0_err,z0_err,theta_err,phi_err; // Fit error variables
+//
+//     CircleFit3D() = default;
+//     CircleFit3D(const CircleFit3D&) = delete;
+//     CircleFit3D& operator=(const CircleFit3D&) = delete;
+//
+//     void UpdateCurve()
+//     {
+//         cos_theta = cos(theta);
+//         sin_theta = sin(theta);
+//
+//         cos_phi = cos(phi);
+//         sin_phi = sin(phi);
+//
+//         cos_alpha = cos(alpha);
+//         sin_alpha = sin(alpha);
+//
+//         originc = {X17::xmin,y0,z0};
+//
+//         normal = Vector {-sin_alpha*cos_theta*cos_phi-cos_alpha*sin_phi,
+//                          -sin_alpha*cos_theta*sin_phi+cos_alpha*cos_phi,
+//                          sin_alpha*sin_theta};
+//      
+//         center = originc + radius * Vector {cos_alpha*cos_theta*cos_phi-sin_alpha*sin_phi,
+//                                             cos_alpha*cos_theta*sin_phi+sin_alpha*cos_phi,
+//                                             -cos_alpha*sin_theta};
+//     }
+//
+//     double SqDistance(const DataPoint& point)
+//     {
+//         Vector projection = (point.ToVector()-center)-((point.ToVector()-center)*normal)*normal;
+//         projection.Normalize();
+//
+//         Vector circle_point   = radius*projection+center;
+//         Vector circle_vector  = circle_point-point.ToVector();
+//
+//         return circle_vector.SqMagnitude();
+//     }
+//
+//     double SumSq()
+//     {
+//         double sum = 0;
+//         for (DataPoint point : fit_data) sum += point.count*SqDistance(point);
+//         return sum;
+//     }
+//
+//     Vector GetCirclePoint(double varphi)
+//     {
+//         double cos_varphi = cos(varphi);
+//         double sin_varphi = sin(varphi);
+//
+//         return originc + radius*Vector{(1-cos_varphi)*(cos_alpha*cos_theta*cos_phi-sin_alpha*sin_phi)+sin_varphi*sin_theta*cos_phi,
+//                                        (1-cos_varphi)*(cos_alpha*cos_theta*sin_phi+sin_alpha*cos_phi)+sin_varphi*sin_theta*sin_phi,
+//                                        -(1-cos_varphi)*cos_alpha*sin_theta+sin_varphi*cos_theta};
+//     }
+//
+//     double GetMaxPhi()
+//     {
+//         // A*cos + B = C*sin
+//         double A = cos_alpha*cos_theta*cos_phi-sin_alpha*sin_phi;
+//         double B = (X17::xmax - originc.vx)/radius - A;
+//         double C = sin_theta*cos_phi;
+//
+//         // (A^2+C^2) cos^2 + AB cos + (B^2-C^2) = 0
+//         double a = A*A+C*C;
+//         double b = A*B;
+//         double c = B*B-C*C;
+//
+//         return acos((-b+sqrt(b*b-4*a*c))/(2*a));
+//     }
+//
+//     void EvalSumSq(int& npar, double* gin, double& sumsq, double* par, int iflag)
+//     {
+//         alpha   = par[0];
+//         radius  = par[1];
+//         y0      = par[2];
+//         z0      = par[3];
+//
+//         UpdateCurve();
+//
+//         sumsq = SumSq();
+//     }
+//
+//     static void Eval(int& npar, double* gin, double& sumsq, double* par, int iflag)
+//     {
+//         return GetCircleFit().EvalSumSq(npar,gin,sumsq,par,iflag);
+//     }
+//
+//     Vector GetAvgField(VectorField* magfield, double step = 0.1)
+//     {
+//         int i = 0;
+//         double param = 0;
+//         Vector bfield = {0,0,0};
+//         Vector cur_point = GetCirclePoint(param/radius);
+//
+//         while (X17::IsInSector(cur_point,-0.01)) 
+//         {
+//             bfield += magfield->GetField(cur_point/100.0);
+//             i++;
+//             param += step;
+//         }
+//
+//         return bfield/i;
+//     }
+//
+//     Vector GetMiddleField(VectorField* magfield, double tolerance = 0.0001)
+//     {
+//         double xmiddle = (X17::xmax+X17::xmin)/2;
+//         double low  = 0;
+//         double high = GetMaxPhi();
+//         double mid  = (low+high)/2;
+//         Vector vmid = GetCirclePoint(mid);
+//
+//         while (abs(xmiddle-vmid.vx) > tolerance)
+//         {
+//             mid = (low+high)/2;
+//             vmid  = GetCirclePoint(mid);
+//
+//             if (vmid.vx < xmiddle) low  = mid;
+//             else                high = mid;
+//         }
+//      
+//         return magfield->GetField(vmid/100.0);
+//     }
+//
+// public:
+//     static CircleFit3D& GetCircleFit()
+//     {
+//         static CircleFit3D instance;
+//         return instance;
+//     }
+//
+//     static CircleFit3D& NewCircleFit(Vector orig, Vector orient)
+//     {
+//         CircleFit3D& instance = GetCircleFit();
+//         instance.fit_data.clear();
+//         instance.origin      = orig;
+//         instance.orientation = orient;
+//         instance.orientation.Normalize();
+//
+//         return instance;
+//     }
+//
+//     vector<DataPoint> GetData() {return fit_data;}
+//
+//     void AddPoint(double x, double y, double z, int count) {fit_data.emplace_back(x,y,z,count);}
+//
+//     void AddPoint(DataPoint p) {fit_data.push_back(p);}
+//
+//     void Prefit()
+//     {
+//         double param = (X17::xmin - origin.vx)/orientation.vx;
+//         Vector v0 = origin+param*orientation;
+//
+//         // preset free parameters here
+//         alpha  = 0;
+//         radius = 20;
+//         y0     = v0.vy;
+//         z0     = v0.vz;
+//         theta  = acos(orientation.vz);
+//         phi    = asin(orientation.vy/sin(theta));
+//
+//         this->UpdateCurve();
+//     }
+//  
+//     void SetFitter(int parameters = 6, bool print = true)
+//     {        
+//         gFitter = TVirtualFitter::Fitter(nullptr,parameters); // the second number is number of parameters
+//         gFitter->SetFCN(this->Eval);
+//
+//         if(!print)
+//         {
+//             double arg = -1;
+//             gFitter->ExecuteCommand("SET PRINTOUT",&arg,1);
+//             gFitter->ExecuteCommand("SET NOW", &arg ,1);
+//         }
+//     }
+//
+//     void FitCircle3D(double max_iter = 500, double toleration = 0.001)
+//     {
+//         Prefit();
+//         gFitter->SetParameter(0,"alpha",  alpha,  0.001,  0,2*M_PI);
+//         gFitter->SetParameter(1,"radius", radius, 0.001,  0,100);
+//         gFitter->SetParameter(2,"y0",     y0,     0.01,  -X17::win_width/2,X17::win_width/2);
+//         gFitter->SetParameter(3,"z0",     z0,     0.01,  -X17::win_height/2,X17::win_height/2);
+//         gFitter->SetParameter(4,"theta",  theta,  0.001,  0,M_PI);
+//         gFitter->SetParameter(5,"phi",    phi,    0.001,  0,2*M_PI);
+//
+//         double arglist[2] = {max_iter,toleration};  // max iterations, step size (toleration)
+//         gFitter->ExecuteCommand("MIGRAD",arglist,2); // last one num of prints (verbosity)
+//
+//         alpha  = gFitter->GetParameter(0);
+//         radius = gFitter->GetParameter(1);
+//         y0     = gFitter->GetParameter(2);
+//         z0     = gFitter->GetParameter(3);
+//         theta  = gFitter->GetParameter(4);
+//         phi    = gFitter->GetParameter(5);
+//
+//         a_err     = gFitter->GetParError(0);
+//         r_err     = gFitter->GetParError(1);
+//         y0_err    = gFitter->GetParError(2);
+//         z0_err    = gFitter->GetParError(3);
+//         theta_err = gFitter->GetParError(4);
+//         phi_err   = gFitter->GetParError(5);
+//
+//         UpdateCurve();
+//     }
+//
+//     void PrintFitParams()
+//     {
+//         cout << "\nCIRCLE FIT PARAMETERS:\n";
+//         cout << "Alpha:   " << alpha   << " +- " << a_err     << "\n";
+//         cout << "Radius:  " << radius  << " +- " << r_err     << "\n";
+//         cout << "Y0:      " << y0      << " +- " << y0_err    << "\n";
+//         cout << "Z0:      " << z0      << " +- " << z0_err    << "\n";
+//         cout << "Theta:   " << theta   << " +- " << theta_err << "\n";
+//         cout << "Phi:     " << phi     << " +- " << phi_err   << "\n\n";
+//     }
+//
+//     TGraph2D* GetGraph(double step = 0.1, double dist = 0)
+//     {
+//         TGraph2D* fit_graph = new TGraph2D();
+//      
+//         double param = 0;
+//         while (param/radius < GetMaxPhi())
+//         {
+//             Vector cur_pos = GetCirclePoint(param/radius);
+//             if(X17::IsInSector(cur_pos,dist)) 
+//                 fit_graph->AddPoint(cur_pos.vx,cur_pos.vy,cur_pos.vz);
+//             param += step;
+//         }
+//
+//         return fit_graph;
+//     }
+//
+//     double GetEnergy(VectorField* magfield, bool middle = true)
+//     {
+//         Vector bfield;
+//         if(middle) bfield = GetMiddleField(magfield); //magfield->GetField(GetCirclePoint(phi_max/2.0)/100.0);
+//         else       bfield = GetAvgField(magfield);
+//
+//         double b_proj = normal*bfield;
+//         const double clight = 299792458;
+//         const double E0 = 510998.95;
+//
+//         double betasq = 1/(1+pow((E0/(clight*(radius/100.0)*b_proj)),2));
+//         double Ekin = E0*(1/sqrt(1-betasq)-1);
+//
+//         return Ekin;
+//     }
+//
+//     TGraph* GetEnergyGraph(VectorField* magfield, double step = 0.1)
+//     {
+//         TGraph* graph = new TGraph();
+//         double param = 0;
+//
+//         while (param/radius < GetMaxPhi()) 
+//         {
+//             Vector cur_point = GetCirclePoint(param/radius);
+//             if(X17::IsInSector(cur_point))
+//             {
+//                 Vector bfield = magfield->GetField(cur_point/100.0);
+//                 double b_proj = normal*bfield;
+//                 const double clight = 299792458;
+//                 const double E0 = 510998.95;
+//
+//                 double betasq = 1/(1+pow((E0/(clight*(radius/100.0)*b_proj)),2));
+//                 double Ekin = E0*(1/sqrt(1-betasq)-1);
+//                 graph->AddPoint(param,Ekin);
+//             }
+//             param += step;
+//         }
+//      
+//         graph->SetTitle("Energy along the track;Parameter [cm];Energy [eV]");
+//         return graph;
+//     }
+// };
