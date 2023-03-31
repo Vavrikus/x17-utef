@@ -2,6 +2,7 @@
 /electron_positron_tracks/data/sample*
 /electron_positron_tracks/data/track*
 /electron_positron_tracks/pictures/
+/electron_positron_tracks/rk_tracks.root
 */build/
 *.d
 *.so

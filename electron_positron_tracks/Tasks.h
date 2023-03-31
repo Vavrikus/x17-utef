@@ -7,11 +7,14 @@
 #include "TLegend.h"
 #include "TPolyLine3D.h"
 #include "TStyle.h"
+#include "TTree.h"
 
 #include "CircleFit2D.h"
 #include "CircleFit3D.h"
 #include "RK4.h"
 #include "../X17Utilities.h"
+
+// File included at the end of TrackLoop.h to avoid circular dependencies and extra translation units
 
 /// @brief Class for plotting drift time vs distance to readout with linear fit
 class DriftTimeTask : public PlotTask
@@ -285,7 +288,7 @@ class RecoPadsTask : public PlotTask
         }
         
         // histogram for scalling axes
-        TH3F* scale = new TH3F("scale","Electron track reconstruction;x [cm]; y [cm];z [cm]",1,X17::xmin,X17::xmax,1,-X17::yhigh,X17::yhigh,1,-2.5,0);
+        TH3F* scale = new TH3F("scale","Electron track reconstruction;x [cm]; y [cm];z [cm]",1,X17::xmin,X17::xmax,1,-X17::yhigh,X17::yhigh,1,height,0);
         scale->Draw("");
         gStyle->SetOptStat(0);
         scale->GetXaxis()->SetTitleOffset(1.5);
@@ -301,25 +304,7 @@ class RecoPadsTask : public PlotTask
         g_xyz->SetMarkerSize(1.2);
         g_xyz->Draw("p same");
 
-        vector<TPolyLine3D*> pad_lines;
-
-        for (int i = 1; i <= X17::channels; i++)
-        {
-            double x1,y1,x2,y2;
-            X17::GetPadCorners(i,x1,y1,x2,y2,true);
-
-            TPolyLine3D* pad = new TPolyLine3D(5);
-            
-            pad->SetPoint(0,x1,y1,height);
-            pad->SetPoint(1,x1,y2,height);
-            pad->SetPoint(2,x2,y2,height);
-            pad->SetPoint(3,x2,y1,height);
-            pad->SetPoint(4,x1,y1,height);
-
-            pad_lines.push_back(pad);
-        }
-        
-        for(auto l : pad_lines)   l->Draw("AL");
+        X17::DrawPads3D(height);
     }
 
 public:

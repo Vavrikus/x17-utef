@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <vector>
 
+#include "TGraph.h"
 #include "TGraph2D.h"
 #include "TMarker3DBox.h"
 #include "TVirtualFitter.h"

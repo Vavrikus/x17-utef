@@ -3,5 +3,6 @@
         "electron_positron_tracks/reco_track.cpp": "cpp"
     },
     "cmake.configureOnOpen": false,
-    "cmake.sourceDirectory": "${workspaceFolder}/electron_positron_tracks"
+    "cmake.sourceDirectory": "${workspaceFolder}/electron_positron_tracks",
+    "C_Cpp.errorSquiggles": "enabled"
 }

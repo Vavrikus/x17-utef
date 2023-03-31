@@ -21,6 +21,9 @@ namespace X17
         constexpr double m0   = e*E0/(c*c);      // Electron rest mass [kg]
         constexpr double m2cm = 100.0;           // Conversion m --> cm
 
+    // Target parameters
+        constexpr double target_radius = 0.1; // Radius of the target [cm]
+
     // TPC window parameters
         constexpr double win_width  = 3.8; // TPC window width [cm]
         constexpr double win_height = 4.0; // TPC window height [cm]
@@ -336,6 +339,30 @@ namespace X17
         DrawTrapezoid(false);
     }
 
+    /// @brief Function for drawing the pads in 3D with certain height
+    /// @param height How high should the pads be drawn
+    void DrawPads3D(const double height = -8)
+    {
+        vector<TPolyLine3D*> pad_lines;
+
+        for (int i = 1; i <= X17::channels; i++)
+        {
+            double x1,y1,x2,y2;
+            X17::GetPadCorners(i,x1,y1,x2,y2,true);
+
+            TPolyLine3D* pad = new TPolyLine3D(5);
+            
+            pad->SetPoint(0,x1,y1,height);
+            pad->SetPoint(1,x1,y2,height);
+            pad->SetPoint(2,x2,y2,height);
+            pad->SetPoint(3,x2,y1,height);
+            pad->SetPoint(4,x1,y1,height);
+
+            pad_lines.push_back(pad);
+        }
+        
+        for(auto l : pad_lines)   l->Draw("AL");
+    }
 
     /// @brief Draw pads using coordinates of electrons ending up in the corners
     /// @param time time to propagate [ns]

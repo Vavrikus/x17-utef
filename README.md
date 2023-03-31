@@ -49,6 +49,7 @@ The project uses the following folder structure (headers and less important file
         - *fetch_data.sh*, *ion_multi.sh*, *ion_single.sh*, *remote_compile.sh* -- scripts for handling the map simulation on MetaCentrum (see above)
         - *gas_table.cpp* -- script for generating the gas table for AvalancheMC simulation (not necessary for microscopic tracking)
         - *ion_electrons.cpp* -- script for ionization electrons simulation (creates input for *make_map.cpp*)
-        - *make_map.cpp* -- script for creating the map of ionization electrons drift
+        - *make_map.cpp* -- script for creating the map of ionization electron drift
         - *make_track.cpp* -- script for single track simulation
         - *reco_track.cpp* -- script for track reconstruction
+        - *rk_tracks.cpp* -- script for quick Runge-Kutta track simulation, generates rk_tracks.root file (currently 100,000 tracks)
