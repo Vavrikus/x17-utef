@@ -228,7 +228,7 @@ public:
             if((100*i)%n_tracks == 0) std::cout << "Progress: " << 100*i/n_tracks << " \%\n";
             std::cout << "Track " << i+1 << " out of " << n_tracks << ".\n";
             Loop();
-            if (i == 1999) break;
+            // if (i == 1999) break;
         }
 
         PostLoop();        

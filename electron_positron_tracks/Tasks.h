@@ -436,7 +436,7 @@ class CircleFitEnergyTask : public PlotTask
     std::string canvasTitle = "Original vs reconstructed energy";
 
     TH2F* h_energy;
-    TGraph2D *g_2d,*g_fit;
+    std::vector<TH1F*> h_energy_diff;
     int bins;
 
     std::vector<TGraph2D*> tracks,fits;
@@ -446,8 +446,14 @@ class CircleFitEnergyTask : public PlotTask
     {
         const char* h_energy_title = "Original RK vs circle fit energy;RK energy [MeV];circle fit energy [MeV]";
         h_energy = new TH2F("h_energy",h_energy_title,bins,4,12,bins,0,15);
-        g_2d = new TGraph2D();
-        g_fit = new TGraph2D();
+
+        for (int i = 4; i < 12; i++)
+        {
+            std::string name  = "h_energy_diff_" + to_string(i);
+            std::string title = "Difference between measured and fitted energy;Energy difference [MeV];Count";
+            h_energy_diff.push_back(new TH1F(name.c_str(), title.c_str(),25,-2+i+0.5,2+i+0.5));
+        }
+
         CircleFit3D::GetCircleFit().SetFitter(4,false);
     }
 
@@ -468,6 +474,7 @@ class CircleFitEnergyTask : public PlotTask
         // g_fit = cfit.GetGraph();
 
         h_energy->Fill(track->kin_energy/1e+6,cfit.GetEnergy(loop->GetMagField())/1e+6);
+        h_energy_diff[floor(track->kin_energy/1e+6)-4]->Fill((track->kin_energy+cfit.GetEnergy(loop->GetMagField())-track->kin_energy)/1e+6);
         if (abs(cfit.GetEnergy(loop->GetMagField())-track->kin_energy) > Ediff_max)
         {
             cout << "\n Electon track? --> " << track->electron << "\n";
@@ -488,6 +495,10 @@ class CircleFitEnergyTask : public PlotTask
         // g_2d->SetTitle("RK track (blue) and its fit (red);x [cm];y [cm];z [cm]");
         // g_fit->Draw("LINE same");
         // g_fit->SetLineColor(kRed);
+        TCanvas* c0 = new TCanvas("c_energy_diff","Energy difference");
+        TH1F* h1 = c0->DrawFrame(-2,0,14,50);
+        for(TH1F* h : h_energy_diff) h->Draw("same plc hist");
+        gStyle->SetOptStat(1111);
 
         TCanvas* c = new TCanvas("c_cfit_failed","Tracks with failed circle fit");
         // histogram for scalling axes
