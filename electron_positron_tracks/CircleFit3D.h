@@ -247,6 +247,12 @@ public:
 
     void AddPoint(DataPoint p) {fit_data.push_back(p);}
 
+    void SetAlpha(bool electron)
+    {
+        if (electron) alpha = 0;
+        else          alpha = M_PI;
+    }
+
     void Prefit()
     {
         // preset free parameters here
@@ -275,10 +281,10 @@ public:
     void FitCircle3D(double max_iter = 500, double toleration = 0.001)
     {
         // Prefit();
-        gFitter->SetParameter(0,"length",length,0.01,-10,8);
-        gFitter->SetParameter(1,"alpha",alpha,0.001,0,2*M_PI);
-        gFitter->SetParameter(2,"radius",radius,0.01,8,100);
-        gFitter->SetParameter(3,"phi_max",phi_max,0.001,0.1,M_PI);
+        gFitter->SetParameter(0,"length",length,0.01,-10,5);
+        gFitter->SetParameter(1,"alpha",alpha,0.001,-M_PI/2,(3/2)*M_PI);
+        gFitter->SetParameter(2,"radius",radius,0.01,10,50);
+        gFitter->SetParameter(3,"phi_max",phi_max,0.001,0.15,M_PI/1.5);
 
         double arglist[2] = {max_iter,toleration};  // max iterations, step size (toleration)
         gFitter->ExecuteCommand("MIGRAD",arglist,2); // last one num of prints (verbosity)

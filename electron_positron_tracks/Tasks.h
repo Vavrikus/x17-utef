@@ -439,13 +439,16 @@ class CircleFitEnergyTask : public PlotTask
     TGraph2D *g_2d,*g_fit;
     int bins;
 
+    std::vector<TGraph2D*> tracks,fits;
+    double Ediff_max = 2e+6;
+
     void PreLoop()
     {
         const char* h_energy_title = "Original RK vs circle fit energy;RK energy [MeV];circle fit energy [MeV]";
         h_energy = new TH2F("h_energy",h_energy_title,bins,4,12,bins,0,15);
         g_2d = new TGraph2D();
         g_fit = new TGraph2D();
-        CircleFit3D::GetCircleFit().SetFitter();
+        CircleFit3D::GetCircleFit().SetFitter(4,false);
     }
 
     void Loop()
@@ -453,8 +456,10 @@ class CircleFitEnergyTask : public PlotTask
         const TrackRK* track = loop->GetCurrentTrack();
 
         CircleFit3D& cfit = CircleFit3D::NewCircleFit(track->origin,track->orientation);
+        tracks.push_back(new TGraph2D());
+        cfit.SetAlpha(track->electron);
 
-        for (auto p : track->points) {cfit.AddPoint(p);}//g_2d->AddPoint(p.x,p.y,p.z);}
+        for (auto p : track->points) {cfit.AddPoint(p);tracks.back()->AddPoint(p.x,p.y,p.z);}//g_2d->AddPoint(p.x,p.y,p.z);}
         
         // cfit.Prefit();
         cfit.FitCircle3D();
@@ -463,7 +468,13 @@ class CircleFitEnergyTask : public PlotTask
         // g_fit = cfit.GetGraph();
 
         h_energy->Fill(track->kin_energy/1e+6,cfit.GetEnergy(loop->GetMagField())/1e+6);
-        
+        if (abs(cfit.GetEnergy(loop->GetMagField())-track->kin_energy) > Ediff_max)
+        {
+            cout << "\n Electon track? --> " << track->electron << "\n";
+            cfit.PrintFitParams();
+            fits.push_back(cfit.GetGraph());
+        }
+        if (abs(cfit.GetEnergy(loop->GetMagField())-track->kin_energy) < Ediff_max) tracks.pop_back();         
     }
 
     void PostLoop()
@@ -477,8 +488,81 @@ class CircleFitEnergyTask : public PlotTask
         // g_2d->SetTitle("RK track (blue) and its fit (red);x [cm];y [cm];z [cm]");
         // g_fit->Draw("LINE same");
         // g_fit->SetLineColor(kRed);
+
+        TCanvas* c = new TCanvas("c_cfit_failed","Tracks with failed circle fit");
+        // histogram for scalling axes
+        TH3F* scale = new TH3F("scale","Tracks with failed circle fit;x [cm];y [cm];z [cm]",1,X17::xmin,X17::xmax,1,-X17::yhigh,X17::yhigh,1,X17::zmin,X17::zmax);
+        scale->Draw("");
+        gStyle->SetOptStat(0);
+        scale->GetXaxis()->SetTitleOffset(1.5);
+        scale->GetZaxis()->SetTitleOffset(1.5);
+
+        for (TGraph2D* g : tracks) 
+        {
+            g->SetLineColor(kRed);
+            g->Draw("LINE same");
+        }
+
+        for (TGraph2D* g : fits) 
+        {
+            g->SetLineColor(kBlue);
+            g->Draw("LINE same");
+        }
+
+        cout << "n_failed_fits: " << tracks.size() << "\n";
     }
 
 public:
     CircleFitEnergyTask(const int& bins = 100) : bins(bins) {}
+};
+
+
+/// @brief Class for plotting Runge-Kutta simulated tracks with lower than selected energy
+class PlotSelectionTask : public PlotTask
+{
+    std::string canvasName  = "c_cfit_failed";
+    std::string canvasTitle = "Tracks with failed circle fit";
+
+    std::vector<TGraph2D*> tracks;
+    double E_max;
+
+    void PreLoop()
+    {
+        CircleFit3D::GetCircleFit().SetFitter();
+    }
+
+    void Loop()
+    {
+        const TrackRK* track = loop->GetCurrentTrack();
+
+        CircleFit3D& cfit = CircleFit3D::NewCircleFit(track->origin,track->orientation);
+        tracks.push_back(new TGraph2D());
+
+        for (auto p : track->points) {cfit.AddPoint(p);tracks.back()->AddPoint(p.x,p.y,p.z);}
+        
+        cfit.FitCircle3D();
+
+        if (cfit.GetEnergy(loop->GetMagField()) > E_max) tracks.pop_back(); 
+    }
+
+    void PostLoop()
+    {
+        // histogram for scalling axes
+        TH3F* scale = new TH3F("scale","Tracks with failed circle fit;x [cm];y [cm];z [cm]",1,X17::xmin,X17::xmax,1,-X17::yhigh,X17::yhigh,1,X17::zmin,X17::zmax);
+        scale->Draw("");
+        gStyle->SetOptStat(0);
+        scale->GetXaxis()->SetTitleOffset(1.5);
+        scale->GetZaxis()->SetTitleOffset(1.5);
+
+        for (TGraph2D* g : tracks) 
+        {
+            g->SetLineColor(kRed);
+            g->Draw("LINE same");
+        }
+
+        cout << "n_failed_fits: " << tracks.size() << "\n";
+    }
+
+public:
+    PlotSelectionTask(double E_max = 3.5e+6) : E_max(E_max) {}
 };
