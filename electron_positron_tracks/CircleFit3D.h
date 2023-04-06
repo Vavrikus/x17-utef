@@ -211,7 +211,7 @@ private:
         double mid  = (low+high)/2;
         Vector vmid = GetCirclePoint(mid);
 
-        while (abs(xmiddle-vmid.vx) > tolerance)
+        while ((abs(xmiddle-vmid.vx) > tolerance) && (low*(1+1e-15) < high))
         {
             mid = (low+high)/2;
             vmid  = GetCirclePoint(mid);
@@ -253,7 +253,7 @@ public:
         length  = 6.5; 
         alpha   = 0;
         radius  = 20;
-        phi_max = 0.3;
+        phi_max = 0.6;
         
         
         this->UpdateCurve();
@@ -274,11 +274,11 @@ public:
 
     void FitCircle3D(double max_iter = 500, double toleration = 0.001)
     {
-        Prefit();
-        gFitter->SetParameter(0,"length",length,0.01,0,20);
+        // Prefit();
+        gFitter->SetParameter(0,"length",length,0.01,-10,8);
         gFitter->SetParameter(1,"alpha",alpha,0.001,0,2*M_PI);
-        gFitter->SetParameter(2,"radius",radius,0.01,0,100);
-        gFitter->SetParameter(3,"phi_max",phi_max,0.001,0,2*M_PI);
+        gFitter->SetParameter(2,"radius",radius,0.01,8,100);
+        gFitter->SetParameter(3,"phi_max",phi_max,0.001,0.1,M_PI);
 
         double arglist[2] = {max_iter,toleration};  // max iterations, step size (toleration)
         gFitter->ExecuteCommand("MIGRAD",arglist,2); // last one num of prints (verbosity)

@@ -316,7 +316,7 @@ public:
 /// @brief Class for plotting circle and Runge-Kutta track fits
 class CircleAndRKFitTask : public PlotTask
 {
-    CircleFit3D& cfit3d = CircleFit3D::NewCircleFit({0,0,0},{1,0,0});
+    CircleFit3D& cfit3d = CircleFit3D::NewCircleFit({X17::xmin,0,0},{1,0,0});
     RecoPadsTask* reco_task = nullptr;
 
     void PreLoop() {}
@@ -329,7 +329,7 @@ class CircleAndRKFitTask : public PlotTask
 
     void PostLoop()
     {
-        cfit3d.Prefit();
+        // cfit3d.Prefit();
         cfit3d.SetFitter(4);
         cfit3d.FitCircle3D();
         cfit3d.PrintFitParams();
@@ -369,7 +369,7 @@ class CircleAndRKFitTask : public PlotTask
         for (auto m : reco_markers) m->Draw("same");
 
 
-        cfit3d_reco.Prefit();
+        // cfit3d_reco.Prefit();
         cfit3d_reco.SetFitter(4);
         cfit3d_reco.FitCircle3D();
         cfit3d_reco.PrintFitParams();
@@ -436,12 +436,15 @@ class CircleFitEnergyTask : public PlotTask
     std::string canvasTitle = "Original vs reconstructed energy";
 
     TH2F* h_energy;
+    TGraph2D *g_2d,*g_fit;
     int bins;
 
     void PreLoop()
     {
         const char* h_energy_title = "Original RK vs circle fit energy;RK energy [MeV];circle fit energy [MeV]";
-        h_energy = new TH2F("h_energy",h_energy_title,bins,4,12,bins,1,15);
+        h_energy = new TH2F("h_energy",h_energy_title,bins,4,12,bins,0,15);
+        g_2d = new TGraph2D();
+        g_fit = new TGraph2D();
         CircleFit3D::GetCircleFit().SetFitter();
     }
 
@@ -451,17 +454,29 @@ class CircleFitEnergyTask : public PlotTask
 
         CircleFit3D& cfit = CircleFit3D::NewCircleFit(track->origin,track->orientation);
 
-        for (auto p : track->points) cfit.AddPoint(p);
+        for (auto p : track->points) {cfit.AddPoint(p);}//g_2d->AddPoint(p.x,p.y,p.z);}
         
-        cfit.Prefit();
+        // cfit.Prefit();
         cfit.FitCircle3D();
+        // cfit.PrintFitParams();
 
-        h_energy->Fill(track->kin_energy,cfit.GetEnergy(loop->GetMagField()));
+        // g_fit = cfit.GetGraph();
+
+        h_energy->Fill(track->kin_energy/1e+6,cfit.GetEnergy(loop->GetMagField())/1e+6);
+        
     }
 
     void PostLoop()
     {
         h_energy->Draw("colz");
+        TF1 *f1 = new TF1("f1","x",4,12);
+        f1->Draw("same");
+        // TCanvas* c = new TCanvas();
+        // g_2d->Draw("LINE");
+        // g_2d->SetLineColor(kBlue);
+        // g_2d->SetTitle("RK track (blue) and its fit (red);x [cm];y [cm];z [cm]");
+        // g_fit->Draw("LINE same");
+        // g_fit->SetLineColor(kRed);
     }
 
 public:

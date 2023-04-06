@@ -51,10 +51,11 @@ int rk_tracks()
         double r   = sqrt(RandomMinMax(rand,0,r_max*r_max));
         double y0  = r*cos(phi);
         double z0  = r*sin(phi);
-        origin = {x0,y0,z0};
 
         double y1 = RandomMinMax(rand,y1_min,y1_max);
         double z1 = RandomMinMax(rand,z1_min,z1_max);
+
+        origin = {x1,y1,z1};
         orientation = {x1-x0,y1-y0,z1-z0};
         orientation.Normalize();
 

@@ -24,6 +24,7 @@ int reco_track()
     loop->LoadRK("rk_tracks.root");
     loop->AddTask(new CircleFitEnergyTask());
 
+    gErrorIgnoreLevel = 6001;
     loop->RunRKLoop();
 
     return 0;
