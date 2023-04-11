@@ -12,9 +12,9 @@ cd $(dirname $0) #Makes sure you are in the directory of this script.
 [ -z $PAR4 ] && echo "Parameter 4 (iterations) is missing." && exit 5
 
 # define a DATADIR variable: directory where the input files are taken from and where output will be copied to
-DATADIR=/storage/projects/utefx17/martin/electron_positron_tracks/data # substitute username and path to to your real username and path
-BUILDDIR=$DATADIR/../build
-MAGDIR=$DATADIR/../../mag_data
+DATADIR=/storage/projects/utefx17/martin/data/ion_map/new_sample
+BUILDDIR=/storage/projects/utefx17/martin/simulations/ion_map/build
+MAGDIR=$DATADIR/../../elmag
 
 # append a line to a file "jobs_info.txt" containing the ID of the job, the hostname of node it is run on and the path to a scratch directory
 # this information helps to find a scratch directory in case the job fails and you need to remove the scratch directory manually 

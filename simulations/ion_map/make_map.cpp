@@ -1,6 +1,6 @@
 // my dependencies
-#include "../VectorField.h"
-#include "../X17Utilities.h"
+#include "VectorField.h"
+#include "X17Utilities.h"
 
 // C++ dependencies
 #include <iostream>
@@ -21,7 +21,7 @@
 using namespace std;
 
 // loads data (named ion(id).root) from folder
-TChain* LoadData(int max_id, string folder = "/data/")
+TChain* LoadData(int max_id, string folder = "../../data/ion_map/sample_1.0/")
 {
     TChain* map_data = new TChain("map_data","Data from ionization electrons simulation.");
 
@@ -138,7 +138,7 @@ int make_map()
     }
 
     // output
-    TFile* outfile = new TFile("map.root","RECREATE");
+    TFile* outfile = new TFile("../../data/ion_map/map.root","RECREATE");
     outfile->WriteObject(&map,"map");
     // outfile->Close();
 
@@ -321,7 +321,7 @@ int make_map()
 
         outfile->Close();
 
-        TFile* mapfile = new TFile("map.root");
+        TFile* mapfile = new TFile("../../data/ion_map/map.root");
         Field<SensorData>* map = (Field<SensorData>*)mapfile->Get("map");
         TCanvas* c_pads = new TCanvas("c_pads", "Pads distortion for different times.");
         c_pads->Divide(4,4);

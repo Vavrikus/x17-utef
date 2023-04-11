@@ -8,8 +8,8 @@
 #include "TMarker3DBox.h"
 #include "TVirtualFitter.h"
 
-#include "../VectorField.h"
-#include "../X17Utilities.h"
+#include "VectorField.h"
+#include "X17Utilities.h"
 
 using namespace std;
 

@@ -2,7 +2,7 @@
 #include "TGraph.h"
 #include "TSpline.h"
 
-#include "../VectorField.h"
+#include "VectorField.h"
 
 /// @brief Function for simple circlular arc fit (using function for half of circle, curves up)
 /// @param graph Graph to be fitted

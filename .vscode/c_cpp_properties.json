@@ -3,7 +3,7 @@
         {
             "name": "Linux",
             "includePath": [
-                "${default}",
+                "/home/vavrik/work/X17/include",
                 "/home/vavrik/work/source/root/root_install/include",
                 "/home/vavrik/work/source/garfield/Include"
             ],

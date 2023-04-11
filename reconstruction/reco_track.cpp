@@ -4,9 +4,9 @@ int reco_track()
 {
     TrackLoop* loop = new TrackLoop();
 
-    loop->LoadSingle("electrons.root");
-    loop->LoadMap("map.root");
-    loop->LoadMagField("../mag_data/VecB2.txt");
+    loop->LoadSingle("../data/single_track/new_9010/electrons.root");
+    loop->LoadMap("../data/ion_map/map.root");
+    loop->LoadMagField("../data/elmag/VecB2.txt");
 
     loop->AddTask(new DriftTimeTask());
     loop->AddTask(new XZPlotTask());
@@ -21,7 +21,7 @@ int reco_track()
     // loop->RunSingleLoop();
 
     loop->ResetTasks();
-    loop->LoadRK("rk_tracks.root");
+    loop->LoadRK("../data/rk_tracks/rk_tracks.root");
     loop->AddTask(new CircleFitEnergyTask());
     // loop->AddTask(new PlotSelectionTask());
 

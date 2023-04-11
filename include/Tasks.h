@@ -14,7 +14,7 @@
 #include "CircleFit3D.h"
 #include "RK4.h"
 #include "TrackLoop.h"
-#include "../X17Utilities.h"
+#include "X17Utilities.h"
 
 // File included at the end of TrackLoop.h to avoid circular dependencies and extra translation units
 

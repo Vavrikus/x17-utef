@@ -372,7 +372,7 @@ namespace X17
         // Get map from initial to final electron positions from file
         if (map == nullptr)
         {
-            TFile* inFile2 = new TFile("map.root");
+            TFile* inFile2 = new TFile("/home/vavrik/work/X17/data/ion_map/map.root");
             map = (Field<SensorData>*)inFile2->Get("map");
         }
 

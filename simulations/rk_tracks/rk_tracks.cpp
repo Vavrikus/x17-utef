@@ -5,7 +5,7 @@
 
 #include "RK4.h"
 #include "Track.h"
-#include "../X17Utilities.h"
+#include "X17Utilities.h"
 
 double RandomMinMax(TRandom3* rand, double min, double max) {return min + (max-min)*rand->Rndm();}
 
@@ -29,7 +29,7 @@ int rk_tracks()
 
 
     VectorField* magfield = new VectorField(-0.2,0.2,-0.3,0.3,-0.3,0.3,0.005);
-    magfield->LoadField("../mag_data/VecB2.txt");
+    magfield->LoadField("../../data/elmag/VecB2.txt");
 
     TTree* simulated_tracks = new TTree("rk_tracks","Runge-Kutta simulated tracks");
     TRandom3* rand = new TRandom3(0);
@@ -92,7 +92,7 @@ int rk_tracks()
     
     X17::DrawPads3D(height);
     
-    TFile* outfile = new TFile("rk_tracks.root","RECREATE");
+    TFile* outfile = new TFile("../../data/rk_tracks/rk_tracks.root","RECREATE");
     simulated_tracks->Write();
 
     return 0;

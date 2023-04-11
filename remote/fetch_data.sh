@@ -5,4 +5,4 @@ i="meta"
 
 echo "Connecting to ${i}"
 
-rsync ${i}:/storage/projects/utefx17/martin/electron_positron_tracks/data/* data/ --progress
+rsync ${i}:/storage/projects/utefx17/martin/data/ion_map/new_sample/* ../data/ion_map/new_sample/ --progress

@@ -7,8 +7,8 @@
 #include "TGraph2D.h"
 
 #include "CircleFit3D.h"
-#include "../VectorField.h"
-#include "../X17Utilities.h"
+#include "VectorField.h"
+#include "X17Utilities.h"
 
 template<int N>
 class RK4

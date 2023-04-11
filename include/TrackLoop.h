@@ -5,8 +5,8 @@
 #include "TTree.h"
 
 #include "Track.h"
-#include "../VectorField.h"
-#include "../X17Utilities.h"
+#include "VectorField.h"
+#include "X17Utilities.h"
 
 class TrackLoop;
 

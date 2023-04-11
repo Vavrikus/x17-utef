@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CircleFit3D.h"
-#include "../VectorField.h"
+#include "VectorField.h"
 
 /// @brief Struct for information about Runge-Kutta simulated track
 struct TrackRK
