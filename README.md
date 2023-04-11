@@ -33,23 +33,38 @@ The map of the ionization electron drift can be simulated on MetaCentrum:
 ## Usage
 The project uses the following folder structure (headers and less important files ommited):
 - **The project folder**
-    - *GEMReadout_CenteredConector.kicad_pcb* -- KiCad file with the readout PCB
-    - *tpc_layout.ggb* -- GeoGebra file with a top-down view of the TPCs
-    - *sync.sh* -- Syncing with MetaCentrum (needs adjustments)
     - **.vscode**
         - *root-on-vscode.code-workspace* -- useful setup for using ROOT and Garfield++ in Visual Studio Code with Intellisense and debuging tool (some paths may need adjusting)
-    - **Magnetic_field_plot**
+    - **tests/magnetic_field_plot**
         - *bfield.C* -- old script for displaying the magnetic field using Garfield++
-    - **mag_data**
-        - Contains files *VecB.txt* and *VecE.txt* with magnetic field simulation (electric field is homogeneous) and files *VecB2.txt* and *VecE2.txt* containing the same data with adjusted coordinates.
+    - **data**
+        - **elmag**
+            - Contains files *VecB.txt* and *VecE.txt* with magnetic field simulation (electric field is homogeneous) and files *VecB2.txt* and *VecE2.txt* containing the same data with adjusted coordinates.
+        - **ion_map**
+            - Contains files with ionization electron data and compiled map in the file *map.root*
+        - **single_track**
+            - Contains files with single simulated track for different settings
+    - **include**
+        - Contains headers for the project (headers also include all definitions)
     - **presentations**
         - Contains presentation from 07-03-2023 seminar (tex and pdf files)
-    - **electron_positron_tracks**
-        - *circle_lines.ggb* -- GeoGebra file with circle fit geometry
-        - *fetch_data.sh*, *ion_multi.sh*, *ion_single.sh*, *remote_compile.sh* -- scripts for handling the map simulation on MetaCentrum (see above)
-        - *gas_table.cpp* -- script for generating the gas table for AvalancheMC simulation (not necessary for microscopic tracking)
-        - *ion_electrons.cpp* -- script for ionization electrons simulation (creates input for *make_map.cpp*)
-        - *make_map.cpp* -- script for creating the map of ionization electron drift
-        - *make_track.cpp* -- script for single track simulation
+    - **reconstruction**
         - *reco_track.cpp* -- script for track reconstruction
-        - *rk_tracks.cpp* -- script for quick Runge-Kutta track simulation, generates rk_tracks.root file (currently 100,000 tracks)
+    - **remote**
+        - *sync.sh* -- Syncing with MetaCentrum (needs adjustments)
+        - *fetch_data.sh* -- Syncing data simulated on MetaCentrum (needs adjustments)
+        - *remote_compile.sh* -- Compiling scripts on MetaCentrum
+    - **schematics**
+        - *circle_lines.ggb* -- GeoGebra file with circle fit geometry
+        - *GEMReadout_CenteredConector.kicad_pcb* -- KiCad file with the readout PCB
+        - *tpc_layout.ggb* -- GeoGebra file with a top-down view of the TPCs
+    - **simulations**
+        - **ion_map**
+            - *ion_electrons.cpp* -- script for ionization electrons simulation (creates input for *make_map.cpp*)
+            - *make_map.cpp* -- script for creating the map of ionization electron drift
+            - *ion_multi.sh*, *ion_single.sh* -- scripts for handling the map simulation on MetaCentrum (see above)
+        - **rk_tracks**
+            - *rk_tracks.cpp* -- script for quick Runge-Kutta track simulation, generates rk_tracks.root file (currently 100,000 tracks)
+        - **single_track**
+            - *gas_table.cpp* -- script for generating the gas table for AvalancheMC simulation (not necessary for microscopic tracking)
+            - *make_track.cpp* -- script for single track simulation
