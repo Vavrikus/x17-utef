@@ -1,10 +1,20 @@
-/tests/
-/electron_positron_tracks/data/sample*
-/electron_positron_tracks/data/track*
-/electron_positron_tracks/pictures/
-/electron_positron_tracks/rk_tracks.root
+# No compilation files
 */build/
 *.d
 *.so
 *.pcm
 *.out
+
+# No unnecessary big data files
+/data/rk_tracks/
+/data/ion_map/sample_0.0/
+/data/ion_map/sample_0.1/
+/data/single_track/new_7030/*.pdf
+/data/single_track/new_9010/*.pdf
+/data/single_track/original/
+/data/single_track/originalMC/
+/data/single_track/original_v2/
+/data/single_track/track1/
+
+# No tests
+/tests/
