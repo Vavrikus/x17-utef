@@ -1,5 +1,5 @@
 # No compilation files
-*/build/
+*build/
 *.d
 *.so
 *.pcm
