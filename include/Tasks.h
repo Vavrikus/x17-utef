@@ -436,6 +436,8 @@ class CircleFitEnergyTask : public PlotTask
     std::string canvasTitle = "Original vs reconstructed energy";
 
     TH2F* h_energy;
+    TH2F* h_energy2;
+    TH2F* h_energy3;
     std::vector<TH1F*> h_energy_diff;
     int bins;
 
@@ -445,7 +447,12 @@ class CircleFitEnergyTask : public PlotTask
     void PreLoop()
     {
         const char* h_energy_title = "Original RK vs circle fit energy;RK energy [MeV];circle fit energy [MeV]";
-        h_energy = new TH2F("h_energy",h_energy_title,bins,4,12,bins,0,15);
+        const char* h_energy2_title =  "Original RK vs circle fit energy;RK energy [MeV];energy difference [MeV]";
+        const char* h_energy3_title = "Original RK vs circle fit energy;RK energy [MeV];relative energy difference";
+
+        h_energy =  new TH2F("h_energy", h_energy_title, bins,4,12,bins,0,15);
+        h_energy2 = new TH2F("h_energy2",h_energy2_title,bins,4,12,bins,-1,1);
+        h_energy3 = new TH2F("h_energy3",h_energy3_title,bins,4,12,bins,-0.1,0.1);
 
         for (int i = 4; i < 12; i++)
         {
@@ -474,6 +481,8 @@ class CircleFitEnergyTask : public PlotTask
         // g_fit = cfit.GetGraph();
 
         h_energy->Fill(track->kin_energy/1e+6,cfit.GetEnergy(loop->GetMagField())/1e+6);
+        h_energy2->Fill(track->kin_energy/1e+6,track->kin_energy/1e+6-cfit.GetEnergy(loop->GetMagField())/1e+6);
+        h_energy3->Fill(track->kin_energy/1e+6,(track->kin_energy-cfit.GetEnergy(loop->GetMagField()))/track->kin_energy);
         h_energy_diff[floor(track->kin_energy/1e+6)-4]->Fill((track->kin_energy+cfit.GetEnergy(loop->GetMagField())-track->kin_energy)/1e+6);
         if (abs(cfit.GetEnergy(loop->GetMagField())-track->kin_energy) > Ediff_max)
         {
@@ -489,6 +498,10 @@ class CircleFitEnergyTask : public PlotTask
         h_energy->Draw("colz");
         TF1 *f1 = new TF1("f1","x",4,12);
         f1->Draw("same");
+        TCanvas* c2 = new TCanvas("c_energy2","Error");
+        h_energy2->Draw("colz");
+        TCanvas* c1 = new TCanvas("c_energy3","Relative error");
+        h_energy3->Draw("colz");
         // TCanvas* c = new TCanvas();
         // g_2d->Draw("LINE");
         // g_2d->SetLineColor(kBlue);
