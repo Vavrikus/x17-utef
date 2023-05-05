@@ -19,3 +19,6 @@
 
 # No tests
 /tests/
+
+# No redesign folder
+/redesign/
