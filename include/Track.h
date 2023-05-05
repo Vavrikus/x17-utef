@@ -1,19 +1,23 @@
 #pragma once
 
-#include "CircleFit3D.h"
-#include "VectorField.h"
+#include <vector>
 
-/// @brief Struct for information about Runge-Kutta simulated track
-struct TrackRK
+#include "Points.h"
+
+namespace X17
 {
-    bool electron;                 // true if electron, false if positron
-    std::vector<DataPoint> points; // simulated points
-    Vector origin;                 // starting point of the track
-    Vector orientation;            // normalized original direction of the track
-    double kin_energy;             // kinetic energy of the track
+    /// @brief Struct for information about Runge-Kutta simulated track
+    struct TrackRK
+    {
+        bool electron;                 // True if electron, false if positron.
+        std::vector<RKPoint> points;   // Simulated points.
+        Vector origin;                 // starting point of the track
+        Vector orientation;            // normalized original direction of the track
+        double kin_energy;             // kinetic energy of the track
 
-    TrackRK() = default;
+        TrackRK() = default;
 
-    TrackRK(const bool& e, const std::vector<DataPoint>& pts, const Vector& orig, const Vector& orient, const double& Ek)
-        : electron(e), points(pts), origin(orig), orientation(orient), kin_energy(Ek) {}
-};
+        TrackRK(const bool& e, const std::vector<RKPoint>& pts, const Vector& orig, const Vector& orient, const double& Ek)
+            : electron(e), points(pts), origin(orig), orientation(orient), kin_energy(Ek) {}
+    };
+} // namespace X17

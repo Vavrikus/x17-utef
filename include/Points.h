@@ -1,0 +1,337 @@
+#pragma once
+
+#include <vector>
+
+#include "Vector.h"
+#include "X17Utilities.h"
+
+#include "TMarker3DBox.h"
+
+namespace X17
+{
+    /// @brief A struct for storing the coordinates and the time of the initial point of an ionization electron.
+    struct StartPoint
+    {
+        Vector point; // Initial coordinates [cm].
+        double t;     // Initial time [ns] (should be close to 0).
+
+        // References for easier access
+        double& x = point.vx; // The x-coordinate [cm].
+        double& y = point.vy; // The y-coordinate [cm].
+        double& z = point.vz; // The z-coordinate [cm].
+
+        /// @brief Default constructor that initializes the coordinates to 0 and time to -1.
+        StartPoint() : point(), t(-1) { }
+
+        /// @brief Constructor that takes individual double arguments for the coordinates and time.
+        /// @param x The x-coordinate [cm].
+        /// @param y The y-coordinate [cm].
+        /// @param z The z-coordinate [cm].
+        /// @param t The starting time [ns].
+        StartPoint(double x, double y, double z, double t) : point(x, y, z), t(t) { }
+
+        /// @brief Assignment operator.
+        /// @param other The object to be assigned to this object.
+        void operator=(const StartPoint& other)
+        {
+            point = other.point;
+            t = other.t;
+        }
+    };
+
+    /// @brief A struct for storing the coordinates and the time of the final point of an ionization electron.
+    struct EndPoint
+    {
+        Vector point; // Final coordinates [cm].
+        double t;     // Final time [ns].
+        
+        // References for easier access
+        double& x = point.vx; // The x-coordinate [cm].
+        double& y = point.vy; // The y-coordinate [cm].
+        double& z = point.vz; // The z-coordinate [cm].
+
+        /// @brief Default constructor that initializes the coordinates to 0 and time to -1.
+        EndPoint() : point(), t(-1) { }
+
+        /// @brief Constructor that takes individual double arguments for the coordinates and time.
+        /// @param x The x-coordinate [cm].
+        /// @param y The y-coordinate [cm].
+        /// @param z The z-coordinate [cm].
+        /// @param t The final time [ns].
+        EndPoint(double x, double y, double z, double t) : point(x, y, z), t(t) { }
+        
+        /// @brief Constructor that takes a Vector object for the coordinates and a double for the time.
+        /// @param point The final coordinates [cm].
+        /// @param t The final time [ns].
+        EndPoint(Vector point, double t) : point(point), t(t) { }
+
+        /// @brief Conversion constructor for static casting zero to EndPoint.
+        EndPoint(int zero) : point(Vector(0, 0, 0)), t(0) { }
+
+        /// @brief Default copy constructor.
+        /// @param p The endpoint to be copied.
+        EndPoint(const EndPoint& p) = default;
+
+        /// @brief Assignment operator.
+        /// @param p The endpoint to be assigned.
+        void operator=(const EndPoint& other)
+        {
+            point = other.point;
+            t = other.t;
+        }
+
+        /// @brief Add another endpoint to this endpoint.
+        /// @param[in] p The endpoint to add.
+        void operator+=(const EndPoint& p)
+        {
+            this->point += p.point;
+            this->t += p.t;
+        }
+
+        /// @brief Division by a scalar component-wise.
+        /// @param d The scalar to divide with.
+        /// @return The scaled endpoint.
+        EndPoint operator/(const double& d) { return EndPoint(point / d, t / d); }
+
+        /// @brief Division by a scalar component-wise.
+        /// @param d The scalar to divide with.
+        void operator/=(const double& d)
+        {
+            point /= d;
+            t /= d;
+        }
+    };
+
+    /// @brief Adds two endpoints component-wise and returns the result.
+    /// @param p1 The first endpoint.
+    /// @param p2 The second endpoint.
+    /// @return The sum of the two endpoints.
+    EndPoint operator+(const EndPoint& p1, const EndPoint& p2)
+    {
+        return EndPoint{p1.point + p2.point, p1.t + p2.t};
+    }
+
+    /// @brief Subtracts two endpoints component-wise.
+    /// @param p1 The first endpoint.
+    /// @param p2 The second endpoint.
+    /// @return EndPoint The difference between the two endpoints.
+    EndPoint operator-(const EndPoint& p1, const EndPoint& p2)
+    {
+        return EndPoint{p1.point - p2.point, p1.t - p2.t};
+    }
+
+    /// @brief Scalar multiplication of a endpoint.
+    /// @param d The scalar to multiply with.
+    /// @param p The endpoint to multiply.
+    /// @return The scaled endpoint.
+    EndPoint operator*(const double& d, const EndPoint& p)
+    {
+        return EndPoint{d*p.point, d*p.t};
+    }
+
+    /// @brief A struct for storing the coordinates and the time of the final point of an ionization electron using pads;
+    struct EndPointDiscrete
+    {
+        int n_pad;    // The channel (pad) number.
+        int time_bin; // Number of the time bin (time bin size 100 ns).
+    };
+
+    /// @brief A struct for storing the results of microscopic simulation of ionization electrons.
+    struct MicroPoint
+    {
+        StartPoint start; // Initial coordinates of the electron. [cm] and [ns]
+        EndPoint end;     // Final coordinates of the electron. [cm] and [ns]
+        double e0;        // Initial energy.
+        double e1;        // Final energy.
+        
+        // References for easier access
+        double& x0 = start.x; // The initial x-coordinate [cm].
+        double& y0 = start.y; // The initial y-coordinate [cm].
+        double& z0 = start.z; // The initial z-coordinate [cm].
+        double& t0 = start.t; // The initial time [ns].
+        double& x1 = end.x;   // The final x-coordinate [cm].
+        double& y1 = end.y;   // The final y-coordinate [cm].
+        double& z1 = end.z;   // The final z-coordinate [cm].
+        double& t1 = end.t;   // The final time [ns].
+
+        /// @brief The default constructor. Initializes time to -1, everything else to 0.
+        MicroPoint() : start(), end(), e0(0), e1(0) { }
+
+        /// @brief Returns the initial position of the ionization electron.
+        /// @return The initial position of the electron.
+        Vector GetInitPos() { return this->start.point; }
+    };
+    
+    /// @brief A struct for storing a Runge-Kutta generated track point.
+    struct RKPoint
+    {
+        StartPoint point; // Track point coordinates. [cm] and [ns]
+
+        // References for easier access
+        double& x = point.x; // The simulated x-coordinate [cm].
+        double& y = point.y; // The simulated y-coordinate [cm].
+        double& z = point.z; // The simulated z-coordinate [cm].
+        double& t = point.t; // The simulated time [ns].
+
+        /// @brief Default constructor.
+        RKPoint() : point() { }
+
+        /// @brief Constructor that takes individual double arguments for the coordinates and time.
+        /// @param x The x-coordinate [cm].
+        /// @param y The y-coordinate [cm].
+        /// @param z The z-coordinate [cm].
+        /// @param t The time [ns].
+        RKPoint(double x, double y, double z, double t) : point(x,y,z,t) { }
+
+        /// @brief Assignment operator.
+        /// @param other The RKPoint to assign.
+        void operator=(const RKPoint& other) { this->point = other.point; }
+        
+        /// @brief Returns the coordinates of the point as Vector object.
+        /// @return The vector with coordinates of the point.
+        Vector Vector() const { return point.point; }
+    };
+
+    /// @brief A struct for storing the results of map simulation (multiple ionization electrons with same initial coordinates).
+    struct MapPoint
+    {
+        EndPoint point; // The average final point of the ionization electrons. [cm] and [ns]
+        EndPoint dev;   // The standard deviations of individual points. [cm] and [ns]
+
+        // References for easier access
+        double& x = point.x;  // The x-coordinate [cm].
+        double& y = point.y;  // The y-coordinate [cm].
+        double& z = point.z;  // The z-coordinate [cm].
+        double& t = point.t;  // The time [ns].
+        double& xdev = dev.x; // The x-coordinate deviation [cm].
+        double& ydev = dev.y; // The y-coordinate deviation [cm].
+        double& zdev = dev.z; // The z-coordinate deviation [cm].
+        double& tdev = dev.t; // The time deviation [ns].
+
+        /// @brief Default constructor. Coordinates x,y,z set to zero, time to -1.
+        MapPoint() : point(), dev() { }
+
+        /// @brief Constructor for initializing a MapPoint object with given values.
+        /// @param p The EndPoint with (x,y,z,t) coordinates. [cm] and [ns]
+        /// @param d The EndPoint with (x,y,z,t) coordinates deviations. [cm] and [ns]
+        MapPoint(const EndPoint& p, const EndPoint& d) : point(p), dev(d) { }
+
+        /// @brief Add another map point to this map point.
+        /// @param[in] p The map point to add.
+        void operator+=(const MapPoint& p)
+        {
+            this->point += p.point;
+            this->dev += p.dev;
+        }
+
+        /// @brief Accesses the individual components of the endpoint.
+        /// @param i Index of the component to access. Must be in the range [0, 3].
+        /// @return The value of the component.
+        /// @throws std::out_of_range if i is out of range.
+        double operator[](int i) const
+        {
+            switch (i)
+            {
+            case 0:
+                return this->point.x;
+                break;
+            case 1:
+                return this->point.y;
+                break;
+            case 2:
+                return this->point.z;
+                break;
+            case 3:
+                return this->point.t;
+                break;
+            
+            default:
+                throw std::out_of_range("MapPoint[] index out of range.\n");
+                break;
+            }
+        }
+    };
+
+    /// @brief Adds two map points component-wise and returns the result.
+    /// @param p1 The first map point.
+    /// @param p2 The second map point.
+    /// @return The sum of the two map points.
+    MapPoint operator+(const MapPoint& p1, const MapPoint& p2)
+    {
+        return MapPoint{p1.point + p2.point, p1.dev + p2.dev};
+    }
+
+    /// @brief Subtracts two map points component-wise.
+    /// @param p1 The first map point.
+    /// @param p2 The second map point.
+    /// @return MapPoint The difference between the two map points.
+    MapPoint operator-(const MapPoint& p1, const MapPoint& p2)
+    {
+        return MapPoint{p1.point - p2.point, p1.dev - p2.dev};
+    }
+
+    /// @brief Scalar multiplication of a map point.
+    /// @param d The scalar to multiply with.
+    /// @param p The map point to multiply.
+    /// @return The scaled map point.
+    MapPoint operator*(const double& d, const MapPoint& p)
+    {
+        return MapPoint{d*p.point, d*p.dev};
+    }
+
+    /// @brief A struct for storing the reconstructed initial points of the track. If points are reconstructed from pads, count/charge also relevant.
+    struct RecoPoint
+    {
+        StartPoint point; // The reconstructed coordinates. [cm]
+        double count;     // The number of electrons or charge.
+
+        // References for easier access
+        double& x = point.x; // The x-coordinate [cm].
+        double& y = point.y; // The y-coordinate [cm].
+        double& z = point.z; // The z-coordinate [cm].
+
+        /// @brief Assignment operator.
+        /// @param other The object to be assigned to this object.
+        void operator=(const RecoPoint& other)
+        {
+            point = other.point;
+            count = other.count;
+        }
+
+        /// @brief Returns the coordinates of the point as Vector object.
+        /// @return The vector with coordinates of the point.
+        Vector Vector() const { return point.point; }
+    };
+
+    std::vector<TMarker3DBox*> GetDataMarkers(std::vector<RecoPoint> data, double zbin_size = 0.3)
+    {
+        std::vector<TMarker3DBox*> markers;
+        constexpr double max_size = 0.75;
+
+        // find maximal count
+        int max_count = 0;
+        for (RecoPoint p : data) if (p.count > max_count) max_count = p.count;
+
+        // create markers
+        for (RecoPoint p : data)
+        {
+            using namespace constants;
+
+            double rel_size = max_size * p.count / max_count;
+            double xlen = rel_size * pad_width  / 2.0;
+            double ylen = rel_size * pad_height / 2.0;
+            double zlen = rel_size * zbin_size  / 2.0;
+
+            markers.push_back(new TMarker3DBox(p.x,p.y,p.z,xlen,ylen,zlen,0,0));
+        }
+        
+        return markers;
+    }
+
+    /// @brief A struct for storing the simulated (later maybe also real) data from the TPC readout.
+    struct DataPoint
+    {
+        EndPointDiscrete point; // The binned time and position information.
+        double count;           // The number of electrons or charge.
+    };
+} // namespace X17

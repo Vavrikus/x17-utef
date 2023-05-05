@@ -1,12 +1,6 @@
-// my dependencies
-#include "VectorField.h"
-#include "X17Utilities.h"
-
 // C++ dependencies
 #include <iostream>
-#include <stdexcept>
 #include <string>
-#include <vector>
 
 // ROOT dependencies
 #include "TArrow.h"
@@ -14,117 +8,54 @@
 #include "TChain.h"
 #include "TFile.h"
 #include "TGraph.h"
-#include "TGraph2D.h"
 #include "TGraphErrors.h"
 #include "TH2F.h"
 #include "TStyle.h"
 
-using namespace std;
+// X17 dependencies
+#include "Field.h"
+#include "MapTask.h"
+#include "PadLayout.h"
+#include "Points.h"
+#include "Utilities.h"
+#include "X17Utilities.h"
 
-// loads data (named ion(id).root) from folder
-TChain* LoadData(int max_id, string folder = "../../data/ion_map/sample_1.0/")
+int main(int argc, char const *argv[])
 {
-    TChain* map_data = new TChain("map_data","Data from ionization electrons simulation.");
-
-    for (int i = 1; i <= max_id; i++)
-    {
-        string filepath = folder + "ion" + to_string(i) + ".root?#electrons";
-        map_data->Add(filepath.c_str());
-    }
-
-    return map_data;
-}
-
-// calculates standard deviation assuming gaussian distribution
-double stdev(vector<double> values, double average)
-{
-    double sqdev_sum = 0;
-    double dmin = values[0];
-    double dmax = values[0];
-
-    for (double d : values)
-    {
-        if(d<dmin) dmin = d;
-        if(d>dmax) dmax = d;
-        sqdev_sum += pow((d-average),2);
-    }
-
-    // cout << "min: " << dmin << " average: " << average << " max: " << dmax << " N: " << values.size() << " stdev: " << sqrt(sqdev_sum/values.size()) << "\n";
-
-    return sqrt(sqdev_sum/values.size());
-}
-
-// calculates correlation coefficient
-double correlation(vector<double> values1, vector<double> values2, double average1, double average2)
-{
-    if (values1.size() != values2.size()) throw std::invalid_argument("Correlation: Both samples must have the same size.");
-
-    double sum_product = 0;
-    double sum1 = 0;
-    double sum2 = 0;
-
-    for (int i = 0; i < values1.size(); i++)
-    {
-        sum_product += (values1[i]-average1)*(values2[i]-average2);
-        sum1 += pow((values1[i]-average1),2);
-        sum2 += pow((values2[i]-average2),2);
-    }
-
-    double coef = sum_product/sqrt(sum1*sum2);
-
-    cout << "Correlation: " << coef << " Average1: " << average1 << " Stdev1: " << sum1/values1.size() << " Average2: " << average2 << " Stdev2: " << sum2/values2.size() << "\n";
-
-    return coef;
+    return make_map();
 }
 
 int make_map()
-{
-    // load data from all files (results of individual jobs)
+{    
+    // Load data from all files (results of individual jobs).
     TChain* map_data_in = LoadData(200);
+    std::cout << "Number of simulated electrons: " << map_data_in->GetEntries() << "\n";
 
-    //map_data_in->Print();
-    cout << "\n\nEntries: " << map_data_in->GetEntries() << "\n";
+    // Set branches for TChain containing data.
+    X17::MicroPoint point; // An object that will hold the information about current ionization electron loaded.
+    SetTChainBranches(map_data_in, point);
 
-    // set branches for tchain containing data
-    // ADJUSTED FOR OLD COORDINATES ONLY!!!!!!!
-    cout << "MAKE SURE TO CHANGE THE COORDINATE ASSIGNMENT IF USING NEW SIMULATIONS!!!!!!!\n";
-    double x0, y0, z0, t0, e0;
-    double x1, y1, z1, t1, e1;
-    map_data_in->SetBranchAddress("z0",&x0);
-    map_data_in->SetBranchAddress("x0",&y0);
-    map_data_in->SetBranchAddress("y0",&z0);
-    map_data_in->SetBranchAddress("t0",&t0);
-    map_data_in->SetBranchAddress("e0",&e0);
-    map_data_in->SetBranchAddress("z1",&x1);
-    map_data_in->SetBranchAddress("x1",&y1);
-    map_data_in->SetBranchAddress("y1",&z1);
-    map_data_in->SetBranchAddress("t1",&t1);
-    map_data_in->SetBranchAddress("e1",&e1);
-
-    // prepare field for output
-    Field<SensorData> map;
-    map.SetDefault({0,0,0,0,0,0,0,0});
-    map.InitField(0,15,-30,30,-8,8,1);
+    // Prepare the field that will hold the final values.
+    X17::Field<X17::MapPoint> map({0,-30,-8},{15,30,8},1,X17::MapPoint());
 
     // variables for checking with the previous position
-    double x0_prev = 0; double y0_prev = 0; double z0_prev = 0;
-    int same_prev = 1;
-    
-    double x1_avg = 0; double y1_avg = 0; double z1_avg = 0; double t1_avg = 0; // variables for averages
-    vector<double> x1_vec,y1_vec,z1_vec,t1_vec;                                 // variables for data from each point
-    
-    // calculate averages and standard deviations
+    X17::Vector v_prev(0,0,0);        // Vector for the previous position. Used for comparison with current position.
+    int same_prev = 1;                // The number of entries with the same position including the current entry.
+    X17::EndPoint p_avg(0,0,0,0);     // The object used for calculating of the averages.
+    std::vector<X17::EndPoint> p_vec; // Stores the endpoints with the same initial position.
+
+    // Calculate the averages and standard deviations.
     for (int i = 0; i < map_data_in->GetEntries(); i++)
     {
         map_data_in->GetEntry(i);
         
         double percent_complete = 100*i*1.0/map_data_in->GetEntries();
-        if (floor(percent_complete)-floor(percent_complete*(i-1.0)/i) == 1) cout << floor(percent_complete) << "\%\n";
+        if (floor(percent_complete) - floor(percent_complete*(i-1.0)/i) == 1) std::cout << "Progress: " << floor(percent_complete) << "\%\n";
 
-        if ((x0 == x0_prev) && (y0 == y0_prev) && (z0 == z0_prev) && (i != map_data_in->GetEntries()-1))
+        if (point.GetInitPos() == v_prev && (i != map_data_in->GetEntries()-1))
         {
-            x1_avg += x1; y1_avg += y1; z1_avg += z1; t1_avg += t1;
-            x1_vec.push_back(x1);y1_vec.push_back(y1);z1_vec.push_back(z1);t1_vec.push_back(t1);
+            p_avg += point.end;
+            p_vec.push_back(point.end);
             same_prev++;
         }
 
@@ -133,169 +64,294 @@ int make_map()
             if(i == map_data_in->GetEntries()-1) 
             {
                 same_prev++;
-                x1_vec.push_back(x1);y1_vec.push_back(y1);z1_vec.push_back(z1);t1_vec.push_back(t1);
-                x1_avg = x1; y1_avg = y1; z1_avg = z1; t1_avg = t1;
+                p_vec.push_back(point.end);
+                p_avg = point.end; // CHECK IF CORRECT!
             }
 
-            x1_avg /= same_prev; y1_avg /= same_prev; z1_avg /= same_prev; t1_avg /= same_prev;
+            p_avg /= same_prev;
+
             if(i != 0) 
             {
-                map.SetPoint(x0_prev,y0_prev,z0_prev,
-                             {
-                                x1_avg,y1_avg,z1_avg,t1_avg,
-                                stdev(x1_vec,x1_avg),stdev(y1_vec,y1_avg),stdev(z1_vec,z1_avg),stdev(t1_vec,t1_avg),
-                                correlation(x1_vec,y1_vec,x1_avg,y1_avg),correlation(x1_vec,z1_vec,x1_avg,z1_avg),correlation(x1_vec,t1_vec,x1_avg,t1_avg),
-                                correlation(y1_vec,z1_vec,y1_avg,z1_avg),correlation(y1_vec,t1_vec,y1_avg,t1_avg),correlation(z1_vec,t1_vec,z1_avg,t1_avg)
-                             });
-                cout << "\n";
-
-                // TCanvas* c = new TCanvas();
-                // TGraph2D* point_spread = new TGraph2D();
-                // string ps_title = "Point spread for x = " + to_string(x0_prev) + ", y = " + to_string(y0_prev) + ", z = " + to_string(z0_prev) + ";x [cm];y [cm];time [ns]";
-                // point_spread->SetTitle(ps_title.c_str());
-                // for (int i = 0; i < same_prev; i++) point_spread->AddPoint(x1_vec[i],y1_vec[i],t1_vec[i]);
-                // point_spread->Draw("P");
-                // point_spread->SetMarkerSize(2);
-                // point_spread->SetMarkerStyle(2);
-
-                x1_vec.clear();y1_vec.clear();z1_vec.clear();t1_vec.clear();
+                map.SetPoint(v_prev,X17::MapPoint(p_avg,stdev(p_vec,p_avg)));
+                p_vec.clear();
             }
 
-            x1_vec.push_back(x1);y1_vec.push_back(y1);z1_vec.push_back(z1);t1_vec.push_back(t1);
-            x1_avg = x1; y1_avg = y1; z1_avg = z1; t1_avg = t1;
-            x0_prev = x0; y0_prev = y0; z0_prev = z0;
+            p_vec.push_back(point.end);
+            p_avg  = point.end;
+            v_prev = point.GetInitPos();
             same_prev = 1;
         }
     }
 
-    // output
+    // Save the compiled map.
     TFile* outfile = new TFile("../../data/ion_map/map.root","RECREATE");
     outfile->WriteObject(&map,"map");
-    // outfile->Close();
 
-    // plotting
+    // Plotting.
     bool MakePlots = true;
 
     if(MakePlots)
     {
-        vector<TH2F*> v_yx_dx;
-        vector<TH2F*> v_yx_dy;
-        vector<TGraphErrors*> v_g_yx;
-        vector<vector<TArrow*>> vv_g_yx_arrows;
-        vector<TH2F*> v_yx_t1;
-
-        TGraphErrors* g_xz = new TGraphErrors();
-        vector<TArrow*> v_g_xz_arrows;
-        TGraphErrors* g_xt = new TGraphErrors();
-        TGraph* g_zt = new TGraph();
-
-        g_xz->SetName("g_xz");
-        g_xz->SetTitle("Map of electron displacement (x = 0)");
-        g_xz->SetMarkerColor(2);
-        g_xz->SetMarkerStyle(6);
-        g_xz->GetXaxis()->SetTitle("x [cm]");
-        g_xz->GetYaxis()->SetTitle("z [cm]");
-
-        g_xt->SetName("g_xt");
-        g_xt->SetTitle("Map of drift times (y = 0)");
-        g_xt->SetMarkerColor(2);
-        g_xt->SetMarkerStyle(6);
-        g_xt->GetXaxis()->SetTitle("x [cm]");
-        g_xt->GetYaxis()->SetTitle("t [ns]");
-
-        g_zt->SetName("g_zt");
-        g_zt->SetTitle("Original height vs drift time");
-        g_zt->SetMarkerColor(2);
-        g_zt->SetMarkerStyle(6);
-        g_zt->GetXaxis()->SetTitle("z [cm]");
-        g_zt->GetYaxis()->SetTitle("t [ns]");
-
-        TH2F* xz_t1 = new TH2F("h_xz_t1","XZ plane t1;x [cm];z [cm]",map.ximax,map.xmin,map.xmax,map.zimax,map.zmin,map.zmax);
-
         gStyle->SetOptStat(0);
 
-        double z_xy = 7;
-        double y_xz = 0;
+        // Plotting limits for some of the plots.
+        double ymin = -10; // Minimal plotted y-coordinate.
+        double ymax = 10;  // Maximal plotted y-coordinate.
+        double xmin = 5;   // Minimal plotted x-coordinate.
+        double xmax = 16;  // Maximal plotted x-coordinate.
+        
+        std::vector<MapTask*> plot_tasks; // The vector containing all plotting tasks to be plotted.
+        plot_tasks.push_back(new Hist_YX_DX(&map));
+        plot_tasks.push_back(new Hist_YX_DY(&map));
+        plot_tasks.push_back(new Hist_YX_T1(&map,xmin,xmax,ymin,ymax));
+        plot_tasks.push_back(new Graph_YX(&map,xmin,xmax,ymin,ymax));
+        plot_tasks.push_back(new Graph_ZT(&map));
+        plot_tasks.push_back(new Graph_XZ(&map));
+        plot_tasks.push_back(new Graph_XT(&map));
+        plot_tasks.push_back(new Hist_XZ_T1(&map));
 
-        // int z_xyi = round(z_xy-map.zmin)/map.step;
-        int y_xzi = round(y_xz-map.ymin)/map.step;
-        for (int z_xyi = 0; z_xyi <= map.zimax; z_xyi++)
+        for(MapTask* t : plot_tasks) t->PreLoop();
+
+        for (int z_xyi = 0; z_xyi <= map.GetZCells(); z_xyi++)
         {
-            double z = map.zmin + z_xyi*map.step;
-            string h_dx_name = "h_yx_dx_" + to_string(z);
-            string h_dy_name = "h_yx_dy_" + to_string(z);
-            string h_t1_name = "h_yx_t1_" + to_string(z);
-            string g_yx_name = "g_yx_" + to_string(z);
-            string h_dx_title = "XY plane dx (z = " + to_string(z) + ");x [cm];y [cm]";
-            string h_dy_title = "XY plane dy (z = " + to_string(z) + ");x [cm];y [cm]";
-            string h_t1_title = "XY plane t1 (z = " + to_string(z) + ");x [cm];y[cm]";
-            string g_yx_title = "Map of electron readout positions, z = " + to_string(z);
+            double z = map.GetZMin() + z_xyi*map.GetStep();
+            for(MapTask* t : plot_tasks) t->Z_Loop_Start(z);
 
-            v_yx_dx.push_back(new TH2F(h_dx_name.c_str(),h_dx_title.c_str(),map.yimax,map.ymin,map.ymax,map.ximax,map.xmin,map.xmax));
-            v_yx_dy.push_back(new TH2F(h_dy_name.c_str(),h_dy_title.c_str(),map.yimax,map.ymin,map.ymax,map.ximax,map.xmin,map.xmax));
-            v_yx_t1.push_back(new TH2F(h_t1_name.c_str(),h_t1_title.c_str(),map.yimax,map.ymin,map.ymax,map.ximax,map.xmin,map.xmax));
-            v_g_yx.push_back(new TGraphErrors());
-
-            v_g_yx[z_xyi]->SetName(g_yx_name.c_str());
-            v_g_yx[z_xyi]->SetTitle(g_yx_title.c_str());
-            v_g_yx[z_xyi]->SetMarkerColor(2);
-            v_g_yx[z_xyi]->SetMarkerStyle(6);
-            v_g_yx[z_xyi]->GetXaxis()->SetTitle("y [cm]");
-            v_g_yx[z_xyi]->GetYaxis()->SetTitle("x [cm]");
-
-            vector<TArrow*> arrows;
-
-            for (int xi = 0; xi <= map.ximax; xi++)
+            for (int xi = 0; xi <= map.GetXCells(); xi++)
             {
-                double x = map.xmin+xi*map.step;
+                double x = map.GetXMin()+xi*map.GetStep();
 
-                for (int yi = 0; yi <= map.yimax; yi++)
+                for (int yi = 0; yi <= map.GetYCells(); yi++)
                 {
-                    double y = map.ymin+yi*map.step;
-                    SensorData& s_curr = map.field[xi][yi][z_xyi];
-                    if(s_curr.x1 != 0) v_yx_dx[z_xyi]->Fill(y,x,s_curr.x1-x);
-                    if(s_curr.y1 != 0) v_yx_dy[z_xyi]->Fill(y,x,s_curr.y1-y);
-                    if(s_curr.t1 != 0) v_yx_t1[z_xyi]->Fill(y,x,s_curr.t1);
-                    if((s_curr.x1 != 0) && (s_curr.y1 != 0))
-                    {
-                        v_g_yx[z_xyi]->AddPoint(s_curr.y1,s_curr.x1);
-                        v_g_yx[z_xyi]->SetPointError(v_g_yx[z_xyi]->GetN()-1,s_curr.y1dev,s_curr.x1dev);
-                        TArrow* arrow = new TArrow(y,x,s_curr.y1,s_curr.x1);
-                        arrows.push_back(arrow);
-                    }
-                    g_zt->AddPoint(z,s_curr.t1);
+                    double y = map.GetYMin()+yi*map.GetStep();
+                    X17::MapPoint& current = map.at(xi,yi,z_xyi);
+
+                    for(MapTask* t : plot_tasks) t->XYZ_Loop(x,y,z,current);
                 }
             }
-
-            vv_g_yx_arrows.push_back(arrows);
+            for(MapTask* t : plot_tasks) t->Z_Loop_End();
         }
 
-        for (int xi = 0; xi <= map.ximax; xi++)
+        double y_xz = 0;                                       // The y-coordinate of xz plots.
+        int y_xzi   = round(y_xz-map.GetYMin())/map.GetStep(); // The y-coordinate index of xz plots.
+
+        for (int xi = 0; xi <= map.GetXCells(); xi++)
         {
-            double x = map.xmin+xi*map.step;
-            for (int zi = 0; zi <= map.zimax; zi++)
+            double x = map.GetXMin()+xi*map.GetStep();
+            for (int zi = 0; zi <= map.GetZCells(); zi++)
             {
-                double z = map.zmin+zi*map.step;
+                double z = map.GetZMin()+zi*map.GetStep();
+                X17::MapPoint& current = map.at(xi,y_xzi,zi);
 
-                SensorData& s_curr = map.field[xi][y_xzi][zi];
-
-                xz_t1->Fill(x,z,s_curr.t1);
-                g_xz->AddPoint(s_curr.x1,z);
-                g_xz->SetPointError(g_xz->GetN()-1,s_curr.x1dev,0);
-                g_xt->AddPoint(x,s_curr.t1);
-                g_xt->SetPointError(g_xt->GetN()-1,s_curr.x1dev,s_curr.t1dev);
-
-                TArrow* arrow = new TArrow(x,z,s_curr.x1,z);
-                v_g_xz_arrows.push_back(arrow);
+                for(MapTask* t : plot_tasks) t->ZX_Loop(z,x,current);
             }
         }
-        xz_t1->Write();
-        for(TH2F* h : v_yx_dx) h->Write();
-        for(TH2F* h : v_yx_dy) h->Write();
-        // for(TGraph* g : v_g_xy) g->Write();
 
+        for(MapTask* t : plot_tasks) t->PostLoop();
+
+        outfile->Close();
+
+        // Drawing the distortion of the pads.
+        TFile* mapfile = new TFile("../../data/ion_map/map.root");
+        X17::Field<X17::MapPoint>* map = (X17::Field<X17::MapPoint>*)mapfile->Get("map");
+        TCanvas* c_pads = new TCanvas("c_pads", "Pads distortion for different times.");
+        c_pads->Divide(4,4);
+
+        for (int i = 0; i < 16; i++)
+        {
+            using namespace X17::constants;
+            
+            c_pads->cd(i+1);
+            TGraph* gr = new TGraph();
+            gr->AddPoint(-yhigh,xmin);
+            gr->AddPoint(yhigh,xmax);
+            gr->Draw("AP");
+
+            X17::DefaultLayout& pads = X17::DefaultLayout::GetDefaultLayout();
+            pads.DrawPadsDistortion((i+1)*5000/16,c_pads,map);
+            //X17::DrawTrapezoid();
+        }
+    }
+
+    return 0;
+}
+
+/// @brief Loads ionization electron data from files (named ion(id).root) in a specified folder.
+/// @param max_id The maximum ID number of the files to load.
+/// @param folder The folder containing the files to load. Default is "../../data/ion_map/sample_1.0/".
+/// @return A TChain pointer containing the loaded data.
+TChain* LoadData(int max_id, std::string folder = "../../data/ion_map/sample_1.0/")
+{
+    TChain* map_data = new TChain("map_data","Data from ionization electrons simulation.");
+
+    for (int i = 1; i <= max_id; i++)
+    {
+        std::string filepath = folder + "ion" + std::to_string(i) + ".root?#electrons";
+        map_data->Add(filepath.c_str());
+    }
+
+    return map_data;
+}
+
+/// @brief Sets the branches of a TChain to a MicroPoint object.
+/// @param chain Pointer to TChain object.
+/// @param point Reference to X17::MicroPoint object.
+/// @param old_data Boolean indicating whether the data is from old simulations with different coordinate system (zxy). Defaults to true.
+void SetTChainBranches(TChain* chain, X17::MicroPoint& point, bool old_data = true)
+{
+    if (old_data)
+    {
+        std::cout << "MAKE SURE TO CHANGE THE COORDINATE ASSIGNMENT IF USING NEW SIMULATIONS!!!!!!!\n";
+        chain->SetBranchAddress("z0",&point.x0);
+        chain->SetBranchAddress("x0",&point.y0);
+        chain->SetBranchAddress("y0",&point.z0);
+        chain->SetBranchAddress("t0",&point.t0);
+        chain->SetBranchAddress("e0",&point.e0);
+        chain->SetBranchAddress("z1",&point.x1);
+        chain->SetBranchAddress("x1",&point.y1);
+        chain->SetBranchAddress("y1",&point.z1);
+        chain->SetBranchAddress("t1",&point.t1);
+        chain->SetBranchAddress("e1",&point.e1);
+    }
+
+    else chain->SetBranchAddress("point",&point);
+}
+
+class Hist_YX_DX : public MapTask
+{
+    std::vector<TH2F*> v_yx_dx;
+
+public:
+    Hist_YX_DX(X17::Field<X17::MapPoint>* map) : MapTask(map) { }
+
+    void Z_Loop_Start(const double& z) override
+    {
+        std::string h_dx_name = "h_yx_dx_" + std::to_string(z);
+        std::string h_dx_title = "XY plane dx (z = " + std::to_string(z) + ");x [cm];y [cm]";
+        v_yx_dx.push_back(new TH2F(h_dx_name.c_str(),h_dx_title.c_str(),map->GetYCells(),map->GetYMin(),map->GetYMax(),map->GetXCells(),map->GetXMin(),map->GetXMax()));
+    }
+
+    void XYZ_Loop(const double& x, const double& y, const double& z, const X17::MapPoint& current) override
+    {
+        if(current.x != 0) v_yx_dx.back()->Fill(y,x,current.x-x);
+    }
+
+    void PostLoop() override
+    {
+        for(TH2F* h : v_yx_dx) h->Write();
+    }
+};
+
+class Hist_YX_DY : public MapTask
+{
+    std::vector<TH2F*> v_yx_dy;
+
+public:
+    Hist_YX_DY(X17::Field<X17::MapPoint>* map) : MapTask(map) { }
+
+    void Z_Loop_Start(const double& z) override
+    {
+        std::string h_dy_name = "h_yx_dy_" + std::to_string(z);
+        std::string h_dy_title = "XY plane dy (z = " + std::to_string(z) + ");x [cm];y [cm]";
+        v_yx_dy.push_back(new TH2F(h_dy_name.c_str(),h_dy_title.c_str(),map->GetYCells(),map->GetYMin(),map->GetYMax(),map->GetXCells(),map->GetXMin(),map->GetXMax()));
+    }
+
+    void XYZ_Loop(const double& x, const double& y, const double& z, const X17::MapPoint& current) override
+    {
+        if(current.y != 0) v_yx_dy.back()->Fill(y,x,current.y-y);
+    }
+
+    void PostLoop() override
+    {
+        for(TH2F* h : v_yx_dy) h->Write();
+    }
+};
+
+
+class Hist_YX_T1 : public MapTask
+{
+    double xmin,xmax,ymin,ymax;
+    std::vector<TH2F*> v_yx_t1;
+
+public:
+    Hist_YX_T1(X17::Field<X17::MapPoint>* map, double xmin, double xmax, double ymin, double ymax) : MapTask(map),xmin(xmin),xmax(xmax),ymin(ymin),ymax(ymax) { }
+
+    void Z_Loop_Start(const double& z) override
+    {
+        std::string h_t1_name = "h_yx_t1_" + std::to_string(z);
+        std::string h_t1_title = "XY plane t1 (z = " + std::to_string(z) + ");x [cm];y [cm]";
+        v_yx_t1.push_back(new TH2F(h_t1_name.c_str(),h_t1_title.c_str(),map->GetYCells(),map->GetYMin(),map->GetYMax(),map->GetXCells(),map->GetXMin(),map->GetXMax()));
+    }
+
+    void XYZ_Loop(const double& x, const double& y, const double& z, const X17::MapPoint& current) override
+    {
+        if(current.t != 0) v_yx_t1.back()->Fill(y,x,current.t);
+    }
+
+    void PostLoop() override
+    {
+        TCanvas* c_yx_t1 = new TCanvas("c_yx_t1","Map of drift times");
+        c_yx_t1->Divide(4,4);
+        for (int i = 0; i < v_yx_t1.size()-1; i++)
+        {
+            c_yx_t1->cd(i+1);
+            v_yx_t1[i]->GetXaxis()->SetRangeUser(ymin,ymax);
+            v_yx_t1[i]->GetYaxis()->SetRangeUser(xmin,xmax);
+            v_yx_t1[i]->Draw("colz");
+            double min_percent = 0.8+0.13*(v_yx_t1.size()-1-i)/(v_yx_t1.size()-1); //how high is minimum compared to maximum
+            v_yx_t1[i]->SetMinimum(min_percent*v_yx_t1[i]->GetMaximum());
+            v_yx_t1[i]->SetMaximum(min_percent*v_yx_t1[i]->GetMaximum()+500);
+            X17::DrawTrapezoid();
+        }
+        c_yx_t1->Write();
+    }
+};
+
+class Graph_YX : public MapTask
+{
+    double xmin,xmax,ymin,ymax;
+    std::vector<TGraphErrors*> v_g_yx;
+    std::vector<std::vector<TArrow*>> vv_g_yx_arrows;
+    std::vector<TArrow*> arrows;
+
+public:
+    Graph_YX(X17::Field<X17::MapPoint>* map, double xmin, double xmax, double ymin, double ymax) : MapTask(map),xmin(xmin),xmax(xmax),ymin(ymin),ymax(ymax) { }
+
+    void Z_Loop_Start(const double& z) override
+    {
+        std::string g_yx_name = "g_yx_" + std::to_string(z);
+        std::string g_yx_title = "Map of electron readout positions, z = " + std::to_string(z);
+
+        v_g_yx.push_back(new TGraphErrors());
+
+        v_g_yx.back()->SetName(g_yx_name.c_str());
+        v_g_yx.back()->SetTitle(g_yx_title.c_str());
+        v_g_yx.back()->SetMarkerColor(2);
+        v_g_yx.back()->SetMarkerStyle(6);
+        v_g_yx.back()->GetXaxis()->SetTitle("y [cm]");
+        v_g_yx.back()->GetYaxis()->SetTitle("x [cm]");
+    }
+
+    void XYZ_Loop(const double& x, const double& y, const double& z, const X17::MapPoint& current) override
+    {
+        if((current.x != 0) && (current.y != 0))
+        {
+            v_g_yx.back()->AddPoint(current.y,current.x);
+            v_g_yx.back()->SetPointError(v_g_yx.back()->GetN()-1,current.ydev,current.xdev);
+            TArrow* arrow = new TArrow(y,x,current.y,current.x);
+            arrows.push_back(arrow);
+        }
+    }
+
+    void Z_Loop_End() override
+    {
+        vv_g_yx_arrows.push_back(arrows);
+    }
+
+    void PostLoop() override
+    {
+        // for(TGraph* g : v_g_yx) g->Write();
         TCanvas* c_g_yx = new TCanvas("c_g_yx","Map of electron readout positions");
-        double ymin = -10; double ymax = 10; double xmin = 5; double xmax = 16;
         c_g_yx->Divide(4,4);
         for (int i = 0; i < v_g_yx.size()-1; i++)
         {
@@ -315,22 +371,70 @@ int make_map()
             }
         }
         c_g_yx->Write();
+    }
+};
 
-        TCanvas* c_yx_t1 = new TCanvas("c_yx_t1","Map of drift times");
-        c_yx_t1->Divide(4,4);
-        for (int i = 0; i < v_yx_t1.size()-1; i++)
-        {
-            c_yx_t1->cd(i+1);
-            v_yx_t1[i]->GetXaxis()->SetRangeUser(ymin,ymax);
-            v_yx_t1[i]->GetYaxis()->SetRangeUser(xmin,xmax);
-            v_yx_t1[i]->Draw("colz");
-            double min_percent = 0.8+0.13*(v_yx_t1.size()-1-i)/(v_yx_t1.size()-1); //how high is minimum compared to maximum
-            v_yx_t1[i]->SetMinimum(min_percent*v_yx_t1[i]->GetMaximum());
-            v_yx_t1[i]->SetMaximum(min_percent*v_yx_t1[i]->GetMaximum()+500);
-            X17::DrawTrapezoid();
-        }
-        c_yx_t1->Write();
+class Graph_ZT : public MapTask
+{
+    TGraph* g_zt;
 
+public:
+    Graph_ZT(X17::Field<X17::MapPoint>* map) : MapTask(map) { }
+
+    void Z_Loop_Start(const double& z) override
+    {
+        g_zt = new TGraph();
+
+        g_zt->SetName("g_zt");
+        g_zt->SetTitle("Original height vs drift time");
+        g_zt->SetMarkerColor(2);
+        g_zt->SetMarkerStyle(6);
+        g_zt->GetXaxis()->SetTitle("z [cm]");
+        g_zt->GetYaxis()->SetTitle("t [ns]");
+    }
+
+    void XYZ_Loop(const double& x, const double& y, const double& z, const X17::MapPoint& current) override
+    {
+        g_zt->AddPoint(z,current.t);
+    }
+
+    void PostLoop() override
+    {
+        TCanvas* c_g_zt = new TCanvas("c_g_zt","Original height vs drift time");
+        g_zt->Draw("AP");
+        c_g_zt->Write();
+    }
+};
+
+class Graph_XZ : public MapTask
+{
+    TGraphErrors* g_xz;
+    std::vector<TArrow*> v_g_xz_arrows;
+
+public:
+    Graph_XZ(X17::Field<X17::MapPoint>* map) : MapTask(map) { }
+
+    void PreLoop() override
+    {
+        g_xz = new TGraphErrors();
+        g_xz->SetName("g_xz");
+        g_xz->SetTitle("Map of electron displacement (x = 0)");
+        g_xz->SetMarkerColor(2);
+        g_xz->SetMarkerStyle(6);
+        g_xz->GetXaxis()->SetTitle("x [cm]");
+        g_xz->GetYaxis()->SetTitle("z [cm]");
+    }
+
+    void ZX_Loop(const double& z, const double& x, const X17::MapPoint& current) override
+    {
+        g_xz->AddPoint(current.x,z);
+        g_xz->SetPointError(g_xz->GetN()-1,current.xdev,0);
+        TArrow* arrow = new TArrow(x,z,current.x,z);
+        v_g_xz_arrows.push_back(arrow);
+    }
+
+    void PostLoop() override
+    {
         TCanvas* c_g_xz = new TCanvas("c_g_xz","Map of ionization electron displacement");
         g_xz->Draw("AP");
         TLine* lleft  = new TLine(6.51,8,6.51,-8);
@@ -338,39 +442,63 @@ int make_map()
         lleft->Draw();lright->Draw();
         for(TArrow* arr : v_g_xz_arrows) {arr->SetArrowSize(0.004); arr->Draw();}
         c_g_xz->Write();
+    }
+};
 
-        TCanvas* c_g_xt = new TCanvas("c_g_xt","Map of ionization electron drift times");
-        g_xt->Draw("AP");
-        lleft  = new TLine(6.51,0,6.51,5000);
-        lright = new TLine(14.61,0,14.61,5000);
-        lleft->Draw();lright->Draw();
-        c_g_xt->Write();
+class Graph_XT : public MapTask
+{
+    TGraphErrors* g_xt;
 
-        TCanvas* c_g_zt = new TCanvas("c_g_zt","Original height vs drift time");
-        g_zt->Draw("AP");
-        c_g_zt->Write();
+public:
+    Graph_XT(X17::Field<X17::MapPoint>* map) : MapTask(map) { }
 
-        outfile->Close();
-
-        TFile* mapfile = new TFile("../../data/ion_map/map.root");
-        Field<SensorData>* map = (Field<SensorData>*)mapfile->Get("map");
-        TCanvas* c_pads = new TCanvas("c_pads", "Pads distortion for different times.");
-        c_pads->Divide(4,4);
-        for (int i = 0; i < 16; i++)
-        {
-            c_pads->cd(i+1);
-            TGraph* gr = new TGraph(); gr->AddPoint(-X17::yhigh,X17::xmin);gr->AddPoint(X17::yhigh,X17::xmax);gr->Draw("AP");
-            X17::DrawPadsDistortion((i+1)*5000/16,c_pads,map);
-            //X17::DrawTrapezoid();
-        }
-        
-        
+    void PreLoop() override
+    {
+        g_xt = new TGraphErrors();
+        g_xt->SetName("g_xt");
+        g_xt->SetTitle("Map of drift times (y = 0)");
+        g_xt->SetMarkerColor(2);
+        g_xt->SetMarkerStyle(6);
+        g_xt->GetXaxis()->SetTitle("x [cm]");
+        g_xt->GetYaxis()->SetTitle("t [ns]");
     }
 
-    return 0;
-}
+    void ZX_Loop(const double& z, const double& x, const X17::MapPoint& current) override
+    {        
+        g_xt->AddPoint(x,current.t);
+        g_xt->SetPointError(g_xt->GetN()-1,current.xdev,current.tdev);
+    }
 
-int main(int argc, char const *argv[])
+    void PostLoop() override
+    {
+        TCanvas* c_g_xt = new TCanvas("c_g_xt","Map of ionization electron drift times");
+        g_xt->Draw("AP");
+        TLine* lleft  = new TLine(6.51,0,6.51,5000);
+        TLine* lright = new TLine(14.61,0,14.61,5000);
+        lleft->Draw();lright->Draw();
+        c_g_xt->Write();
+    }
+};
+
+class Hist_XZ_T1 : public MapTask
 {
-    return make_map();
-}
+    TH2F* xz_t1;
+
+public:
+    Hist_XZ_T1(X17::Field<X17::MapPoint>* map) : MapTask(map) { }
+
+    void PreLoop() override
+    {
+        xz_t1 = new TH2F("h_xz_t1","XZ plane t1;x [cm];z [cm]",map->GetXCells(),map->GetXMin(),map->GetXMax(),map->GetZCells(),map->GetZMin(),map->GetZMax());
+    }
+
+    void ZX_Loop(const double& z, const double& x, const X17::MapPoint& current) override
+    {        
+        xz_t1->Fill(x,z,current.t);
+    }
+
+    void PostLoop() override
+    {
+        xz_t1->Write();
+    }
+};
