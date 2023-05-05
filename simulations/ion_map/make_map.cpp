@@ -4,6 +4,7 @@
 
 // C++ dependencies
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -34,7 +35,7 @@ TChain* LoadData(int max_id, string folder = "../../data/ion_map/sample_1.0/")
     return map_data;
 }
 
-//calculates standard deviation assuming gaussian distribution
+// calculates standard deviation assuming gaussian distribution
 double stdev(vector<double> values, double average)
 {
     double sqdev_sum = 0;
@@ -51,6 +52,29 @@ double stdev(vector<double> values, double average)
     // cout << "min: " << dmin << " average: " << average << " max: " << dmax << " N: " << values.size() << " stdev: " << sqrt(sqdev_sum/values.size()) << "\n";
 
     return sqrt(sqdev_sum/values.size());
+}
+
+// calculates correlation coefficient
+double correlation(vector<double> values1, vector<double> values2, double average1, double average2)
+{
+    if (values1.size() != values2.size()) throw std::invalid_argument("Correlation: Both samples must have the same size.");
+
+    double sum_product = 0;
+    double sum1 = 0;
+    double sum2 = 0;
+
+    for (int i = 0; i < values1.size(); i++)
+    {
+        sum_product += (values1[i]-average1)*(values2[i]-average2);
+        sum1 += pow((values1[i]-average1),2);
+        sum2 += pow((values2[i]-average2),2);
+    }
+
+    double coef = sum_product/sqrt(sum1*sum2);
+
+    cout << "Correlation: " << coef << " Average1: " << average1 << " Stdev1: " << sum1/values1.size() << " Average2: " << average2 << " Stdev2: " << sum2/values2.size() << "\n";
+
+    return coef;
 }
 
 int make_map()
@@ -116,7 +140,14 @@ int make_map()
             x1_avg /= same_prev; y1_avg /= same_prev; z1_avg /= same_prev; t1_avg /= same_prev;
             if(i != 0) 
             {
-                map.SetPoint(x0_prev,y0_prev,z0_prev,{x1_avg,y1_avg,z1_avg,t1_avg,stdev(x1_vec,x1_avg),stdev(y1_vec,y1_avg),stdev(z1_vec,z1_avg),stdev(t1_vec,t1_avg)});
+                map.SetPoint(x0_prev,y0_prev,z0_prev,
+                             {
+                                x1_avg,y1_avg,z1_avg,t1_avg,
+                                stdev(x1_vec,x1_avg),stdev(y1_vec,y1_avg),stdev(z1_vec,z1_avg),stdev(t1_vec,t1_avg),
+                                correlation(x1_vec,y1_vec,x1_avg,y1_avg),correlation(x1_vec,z1_vec,x1_avg,z1_avg),correlation(x1_vec,t1_vec,x1_avg,t1_avg),
+                                correlation(y1_vec,z1_vec,y1_avg,z1_avg),correlation(y1_vec,t1_vec,y1_avg,t1_avg),correlation(z1_vec,t1_vec,z1_avg,t1_avg)
+                             });
+                cout << "\n";
 
                 // TCanvas* c = new TCanvas();
                 // TGraph2D* point_spread = new TGraph2D();

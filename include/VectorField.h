@@ -381,6 +381,7 @@ struct SensorData
 {
     double x1,y1,z1,t1;
     double x1dev,y1dev,z1dev,t1dev;
+    double xycorr,xzcorr,xtcorr,yzcorr,ytcorr,ztcorr;
 
     void operator+=(const SensorData& s)
     {

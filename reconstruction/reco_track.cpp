@@ -18,15 +18,15 @@ int reco_track()
     loop->AddTask(t);
     loop->AddTask(new CircleAndRKFitTask(t));
 
-    // loop->RunSingleLoop();
+    loop->RunSingleLoop();
 
-    loop->ResetTasks();
-    loop->LoadRK("../data/rk_tracks/rk_tracks.root");
-    loop->AddTask(new CircleFitEnergyTask());
+    // loop->ResetTasks();
+    // loop->LoadRK("../data/rk_tracks/rk_tracks.root");
+    // loop->AddTask(new CircleFitEnergyTask());
     // loop->AddTask(new PlotSelectionTask());
 
-    gErrorIgnoreLevel = 6001;
-    loop->RunRKLoop();
+    // gErrorIgnoreLevel = 6001;
+    // loop->RunRKLoop();
 
     return 0;
 }
