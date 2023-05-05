@@ -97,13 +97,13 @@ namespace X17
 
         return Matrix<8,1>({
             0,
-            start.vx,
-            start.vy,
-            start.vz,
+            start.x,
+            start.y,
+            start.z,
             gamma*c,
-            gamma*velocity*n_orient.vx,
-            gamma*velocity*n_orient.vy,
-            gamma*velocity*n_orient.vz
+            gamma*velocity*n_orient.x,
+            gamma*velocity*n_orient.y,
+            gamma*velocity*n_orient.z
         });
     }
 
@@ -117,10 +117,10 @@ namespace X17
 
         Vector b = magfield.GetField(position);
 
-        return Matrix<4,4>({0,                -m2cm*efield.vx/c, -m2cm*efield.vy/c, -m2cm*efield.vz/c,
-                            m2cm*efield.vx/c,  0,                 b.vz,             -b.vy,
-                            m2cm*efield.vy/c, -b.vz,              0,                 b.vx,
-                            m2cm*efield.vz/c,  b.vy,             -b.vx,              0               });
+        return Matrix<4,4>({0,                -m2cm*efield.x/c, -m2cm*efield.y/c, -m2cm*efield.z/c,
+                            m2cm*efield.x/c,  0,                 b.z,             -b.y,
+                            m2cm*efield.y/c, -b.z,              0,                 b.x,
+                            m2cm*efield.z/c,  b.y,             -b.x,              0               });
     }
 
     /// @brief Calculates the electromagnetic motion of a charged particle using the Lorentz force equation.
@@ -189,7 +189,7 @@ namespace X17
         {
             using namespace constants;
             Vector point = {m2cm*r.at(1,0),m2cm*r.at(2,0),m2cm*r.at(3,0)};
-            if (IsInSector(point)) output->AddPoint(point.vx,point.vy,point.vz);
+            if (IsInSector(point)) output->AddPoint(point.x,point.y,point.z);
         }
         return output;
     }
@@ -230,7 +230,7 @@ namespace X17
         double SqDist(const int& index, const Vector& point)
         {
             RKPoint rk_point = GetPoint(index);
-            return rk_point.Vector().SqDist(point);
+            return rk_point.AsVector().SqDist(point);
         }
 
         /// @brief Computes the scaled derivative of the square of the distance between a point and the point on the computed trajectory with respect to the index.
@@ -264,9 +264,9 @@ namespace X17
             }
 
             // minimal distance from two lines
-            Vector orig    = GetPoint(max_index).Vector();
-            Vector orient1 = GetPoint(max_index + 1).Vector() - orig;
-            Vector orient2 = GetPoint(max_index - 1).Vector() - orig;
+            Vector orig    = GetPoint(max_index).AsVector();
+            Vector orient1 = GetPoint(max_index + 1).AsVector() - orig;
+            Vector orient2 = GetPoint(max_index - 1).AsVector() - orig;
 
             double dist1 = LineSqDist(orig,orient1,orient1.Magnitude(),point);
             double dist2 = LineSqDist(orig,orient2,orient2.Magnitude(),point);
@@ -289,7 +289,7 @@ namespace X17
             curr_rk->Run();
             
             sumsq = 0;
-            for (auto p : fit_data) sumsq += p.count*GetSqDist(p.Vector());
+            for (auto p : fit_data) sumsq += p.count*GetSqDist(p.AsVector());
         }
         
         /// @brief A static wrapper function used to get the correct function pointer type needed for ROOT. Simply calls lastfit->SumSqDist().

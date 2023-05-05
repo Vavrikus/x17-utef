@@ -3,6 +3,12 @@
 #include "TLine.h"
 
 #include "Vector.h"
+namespace X17
+{
+    template <typename T> class Field;
+    void GetMinMaxField(const Field<Vector>& magfield, double& out_min, double& out_max, const double& dist);
+    void GetMinMaxFieldAngle(const Field<Vector>& magfield, double& out_min, double& out_max, const double& dist);
+}
 #include "Field.h"
 
 namespace X17
@@ -77,7 +83,7 @@ namespace X17
     /// @return True if in sector, false otherwise.
     bool IsInSector(const Vector& vec, const double& dist = 0)
     {
-        return IsInSector(vec.vx,vec.vy,vec.vz,dist);
+        return IsInSector(vec.x,vec.y,vec.z,dist);
     }
     
     /// @brief Returns minimal and maximal (magnetic) field inside first sector TPC volume.
@@ -85,7 +91,7 @@ namespace X17
     /// @param out_min Output for minimal field [T].
     /// @param out_max Output for maximal field [T].
     /// @param dist Specifies the minimal distance from within the TPC walls except the bottom anode wall (makes volume smaller).
-    void GetMinMaxField(const Field<Vector>& magfield, double& out_min, double& out_max, const double& dist = 0)
+    void GetMinMaxField(const Field<Vector>& magfield, double& out_min, double& out_max, const double& dist)
     {
         double min_magnitude_sq = -1;
         double max_magnitude_sq = -1;
@@ -118,7 +124,7 @@ namespace X17
     /// @param out_min Output for minimal angle [rad].
     /// @param out_max Output for maximal angle [rad].
     /// @param dist Specifies the minimal distance from within the TPC walls except the bottom anode wall (makes volume smaller).
-    void GetMinMaxFieldAngle(const Field<Vector>& magfield, double& out_min, double& out_max, const double& dist = 0)
+    void GetMinMaxFieldAngle(const Field<Vector>& magfield, double& out_min, double& out_max, const double& dist)
     {
         double min_angle = -1;
         double max_angle = -1;

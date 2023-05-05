@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "Vector.h"
+#include "X17Utilities.h"
 
 namespace X17
 {
@@ -51,9 +52,9 @@ namespace X17
             }
 
             // Calculate the indices of the corresponding grid cell.
-            xi = round((x - xmin) / step);
-            yi = round((y - ymin) / step);
-            zi = round((z - zmin) / step);
+            xi = round((x - m_xmin) / m_step_size);
+            yi = round((y - m_ymin) / m_step_size);
+            zi = round((z - m_zmin) / m_step_size);
         }
 
     public:
@@ -66,8 +67,8 @@ namespace X17
         /// @param step The spacing between grid points.
         /// @param def_value The default value for all points in the field.
         Field(const Vector& min_corner, const Vector& max_corner, const double& step, const T& def_value)
-            : m_xmin(min_corner.vx), m_xmax(max_corner.vx), m_ymin(min_corner.vy), m_ymax(max_corner.vy),
-              m_zmin(min_corner.vz), m_zmax(max_corner.vz), m_step_size(step), m_def_value(def_value)
+            : m_xmin(min_corner.x), m_xmax(max_corner.x), m_ymin(min_corner.y), m_ymax(max_corner.y),
+              m_zmin(min_corner.z), m_zmax(max_corner.z), m_step_size(step), m_def_value(def_value)
         {
             // Determine the number of grid points along each axis.
             this->m_num_x_cells = round((max_corner.x - min_corner.x) / step) + 1;
@@ -245,7 +246,7 @@ namespace X17
         /// @return The interpolated value of the field at the specified position.
         T GetField(const Vector& vec) const
         {
-            return GetField(vec.vx,vec.vy,vec.vz);
+            return GetField(vec.x,vec.y,vec.z);
         }
     };
 
@@ -258,16 +259,16 @@ namespace X17
     /// @param max_corner The maximum corner of the field as a Vector object (meters).
     /// @param step The spacing between grid points.
     /// @param printInfo If true, prints information about maximal and minimal field magnitude and angle values.
-    Field<Vector>& LoadField(const char* filename, const Vector& min_corner, const Vector& max_corner, const double& step, bool printInfo = false)
+    Field<Vector>* LoadField(const char* filename, const Vector& min_corner, const Vector& max_corner, const double& step, bool printInfo = false)
     {
-        Field<Vector> field(min_corner,max_corner,step,{0,0,0});
+        Field<Vector>* field = new Field<Vector>(min_corner,max_corner,step,{0,0,0});
 
         std::ifstream inf {filename};
         std::cout << "\nLoading field from " << filename << "\n";
 
         int lines_read = 0;
         int lines_processed = 0;
-        int lines_expected = field.GetNCells();
+        int lines_expected = field->GetNCells();
 
         while (inf)
         {
@@ -283,7 +284,7 @@ namespace X17
                     x = stod(X); y = stod(Y); z = stod(Z);
                     vx = stod(VX); vy = stod(VY); vz = stod(VZ);
 
-                    *(field.GetPoint(x,y,z)) = Vector{vx,vy,vz};
+                    *(field->GetPoint(x,y,z)) = Vector{vx,vy,vz};
                     lines_processed++;
                 }
             }
@@ -300,18 +301,20 @@ namespace X17
         if (printInfo)
         {
             double minfield,maxfield,minangle,maxangle;
-            X17::GetMinMaxField(field,minfield,maxfield);
-            X17::GetMinMaxFieldAngle(field,minangle,maxangle);
+            GetMinMaxField(*field,minfield,maxfield,0);
+            GetMinMaxFieldAngle(*field,minangle,maxangle,0);
             std::cout << "At least 0.0 cm from TPC walls: minimal magnetic field: " << minfield << " maximal: " << maxfield;
             std::cout << " minimal angle to electric field: " << minangle << " maximal: " << maxangle << "\n";
-            X17::GetMinMaxField(field,minfield,maxfield,0.5);
-            X17::GetMinMaxFieldAngle(field,minangle,maxangle,0.5);
+            GetMinMaxField(*field,minfield,maxfield,0.5);
+            GetMinMaxFieldAngle(*field,minangle,maxangle,0.5);
             std::cout << "At least 0.5 cm from TPC walls: Minimal magnetic field: " << minfield << " maximal: " << maxfield;
             std::cout << " minimal angle to electric field: " << minangle << " maximal: " << maxangle << "\n";
-            X17::GetMinMaxField(field,minfield,maxfield,1);
-            X17::GetMinMaxFieldAngle(field,minangle,maxangle,1);
+            GetMinMaxField(*field,minfield,maxfield,1);
+            GetMinMaxFieldAngle(*field,minangle,maxangle,1);
             std::cout << "At least 1.0 cm from TPC walls: Minimal magnetic field: " << minfield << " maximal: " << maxfield;
             std::cout << " minimal angle to electric field: " << minangle << " maximal: " << maxangle << "\n";
         }
+
+        return field;
     }
 } // namespace X17

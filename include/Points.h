@@ -16,9 +16,9 @@ namespace X17
         double t;     // Initial time [ns] (should be close to 0).
 
         // References for easier access
-        double& x = point.vx; // The x-coordinate [cm].
-        double& y = point.vy; // The y-coordinate [cm].
-        double& z = point.vz; // The z-coordinate [cm].
+        double& x = point.x; // The x-coordinate [cm].
+        double& y = point.y; // The y-coordinate [cm].
+        double& z = point.z; // The z-coordinate [cm].
 
         /// @brief Default constructor that initializes the coordinates to 0 and time to -1.
         StartPoint() : point(), t(-1) { }
@@ -46,9 +46,9 @@ namespace X17
         double t;     // Final time [ns].
         
         // References for easier access
-        double& x = point.vx; // The x-coordinate [cm].
-        double& y = point.vy; // The y-coordinate [cm].
-        double& z = point.vz; // The z-coordinate [cm].
+        double& x = point.x; // The x-coordinate [cm].
+        double& y = point.y; // The y-coordinate [cm].
+        double& z = point.z; // The z-coordinate [cm].
 
         /// @brief Default constructor that initializes the coordinates to 0 and time to -1.
         EndPoint() : point(), t(-1) { }
@@ -189,7 +189,7 @@ namespace X17
         
         /// @brief Returns the coordinates of the point as Vector object.
         /// @return The vector with coordinates of the point.
-        Vector Vector() const { return point.point; }
+        Vector AsVector() const { return point.point; }
     };
 
     /// @brief A struct for storing the results of map simulation (multiple ionization electrons with same initial coordinates).
@@ -300,7 +300,7 @@ namespace X17
 
         /// @brief Returns the coordinates of the point as Vector object.
         /// @return The vector with coordinates of the point.
-        Vector Vector() const { return point.point; }
+        Vector AsVector() const { return point.point; }
     };
 
     std::vector<TMarker3DBox*> GetDataMarkers(std::vector<RecoPoint> data, double zbin_size = 0.3)

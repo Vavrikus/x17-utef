@@ -95,7 +95,7 @@ namespace X17
             double r    = 0.01 * pow(1 + der * der, 1.5) / der2;
             
             Vector B      = magfield.GetField(x / 100, 0, (8 - sp_fit->Eval(x)) / 100);
-            double betasq = 1 / (1 + pow((E0 / (c * r * B.vx)), 2));
+            double betasq = 1 / (1 + pow((E0 / (c * r * B.x)), 2));
             double Ekin   = E0 * (1 / sqrt(1 - betasq) - 1);
 
             if (x > 4)
@@ -103,7 +103,7 @@ namespace X17
             if (r < 1 && r > 0)
                 radius->AddPoint(x, r * 100);
 
-            magnetic->AddPoint(x, B.vy);
+            magnetic->AddPoint(x, B.y);
         }
     }
 
@@ -126,13 +126,13 @@ namespace X17
         for (double x = min; x <= max; x += step)
         {
             Vector B2 = magfield.GetField(x/100,0,(8-fit->Eval(x))/100);
-            magnetic->AddPoint(x,B2.vy);
+            magnetic->AddPoint(x,B2.y);
         }
         
-        double betasq = 1/(1+pow((E0/(clight*r*B.vy)),2));
+        double betasq = 1/(1+pow((E0/(clight*r*B.y)),2));
         double Ekin = E0*(1/sqrt(1-betasq)-1);
 
-        std::cout << "Kinetic energy: " << Ekin << " eV, By: " << B.vy << " T, beta: ";
+        std::cout << "Kinetic energy: " << Ekin << " eV, By: " << B.y << " T, beta: ";
         std::cout << sqrt(betasq) << "\n";
     }
 }

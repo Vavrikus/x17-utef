@@ -77,11 +77,11 @@ namespace X17
         /// @note This function assumes that the orientation, length, radius, alpha, and phi_max values have already been set.
         void UpdateCurve()
         {
-            cos_theta = orientation.vz;
+            cos_theta = orientation.z;
             sin_theta = sqrt(1-cos_theta*cos_theta);
 
-            cos_phi = orientation.vx/sin_theta;
-            sin_phi = orientation.vy/sin_theta;
+            cos_phi = orientation.x/sin_theta;
+            sin_phi = orientation.y/sin_theta;
 
             cos_alpha = cos(alpha);
             sin_alpha = sin(alpha);
@@ -116,11 +116,11 @@ namespace X17
             if (first_line) { orig = &origin;  orient = &orientation;  }
             else            { orig = &origin2; orient = &orientation2; }
 
-            double t_close = *orient*(point.Vector()-*orig)/orient->SqMagnitude();
+            double t_close = *orient*(point.AsVector()-*orig)/orient->SqMagnitude();
             if (first_line  && (t_close > length)) t_close = length;
             if (!first_line && (t_close < 0))      t_close = 0;
 
-            Vector line_vector = *orig+t_close*(*orient)-point.Vector();
+            Vector line_vector = *orig+t_close*(*orient)-point.AsVector();
 
             return line_vector.SqMagnitude();
         }
@@ -130,13 +130,13 @@ namespace X17
         /// @return The squared distance between the point and the circular trajectory.
         double CircleSqDist(const RecoPoint& point)
         {
-            Vector projection = (point.Vector()-center)-((point.Vector()-center)*normal)*normal;
+            Vector projection = (point.AsVector()-center)-((point.AsVector()-center)*normal)*normal;
             projection.Normalize();
 
             Vector circle_point   = radius * projection + center;
-            Vector circle_vector  = circle_point - point.Vector();
-            Vector arc_beg_vector = originc - point.Vector();
-            Vector arc_end_vector = origin2 - point.Vector();
+            Vector circle_vector  = circle_point - point.AsVector();
+            Vector arc_beg_vector = originc - point.AsVector();
+            Vector arc_end_vector = origin2 - point.AsVector();
 
             return find_min(circle_vector.SqMagnitude(),arc_beg_vector.SqMagnitude(),arc_end_vector.SqMagnitude());
         }
@@ -230,12 +230,12 @@ namespace X17
             double mid  = (low + high) / 2;
             Vector vmid = GetCirclePoint(mid);
 
-            while ((abs(xmiddle-vmid.vx) > tolerance) && (low*(1+1e-15) < high))
+            while ((abs(xmiddle-vmid.x) > tolerance) && (low*(1+1e-15) < high))
             {
                 mid = (low + high) / 2;
                 vmid  = GetCirclePoint(mid);
 
-                if (vmid.vx < xmiddle) low  = mid;
+                if (vmid.x < xmiddle) low  = mid;
                 else                   high = mid;
             }
             
@@ -357,7 +357,7 @@ namespace X17
             {
                 Vector cur_pos = GetLinePoint(param,true);
                 if(IsInSector(cur_pos,dist)) 
-                    fit_graph->AddPoint(cur_pos.vx,cur_pos.vy,cur_pos.vz);
+                    fit_graph->AddPoint(cur_pos.x,cur_pos.y,cur_pos.z);
                 param += step;
             }
 
@@ -367,7 +367,7 @@ namespace X17
             {
                 Vector cur_pos = GetCirclePoint(param/radius);
                 if(IsInSector(cur_pos,dist)) 
-                    fit_graph->AddPoint(cur_pos.vx,cur_pos.vy,cur_pos.vz);
+                    fit_graph->AddPoint(cur_pos.x,cur_pos.y,cur_pos.z);
                 param += step;
             }
 
@@ -377,7 +377,7 @@ namespace X17
             {
                 Vector cur_pos = GetLinePoint(param,false);
                 if(IsInSector(cur_pos,dist)) 
-                    fit_graph->AddPoint(cur_pos.vx,cur_pos.vy,cur_pos.vz);
+                    fit_graph->AddPoint(cur_pos.x,cur_pos.y,cur_pos.z);
                 param += step;
             }
 
@@ -521,7 +521,7 @@ namespace X17
 //     {
 //         // A*cos + B = C*sin
 //         double A = cos_alpha*cos_theta*cos_phi-sin_alpha*sin_phi;
-//         double B = (X17::xmax - originc.vx)/radius - A;
+//         double B = (X17::xmax - originc.x)/radius - A;
 //         double C = sin_theta*cos_phi;
 //
 //         // (A^2+C^2) cos^2 + AB cos + (B^2-C^2) = 0
@@ -574,12 +574,12 @@ namespace X17
 //         double mid  = (low+high)/2;
 //         Vector vmid = GetCirclePoint(mid);
 //
-//         while (abs(xmiddle-vmid.vx) > tolerance)
+//         while (abs(xmiddle-vmid.x) > tolerance)
 //         {
 //             mid = (low+high)/2;
 //             vmid  = GetCirclePoint(mid);
 //
-//             if (vmid.vx < xmiddle) low  = mid;
+//             if (vmid.x < xmiddle) low  = mid;
 //             else                high = mid;
 //         }
 //      
@@ -612,16 +612,16 @@ namespace X17
 //
 //     void Prefit()
 //     {
-//         double param = (X17::xmin - origin.vx)/orientation.vx;
+//         double param = (X17::xmin - origin.x)/orientation.x;
 //         Vector v0 = origin+param*orientation;
 //
 //         // preset free parameters here
 //         alpha  = 0;
 //         radius = 20;
-//         y0     = v0.vy;
-//         z0     = v0.vz;
-//         theta  = acos(orientation.vz);
-//         phi    = asin(orientation.vy/sin(theta));
+//         y0     = v0.y;
+//         z0     = v0.z;
+//         theta  = acos(orientation.z);
+//         phi    = asin(orientation.y/sin(theta));
 //
 //         this->UpdateCurve();
 //     }
@@ -689,7 +689,7 @@ namespace X17
 //         {
 //             Vector cur_pos = GetCirclePoint(param/radius);
 //             if(X17::IsInSector(cur_pos,dist)) 
-//                 fit_graph->AddPoint(cur_pos.vx,cur_pos.vy,cur_pos.vz);
+//                 fit_graph->AddPoint(cur_pos.x,cur_pos.y,cur_pos.z);
 //             param += step;
 //         }
 //

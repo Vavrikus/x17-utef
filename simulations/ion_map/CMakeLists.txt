@@ -14,6 +14,7 @@ set(CMAKE_CXX_FLAGS "${ROOT_CXX_FLAGS}")
 
 include(${ROOT_USE_FILE})
 include_directories(${ROOT_INCLUDE_DIRS})
+include_directories(../../include)
 link_directories(${ROOT_LIBRARY_DIR})
 
 find_package(GSL REQUIRED)

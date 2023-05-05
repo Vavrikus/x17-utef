@@ -9,44 +9,44 @@ namespace X17
     /// @brief A 3D vector class with x, y, and z components.
     struct Vector
     {
-        double vx; // The x component of the vector.
-        double vy; // The y component of the vector.
-        double vz; // The z component of the vector.
+        double x; // The x component of the vector.
+        double y; // The y component of the vector.
+        double z; // The z component of the vector.
 
         /// @brief Default constructor that initializes all components to 0.
-        Vector() : vx(0), vy(0), vz(0) { }
+        Vector() : x(0), y(0), z(0) { }
 
         /// @brief Constructor that takes three doubles to initialize the x, y, and z components.
         /// @param x The x component of the vector.
         /// @param y The y component of the vector.
         /// @param z The z component of the vector.
-        Vector(double x, double y, double z) : vx(x), vy(y), vz(z) { }
+        Vector(double x, double y, double z) : x(x), y(y), z(z) { }
 
         /// @brief Add another vector to this vector.
         /// @param[in] v The vector to add.
         void operator+=(const Vector& v)
         {
-            this->vx += v.vx;
-            this->vy += v.vy;
-            this->vz += v.vz;
+            this->x += v.x;
+            this->y += v.y;
+            this->z += v.z;
         }
         /// @brief Divide each component of the vector by a scalar.
         /// @param d The scalar to divide by.
         void operator/=(const double& d)
         {
-            vx /= d;
-            vy /= d;
-            vz /= d;
+            x /= d;
+            y /= d;
+            z /= d;
         }
 
         /// @brief Equality operator for comparing two Vector objects. All components must be equal.
         /// @param v The vector to compare with.
         /// @return True if the vectors are equal, false otherwise.
-        bool operator==(const Vector& v) const { return (vx == v.vx) && (vy == v.vy) && (vz == v.vz); }
+        bool operator==(const Vector& v) const { return (x == v.x) && (y == v.y) && (z == v.z); }
 
         /// @brief Compute the square of the magnitude of this vector.
         /// @return The square of the magnitude.
-        double SqMagnitude() const { return vx * vx + vy * vy + vz * vz; }
+        double SqMagnitude() const { return x * x + y * y + z * z; }
 
         /// @brief Compute the magnitude of this vector.
         /// @return The magnitude.
@@ -60,13 +60,13 @@ namespace X17
         /// @return The angle between the two vectors in radians.
         double Angle(const Vector& other) const
         {
-            return acos((vx * other.vx + vy * other.vy + vz * other.vz) / (this->Magnitude() * other.Magnitude()));
+            return acos((x * other.x + y * other.y + z * other.z) / (this->Magnitude() * other.Magnitude()));
         }
 
         /// @brief Compute the square of the distance between this vector and another vector.
         /// @param[in] other The other vector.
         /// @return The square of the distance.
-        double SqDist(const Vector& other) const { return pow(vx - other.vx, 2) + pow(vy - other.vy, 2) + pow(vz - other.vz, 2); }
+        double SqDist(const Vector& other) const { return pow(x - other.x, 2) + pow(y - other.y, 2) + pow(z - other.z, 2); }
     };
 
     /// @brief Adds two vectors component-wise and returns the result.
@@ -75,7 +75,7 @@ namespace X17
     /// @return The sum of the two vectors.
     Vector operator+(const Vector& v1, const Vector& v2)
     {
-        return Vector{v1.vx + v2.vx, v1.vy + v2.vy, v1.vz + v2.vz};
+        return Vector{v1.x + v2.x, v1.y + v2.y, v1.z + v2.z};
     }
 
     /// @brief Subtracts two vectors component-wise.
@@ -84,7 +84,7 @@ namespace X17
     /// @return Vector The difference between the two vectors.
     Vector operator-(const Vector& v1, const Vector& v2)
     {
-        return Vector{v1.vx - v2.vx, v1.vy - v2.vy, v1.vz - v2.vz};
+        return Vector{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};
     }
 
     /// @brief Scalar multiplication of a vector.
@@ -93,7 +93,7 @@ namespace X17
     /// @return The scaled vector.
     Vector operator*(const double& d, const Vector& v)
     {
-        return Vector{d * v.vx, d * v.vy, d * v.vz};
+        return Vector{d * v.x, d * v.y, d * v.z};
     }
 
     /// @brief Scalar multiplication of a vector.
@@ -102,7 +102,7 @@ namespace X17
     /// @return The scaled vector.
     Vector operator*(const Vector& v, const double& d)
     {
-        return Vector{d * v.vx, d * v.vy, d * v.vz};
+        return Vector{d * v.x, d * v.y, d * v.z};
     }
 
     /// @brief Divide a vector by a scalar.
@@ -116,7 +116,7 @@ namespace X17
         if (d == 0) throw std::invalid_argument("division by zero");
     #endif
 
-        return Vector{v.vx/d, v.vy/d, v.vz/d};
+        return Vector{v.x/d, v.y/d, v.z/d};
     }
     
     /// @brief Compute the dot product of two vectors.
@@ -125,7 +125,7 @@ namespace X17
     /// @return The dot product.
     double operator*(const Vector& v1, const Vector& v2)
     {
-        return v1.vx * v2.vx + v1.vy * v2.vy + v1.vz * v2.vz;
+        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
     }
 
     /// @brief Normalize a vector. Divides the vector by its magnitude to produce a unit vector in the same direction.
