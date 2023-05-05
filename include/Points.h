@@ -160,6 +160,22 @@ namespace X17
         /// @brief Returns the initial position of the ionization electron.
         /// @return The initial position of the electron.
         Vector GetInitPos() { return this->start.point; }
+
+        /// @brief Creates the branches of the given tree used for output.
+        /// @param tree TTree used for output.
+        void MakeTTreeBranches(TTree* tree)
+        {
+            tree->Branch("x0",&x0);
+            tree->Branch("y0",&y0);
+            tree->Branch("z0",&z0);
+            tree->Branch("t0",&t0);
+            tree->Branch("e0",&e0);
+            tree->Branch("x1",&x1);
+            tree->Branch("y1",&y1);
+            tree->Branch("z1",&z1);
+            tree->Branch("t1",&t1);
+            tree->Branch("e1",&e1);
+        }
     };
     
     /// @brief A struct for storing a Runge-Kutta generated track point.

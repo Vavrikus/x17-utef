@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
     // Setting up the output TTree, contains initial and final time, position and energy of electrons.
     X17::MicroPoint point;
-    electrons.Branch("point",&point);
+    point.MakeTTreeBranches(&electrons);
 
     // Set the gas mixture.
     MediumMagboltz gas;
@@ -55,8 +55,8 @@ int main(int argc, char *argv[])
     // Add magnetic and electric field.
     ComponentGrid grid;
     const double m2cm = 100.;
-    grid.LoadMagneticField("../../data/elmag/VecB2.txt", "xyz", m2cm); 
-    grid.LoadElectricField("../../data/elmag/VecE2.txt", "xyz", false, false, m2cm);
+    grid.LoadMagneticField("../../../data/elmag/VecB2.txt", "xyz", m2cm); 
+    grid.LoadElectricField("../../../data/elmag/VecE2.txt", "xyz", false, false, m2cm);
     grid.SetMedium(&gas);
 
     // Assemble a sensor.

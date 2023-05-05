@@ -8,13 +8,14 @@ endif()
 # ########################################################################################
 
 # ---Root------------------------------------------------------------------------
+message(STATUS "Looking for ROOT")
 find_package(ROOT REQUIRED)
+message(STATUS "ROOT ${ROOT_VERSION} found at ${ROOT_BINDIR}")
 
 set(CMAKE_CXX_FLAGS "${ROOT_CXX_FLAGS}")
 
 include(${ROOT_USE_FILE})
 include_directories(${ROOT_INCLUDE_DIRS})
-include_directories(../../include)
 link_directories(${ROOT_LIBRARY_DIR})
 
 find_package(GSL REQUIRED)
@@ -23,3 +24,4 @@ find_package(GSL REQUIRED)
 add_executable(ion_electrons ion_electrons.cpp)
 
 target_link_libraries(ion_electrons Garfield::Garfield ${ROOT_LIBRARIES})
+target_include_directories(ion_electrons PRIVATE ../../include)

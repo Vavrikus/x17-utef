@@ -34,7 +34,7 @@ int rk_tracks()
     constexpr double e_max  =  12e+6;         // The maximal simulated energy [eV].
 
     // Loading the magnetic field.
-    X17::Field<X17::Vector>& magfield = X17::LoadField("../../data/elmag/VecB2.txt",{-0.2,-0.3,-0.3},{0.2,0.3,0.3},0.005);
+    X17::Field<X17::Vector>* magfield = X17::LoadField("../../data/elmag/VecB2.txt",{-0.2,-0.3,-0.3},{0.2,0.3,0.3},0.005);
 
     // Some necessary variables for simulating and saving track parameters.
     TTree* simulated_tracks = new TTree("rk_tracks","Runge-Kutta simulated tracks");
@@ -70,7 +70,7 @@ int rk_tracks()
         bool electron = rand->Rndm() > 0.5;                  // Choosing either electron or positron.
 
         // The actual track simulation.
-        X17::RK4<8>* track = GetTrackRK(magfield,electron,step,kin_en,origin,orientation);
+        X17::RK4<8>* track = GetTrackRK(*magfield,electron,step,kin_en,origin,orientation);
         track->Run();
 
         std::vector<X17::Matrix<8,1>> results = track->GetResults();
