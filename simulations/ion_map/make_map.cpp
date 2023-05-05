@@ -33,7 +33,7 @@ int make_map()
 
     // Set branches for TChain containing data.
     X17::MicroPoint point; // An object that will hold the information about current ionization electron loaded.
-    SetTChainBranches(map_data_in, point);
+    point.SetTChainBranches(map_data_in);
 
     // Prepare the field that will hold the final values.
     X17::Field<X17::MapPoint> map({0,-30,-8},{15,30,8},1,X17::MapPoint());
@@ -191,30 +191,6 @@ TChain* LoadData(int max_id, std::string folder = "../../data/ion_map/sample_1.0
     }
 
     return map_data;
-}
-
-/// @brief Sets the branches of a TChain to a MicroPoint object.
-/// @param chain Pointer to TChain object.
-/// @param point Reference to X17::MicroPoint object.
-/// @param old_data Boolean indicating whether the data is from old simulations with different coordinate system (zxy). Defaults to true.
-void SetTChainBranches(TChain* chain, X17::MicroPoint& point, bool old_data = true)
-{
-    if (old_data)
-    {
-        std::cout << "MAKE SURE TO CHANGE THE COORDINATE ASSIGNMENT IF USING NEW SIMULATIONS!!!!!!!\n";
-        chain->SetBranchAddress("z0",&point.x0);
-        chain->SetBranchAddress("x0",&point.y0);
-        chain->SetBranchAddress("y0",&point.z0);
-        chain->SetBranchAddress("t0",&point.t0);
-        chain->SetBranchAddress("e0",&point.e0);
-        chain->SetBranchAddress("z1",&point.x1);
-        chain->SetBranchAddress("x1",&point.y1);
-        chain->SetBranchAddress("y1",&point.z1);
-        chain->SetBranchAddress("t1",&point.t1);
-        chain->SetBranchAddress("e1",&point.e1);
-    }
-
-    else chain->SetBranchAddress("point",&point);
 }
 
 class Hist_YX_DX : public MapTask

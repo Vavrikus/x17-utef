@@ -1,7 +1,9 @@
 #pragma once
 
+// C++ dependencies
 #include <vector>
 
+// X17 dependencies
 #include "Points.h"
 
 namespace X17

@@ -1,5 +1,6 @@
 #pragma once
 
+// C++ dependencies
 #include <algorithm>
 #include <cmath>
 #include <stdexcept>
@@ -24,20 +25,11 @@ namespace X17
 
         /// @brief Add another vector to this vector.
         /// @param[in] v The vector to add.
-        void operator+=(const Vector& v)
-        {
-            this->x += v.x;
-            this->y += v.y;
-            this->z += v.z;
-        }
+        void operator+=(const Vector& v);
+
         /// @brief Divide each component of the vector by a scalar.
         /// @param d The scalar to divide by.
-        void operator/=(const double& d)
-        {
-            x /= d;
-            y /= d;
-            z /= d;
-        }
+        void operator/=(const double& d);
 
         /// @brief Equality operator for comparing two Vector objects. All components must be equal.
         /// @param v The vector to compare with.
@@ -109,7 +101,7 @@ namespace X17
     /// @param v The vector to be divided.
     /// @param d The scalar to divide by (cannot be zero).
     /// @return The resulting vector.
-    /// @throw std::invalid_argument if d is zero (only if DEBUG defined)
+    /// @throw std::invalid_argument if d is zero (only if DEBUG defined).
     Vector operator/(const Vector& v, const double& d)
     {
     #ifdef DEBUG
@@ -137,18 +129,5 @@ namespace X17
     /// @param max_param The maximum allowed parameter of the line.
     /// @param point The point to compute the distance from.
     /// @return The squared distance between the line and the point.
-    double LineSqDist(const Vector& origin, const Vector& orientation, double max_param, const Vector& point)
-    {
-        // Normalize the orientation vector to ensure correct computations.
-        Vector norm_orientation = orientation;
-        norm_orientation.Normalize();
-        
-        // Compute the parameter t_close and clamp it to [0, max_param].
-        double t_close = norm_orientation * (point - origin);
-        t_close = std::clamp(t_close, 0.0, max_param);
-
-        // Compute the vector from the line to the point and return its squared magnitude.
-        Vector line_vector = origin + t_close * norm_orientation - point;
-        return line_vector.SqMagnitude();
-    }
+    double LineSqDist(const Vector& origin, const Vector& orientation, double max_param, const Vector& point);
 } // namespace X17

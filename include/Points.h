@@ -1,11 +1,15 @@
 #pragma once
 
+// C++ dependencies
 #include <vector>
 
+// ROOT dependencies
+#include "TChain.h"
+#include "TMarker3DBox.h"
+
+// X17 dependencies
 #include "Vector.h"
 #include "X17Utilities.h"
-
-#include "TMarker3DBox.h"
 
 namespace X17
 {
@@ -163,19 +167,12 @@ namespace X17
 
         /// @brief Creates the branches of the given tree used for output.
         /// @param tree TTree used for output.
-        void MakeTTreeBranches(TTree* tree)
-        {
-            tree->Branch("x0",&x0);
-            tree->Branch("y0",&y0);
-            tree->Branch("z0",&z0);
-            tree->Branch("t0",&t0);
-            tree->Branch("e0",&e0);
-            tree->Branch("x1",&x1);
-            tree->Branch("y1",&y1);
-            tree->Branch("z1",&z1);
-            tree->Branch("t1",&t1);
-            tree->Branch("e1",&e1);
-        }
+        void MakeTTreeBranches(TTree* tree);
+
+        /// @brief Sets the branches of a TChain to this MicroPoint object.
+        /// @param chain Pointer to TChain object.
+        /// @param old_data Boolean indicating whether the data is from old simulations with different coordinate system (zxy). Defaults to true.
+        void SetTChainBranches(TChain* chain, bool old_data = true);
     };
     
     /// @brief A struct for storing a Runge-Kutta generated track point.
@@ -244,28 +241,7 @@ namespace X17
         /// @param i Index of the component to access. Must be in the range [0, 3].
         /// @return The value of the component.
         /// @throws std::out_of_range if i is out of range.
-        double operator[](int i) const
-        {
-            switch (i)
-            {
-            case 0:
-                return this->point.x;
-                break;
-            case 1:
-                return this->point.y;
-                break;
-            case 2:
-                return this->point.z;
-                break;
-            case 3:
-                return this->point.t;
-                break;
-            
-            default:
-                throw std::out_of_range("MapPoint[] index out of range.\n");
-                break;
-            }
-        }
+        double operator[](int i) const;
     };
 
     /// @brief Adds two map points component-wise and returns the result.
@@ -319,30 +295,7 @@ namespace X17
         Vector AsVector() const { return point.point; }
     };
 
-    std::vector<TMarker3DBox*> GetDataMarkers(std::vector<RecoPoint> data, double zbin_size = 0.3)
-    {
-        std::vector<TMarker3DBox*> markers;
-        constexpr double max_size = 0.75;
-
-        // find maximal count
-        int max_count = 0;
-        for (RecoPoint p : data) if (p.count > max_count) max_count = p.count;
-
-        // create markers
-        for (RecoPoint p : data)
-        {
-            using namespace constants;
-
-            double rel_size = max_size * p.count / max_count;
-            double xlen = rel_size * pad_width  / 2.0;
-            double ylen = rel_size * pad_height / 2.0;
-            double zlen = rel_size * zbin_size  / 2.0;
-
-            markers.push_back(new TMarker3DBox(p.x,p.y,p.z,xlen,ylen,zlen,0,0));
-        }
-        
-        return markers;
-    }
+    std::vector<TMarker3DBox*> GetDataMarkers(std::vector<RecoPoint> data, double zbin_size = 0.3);
 
     /// @brief A struct for storing the simulated (later maybe also real) data from the TPC readout.
     struct DataPoint

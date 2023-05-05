@@ -1,8 +1,10 @@
 #pragma once
 
+// C++ dependencies
 #include <cmath>
 #include <vector>
 
+// ROOT dependencies
 #include "TRandom3.h"
 
 /// @brief Find the minimum value among the given parameters.
