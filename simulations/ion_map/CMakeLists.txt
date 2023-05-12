@@ -9,7 +9,7 @@ endif()
 
 add_compile_options(-O3) # enable maximum optimization
 
-# ---Root------------------------------------------------------------------------
+# ---Root---------------------------------------------------------------------------------
 message(STATUS "Looking for ROOT")
 find_package(ROOT REQUIRED)
 message(STATUS "ROOT ${ROOT_VERSION} found at ${ROOT_BINDIR}")
@@ -22,12 +22,12 @@ link_directories(${ROOT_LIBRARY_DIR})
 
 find_package(GSL REQUIRED)
 
-# ---Add subdirectory containing source code----------------------------------------
+# ---Add subdirectory containing source code----------------------------------------------
 include_directories(../../include)
 file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../../source/*.cpp")
 add_library(X17_source_lib STATIC ${SOURCES})
 
-# ---Build executable------------------------------------------------------------
+# ---Build executable---------------------------------------------------------------------
 add_executable(ion_electrons ion_electrons.cpp)
 
 target_link_libraries(ion_electrons Garfield::Garfield ${ROOT_LIBRARIES} X17_source_lib)
