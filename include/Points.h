@@ -110,7 +110,7 @@ namespace X17
     /// @param p1 The first endpoint.
     /// @param p2 The second endpoint.
     /// @return The sum of the two endpoints.
-    EndPoint operator+(const EndPoint& p1, const EndPoint& p2)
+    inline EndPoint operator+(const EndPoint& p1, const EndPoint& p2)
     {
         return EndPoint{p1.point + p2.point, p1.t + p2.t};
     }
@@ -119,7 +119,7 @@ namespace X17
     /// @param p1 The first endpoint.
     /// @param p2 The second endpoint.
     /// @return EndPoint The difference between the two endpoints.
-    EndPoint operator-(const EndPoint& p1, const EndPoint& p2)
+    inline EndPoint operator-(const EndPoint& p1, const EndPoint& p2)
     {
         return EndPoint{p1.point - p2.point, p1.t - p2.t};
     }
@@ -128,7 +128,7 @@ namespace X17
     /// @param d The scalar to multiply with.
     /// @param p The endpoint to multiply.
     /// @return The scaled endpoint.
-    EndPoint operator*(const double& d, const EndPoint& p)
+    inline EndPoint operator*(const double& d, const EndPoint& p)
     {
         return EndPoint{d*p.point, d*p.t};
     }
@@ -248,7 +248,7 @@ namespace X17
     /// @param p1 The first map point.
     /// @param p2 The second map point.
     /// @return The sum of the two map points.
-    MapPoint operator+(const MapPoint& p1, const MapPoint& p2)
+    inline MapPoint operator+(const MapPoint& p1, const MapPoint& p2)
     {
         return MapPoint{p1.point + p2.point, p1.dev + p2.dev};
     }
@@ -257,7 +257,7 @@ namespace X17
     /// @param p1 The first map point.
     /// @param p2 The second map point.
     /// @return MapPoint The difference between the two map points.
-    MapPoint operator-(const MapPoint& p1, const MapPoint& p2)
+    inline MapPoint operator-(const MapPoint& p1, const MapPoint& p2)
     {
         return MapPoint{p1.point - p2.point, p1.dev - p2.dev};
     }
@@ -266,7 +266,7 @@ namespace X17
     /// @param d The scalar to multiply with.
     /// @param p The map point to multiply.
     /// @return The scaled map point.
-    MapPoint operator*(const double& d, const MapPoint& p)
+    inline MapPoint operator*(const double& d, const MapPoint& p)
     {
         return MapPoint{d*p.point, d*p.dev};
     }
@@ -281,6 +281,16 @@ namespace X17
         double& x = point.x; // The x-coordinate [cm].
         double& y = point.y; // The y-coordinate [cm].
         double& z = point.z; // The z-coordinate [cm].
+
+        /// @brief Default constructor. Coordinates x,y,z set to zero, time to -1.
+        RecoPoint() : point() { }
+
+        /// @brief Constructor of RecoPoint. Sets time to -1.
+        /// @param x The x-coordinate [cm].
+        /// @param y The y-coordinate [cm].
+        /// @param z The z-coordinate [cm].
+        /// @param count The number of electrons or charge.
+        RecoPoint(double x, double y, double z, int count) : point(x,y,z,-1), count(count) { }
 
         /// @brief Assignment operator.
         /// @param other The object to be assigned to this object.

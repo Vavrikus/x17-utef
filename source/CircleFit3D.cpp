@@ -1,5 +1,4 @@
-#pragma once
-
+// X17 dependencies
 #include "CircleFit3D.h"
 
 namespace X17
@@ -114,7 +113,7 @@ namespace X17
         return lastfit->EvalSumSq(npar,gin,sumsq,par,iflag);
     }
 
-    Vector CircleFit3D::GetAvgField(const Field<Vector>& magfield, double step = 0.1)
+    Vector CircleFit3D::GetAvgField(const Field<Vector>& magfield, double step)
     {
         int i = 0;
         double param = 0;
@@ -134,7 +133,7 @@ namespace X17
         return bfield/i;
     }
     
-    Vector CircleFit3D::GetMiddleField(const Field<Vector>& magfield, double tolerance = 0.0001)
+    Vector CircleFit3D::GetMiddleField(const Field<Vector>& magfield, double tolerance)
     {
         using namespace constants;
 
@@ -166,7 +165,7 @@ namespace X17
         lastfit = this;
     }
 
-    void CircleFit3D::SetFitter(int parameters = 4, bool print = true)
+    void CircleFit3D::SetFitter(int parameters, bool print)
     {        
         gFitter = TVirtualFitter::Fitter(nullptr,parameters); // the second number is number of parameters
         gFitter->SetFCN(this->Eval);
@@ -179,7 +178,7 @@ namespace X17
         }
     }
 
-    void CircleFit3D::FitCircle3D(double max_iter = 500, double toleration = 0.001)
+    void CircleFit3D::FitCircle3D(double max_iter, double toleration)
     {
         gFitter->SetParameter(0,"length",length,0.01,-10,5);
         gFitter->SetParameter(1,"alpha",alpha,0.001,-M_PI/2,(3/2)*M_PI);
@@ -210,7 +209,7 @@ namespace X17
         std::cout << "Phi_max: " << phi_max << " +- " << phi_err << "\n\n";
     }
 
-    TGraph2D* CircleFit3D::GetGraph(double step = 0.1, double dist = 0)
+    TGraph2D* CircleFit3D::GetGraph(double step, double dist)
     {
         TGraph2D* fit_graph = new TGraph2D();
         
@@ -247,7 +246,7 @@ namespace X17
         return fit_graph;
     }
 
-    double CircleFit3D::GetEnergy(const Field<Vector>& magfield, bool middle = true)
+    double CircleFit3D::GetEnergy(const Field<Vector>& magfield, bool middle)
     {
         using namespace constants;
 
@@ -263,7 +262,7 @@ namespace X17
         return Ekin;
     }
 
-    TGraph* CircleFit3D::GetEnergyGraph(const Field<Vector>& magfield, double step = 0.1)
+    TGraph* CircleFit3D::GetEnergyGraph(const Field<Vector>& magfield, double step)
     {
         TGraph* graph = new TGraph();
         double param = 0;

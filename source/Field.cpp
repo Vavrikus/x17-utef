@@ -1,5 +1,4 @@
-#pragma once
-
+// X17 dependencies
 #include "Field.h"
 #include "X17Utilities.h"
 
@@ -83,7 +82,7 @@ namespace X17
         return (1 - dz) * c0 + dz * c1;
     }
 
-    Field<Vector>* LoadField(const char* filename, const Vector& min_corner, const Vector& max_corner, const double& step, bool printInfo = false)
+    Field<Vector>* LoadField(const char* filename, const Vector& min_corner, const Vector& max_corner, const double& step, bool printInfo)
     {
         Field<Vector>* field = new Field<Vector>(min_corner,max_corner,step,{0,0,0});
 

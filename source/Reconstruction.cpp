@@ -1,5 +1,3 @@
-#pragma once
-
 // X17 dependencies
 #include "Reconstruction.h"
 
@@ -188,7 +186,7 @@ namespace X17
         double yout = coef[1][0] + coef[1][1]*x1 + coef[1][2]*y1 + coef[1][3]*t1 + coef[1][4]*x1*y1 + coef[1][5]*x1*t1 + coef[1][6]*y1*t1 + coef[1][7]*x1*y1*t1;
         double zout = coef[2][0] + coef[2][1]*x1 + coef[2][2]*y1 + coef[2][3]*t1 + coef[2][4]*x1*y1 + coef[2][5]*x1*t1 + coef[2][6]*y1*t1 + coef[2][7]*x1*y1*t1;
 
-        return {{xout,yout,zout,0},1};
+        return RecoPoint(xout,yout,zout,1);
     }
 
     double Offset(const MapPoint& p, const double& x1, const double& y1, const double& t1)
@@ -256,6 +254,6 @@ namespace X17
         }
         while ((offset > max_err) && (iterations < 1000));
 
-        return {{x,y,z,0},1};
+        return RecoPoint(x,y,z,1);
     }
 } // namespace X17

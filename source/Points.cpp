@@ -1,5 +1,3 @@
-#pragma once
-
 // X17 dependencies
 #include "Points.h"
 
@@ -19,7 +17,7 @@ namespace X17
         tree->Branch("e1",&e1);
     }
 
-    void MicroPoint::SetTChainBranches(TChain* chain, bool old_data = true)
+    void MicroPoint::SetTChainBranches(TChain* chain, bool old_data)
     {
         if (old_data)
         {
@@ -74,7 +72,7 @@ namespace X17
         }
     }
 
-    std::vector<TMarker3DBox*> GetDataMarkers(std::vector<RecoPoint> data, double zbin_size = 0.3)
+    std::vector<TMarker3DBox*> GetDataMarkers(std::vector<RecoPoint> data, double zbin_size)
     {
         std::vector<TMarker3DBox*> markers;
         constexpr double max_size = 0.75;

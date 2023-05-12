@@ -65,7 +65,7 @@ namespace X17
     /// @param v1 The first vector.
     /// @param v2 The second vector.
     /// @return The sum of the two vectors.
-    Vector operator+(const Vector& v1, const Vector& v2)
+    inline Vector operator+(const Vector& v1, const Vector& v2)
     {
         return Vector{v1.x + v2.x, v1.y + v2.y, v1.z + v2.z};
     }
@@ -74,7 +74,7 @@ namespace X17
     /// @param v1 The first vector.
     /// @param v2 The second vector.
     /// @return Vector The difference between the two vectors.
-    Vector operator-(const Vector& v1, const Vector& v2)
+    inline Vector operator-(const Vector& v1, const Vector& v2)
     {
         return Vector{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};
     }
@@ -83,7 +83,7 @@ namespace X17
     /// @param d The scalar to multiply with.
     /// @param v The vector to multiply.
     /// @return The scaled vector.
-    Vector operator*(const double& d, const Vector& v)
+    inline Vector operator*(const double& d, const Vector& v)
     {
         return Vector{d * v.x, d * v.y, d * v.z};
     }
@@ -92,7 +92,7 @@ namespace X17
     /// @param v The vector to multiply.
     /// @param d The scalar to multiply with.
     /// @return The scaled vector.
-    Vector operator*(const Vector& v, const double& d)
+    inline Vector operator*(const Vector& v, const double& d)
     {
         return Vector{d * v.x, d * v.y, d * v.z};
     }
@@ -102,7 +102,7 @@ namespace X17
     /// @param d The scalar to divide by (cannot be zero).
     /// @return The resulting vector.
     /// @throw std::invalid_argument if d is zero (only if DEBUG defined).
-    Vector operator/(const Vector& v, const double& d)
+    inline Vector operator/(const Vector& v, const double& d)
     {
     #ifdef DEBUG
         if (d == 0) throw std::invalid_argument("division by zero");
@@ -115,13 +115,13 @@ namespace X17
     /// @param v1 The first vector.
     /// @param v2 The second vector.
     /// @return The dot product.
-    double operator*(const Vector& v1, const Vector& v2)
+    inline double operator*(const Vector& v1, const Vector& v2)
     {
         return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
     }
 
     /// @brief Normalize a vector. Divides the vector by its magnitude to produce a unit vector in the same direction.
-    void Vector::Normalize() {*this = (*this) / (this->Magnitude());}
+    inline void Vector::Normalize() {*this = (*this) / (this->Magnitude());}
 
     /// @brief Computes the squared distance between a line and a point in 3D space.
     /// @param origin The origin of the line.

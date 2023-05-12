@@ -1,7 +1,7 @@
 #pragma once
 
 // ROOT dependencies
-#include <TSpline.h>
+#include "TSpline.h"
 
 namespace X17
 {

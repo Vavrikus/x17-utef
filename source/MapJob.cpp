@@ -1,5 +1,3 @@
-#pragma once
-
 // C++ dependencies
 #include <cmath>
 #include <iostream>

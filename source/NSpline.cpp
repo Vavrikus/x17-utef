@@ -1,4 +1,5 @@
-#pragma once
+// ROOT dependencies
+#include "TF1.h"
 
 // X17 dependencies
 #include "NSpline.h"
@@ -36,7 +37,7 @@ namespace X17
 	}
 
 	template<int N>
-	NSpline<N>::EvalFn NSpline<N>::GetEval()
+	typename NSpline<N>::EvalFn NSpline<N>::GetEval()
 	{
 		return [this](double* a, double* b)
 		{

@@ -1,11 +1,12 @@
-#pragma once
+// ROOT dependencies
+#include "TLine.h"
 
 // X17 dependencies
 #include "PadLayout.h"
 
 namespace X17
 {
-    double DefaultLayout::GetPadHeight(const int& i, const bool& effective = false)
+    double DefaultLayout::GetPadHeight(const int& i, const bool& effective)
     {
         using namespace constants;
 
@@ -69,7 +70,7 @@ namespace X17
         out_y = -(yhigh + pad1_offset - (row-1)*(pad_height + pad_offset) - (column-1)*pad_stag - i_pad_height/2);
     }
 
-    void DefaultLayout::GetPadCorners(const int& i, double& out_xlow, double& out_ylow, double& out_xhigh, double& out_yhigh, bool nogaps = false)
+    void DefaultLayout::GetPadCorners(const int& i, double& out_xlow, double& out_ylow, double& out_xhigh, double& out_yhigh, bool nogaps)
     {   
         using namespace constants;
 
@@ -103,7 +104,7 @@ namespace X17
         return -1;        
     }
 
-    void DefaultLayout::DrawPads(bool nogaps = false, TCanvas* c = nullptr)
+    void DefaultLayout::DrawPads(bool nogaps, TCanvas* c)
     {
         using namespace constants;
 
@@ -141,7 +142,7 @@ namespace X17
         DrawTrapezoid(false);
     }
 
-    void DefaultLayout::DrawPads3D(const double height = -8)
+    void DefaultLayout::DrawPads3D(const double height)
     {
         using namespace constants;
 
@@ -166,7 +167,7 @@ namespace X17
         for(auto l : pad_lines)   l->Draw("AL");
     }
 
-    void DefaultLayout::DrawPadsDistortion(const double& time, TCanvas* c = nullptr, Field<MapPoint>* map = nullptr)
+    void DefaultLayout::DrawPadsDistortion(const double& time, TCanvas* c, Field<MapPoint>* map)
     {
         using namespace constants;
 

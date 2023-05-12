@@ -1,5 +1,3 @@
-#pragma once
-
 // X17 dependencies
 #include "Vector.h"
 

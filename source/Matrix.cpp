@@ -1,7 +1,6 @@
-#pragma once
-
 // C++ dependencies
 #include <vector>
+#include <iostream>
 
 // X17 dependencies
 #include "Matrix.h"
@@ -48,7 +47,7 @@ namespace X17
         else
         {
             std::cerr << "ERROR: Invalid matrix column index.\n";
-            return vector<double>();
+            return std::vector<double>();
         }
     }
 

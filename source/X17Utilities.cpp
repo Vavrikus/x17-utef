@@ -1,5 +1,3 @@
-#pragma once
-
 // ROOT dependencies
 #include "TLine.h"
 
@@ -8,7 +6,7 @@
 
 namespace X17
 {    
-    bool IsInSector(const double& x, const double& y, const double& z, const double& dist = 0)
+    bool IsInSector(const double& x, const double& y, const double& z, const double& dist)
     {
         using namespace constants;
 
@@ -80,7 +78,7 @@ namespace X17
         out_max = max_angle;
     }
 
-    void DrawTrapezoid(bool yxformat = true)
+    void DrawTrapezoid(bool yxformat)
     {
         using namespace constants;
 

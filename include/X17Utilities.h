@@ -63,7 +63,7 @@ namespace X17
     /// @param vec The vector representing a point in space (x,y,z) [cm].
     /// @param dist Specifies the minimal distance from within the TPC walls except the bottom anode wall (makes volume smaller).
     /// @return True if in sector, false otherwise.
-    bool IsInSector(const Vector& vec, const double& dist = 0)
+    inline bool IsInSector(const Vector& vec, const double& dist = 0)
     {
         return IsInSector(vec.x,vec.y,vec.z,dist);
     }

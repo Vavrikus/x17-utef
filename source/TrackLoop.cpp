@@ -1,5 +1,3 @@
-#pragma once
-
 // X17 dependencies
 #include "TrackLoop.h"
 
@@ -36,7 +34,7 @@ namespace X17
         for (RecoTask* t : tasks) t->PostElectronLoop();
     }
 
-    void TrackLoop::ProcessRK(TTree* rk_tracks, int n_process = -1)
+    void TrackLoop::ProcessRK(TTree* rk_tracks, int n_process)
     {
         rk_tracks->SetBranchAddress("track",&curr_rk);
         for (RecoTask* t : tasks) t->PreTrackLoop();

@@ -1,4 +1,6 @@
+// X17 dependencies
 #include "CircleFit2D.h"
+#include "X17Utilities.h"
 
 namespace X17
 {

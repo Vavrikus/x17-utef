@@ -1,5 +1,3 @@
-#pragma once
-
 // X17 dependencies
 #include "RK4.h"
 
@@ -101,8 +99,9 @@ namespace X17
     RK4<8>* GetTrackRK(const Field<Vector>& magfield, const bool& electron, const double& step, const double& kin_en, const Vector& origin, const Vector& orientation)
     {
         Matrix<8,1> init = GetInitParams(kin_en,origin,orientation);
-        using VecFn = std::function<void(const double&, const Matrix<8, 1>&, Matrix<8, 1>&)>;
-        VecFn f = std::bind(EMMotion,magfield,electron,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3);
+        auto f = [&magfield, electron](const double& t, const Matrix<8, 1>& y, Matrix<8, 1>& dydt) {
+            EMMotion(magfield, electron, t, y, dydt);
+        };
         return new RK4<8>(0,step,f,init,IsOutOfSector);
     }
 
@@ -122,11 +121,11 @@ namespace X17
 
     RKFit* RKFit::lastfit = nullptr;
 
-    const RKPoint& RKFit::GetPoint(const int& index) const
+    RKPoint RKFit::GetPoint(const int& index) const
     {
         using namespace constants;
         auto rk_pts = curr_rk->GetResults();
-        return {1e+9*rk_pts[index].at(0,0),m2cm*rk_pts[index].at(1,0),m2cm*rk_pts[index].at(2,0),m2cm*rk_pts[index].at(3,0)};
+        return RKPoint(m2cm*rk_pts[index].at(1,0),m2cm*rk_pts[index].at(2,0),m2cm*rk_pts[index].at(3,0),1e+9*rk_pts[index].at(0,0));
     }
 
     double RKFit::SqDist(const int& index, const Vector& point)
@@ -181,7 +180,7 @@ namespace X17
         : magfield(magfield), electron(electron), step(step), origin(origin), orientation(orientation), fit_data(fit_data)
     { lastfit = this; }
 
-    void RKFit::SetFitter(int parameters = 1, bool print = true)
+    void RKFit::SetFitter(int parameters, bool print)
     {        
         fitter = TVirtualFitter::Fitter(nullptr,parameters); // the second number is number of parameters
         fitter->SetFCN(this->Eval);
@@ -194,7 +193,7 @@ namespace X17
         }
     }
 
-    void RKFit::FitRK(double max_iter = 500, double toleration = 0.001)
+    void RKFit::FitRK(double max_iter, double toleration)
     {
         fitter->SetParameter(0,"kin_en",kin_en,1000,1000000,16000000);
 

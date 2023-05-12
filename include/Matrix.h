@@ -22,7 +22,7 @@ namespace X17
         /// @param arr The array of size M*N containing the matrix elements in row-major order.
         Matrix(const double (&arr)[M*N])
         {
-            copy(std::begin(arr), std::end(arr), std::begin(elements));
+            std::copy(std::begin(arr), std::end(arr), std::begin(elements));
         }
 
         /// @brief Addition operator that adds a matrix to the current matrix.

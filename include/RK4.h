@@ -122,7 +122,7 @@ namespace X17
         /// @brief Gets a point on the computed trajectory at a specified index.
         /// @param index The index of the desired point on the trajectory.
         /// @return The RKPoint object representing the position (with time) of the particle at the specified index on the trajectory.
-        const RKPoint& GetPoint(const int& index) const;
+        RKPoint GetPoint(const int& index) const;
 
         /// @brief Computes the square of the distance between a point and a point on the computed trajectory at a specified index.
         /// @param index The index of the point on the trajectory to compare the distance to.
