@@ -71,13 +71,13 @@ namespace X17
     /// @brief A function for the n-th triangle number calculation.
     /// @param n Side of the triangle (i.e. the number of columns).
     /// @return The n-th triangle number.
-    int triangle(int n) { return n * (n + 1) / 2; }
+    inline int triangle(int n) { return n * (n + 1) / 2; }
 
     /// @brief A function that returns the row of an element in inversed triangle (starts with base).
     /// @param columns The total (maximal) number of columns in the triangle.
     /// @param index The index of an element.
     /// @return The number of row of element with given index.
-    int triangle_row(int columns,int index) { return ceil((2 * columns + 1 - sqrt(pow((2 * columns + 1), 2) - 8 * index)) / 2); }
+    inline int triangle_row(int columns,int index) { return ceil((2 * columns + 1 - sqrt(pow((2 * columns + 1), 2) - 8 * index)) / 2); }
 
     /// @brief Singleton class for the default pad layout of the TPC detector (the one that is expected to be used).
     class DefaultLayout : public PadLayout

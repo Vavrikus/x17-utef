@@ -8,7 +8,7 @@
 namespace X17
 {   
     template <int M, int N>    
-    const double& Matrix<M,N>::at(int row, int column) const
+    inline const double& Matrix<M,N>::at(int row, int column) const
     {
         #ifdef DEBUG
         if (row < 0 || row >= M || column < 0 || column >= N)
@@ -21,7 +21,7 @@ namespace X17
     }
 
     template <int M, int N>
-    double& Matrix<M,N>::at(int row, int column)
+    inline double& Matrix<M,N>::at(int row, int column)
     {
         #ifdef DEBUG
         if (row < 0 || row >= M || column < 0 || column >= N)

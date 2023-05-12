@@ -46,7 +46,7 @@ namespace X17
         /// If the specified row or column is out of bounds, returns a reference to the first element and prints an error message.
         /// @note If DEBUG is defined, this method checks if the specified row and column are within bounds and prints an error message if not.
         /// If DEBUG is not defined, no bounds checking is performed for efficiency.
-        const double& at(int row, int column) const;
+        inline const double& at(int row, int column) const;
 
         /// Access the matrix element at the specified row and column.
         /// @param row The row of the element to access, starting from 0.
@@ -55,7 +55,7 @@ namespace X17
         /// If the specified row or column is out of bounds, returns a reference to the first element and prints an error message.
         /// @note If DEBUG is defined, this method checks if the specified row and column are within bounds and prints an error message if not.
         /// If DEBUG is not defined, no bounds checking is performed for efficiency.
-        double& at(int row, int column);
+        inline double& at(int row, int column);
 
         /// @brief Returns a vector representing the specified column of the matrix.
         /// @param c The index of the column to retrieve.
@@ -111,3 +111,6 @@ namespace X17
     template<int M,int N,int P>
     Matrix<M,P> operator*(const Matrix<M,N>& A, const Matrix<N,P>& B);
 } // namespace X17
+
+// template definitions
+#include "Matrix.inl"

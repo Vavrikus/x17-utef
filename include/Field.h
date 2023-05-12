@@ -193,3 +193,6 @@ namespace X17
     /// @param printInfo If true, prints information about maximal and minimal field magnitude and angle values.
     Field<Vector>* LoadField(const char* filename, const Vector& min_corner, const Vector& max_corner, const double& step, bool printInfo = false);
 } // namespace X17
+
+// template definitions
+#include "Field.inl"

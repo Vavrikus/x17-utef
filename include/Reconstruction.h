@@ -57,7 +57,7 @@ namespace X17
     /// @param map The 3D map of ionization electron drift used for interpolation.
     /// @param point An MicroPoint object that represents the simulated point in 3D space to be reconstructed. (x1,y1,t1)
     /// @return A RecoPoint object that represents the reconstructed point in 3D space. (x0,y0,z0)
-    RecoPoint Reconstruct(const Field<MapPoint>& map, const MicroPoint& point) { return Reconstruct(map, point.end); }
+    inline RecoPoint Reconstruct(const Field<MapPoint>& map, const MicroPoint& point) { return Reconstruct(map, point.end); }
 
     /// @brief Estimates the distance between two points, with given coordinates and time values in a SensorData object. The time value is weighted by a factor.
     /// @param p The MapPoint from which we want to calculate distance.
