@@ -1,8 +1,5 @@
 #pragma once
 
-// C++ dependencies
-#include <vector>
-
 namespace X17
 {
     /// @brief A templated Matrix class with M rows and N columns. This class represents a matrix of size M x N,
@@ -13,14 +10,14 @@ namespace X17
     template <int M, int N>
     struct Matrix
     {
-        double elements[M*N]; // The array storing the matrix elements in row-major order.
+        double elements[M * N]; // The array storing the matrix elements in row-major order.
 
         /// @brief Default constructor.
         Matrix() = default;
 
         /// @brief Constructor that initializes the matrix from an array of size M*N.
         /// @param arr The array of size M*N containing the matrix elements in row-major order.
-        Matrix(const double (&arr)[M*N])
+        Matrix(const double (&arr)[M * N])
         {
             std::copy(std::begin(arr), std::end(arr), std::begin(elements));
         }
@@ -29,7 +26,7 @@ namespace X17
         /// @param A The matrix to add.
         void operator+=(const Matrix<M,N>& A)
         {
-            for (int i = 0; i < M*N; i++) this->elements[i] += A.elements[i];
+            for (int i = 0; i < M * N; i++) this->elements[i] += A.elements[i];
         }
 
         /// @brief Multiply each element in the matrix by a scalar.
@@ -112,5 +109,5 @@ namespace X17
     Matrix<M,P> operator*(const Matrix<M,N>& A, const Matrix<N,P>& B);
 } // namespace X17
 
-// template definitions
+// Templated function definitions.
 #include "Matrix.inl"

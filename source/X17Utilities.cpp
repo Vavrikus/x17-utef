@@ -1,11 +1,19 @@
+// C++ dependencies
+#include <cmath>
+#include <stdexcept>
+
 // ROOT dependencies
 #include "TLine.h"
 
 // X17 dependencies
+#include "Field.h"
+#include "Vector.h"
 #include "X17Utilities.h"
 
 namespace X17
-{    
+{
+    //// Useful functions for X17.
+
     bool IsInSector(const double& x, const double& y, const double& z, const double& dist)
     {
         using namespace constants;
@@ -13,8 +21,8 @@ namespace X17
         if (z < zmin      || z > zmax-dist) return false;
         if (x < xmin+dist || x > xmax-dist) return false;
 
-        double dy = dist / std::sqrt(1 + 1/yxslope); // change of allowed y (absolute value) for slanted surface
-        if (std::abs(y) + dy > yxslope*x + yintersect) return false;
+        double dy = dist / std::sqrt(1 + 1/yxslope); // Change of allowed y (absolute value) for slanted surface.
+        if (std::abs(y) + dy > yxslope * x + yintersect) return false;
         
         return true;   
     }

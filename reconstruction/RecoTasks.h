@@ -19,6 +19,7 @@
 #include "PadLayout.h"
 #include "RK4.h"
 #include "TrackLoop.h"
+#include "Reconstruction.h"
 #include "X17Utilities.h"
 
 using namespace X17;
@@ -30,7 +31,7 @@ class DriftTimeTask : public RecoTask
     {
         TCanvas* c = new TCanvas("c_drift","Drift time");
 
-        TTree* electrons = loop->curr_micro_tree;
+        TTree* electrons = m_loop->curr_micro_tree;
         electrons->Draw("t1:8-z0","z1>7.0");
         TGraph* tz = new TGraph(electrons->GetSelectedRows(), electrons->GetV2(), electrons->GetV1());
         tz->SetTitle("Drift time as function of distance;distance to readout [cm]; time [ns]");
@@ -38,13 +39,6 @@ class DriftTimeTask : public RecoTask
         tz->SetMarkerSize(0.4);
         tz->Draw("ap");
         tz->Fit("pol1","","",8.05,11);
-
-        // // getting fit parameters
-        // TF1* tz_fit = (TF1*) tz->GetListOfFunctions()->FindObject("pol1");
-        // double a0 = tz_fit->GetParameter(0);
-        // double a1 = tz_fit->GetParameter(1);
-        // double b0 = -a0/a1; //inverse polynomial param
-        // double b1 = 1.0/a1; //inverse polynomial param
     }
 };
 
@@ -61,8 +55,8 @@ class XZPlotTask : public RecoTask
 
     void ElectronLoop() override
     {
-        MicroPoint micro = loop->curr_micro;
-        RecoPoint reco = loop->curr_reco;
+        MicroPoint micro = m_loop->curr_micro;
+        RecoPoint reco = m_loop->curr_reco;
 
         xz->AddPoint(micro.x0,8-micro.z0);
         xz_reco->AddPoint(reco.x,8-reco.z);
@@ -87,16 +81,16 @@ class XZPlotTask : public RecoTask
         leg_xz->AddEntry(xz_reco,"reconstructed");
         leg_xz->Draw("same");
 
-        // fitting both tracks with circles
-        double min = 0;  // 7
-        double max = 15; // 10.5
+        // Fitting both tracks with circles.
+        double min = 0;
+        double max = 15;
         TF1* circle_fit  = FitCircle2(xz,min,max);
         TF1* circle_fit2 = FitCircle2(xz_reco,min,max);
 
         TGraph* magnetic_x  = new TGraph();
         TGraph* magnetic_x2 = new TGraph();
 
-        Field<Vector>* magfield = loop->magfield;
+        Field<Vector>* magfield = m_loop->magfield;
         double step = 0.1;
         RecoEnergy(circle_fit,*magfield,magnetic_x,min,max,step);
         RecoEnergy(circle_fit2,*magfield,magnetic_x2,min,max,step);
@@ -116,8 +110,8 @@ class XYPlotTask : public RecoTask
 
     void ElectronLoop() override
     {
-        MicroPoint micro = loop->curr_micro;
-        RecoPoint reco = loop->curr_reco;
+        MicroPoint micro = m_loop->curr_micro;
+        RecoPoint reco = m_loop->curr_reco;
 
         xy->AddPoint(micro.x0,micro.y0);
         xy_reco->AddPoint(reco.x,reco.y);
@@ -159,13 +153,13 @@ class GraphResTask : public RecoTask
 
     void ElectronLoop() override
     {
-        MicroPoint micro = loop->curr_micro;
-        RecoPoint reco = loop->curr_reco;
+        MicroPoint micro = m_loop->curr_micro;
+        RecoPoint reco = m_loop->curr_reco;
 
-        gx_res->AddPoint(micro.x0,reco.x-micro.x0);
-        gy_res->AddPoint(micro.x0,reco.y-micro.y0);
-        gz_res->AddPoint(micro.x0,reco.z-micro.z0);
-        gr_res->AddPoint(micro.x0,sqrt(pow((reco.x-micro.x0),2)+pow((reco.y-micro.y0),2)+pow((reco.z-micro.z0),2)));
+        gx_res->AddPoint(micro.x0, reco.x - micro.x0);
+        gy_res->AddPoint(micro.x0, reco.y - micro.y0);
+        gz_res->AddPoint(micro.x0, reco.z - micro.z0);
+        gr_res->AddPoint(micro.x0, sqrt(pow((reco.x - micro.x0),2) + pow((reco.y - micro.y0),2) + pow((reco.z-micro.z0),2)));
     }
 
     void PostElectronLoop() override
@@ -215,13 +209,13 @@ class HistResTask : public RecoTask
 
     void ElectronLoop() override
     {
-        MicroPoint micro = loop->curr_micro;
-        RecoPoint reco = loop->curr_reco;
+        MicroPoint micro = m_loop->curr_micro;
+        RecoPoint reco = m_loop->curr_reco;
 
-        hx_res->Fill(reco.x-micro.x0);
-        hy_res->Fill(reco.y-micro.y0);
-        hz_res->Fill(reco.z-micro.z0);
-        hr_res->Fill(sqrt(pow((reco.x-micro.x0),2)+pow((reco.y-micro.y0),2)+pow((reco.z-micro.z0),2)));        
+        hx_res->Fill(reco.x - micro.x0);
+        hy_res->Fill(reco.y - micro.y0);
+        hz_res->Fill(reco.z - micro.z0);
+        hr_res->Fill(sqrt(pow((reco.x - micro.x0),2) + pow((reco.y - micro.y0),2) + pow((reco.z - micro.z0),2)));        
     }
 
     void PostElectronLoop() override
@@ -256,10 +250,10 @@ class RecoPadsTask : public RecoTask
 
     void ElectronLoop() override
     {
-        MicroPoint micro = loop->curr_micro;
+        MicroPoint micro = m_loop->curr_micro;
 
         int channel = DefaultLayout::GetDefaultLayout().GetPad(micro.x1,micro.y1);
-        int timebin = micro.t1/100.0;
+        int timebin = micro.t1 / 100.0;
 
         if(timebin > timebins - 1) std::cerr << "ERROR: Invalid timebin: " << timebin << std::endl;
         if(channel == -1) std::cerr << "ERROR: No pad hit found. Coordinates x,y: " << micro.x1 << ", " << micro.y1 << std::endl;
@@ -283,7 +277,7 @@ class RecoPadsTask : public RecoTask
                     double xpad,ypad;
                     DefaultLayout::GetDefaultLayout().GetPadCenter(i+1,xpad,ypad);
 
-                    RecoPoint reco = Reconstruct(*(loop->map),EndPoint(xpad,ypad,zmax,time));
+                    RecoPoint reco = Reconstruct(*(m_loop->map),EndPoint(xpad,ypad,zmax,time));
                     g_xyz_reco->AddPoint(reco.x,reco.y,reco.z);
                 }
             }        
@@ -324,7 +318,7 @@ class CircleAndRKFitTask : public RecoTask
     void ElectronLoop() override
     {
         cfit3d = new CircleFit3D({constants::xmin,0,0},{1,0,0});
-        MicroPoint micro = loop->curr_micro;
+        MicroPoint micro = m_loop->curr_micro;
         cfit3d->AddPoint(micro.x0,micro.y0,micro.z0,1);
     }
 
@@ -336,7 +330,7 @@ class CircleAndRKFitTask : public RecoTask
         cfit3d->FitCircle3D();
         cfit3d->PrintFitParams();
 
-        Field<Vector>* magfield = loop->magfield;
+        Field<Vector>* magfield = m_loop->magfield;
 
         TGraph2D* g_cfit3d = cfit3d->GetGraph(0.1,0);
         TGraph* g_en = cfit3d->GetEnergyGraph(*magfield);
@@ -360,7 +354,7 @@ class CircleAndRKFitTask : public RecoTask
                     double xpad,ypad;
                     DefaultLayout::GetDefaultLayout().GetPadCenter(i+1,xpad,ypad);
 
-                    RecoPoint reco = Reconstruct(*(loop->map),EndPoint(xpad,ypad,zmax,time));
+                    RecoPoint reco = Reconstruct(*(m_loop->map),EndPoint(xpad,ypad,zmax,time));
                     cfit3d_reco->AddPoint(reco.x,reco.y,reco.z,reco_task->padhits[i][j]);
                     reco_data.emplace_back(reco.x,reco.y,reco.z,reco_task->padhits[i][j]);
                 }
@@ -468,7 +462,7 @@ class CircleFitEnergyTask : public RecoTask
 
     void PreElectronLoop() override
     {
-        const TrackRK* track = loop->curr_rk;
+        const TrackRK* track = m_loop->curr_rk;
 
         CircleFit3D* cfit = new CircleFit3D(track->origin,track->orientation);
         tracks.push_back(new TGraph2D());
@@ -477,29 +471,29 @@ class CircleFitEnergyTask : public RecoTask
 
     void ElectronLoop() override
     {
-        const TrackRK* track = loop->curr_rk;
-        RKPoint p = loop->curr_rkpoint;
+        const TrackRK* track = m_loop->curr_rk;
+        RKPoint p = m_loop->curr_rkpoint;
 
         cfit->AddPoint(p);tracks.back()->AddPoint(p.x,p.y,p.z);//g_2d->AddPoint(p.x,p.y,p.z);
     }
 
     void PostElectronLoop() override
     {
-        const TrackRK* track = loop->curr_rk;
+        const TrackRK* track = m_loop->curr_rk;
         cfit->FitCircle3D();
         // cfit->PrintFitParams();
 
         // g_fit = cfit->GetGraph();
 
-        h_energy->Fill(track->kin_energy/1e+6,cfit->GetEnergy(*(loop->magfield))/1e+6);
-        h_energy_diff[floor(track->kin_energy/1e+6)-4]->Fill((track->kin_energy+cfit->GetEnergy(*(loop->magfield))-track->kin_energy)/1e+6);
-        if (abs(cfit->GetEnergy(*(loop->magfield))-track->kin_energy) > Ediff_max)
+        h_energy->Fill(track->kin_energy / 1e+6,cfit->GetEnergy(*(m_loop->magfield)) / 1e+6);
+        h_energy_diff[floor(track->kin_energy / 1e+6) - 4]->Fill((track->kin_energy+cfit->GetEnergy(*(m_loop->magfield))-track->kin_energy) / 1e+6);
+        if (abs(cfit->GetEnergy(*(m_loop->magfield))-track->kin_energy) > Ediff_max)
         {
             std::cout << "\n Electon track? --> " << track->electron << "\n";
             cfit->PrintFitParams();
             fits.push_back(cfit->GetGraph());
         }
-        if (abs(cfit->GetEnergy(*(loop->magfield))-track->kin_energy) < Ediff_max) tracks.pop_back();         
+        if (abs(cfit->GetEnergy(*(m_loop->magfield))-track->kin_energy) < Ediff_max) tracks.pop_back();         
     }
 
     void PostLoop()
@@ -564,7 +558,7 @@ class PlotSelectionTask : public RecoTask
 
     void PreElectronLoop() override
     {
-        const TrackRK* track = loop->curr_rk;
+        const TrackRK* track = m_loop->curr_rk;
 
         cfit = new CircleFit3D(track->origin,track->orientation);
         tracks.push_back(new TGraph2D());
@@ -572,8 +566,8 @@ class PlotSelectionTask : public RecoTask
 
     void ElectronLoop() override
     {
-        const TrackRK* track = loop->curr_rk;
-        RKPoint p = loop->curr_rkpoint;
+        const TrackRK* track = m_loop->curr_rk;
+        RKPoint p = m_loop->curr_rkpoint;
 
         cfit->AddPoint(p);
         tracks.back()->AddPoint(p.x,p.y,p.z);
@@ -583,7 +577,7 @@ class PlotSelectionTask : public RecoTask
     {   
         cfit->FitCircle3D();
 
-        if (cfit->GetEnergy(*(loop->magfield)) > E_max) tracks.pop_back(); 
+        if (cfit->GetEnergy(*(m_loop->magfield)) > E_max) tracks.pop_back(); 
     }
 
     void PostLoop()

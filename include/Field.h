@@ -1,11 +1,6 @@
 #pragma once
 
 // C++ dependencies
-#include <algorithm>
-#include <array>
-#include <fstream>
-#include <iostream>
-#include <stdexcept>
 #include <vector>
 
 // X17 dependencies
@@ -35,16 +30,6 @@ namespace X17
         int m_num_z_cells; // The number of grid points along the z axis.
 
         std::vector<T> m_data; // The array of values representing the field. Filled in the order x,y,z.
-
-        /// @brief Maps given 3D coordinates to the corresponding grid cell indices.
-        /// @param x The x-coordinate of the point to be mapped [cm].
-        /// @param y The y-coordinate of the point to be mapped [cm].
-        /// @param z The z-coordinate of the point to be mapped [cm].
-        /// @param xi Output parameter that will be set to the x-index of the corresponding grid cell.
-        /// @param yi Output parameter that will be set to the y-index of the corresponding grid cell.
-        /// @param zi Output parameter that will be set to the z-index of the corresponding grid cell.
-        /// @throws std::out_of_range if the specified coordinates are out of bounds.
-        void GetPointIndices(const double& x, const double& y, const double& z, int& xi, int& yi, int& zi) const;
 
     public:
         /// @brief Deleted copy constructor. 
@@ -141,7 +126,7 @@ namespace X17
         T* GetPoint(const double& x, const double& y, const double& z)
         {
             int xi, yi, zi;
-            GetPointIndices(x, y, z, xi, yi, zi);
+            _GetPointIndices(x, y, z, xi, yi, zi);
 
             return &this->at(xi,yi,zi);
         }
@@ -180,6 +165,17 @@ namespace X17
         {
             return GetField(vec.x,vec.y,vec.z);
         }
+
+    private:
+        /// @brief Maps given 3D coordinates to the corresponding grid cell indices.
+        /// @param x The x-coordinate of the point to be mapped [cm].
+        /// @param y The y-coordinate of the point to be mapped [cm].
+        /// @param z The z-coordinate of the point to be mapped [cm].
+        /// @param xi Output parameter that will be set to the x-index of the corresponding grid cell.
+        /// @param yi Output parameter that will be set to the y-index of the corresponding grid cell.
+        /// @param zi Output parameter that will be set to the z-index of the corresponding grid cell.
+        /// @throws std::out_of_range if the specified coordinates are out of bounds.
+        void _GetPointIndices(const double& x, const double& y, const double& z, int& xi, int& yi, int& zi) const;
     };
 
     /// @brief Loads field data from a file and stores it in a Field<Vector>.
@@ -194,5 +190,5 @@ namespace X17
     Field<Vector>* LoadField(const char* filename, const Vector& min_corner, const Vector& max_corner, const double& step, bool printInfo = false);
 } // namespace X17
 
-// template definitions
+// Templated function definitions.
 #include "Field.inl"

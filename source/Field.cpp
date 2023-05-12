@@ -1,9 +1,16 @@
+// C++ dependencies
+#include <fstream>
+#include <iostream>
+
 // X17 dependencies
 #include "Field.h"
+#include "Vector.h"
 #include "X17Utilities.h"
 
 namespace X17
 {
+    //// Functions related to the Field class.
+
     Field<Vector>* LoadField(const char* filename, const Vector& min_corner, const Vector& max_corner, const double& step, bool printInfo)
     {
         Field<Vector>* field = new Field<Vector>(min_corner,max_corner,step,{0,0,0});
@@ -18,7 +25,12 @@ namespace X17
         while (inf)
         {
             std::string X,Y,Z,VX,VY,VZ;
-            inf >> X; inf >> Y; inf >> Z; inf >> VX; inf >> VY; inf >> VZ;
+            inf >> X;
+            inf >> Y;
+            inf >> Z;
+            inf >> VX;
+            inf >> VY;
+            inf >> VZ;
             lines_read++;
 
             try
@@ -31,8 +43,12 @@ namespace X17
                     double vx,vy,vz; // Components of the vector in given point.
                     
                     // Magnetic and electric field data files contain coordinates in meters.
-                    x = m2cm*stod(X); y = m2cm*stod(Y); z = m2cm*stod(Z);
-                    vx = stod(VX); vy = stod(VY); vz = stod(VZ);
+                    x = m2cm*stod(X);
+                    y = m2cm*stod(Y);
+                    z = m2cm*stod(Z);
+                    vx = stod(VX);
+                    vy = stod(VY);
+                    vz = stod(VZ);
 
                     *(field->GetPoint(x,y,z)) = Vector{vx,vy,vz};
                     lines_processed++;

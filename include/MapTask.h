@@ -7,13 +7,6 @@
 /// @brief An abstract class representing a map task.
 class MapTask
 {
-protected:
-    X17::Field<X17::MapPoint>* map; // A pointer to the ionization electron map.
-
-    /// @brief The constructor of MapTask.
-    /// @param map A pointer to the ionization electron drift map.
-    MapTask(X17::Field<X17::MapPoint>* map) : map(map) { }
-
 public:
     /// @brief A virtual function to be called before all loops of the map points.
     virtual void PreLoop() { }
@@ -40,4 +33,11 @@ public:
 
     /// @brief A virtual function to be called after all loops of the map points.
     virtual void PostLoop() { }
+
+protected:
+    X17::Field<X17::MapPoint>* map; // A pointer to the ionization electron map.
+
+    /// @brief The constructor of MapTask.
+    /// @param map A pointer to the ionization electron drift map.
+    MapTask(X17::Field<X17::MapPoint>* map) : map(map) { }
 };

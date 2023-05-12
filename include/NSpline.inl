@@ -1,11 +1,10 @@
-// ROOT dependencies
-#include "TF1.h"
-
 // X17 dependencies
 #include "NSpline.h"
 
 namespace X17
 {
+	//// Public methods.
+
 	template<int N>
 	double NSpline<N>::Eval(double* x, double* par)
 	{
@@ -15,7 +14,7 @@ namespace X17
 		par[2N-2N+1]=first derivative at begin and end (to be fixed in the fit!)
 		*/
 
-		for (int i = 0; i < N; ++i) par[i] = nodes_x[i];
+		for (int i = 0; i < N; ++i) par[i] = m_nodes_x[i];
 
 		Double_t xx = x[0];
 
@@ -23,13 +22,13 @@ namespace X17
 		Double_t yn[N];
 
 		for (int i = 0; i < N; ++i) xn[i] = par[i];
-		for (int i = 0; i < N; ++i) yn[i] = par[N+i];
+		for (int i = 0; i < N; ++i) yn[i] = par[N + i];
 
-		if(FixDerStart) par[2*N] = der_start;
-		if(FixDerEnd) par[2*N+1] = der_end;
+		if(m_fix_der_start) par[2 * N] = m_der_start;
+		if(m_fix_der_end) par[2 * N + 1] = m_der_end;
 
-		Double_t b1 = par[2*N];
-		Double_t e1 = par[2*N+1];
+		Double_t b1 = par[2 * N];
+		Double_t e1 = par[2 * N + 1];
 
 		TSpline3 sp3("sp3", xn, yn, N, "b1e1", b1, e1);
 
@@ -44,6 +43,12 @@ namespace X17
 			return this->Eval(a,b);
 		};
 	}
+
+
+
+
+
+	//// Functions related to the NSpline class.
 
 	template<int nodes>
 	TSpline3* FitSplines(TGraph* graph, const double& min, const double& max)

@@ -7,6 +7,8 @@
 
 namespace X17
 {   
+    //// Public methods.
+
     template <int M, int N>    
     inline const double& Matrix<M,N>::at(int row, int column) const
     {
@@ -30,13 +32,13 @@ namespace X17
             return elements[0];
         }
         #endif
-        return elements[row*N+column];
+        return elements[row * N + column];
     }
 
     template <int M, int N>
     std::vector<double> Matrix<M,N>::GetColumn(int c) const
     {
-        // Check if the column index is valid
+        // Check if the column index is valid.
         if(c >= 0 && c < N)
         {
             std::vector<double> column(M);
@@ -67,7 +69,7 @@ namespace X17
     template <int M, int N>
     void Matrix<M,N>::SwapRows(int row1, int row2)
     {
-        // Check if the row indexes are valid
+        // Check if the row indexes are valid.
         if (row1 > -1 && row1 < M && row2 > -1 && row2 < M)
         {
             for (int c = 0; c < N; c++)
@@ -86,7 +88,7 @@ namespace X17
     {
         for (int c = 0; c < M; c++) 
         {
-            // Find row with non-zero c-th element
+            // Find row with non-zero c-th element.
             bool not_zero = false;
             for (int r = c; r < M; r++) 
             {
@@ -99,12 +101,12 @@ namespace X17
             }
             if (!not_zero) std::cerr << "WARNING: Singular matrix.\n";
 
-            // Normalize selected row
+            // Normalize selected row.
             double first = this->at(c, c);
-            if (first == 0) continue; // Skip division by zero
+            if (first == 0) continue; // Skip division by zero.
             for (int c2 = c; c2 < N; c2++) this->at(c, c2) /= first;
 
-            // Subtracting rows
+            // Subtracting rows.
             for (int r = 0; r < M; r++) 
             {
                 if (r != c) 
@@ -122,7 +124,7 @@ namespace X17
     Matrix<M,N> operator+(const Matrix<M,N>& A, const Matrix<M,N>& B)
     {
         Matrix<M,N> result;
-        for (int i = 0; i < M*N; i++) 
+        for (int i = 0; i < M * N; i++) 
         {
             result.elements[i] = A.elements[i] + B.elements[i];
         }
@@ -134,7 +136,7 @@ namespace X17
     Matrix<M,N> operator*(const double& d, const Matrix<M,N>& A)
     {
         Matrix<M,N> result;
-        for (int i = 0; i < M*N; i++)
+        for (int i = 0; i < M * N; i++)
         {
             result.elements[i] = d * A.elements[i];
         }
@@ -145,7 +147,7 @@ namespace X17
     Matrix<M,N> operator/(const Matrix<M,N>& A,const double& d)
     {
         Matrix<M,N> result;
-        for (int i = 0; i < M*N; i++)
+        for (int i = 0; i < M * N; i++)
         {
             result.elements[i] = A.elements[i] / d;
         }

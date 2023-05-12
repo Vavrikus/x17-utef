@@ -1,18 +1,13 @@
 #pragma once
 
 // C++ dependencies
-#include <iostream>
 #include <vector>
 
 // ROOT dependencies
 #include "TTree.h"
 
 // X17 dependencies
-#include "Field.h"
-#include "Points.h"
-#include "Reconstruction.h"
 #include "Track.h"
-#include "X17Utilities.h"
 
 namespace X17
 {
@@ -23,7 +18,7 @@ namespace X17
     {
         friend class TrackLoop;
     protected:
-        TrackLoop* loop = nullptr; // The loop that will run this task.
+        TrackLoop* m_loop = nullptr; // The loop that will run this task.
     public:
         /// @brief To be run before any loops.
         virtual void PreTrackLoop()     { }
@@ -53,7 +48,11 @@ namespace X17
 
         TrackRK* curr_rk;        // Current Runge-Kutta simulated track.
         RKPoint curr_rkpoint;    // Current point on the current Runge-Kutta track.
+        
+    private:
+        std::vector<RecoTask*> m_tasks; // Vector of all tasks to be run.
 
+    public:
         /// @brief Constructor of TrackLoop.
         /// @param map Pointer to the ionization electron drift map.
         /// @param magfield Pointer to magnetic field data.
@@ -71,7 +70,5 @@ namespace X17
         /// @param rk_tracks TTree with the simulated tracks.
         /// @param n_process The number of tracks to process. Default value is -1, which processes all tracks.
         void ProcessRK(TTree* rk_tracks, int n_process = -1);
-    private:
-        std::vector<RecoTask*> tasks; // Vector of all tasks to be run.
     };
 } // namespace X17

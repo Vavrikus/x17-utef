@@ -1,9 +1,7 @@
 #pragma once
 
 // C++ dependencies
-#include <algorithm>
 #include <cmath>
-#include <stdexcept>
 
 namespace X17
 {
@@ -108,7 +106,7 @@ namespace X17
         if (d == 0) throw std::invalid_argument("division by zero");
     #endif
 
-        return Vector{v.x/d, v.y/d, v.z/d};
+        return Vector{v.x / d, v.y / d, v.z / d};
     }
     
     /// @brief Compute the dot product of two vectors.

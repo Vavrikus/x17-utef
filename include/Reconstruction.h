@@ -2,13 +2,9 @@
 
 // C++ dependencies
 #include <array>
-#include <iostream>
-#include <vector>
 
 // X17 dependencies
 #include "Field.h"
-#include "Matrix.h"
-#include "Points.h"
 
 namespace X17
 {

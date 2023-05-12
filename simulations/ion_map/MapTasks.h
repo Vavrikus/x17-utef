@@ -59,7 +59,7 @@ public:
 
     void XYZ_Loop(const double& x, const double& y, const double& z, const X17::MapPoint& current) override
     {
-        if(current.y != 0) v_yx_dy.back()->Fill(y,x,current.y-y);
+        if(current.y != 0) v_yx_dy.back()->Fill(y, x, current.y - y);
     }
 
     void PostLoop() override
@@ -99,9 +99,9 @@ public:
             v_yx_t1[i]->GetXaxis()->SetRangeUser(ymin,ymax);
             v_yx_t1[i]->GetYaxis()->SetRangeUser(xmin,xmax);
             v_yx_t1[i]->Draw("colz");
-            double min_percent = 0.8+0.13*(v_yx_t1.size()-1-i)/(v_yx_t1.size()-1); //how high is minimum compared to maximum
-            v_yx_t1[i]->SetMinimum(min_percent*v_yx_t1[i]->GetMaximum());
-            v_yx_t1[i]->SetMaximum(min_percent*v_yx_t1[i]->GetMaximum()+500);
+            double min_percent = 0.8 + 0.13 * (v_yx_t1.size() - 1 - i) / (v_yx_t1.size() - 1); // How high is minimum compared to maximum in percentage.
+            v_yx_t1[i]->SetMinimum(min_percent * v_yx_t1[i]->GetMaximum());
+            v_yx_t1[i]->SetMaximum(min_percent * v_yx_t1[i]->GetMaximum() + 500);
             X17::DrawTrapezoid();
         }
         c_yx_t1->Write();
@@ -154,7 +154,7 @@ public:
         // for(TGraph* g : v_g_yx) g->Write();
         TCanvas* c_g_yx = new TCanvas("c_g_yx","Map of electron readout positions");
         c_g_yx->Divide(4,4);
-        for (int i = 0; i < v_g_yx.size()-1; i++)
+        for (int i = 0; i < v_g_yx.size() - 1; i++)
         {
             c_g_yx->cd(i+1);
             v_g_yx[i]->GetXaxis()->SetRangeUser(ymin,ymax);
@@ -187,7 +187,7 @@ public:
         g_zt = new TGraph();
 
         g_zt->SetName("g_zt");
-        g_zt->SetTitle("Original height vs drift time");
+        g_zt->SetTitle("Initial height vs drift time");
         g_zt->SetMarkerColor(2);
         g_zt->SetMarkerStyle(6);
         g_zt->GetXaxis()->SetTitle("z [cm]");
@@ -201,7 +201,7 @@ public:
 
     void PostLoop() override
     {
-        TCanvas* c_g_zt = new TCanvas("c_g_zt","Original height vs drift time");
+        TCanvas* c_g_zt = new TCanvas("c_g_zt","Initial height vs drift time");
         g_zt->Draw("AP");
         c_g_zt->Write();
     }
@@ -229,7 +229,7 @@ public:
     void ZX_Loop(const double& z, const double& x, const X17::MapPoint& current) override
     {
         g_xz->AddPoint(current.x,z);
-        g_xz->SetPointError(g_xz->GetN()-1,current.xdev,0);
+        g_xz->SetPointError(g_xz->GetN() - 1, current.xdev, 0);
         TArrow* arrow = new TArrow(x,z,current.x,z);
         v_g_xz_arrows.push_back(arrow);
     }
@@ -267,7 +267,7 @@ public:
     void ZX_Loop(const double& z, const double& x, const X17::MapPoint& current) override
     {        
         g_xt->AddPoint(x,current.t);
-        g_xt->SetPointError(g_xt->GetN()-1,current.xdev,current.tdev);
+        g_xt->SetPointError(g_xt->GetN() - 1, current.xdev, current.tdev);
     }
 
     void PostLoop() override
@@ -276,7 +276,8 @@ public:
         g_xt->Draw("AP");
         TLine* lleft  = new TLine(6.51,0,6.51,5000);
         TLine* lright = new TLine(14.61,0,14.61,5000);
-        lleft->Draw();lright->Draw();
+        lleft->Draw();
+        lright->Draw();
         c_g_xt->Write();
     }
 };

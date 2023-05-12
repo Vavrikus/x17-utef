@@ -1,12 +1,20 @@
+// C++ dependencies
+#include <iostream>
+
 // X17 dependencies
+#include "Points.h"
+#include "Reconstruction.h"
 #include "TrackLoop.h"
+#include "X17Utilities.h"
 
 namespace X17
 {
+    //// Public methods.
+
     void TrackLoop::AddTask(RecoTask* task)
     {
-        task->loop = this;
-        tasks.push_back(task);
+        task->m_loop = this;
+        m_tasks.push_back(task);
     }
 
     void TrackLoop::ProcessSingle(TTree* single_track)
@@ -14,7 +22,7 @@ namespace X17
         curr_micro_tree = single_track;
 
         single_track->SetBranchAddress("point",&curr_micro);
-        for (RecoTask* t : tasks) t->PreElectronLoop();
+        for (RecoTask* t : m_tasks) t->PreElectronLoop();
 
         // Looping through all ionization electrons.
         int n_electrons = 0;
@@ -25,40 +33,40 @@ namespace X17
             {
                 n_electrons++;
                 curr_reco = Reconstruct(*map,curr_micro);
-                for (RecoTask* t : tasks) t->ElectronLoop();
+                for (RecoTask* t : m_tasks) t->ElectronLoop();
             }
         }
 
         std::cout << "\nNumber of electrons in the TPC region: " << n_electrons << "\n";
 
-        for (RecoTask* t : tasks) t->PostElectronLoop();
+        for (RecoTask* t : m_tasks) t->PostElectronLoop();
     }
 
     void TrackLoop::ProcessRK(TTree* rk_tracks, int n_process)
     {
         rk_tracks->SetBranchAddress("track",&curr_rk);
-        for (RecoTask* t : tasks) t->PreTrackLoop();
+        for (RecoTask* t : m_tasks) t->PreTrackLoop();
 
         int n_tracks = rk_tracks->GetEntries();
         for (int i = 0; i < n_tracks; i++)
         {
             rk_tracks->GetEntry(i);
-            if((100 * i) % n_tracks == 0) std::cout << "Progress: " << 100*i/n_tracks << " \%\n";
+            if((100 * i) % n_tracks == 0) std::cout << "Progress: " << 100 * i / n_tracks << " \%\n";
             std::cout << "Track " << i+1 << " out of " << n_tracks << ".\n";
 
-            for (RecoTask* t : tasks) t->PreElectronLoop();
+            for (RecoTask* t : m_tasks) t->PreElectronLoop();
 
             for (RKPoint p : curr_rk->points) 
             {
                 curr_rkpoint = p;
-                for (RecoTask* t : tasks) t->ElectronLoop();
+                for (RecoTask* t : m_tasks) t->ElectronLoop();
             }
 
-            for (RecoTask* t : tasks) t->PostElectronLoop();
+            for (RecoTask* t : m_tasks) t->PostElectronLoop();
 
             if (i == n_process - 1) break;
         }
         
-        for (RecoTask* t : tasks) t->PostTrackLoop();
+        for (RecoTask* t : m_tasks) t->PostTrackLoop();
     }
 } // namespace X17

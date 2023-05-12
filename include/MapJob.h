@@ -13,7 +13,7 @@ namespace X17
         double step;    // Spacing of the grid [cm].
 
         // Ranges for simulation.
-        // 1st sector condition (y-sqrt(3)*x<=0)&&(y+sqrt(3)*x>0) has to be satisfied later
+        // 1st sector condition (y-sqrt(3)*x<=0)&&(y+sqrt(3)*x>0) has to be satisfied later.
         double xmin =  0;  // Minimum x coordinate of simulation area.
         double xmax =  15; // Maximum x coordinate of simulation area.
         double ymin = -30; // Minimum y coordinate of simulation area.
@@ -30,6 +30,7 @@ namespace X17
 
         double zsum; // Total distance to propagate all electrons (per iteration).
 
+    public:
         /// @brief Parses command line arguments and sets job parameters.
         /// @param argc Number of command line arguments.
         /// @param argv Array of command line arguments.
@@ -40,16 +41,16 @@ namespace X17
 
     private:
         /// @brief Calculates number of steps in x and y directions for each z step and stores result in member variables.
-        void f_GetStepParameters();
+        void _GetStepParameters();
 
         /// @brief Calculates total distance to propagate for given number of electrons.
         /// @param n_electrons Number of electrons to simulate.
         /// @return Total distance to propagate electrons.
-        double f_Zsum(int n_electrons);
+        double _Zsum(int n_electrons);
 
         /// @brief Finds optimal maximal index of electron for given job's id.
         /// @param l_id Job id.
         /// @return Optimal maximal index of electron.
-        int f_Noptimal(int l_id);
+        int _Noptimal(int l_id);
     };
 } // namespace X17

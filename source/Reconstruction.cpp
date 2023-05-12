@@ -1,8 +1,19 @@
+// C++ dependencies
+#include <array>
+#include <cmath>
+#include <iostream>
+#include <vector>
+
 // X17 dependencies
+#include "Field.h"
+#include "Matrix.h"
+#include "Points.h"
 #include "Reconstruction.h"
 
 namespace X17
 {
+    //// Functions related to reconstruction.
+
     template<typename T>
     std::array<T,3> CubeCorner(const T (&indices)[6], int corner)
     {
@@ -24,20 +35,20 @@ namespace X17
     {
         double bounds[6]; // Array {xmin, xmax, ymin, ymax, zmin, zmax}.
 
-        bounds[0] = indices[0]*map.GetStep()+map.GetXMin();
-        bounds[1] = indices[1]*map.GetStep()+map.GetXMin();
+        bounds[0] = indices[0] * map.GetStep() + map.GetXMin();
+        bounds[1] = indices[1] * map.GetStep() + map.GetXMin();
 
-        bounds[2] = indices[2]*map.GetStep()+map.GetYMin();
-        bounds[3] = indices[3]*map.GetStep()+map.GetYMin();
+        bounds[2] = indices[2] * map.GetStep() + map.GetYMin();
+        bounds[3] = indices[3] * map.GetStep() + map.GetYMin();
 
-        bounds[4] = indices[4]*map.GetStep()+map.GetZMin();
-        bounds[5] = indices[5]*map.GetStep()+map.GetZMin();
+        bounds[4] = indices[4] * map.GetStep() + map.GetZMin();
+        bounds[5] = indices[5] * map.GetStep() + map.GetZMin();
 
-        const int coor_ids[] = {0,1,3};             // x, y and t coordinate indices in SensorData (operator[])
+        const int coor_ids[] = {0,1,3};             // The x, y and t coordinate indices in SensorData (operator[]).
         std::vector<std::vector<double>> xytvalues; // A 2D vector of size 3, containing vectors of the x, y, and t values at each corner of the cube used for interpolation.
         std::vector<std::vector<double>> output;
 
-        // Filling xytvalues
+        // Filling xytvalues.
         for (int id : coor_ids)
         {
             std::vector<double> coor_values;
@@ -61,10 +72,10 @@ namespace X17
                 arr[9*j+1] = xytvalues[0][j];
                 arr[9*j+2] = xytvalues[1][j];
                 arr[9*j+3] = xytvalues[2][j];
-                arr[9*j+4] = xytvalues[0][j]*xytvalues[1][j];
-                arr[9*j+5] = xytvalues[0][j]*xytvalues[2][j];
-                arr[9*j+6] = xytvalues[1][j]*xytvalues[2][j];
-                arr[9*j+7] = xytvalues[0][j]*xytvalues[1][j]*xytvalues[2][j];
+                arr[9*j+4] = xytvalues[0][j] * xytvalues[1][j];
+                arr[9*j+5] = xytvalues[0][j] * xytvalues[2][j];
+                arr[9*j+6] = xytvalues[1][j] * xytvalues[2][j];
+                arr[9*j+7] = xytvalues[0][j] * xytvalues[1][j] * xytvalues[2][j];
 
                 const auto corner = CubeCorner(bounds,j);
                 arr[9*j+8] = corner[i];
@@ -82,12 +93,12 @@ namespace X17
     {
         bool i_mid_is_max; // Does midpoint index contain higher value?
 
-        // The z-index is connected to variable t
+        // The z-index is connected to variable t.
         int var2 = var;
         if (var2 == 2) var2 = 3;
 
     #ifdef DEBUG
-        // Indices for low and high values
+        // Indices for low and high values.
         int i_low[3], i_high[3];
         std::copy(std::begin(i_mid), std::end(i_mid), std::begin(i_low));
         std::copy(std::begin(i_mid), std::end(i_mid), std::begin(i_high));
@@ -111,7 +122,7 @@ namespace X17
         #endif
         }
 
-        // Set up actual min/max variables
+        // Set up actual min/max variables.
         if(i_mid_is_max) {i_max = i_mid[var]; i_min = i_max - 1;}
         else             {i_min = i_mid[var]; i_max = i_min + 1;}
     }
@@ -128,7 +139,7 @@ namespace X17
 
         std::cout << "\n";
 
-        // Bound checks
+        // Bound checks.
         for (int x : {indices[0], indices[1]})
         for (int y : {indices[2], indices[3]})
         for (int z : {indices[4], indices[5]})
@@ -154,19 +165,19 @@ namespace X17
         const double& y1 = end_point.y;
         const double& t1 = end_point.t;
 
-        // Find 8 closest points using binary search (assuming ordering)
-        int ximin = 0;                   // Starting minimal search x index
-        int ximax = map.GetXCells() - 1; // Starting maximal search x index
-        int yimin = 0;                   // Starting minimal search y index
-        int yimax = map.GetYCells() - 1; // Starting maximal search y index
-        int zimin = map.GetZCells() - 1; // Starting minimal search z index (inverted - time is maximal for z minimal)
-        int zimax = 0;                   // Starting maximal search z index (inverted - time is maximal for z minimal)
+        // Find 8 closest points using binary search (assuming ordering).
+        int ximin = 0;                   // Starting minimal search x index.
+        int ximax = map.GetXCells() - 1; // Starting maximal search x index.
+        int yimin = 0;                   // Starting minimal search y index.
+        int yimax = map.GetYCells() - 1; // Starting maximal search y index.
+        int zimin = map.GetZCells() - 1; // Starting minimal search z index (inverted - time is maximal for z minimal).
+        int zimax = 0;                   // Starting maximal search z index (inverted - time is maximal for z minimal).
 
-        int i_mid[3] = { (ximin + ximax) / 2, (yimin + yimax) / 2, (zimin + zimax) / 2}; // Midpoint array
+        int i_mid[3] = { (ximin + ximax) / 2, (yimin + yimax) / 2, (zimin + zimax) / 2}; // Midpoint array.
 
         FindMapMinMaxIndex(map,ximin,ximax,i_mid,0,x1);
 
-        // Some part of the field is initialized with zeros and isn't therefore ordered
+        // Some part of the field is initialized with zeros and isn't therefore ordered.
         if(i_mid[0] != 0)
         {
             while(map.at(i_mid[0],yimin,i_mid[2]).point.y == 0) yimin++;
@@ -176,10 +187,10 @@ namespace X17
         FindMapMinMaxIndex(map,yimin,yimax,i_mid,1,y1);
         FindMapMinMaxIndex(map,zimin,zimax,i_mid,2,t1);
 
-        // Sanity check
+        // Sanity check.
         // PrintCube(map,{ximin,ximax,yimin,yimax,zimin,zimax},end_point);
 
-        // Interpolation from map
+        // Interpolation from map.
         std::vector<std::vector<double>> coef = GetInterpolCoef(map,{ximin,ximax,yimin,yimax,zimin,zimax});
 
         double xout = coef[0][0] + coef[0][1]*x1 + coef[0][2]*y1 + coef[0][3]*t1 + coef[0][4]*x1*y1 + coef[0][5]*x1*t1 + coef[0][6]*y1*t1 + coef[0][7]*x1*y1*t1;
@@ -197,20 +208,20 @@ namespace X17
 
     RecoPoint ReconstructOld(const Field<MapPoint>& map, const double& x1, const double& y1, const double& t1, const double& max_err)
     {
-        // start looking at the same position
+        // Start looking at the same position.
         double x = x1;
         double y = y1;
-        double z = (map.GetZMax()+map.GetZMin())/2;
-        double step = map.GetStep()/10;
+        double z = (map.GetZMax()+map.GetZMin()) / 2;
+        double step = map.GetStep() / 10;
 
-        double offset;       // metric of distance between points
-        int iterations = 0;  // number of iterations should not exceed 100
-        double damp = 0.005; // damping coefficient
+        double offset;       // Metric of distance between points.
+        int iterations = 0;  // Number of iterations should not exceed 100.
+        double damp = 0.005; // Damping coefficient.
 
-        // loop for offset minimization
+        // Loop for offset minimization.
         do
         {
-            // calculate offset gradient
+            // Calculate offset gradient.
             MapPoint xa = map.GetField(x+step,y,z);
             MapPoint xb = map.GetField(x-step,y,z);
             MapPoint ya = map.GetField(x,y+step,z);
@@ -229,24 +240,24 @@ namespace X17
             double grady = (oya-oyb)/(2*step);
             double gradz = (oza-ozb)/(2*step);
 
-            // adjust current guess by minus gradient
+            // Adjust current guess by minus gradient.
             x -= damp*gradx; y -= damp*grady; z -= damp*gradz;
 
-            // check bounds
+            // Check bounds.
             if (x < map.GetXMin()) x = map.GetXMin();
             if (x > map.GetXMax()) x = map.GetXMax();
             if (y < map.GetYMin()) y = map.GetYMin();
             if (y > map.GetYMax()) y = map.GetYMax();
             if (z < map.GetZMin()) z = map.GetZMin();
             if (z > map.GetZMax()) z = map.GetZMax();
-            //cout << "gradx: " << x << " grady: " << y << " gradz: " << z << "\n";
+            // cout << "gradx: " << x << " grady: " << y << " gradz: " << z << "\n";
 
-            // calculate values at current position
+            // Calculate values at current position.
             MapPoint cur = map.GetField(x,y,z);
             offset = Offset(cur,x1,y1,t1);
 
-            // make sure step isn't too high
-            if(offset < 10*step) step /= 10;
+            // Make sure step isn't too high.
+            if(offset < 10 * step) step /= 10;
 
             iterations++;
             // cout << "iter: " << iterations << "\n";        

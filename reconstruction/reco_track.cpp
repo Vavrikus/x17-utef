@@ -4,6 +4,7 @@
 #include "TTree.h"
 
 // X17 dependencies
+#include "Field.h"
 #include "TrackLoop.h"
 
 #include "RecoTasks.h"

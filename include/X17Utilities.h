@@ -9,12 +9,12 @@ namespace X17
     namespace constants
     {
         // Physical constants
-            constexpr double e    = 1.602176634E-19; // Elementary charge
-            constexpr double c    = 299792458;       // Light velocity in vacuum [m/s]
-            constexpr double E0   = 510998.95;       // Electron rest energy [eV]
-            constexpr double m0   = e*E0/(c*c);      // Electron rest mass [kg]
-            constexpr double m2cm = 100.0;           // Conversion m --> cm
-            constexpr double cm2m = 0.01;            // Conversion cm --> m
+            constexpr double e    = 1.602176634E-19;  // Elementary charge
+            constexpr double c    = 299792458;        // Light velocity in vacuum [m/s]
+            constexpr double E0   = 510998.95;        // Electron rest energy [eV]
+            constexpr double m0   = e * E0 / (c * c); // Electron rest mass [kg]
+            constexpr double m2cm = 100.0;            // Conversion m --> cm
+            constexpr double cm2m = 0.01;             // Conversion cm --> m
 
         // Target parameters
             constexpr double target_radius = 0.1; // Radius of the target [cm]

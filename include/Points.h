@@ -1,15 +1,15 @@
 #pragma once
 
 // C++ dependencies
-#include <vector>
+#include <cmath>
 
 // ROOT dependencies
 #include "TChain.h"
 #include "TMarker3DBox.h"
+#include "TTree.h"
 
 // X17 dependencies
 #include "Vector.h"
-#include "X17Utilities.h"
 
 namespace X17
 {
@@ -19,7 +19,7 @@ namespace X17
         Vector point; // Initial coordinates [cm].
         double t;     // Initial time [ns] (should be close to 0).
 
-        // References for easier access
+        // References for easier access.
         double& x = point.x; // The x-coordinate [cm].
         double& y = point.y; // The y-coordinate [cm].
         double& z = point.z; // The z-coordinate [cm].
@@ -49,7 +49,7 @@ namespace X17
         Vector point; // Final coordinates [cm].
         double t;     // Final time [ns].
         
-        // References for easier access
+        // References for easier access.
         double& x = point.x; // The x-coordinate [cm].
         double& y = point.y; // The y-coordinate [cm].
         double& z = point.z; // The z-coordinate [cm].
@@ -141,7 +141,7 @@ namespace X17
         return EndPoint{d*p.point, d*p.t};
     }
 
-    /// @brief A struct for storing the coordinates and the time of the final point of an ionization electron using pads;
+    /// @brief A struct for storing the coordinates and the time of the final point of an ionization electron using pads.
     struct EndPointDiscrete
     {
         int n_pad;    // The channel (pad) number.
@@ -151,12 +151,12 @@ namespace X17
     /// @brief A struct for storing the results of microscopic simulation of ionization electrons.
     struct MicroPoint
     {
-        StartPoint start; // Initial coordinates of the electron. [cm] and [ns]
-        EndPoint end;     // Final coordinates of the electron. [cm] and [ns]
-        double e0;        // Initial energy.
-        double e1;        // Final energy.
+        StartPoint start; // Initial coordinates of the electron ([cm] and [ns]).
+        EndPoint end;     // Final coordinates of the electron ([cm] and [ns]).
+        double e0;        // Initial energy [eV].
+        double e1;        // Final energy [eV].
         
-        // References for easier access
+        // References for easier access.
         double& x0 = start.x; // The initial x-coordinate [cm].
         double& y0 = start.y; // The initial y-coordinate [cm].
         double& z0 = start.z; // The initial z-coordinate [cm].
@@ -186,9 +186,9 @@ namespace X17
     /// @brief A struct for storing a Runge-Kutta generated track point.
     struct RKPoint
     {
-        StartPoint point; // Track point coordinates. [cm] and [ns]
+        StartPoint point; // Track point coordinates ([cm] and [ns]).
 
-        // References for easier access
+        // References for easier access.
         double& x = point.x; // The simulated x-coordinate [cm].
         double& y = point.y; // The simulated y-coordinate [cm].
         double& z = point.z; // The simulated z-coordinate [cm].
@@ -216,10 +216,10 @@ namespace X17
     /// @brief A struct for storing the results of map simulation (multiple ionization electrons with same initial coordinates).
     struct MapPoint
     {
-        EndPoint point; // The average final point of the ionization electrons. [cm] and [ns]
-        EndPoint dev;   // The standard deviations of individual points. [cm] and [ns]
+        EndPoint point; // The average final point of the ionization electrons ([cm] and [ns]).
+        EndPoint dev;   // The standard deviations of individual points ([cm] and [ns]).
 
-        // References for easier access
+        // References for easier access.
         double& x = point.x;  // The x-coordinate [cm].
         double& y = point.y;  // The y-coordinate [cm].
         double& z = point.z;  // The z-coordinate [cm].
@@ -233,8 +233,8 @@ namespace X17
         MapPoint() : point(), dev() { }
 
         /// @brief Constructor for initializing a MapPoint object with given values.
-        /// @param p The EndPoint with (x,y,z,t) coordinates. [cm] and [ns]
-        /// @param d The EndPoint with (x,y,z,t) coordinates deviations. [cm] and [ns]
+        /// @param p The EndPoint with (x,y,z,t) coordinates ([cm] and [ns]).
+        /// @param d The EndPoint with (x,y,z,t) coordinates deviations ([cm] and [ns]).
         MapPoint(const EndPoint& p, const EndPoint& d) : point(p), dev(d) { }
 
         /// @brief Assignment operator.

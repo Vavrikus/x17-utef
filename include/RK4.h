@@ -1,7 +1,8 @@
 #pragma once
 
 // C++ dependencies
-#include <cmath>
+#include <functional>
+#include <vector>
 
 // ROOT dependencies
 #include "TGraph2D.h"
@@ -9,9 +10,6 @@
 
 // X17 dependencies
 #include "Matrix.h"
-#include "Points.h"
-#include "Vector.h"
-#include "X17Utilities.h"
 
 namespace X17
 {
@@ -25,11 +23,11 @@ namespace X17
         typedef std::function<bool(const double&,const VectorN&)> EndFn;
 
     private:
-        VecFn dif_eq;    // The function object that returns the derivative of the dependent variable with respect to the independent variable.
-        VectorN current; // The current value of the dependent variable.
-        double param;    // The current value of the independent variable.
-        double step;     // The step size for the integration.
-        EndFn end_fn;    // The function object that determines the end condition for the integration.
+        VecFn m_dif_eq;    // The function object that returns the derivative of the dependent variable with respect to the independent variable.
+        VectorN m_current; // The current value of the dependent variable.
+        double m_param;    // The current value of the independent variable.
+        double m_step;     // The step size for the integration.
+        EndFn m_end_fn;    // The function object that determines the end condition for the integration.
 
         std::vector<VectorN> results; // A vector that stores the values of the dependent variable at different points in the integration.
         
@@ -43,7 +41,7 @@ namespace X17
         RK4(double start, double step, VecFn equation, VectorN initial, EndFn end_condition);
 
         /// @brief Performs the integration using the fourth-order Runge-Kutta method.
-        void Run();
+        void Integrate();
 
         /// @brief Returns the vector of values of the dependent variable at different points in the integration.
         /// @return The vector of values of the dependent variable at different points in the integration.
@@ -55,7 +53,7 @@ namespace X17
 
         /// @brief Returns the step size used for the integration.
         /// @return The step size used for the integration.
-        double GetStep() const { return step; }
+        double GetStep() const { return m_step; }
     };
 
     /// @brief Computes the initial parameters for a simulation using the RK4 algorithm.
@@ -85,7 +83,7 @@ namespace X17
     /// @return True if the particle is out of the sector after it has moved beyond the minimum x position, false otherwise.
     bool IsOutOfSector(const double& tau, const Matrix<8,1>& params);
 
-    /// @brief Returns a pointer to an instance of RK4 class for tracking a charged particle in a magnetic field
+    /// @brief Returns a pointer to an instance of RK4 class for tracking a charged particle in a magnetic field.
     /// @param magfield Vector field representing the magnetic field.
     /// @param electron Boolean indicating if the particle is an electron or a positron.
     /// @param step Step size for the RK4 integration [s].
@@ -103,65 +101,22 @@ namespace X17
     /// @brief A class for fitting a 4th order Runge-Kutta generated points to a particle's trajectory.
     class RKFit
     {
+    private:
         static RKFit* lastfit; // A static pointer to the last instance of RKFit class created.
 
-        Field<Vector>* magfield; // A pointer to the magnetic field that the particle is traveling through.
-        bool electron;           // A boolean indicating whether the particle is an electron (true) or a positron (false).
-        double step;             // The step size used in the Runge-Kutta 4th order method.
-        Vector origin;           // The initial position of the particle.
-        Vector orientation;      // The initial orientation of the particle.
+        Field<Vector>* m_magfield; // A pointer to the magnetic field that the particle is traveling through.
+        bool m_electron;           // A boolean indicating whether the particle is an electron (true) or a positron (false).
+        double m_step;             // The step size used in the Runge-Kutta 4th order method.
+        Vector m_origin;           // The initial position of the particle.
+        Vector m_orientation;      // The initial orientation of the particle.
 
-        std::vector<RecoPoint> fit_data; // A vector containing the reconstructed points used for fitting.
-        RK4<8>* curr_rk = nullptr;       // A pointer to the RK4 object used to compute the trajectory of the particle.
+        std::vector<RecoPoint> m_fit_data; // A vector containing the reconstructed points used for fitting.
+        RK4<8>* m_curr_rk = nullptr;       // A pointer to the RK4 object used to compute the trajectory of the particle.
 
-        TVirtualFitter* fitter; // A pointer to the ROOT fitter used for fitting.
+        TVirtualFitter* m_fitter; // A pointer to the ROOT fitter used for fitting.
 
-        double kin_en; // The kinetic energy of the particle [eV].
-        double e_err;  // The error of the kinetic energy [eV].
-
-        /// @brief Gets a point on the computed trajectory at a specified index.
-        /// @param index The index of the desired point on the trajectory.
-        /// @return The RKPoint object representing the position (with time) of the particle at the specified index on the trajectory.
-        RKPoint GetPoint(const int& index) const;
-
-        /// @brief Computes the square of the distance between a point and a point on the computed trajectory at a specified index.
-        /// @param index The index of the point on the trajectory to compare the distance to.
-        /// @param point The Vector object representing the point to calculate the distance from.
-        /// @return The square of the distance between the specified point and the point on the trajectory at the specified index.
-        double SqDist(const int& index, const Vector& point);
-
-        /// @brief Computes the scaled derivative of the square of the distance between a point and the point on the computed trajectory with respect to the index.
-        /// @param index The index of the point on the trajectory to compute the derivative at.
-        /// @param point The Vector object representing the point to calculate the derivative for.
-        /// @return The derivative of the square of the distance between the specified point and the computed trajectory at the specified index with respect to the index.
-        double DistDerivative(const int& index, const Vector& point)
-        {
-            return SqDist(index + 1, point) - SqDist(index,point);
-        }
-
-        /// @brief Calculates the squared distance between the given point and the curve.
-        /// @param point The point to calculate the distance to.
-        /// @return The squared distance between the point and the curve.
-        double GetSqDist(const Vector& point);
-
-        /// @brief Calculates the sum of squared distances for a set of fit data.
-        /// @param npar The number of parameters to fit.
-        /// @param gin The gradient of the fit parameters.
-        /// @param sumsq The calculated sum of squared distances.
-        /// @param par The parameters to fit.
-        /// @param iflag The fitting mode flag.
-        void SumSqDist(int& npar, double* gin, double& sumsq, double* par, int iflag);
-        
-        /// @brief A static wrapper function used to get the correct function pointer type needed for ROOT. Simply calls lastfit->SumSqDist().
-        /// @param npar The number of parameters to fit.
-        /// @param gin The gradient of the fit parameters.
-        /// @param sumsq The calculated sum of squared distances.
-        /// @param par The parameters to fit.
-        /// @param iflag The fitting mode flag.
-        static void Eval(int& npar, double* gin, double& sumsq, double* par, int iflag)
-        {
-            lastfit->SumSqDist(npar,gin,sumsq,par,iflag);
-        }
+        double m_kin_en; // The kinetic energy of the particle [eV].
+        double m_e_err;  // The error of the kinetic energy [eV].
 
     public:
         /// @brief Constructor for the RKFit class.
@@ -176,21 +131,69 @@ namespace X17
 
         /// @brief Sets the kinetic energy of the particle being tracked.
         /// @param kin_en The kinetic energy to set.
-        void SetEnergy(const double& kin_en) { this->kin_en = kin_en; }
+        void SetEnergy(const double& kin_en) { this->m_kin_en = kin_en; }
 
         /// @brief Sets up the TVirtualFitter for the circle fitting with the number of parameters and printout options.
         /// @param parameters Number of fitting parameters.
         /// @param print If true, the fit will printout the fitting status. If false, the fit will be silent.
         void SetFitter(int parameters = 1, bool print = true);
 
-        /// @brief Fits the Runge-Kutta object to the given data using the MINUIT fitter with specified maximum number of iterations and toleration
-        /// @param max_iter The maximum number of iterations for the fitting procedure (default = 500)
-        /// @param toleration The toleration level for the fitting procedure (default = 0.001)
+        /// @brief Fits the Runge-Kutta object to the given data using the MINUIT fitter with specified maximum number of iterations and toleration.
+        /// @param max_iter The maximum number of iterations for the fitting procedure (default = 500).
+        /// @param toleration The toleration level for the fitting procedure (default = 0.001).
         void FitRK(double max_iter = 500, double toleration = 0.001);
 
         /// @brief Prints the fitting parameters of the RK4 fit with their errors.
         void PrintFitParams();
 
-        TGraph2D* GetFitGraph() {return GetGraphRK(curr_rk);}
+        TGraph2D* GetFitGraph() { return GetGraphRK(m_curr_rk); }
+
+    private:
+        /// @brief Gets a point on the computed trajectory at a specified index.
+        /// @param index The index of the desired point on the trajectory.
+        /// @return The RKPoint object representing the position (with time) of the particle at the specified index on the trajectory.
+        RKPoint _GetPoint(const int& index) const;
+
+        /// @brief Computes the square of the distance between a point and a point on the computed trajectory at a specified index.
+        /// @param index The index of the point on the trajectory to compare the distance to.
+        /// @param point The Vector object representing the point to calculate the distance from.
+        /// @return The square of the distance between the specified point and the point on the trajectory at the specified index.
+        double _SqDist(const int& index, const Vector& point);
+
+        /// @brief Computes the scaled derivative of the square of the distance between a point and the point on the computed trajectory with respect to the index.
+        /// @param index The index of the point on the trajectory to compute the derivative at.
+        /// @param point The Vector object representing the point to calculate the derivative for.
+        /// @return The derivative of the square of the distance between the specified point and the computed trajectory at the specified index with respect to the index.
+        double _DistDerivative(const int& index, const Vector& point)
+        {
+            return _SqDist(index + 1, point) - _SqDist(index,point);
+        }
+
+        /// @brief Calculates the squared distance between the given point and the curve.
+        /// @param point The point to calculate the distance to.
+        /// @return The squared distance between the point and the curve.
+        double _GetSqDist(const Vector& point);
+
+        /// @brief Calculates the sum of squared distances for a set of fit data.
+        /// @param npar The number of parameters to fit.
+        /// @param gin The gradient of the fit parameters.
+        /// @param sumsq The calculated sum of squared distances.
+        /// @param par The parameters to fit.
+        /// @param iflag The fitting mode flag.
+        void _SumSqDist(int& npar, double* gin, double& sumsq, double* par, int iflag);
+        
+        /// @brief A static wrapper function used to get the correct function pointer type needed for ROOT. Simply calls lastfit->_SumSqDist().
+        /// @param npar The number of parameters to fit.
+        /// @param gin The gradient of the fit parameters.
+        /// @param sumsq The calculated sum of squared distances.
+        /// @param par The parameters to fit.
+        /// @param iflag The fitting mode flag.
+        static void _Eval(int& npar, double* gin, double& sumsq, double* par, int iflag)
+        {
+            lastfit->_SumSqDist(npar,gin,sumsq,par,iflag);
+        }
     };
 } // namespace X17
+
+// Templated function definitions.
+#include "RK4.inl"

@@ -1,10 +1,15 @@
+// C++ dependencies
+#include <algorithm>
+
 // X17 dependencies
 #include "Field.h"
 
 namespace X17
 {
+    //// Private methods.
+
     template <typename T>
-    void Field<T>::GetPointIndices(const double& x, const double& y, const double& z, int& xi, int& yi, int& zi) const
+    void Field<T>::_GetPointIndices(const double& x, const double& y, const double& z, int& xi, int& yi, int& zi) const
     {
         // Check if the point is out of bounds.
         if(x < m_xmin || x > m_xmax || y < m_ymin || y > m_ymax || z < m_zmin || z > m_zmax)
@@ -17,6 +22,12 @@ namespace X17
         yi = round((y - m_ymin) / m_step_size);
         zi = round((z - m_zmin) / m_step_size);
     }
+
+
+
+
+
+    //// Public methods.
 
     template <typename T>
     Field<T>::Field(const Vector& min_corner, const Vector& max_corner, const double& step, const T& def_value)
@@ -36,7 +47,7 @@ namespace X17
     T Field<T>::GetField(double x, double y, double z) const
     {
         int xi, yi, zi;
-        GetPointIndices(x, y, z, xi, yi, zi);
+        _GetPointIndices(x, y, z, xi, yi, zi);
 
         // Determine the grid coordinates of given point.
         int x_grid = m_xmin + m_step_size * xi;
@@ -45,9 +56,9 @@ namespace X17
 
         // Determine the indices of the eight surrounding points.
         int xi2, yi2, zi2;
-        if(x - x_grid < 0) xi2 = xi-1; else xi2 = xi + 1;
-        if(y - y_grid < 0) yi2 = yi-1; else yi2 = yi + 1;
-        if(z - z_grid < 0) zi2 = zi-1; else zi2 = zi + 1;
+        if(x - x_grid < 0) xi2 = xi - 1; else xi2 = xi + 1;
+        if(y - y_grid < 0) yi2 = yi - 1; else yi2 = yi + 1;
+        if(z - z_grid < 0) zi2 = zi - 1; else zi2 = zi + 1;
 
         // Make sure the indices are in bounds.
         std::clamp(xi2, 0, m_num_x_cells - 1);

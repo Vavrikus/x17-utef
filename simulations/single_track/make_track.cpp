@@ -1,3 +1,6 @@
+// C++ dependencies
+#include <iostream>
+
 // ROOT dependencies
 #include <TApplication.h>
 #include <TFile.h>
@@ -95,11 +98,11 @@ int main(int argc, char *argv[])
     double pz = 0;
     int k = 0;
 
-    // Now simulate a track, with p0 = x̂
+    // Now simulate a track, with p0 = x̂.
     track.NewTrack(xt, yt, zt, ti, px, py, pz);
 
     // Loop over the clusters.
-    double xc, yc, zc, tc, ec, extra; //parameters
+    double xc, yc, zc, tc, ec, extra;
     int nc;
     while (track.GetCluster(xc, yc, zc, tc, nc, ec, extra)) 
     {
@@ -110,7 +113,7 @@ int main(int argc, char *argv[])
             track.GetElectron(j, xe, ye, ze, te, ee, dxe, dye, dze);
             // Simulate the drift/avalanche of this electron.
             aval.AvalancheElectron(xe, ye, ze, te, 0.1, dxe, dye, dze);
-            // // Move electrons that hit the mesh plane into the amplification gap.
+            // Move electrons that hit the mesh plane into the amplification gap.
             int status;
             aval.GetElectronEndpoint(0, point.x0, point.y0, point.z0, point.t0, point.e0, point.x1, point.y1, point.z1, point.t1, point.e1, status);
             electrons.Fill();

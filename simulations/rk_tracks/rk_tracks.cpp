@@ -1,5 +1,6 @@
 // ROOT dependencies
 #include "TCanvas.h"
+#include "TFile.h"
 #include "TH3F.h"
 #include "TRandom3.h"
 #include "TStyle.h"
@@ -17,21 +18,21 @@ using namespace X17::constants;
 
 int rk_tracks()
 {
-    constexpr int n_tracks  =  100000;        // The number of tracks to be simulated by Runge-Kutta.
-    constexpr double step   =  1E-13;         // The step of Runge-Kutta [s].
+    constexpr int n_tracks  =  100000;         // The number of tracks to be simulated by Runge-Kutta.
+    constexpr double step   =  1E-13;          // The step of Runge-Kutta [s].
 
     // Assuming that the target is in the YZ plane.
-    constexpr double x0     =  0;             // The x coordinate of simulated origin [cm].
-    constexpr double r_max  =  target_radius; // The maximal distance from origin [cm].
+    constexpr double x0     =  0;              // The x coordinate of simulated origin [cm].
+    constexpr double r_max  =  target_radius;  // The maximal distance from origin [cm].
 
-    constexpr double x1     =  xmin;          // The x coordinate of simulated window point [cm].
-    constexpr double y1_min = -win_width/2;   // The minimal y coordinate of simulated window point [cm].
-    constexpr double y1_max = -y1_min;        // The maximal y coordinate of simulated window point [cm].
-    constexpr double z1_min = -win_height/2;  // The minimal z coordinate of simulated window point [cm].
-    constexpr double z1_max = -z1_min;        // The maximal z coordinate of simulated window point [cm].
+    constexpr double x1     =  xmin;           // The x coordinate of simulated window point [cm].
+    constexpr double y1_min = -win_width / 2;  // The minimal y coordinate of simulated window point [cm].
+    constexpr double y1_max = -y1_min;         // The maximal y coordinate of simulated window point [cm].
+    constexpr double z1_min = -win_height / 2; // The minimal z coordinate of simulated window point [cm].
+    constexpr double z1_max = -z1_min;         // The maximal z coordinate of simulated window point [cm].
 
-    constexpr double e_min  =  4e+6;          // The minimal simulated energy [eV].
-    constexpr double e_max  =  12e+6;         // The maximal simulated energy [eV].
+    constexpr double e_min  =  4e+6;           // The minimal simulated energy [eV].
+    constexpr double e_max  =  12e+6;          // The maximal simulated energy [eV].
 
     // Loading the magnetic field.
     X17::Field<X17::Vector>* magfield = X17::LoadField("../../data/elmag/VecB2.txt",{-20,-30,-30},{20,30,30},0.5);
@@ -71,18 +72,18 @@ int rk_tracks()
 
         // The actual track simulation.
         X17::RK4<8>* track = GetTrackRK(*magfield,electron,step,kin_en,origin,orientation);
-        track->Run();
+        track->Integrate();
 
         std::vector<X17::Matrix<8,1>> results = track->GetResults();
         std::vector<X17::RKPoint> points;
 
         using namespace X17::constants;
-        for (auto r : results) points.emplace_back(m2cm*r.at(1,0),m2cm*r.at(2,0),m2cm*r.at(3,0),1e+9*r.at(0,0));
+        for (auto r : results) points.emplace_back(m2cm * r.at(1,0), m2cm * r.at(2,0), m2cm * r.at(3,0), 1e+9 * r.at(0,0));
 
         current_track = X17::TrackRK(electron,points,origin,orientation,kin_en);
         simulated_tracks->Fill();
 
-        if((100*i)%n_tracks == 0) track_graphs.push_back(GetGraphRK(track));
+        if((100 * i) % n_tracks == 0) track_graphs.push_back(GetGraphRK(track));
     }
 
     // Plotting some of the tracks.

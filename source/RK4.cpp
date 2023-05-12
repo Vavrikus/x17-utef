@@ -1,37 +1,20 @@
+// C++ dependencies
+#include <cmath>
+#include <iostream>
+
+// ROOT dependencies
+#include "TGraph2D.h"
+
 // X17 dependencies
+#include "Field.h"
+#include "Matrix.h"
+#include "Points.h"
 #include "RK4.h"
+#include "Vector.h"
+#include "X17Utilities.h"
 
 namespace X17
 {
-    template<int N>        
-    RK4<N>::RK4(double start, double step, VecFn equation, VectorN initial, EndFn end_condition)
-        : param(start),step(step),dif_eq(equation),end_fn(end_condition),current(initial)
-    {
-        results.push_back(current);
-    }
-
-    template<int N>
-    void RK4<N>::Run()
-    {
-        while(!end_fn(step,current))
-        {
-            VectorN k1,k2,k3,k4;
-            dif_eq(param,        current,      k1);
-            k1 *= step;
-            dif_eq(param+step/2, current+k1/2, k2);
-            k2 *= step;
-            dif_eq(param+step/2, current+k2/2, k3);
-            k3 *= step;
-            dif_eq(param+step,   current+k3,   k4);
-            k4 *= step;
-
-            VectorN diff = (1.0/6.0)*(k1+2*k2+2*k3+k4);
-            current += diff;
-            param   += step;
-            results.push_back(current);
-        }
-    }
-
     Matrix<8,1> GetInitParams(const double& kin_en, const Vector& origin, const Vector& orientation)
     {
         using namespace constants;
@@ -41,8 +24,8 @@ namespace X17
 
         Vector start = origin/m2cm;
 
-        double gamma    = 1 + kin_en/E0;
-        double velocity = sqrt((1-pow(1/gamma,2))*pow(c,2));
+        double gamma    = 1 + kin_en / E0;
+        double velocity = sqrt((1 - pow(1 / gamma,2)) * pow(c,2));
 
         return Matrix<8,1>({
             0,
@@ -63,10 +46,10 @@ namespace X17
         Vector b = magfield.GetField(m2cm * position);
 
         // The electric field in the TPC has units of [V/cm] so we transform to [V/m].
-        return Matrix<4,4>({0,                -m2cm*efield.x/c, -m2cm*efield.y/c, -m2cm*efield.z/c,
-                            m2cm*efield.x/c,  0,                 b.z,             -b.y,
-                            m2cm*efield.y/c, -b.z,              0,                 b.x,
-                            m2cm*efield.z/c,  b.y,             -b.x,              0               });
+        return Matrix<4,4>({ 0,                -m2cm*efield.x/c, -m2cm*efield.y/c, -m2cm*efield.z/c,
+                             m2cm*efield.x/c,  0,                 b.z,             -b.y,
+                             m2cm*efield.y/c, -b.z,               0,                b.x,
+                             m2cm*efield.z/c,  b.y,              -b.x,              0                });
     }
 
     void EMMotion(const Field<Vector>& magfield, const bool& electron, const double& tau, const Matrix<8,1>& params, Matrix<8,1>& output)
@@ -94,7 +77,7 @@ namespace X17
     bool IsOutOfSector(const double& tau, const Matrix<8,1>& params)
     {
         using namespace constants;
-        return (!IsInSector(m2cm*params.at(1,0),m2cm*params.at(2,0),m2cm*params.at(3,0),-0.5)) && (m2cm*params.at(1,0) > xmin);
+        return (!IsInSector(m2cm * params.at(1,0), m2cm * params.at(2,0), m2cm * params.at(3,0),-0.5)) && (m2cm * params.at(1,0) > xmin);
     }
 
     RK4<8>* GetTrackRK(const Field<Vector>& magfield, const bool& electron, const double& step, const double& kin_en, const Vector& origin, const Vector& orientation)
@@ -114,7 +97,7 @@ namespace X17
         for (auto r : results)
         {
             using namespace constants;
-            Vector point = {m2cm*r.at(1,0),m2cm*r.at(2,0),m2cm*r.at(3,0)};
+            Vector point = {m2cm * r.at(1,0), m2cm * r.at(2,0), m2cm * r.at(3,0)};
             if (IsInSector(point)) output->AddPoint(point.x,point.y,point.z);
         }
         return output;
@@ -122,41 +105,41 @@ namespace X17
 
     RKFit* RKFit::lastfit = nullptr;
 
-    RKPoint RKFit::GetPoint(const int& index) const
+    RKPoint RKFit::_GetPoint(const int& index) const
     {
         using namespace constants;
-        auto rk_pts = curr_rk->GetResults();
-        return RKPoint(m2cm*rk_pts[index].at(1,0),m2cm*rk_pts[index].at(2,0),m2cm*rk_pts[index].at(3,0),1e+9*rk_pts[index].at(0,0));
+        auto rk_pts = m_curr_rk->GetResults();
+        return RKPoint(m2cm * rk_pts[index].at(1,0), m2cm * rk_pts[index].at(2,0), m2cm * rk_pts[index].at(3,0), 1e+9 * rk_pts[index].at(0,0));
     }
 
-    double RKFit::SqDist(const int& index, const Vector& point)
+    double RKFit::_SqDist(const int& index, const Vector& point)
     {
-        RKPoint rk_point = GetPoint(index);
+        RKPoint rk_point = _GetPoint(index);
         return rk_point.AsVector().SqDist(point);
     }
 
-    double RKFit::GetSqDist(const Vector& point)
+    double RKFit::_GetSqDist(const Vector& point)
     {
         int min_index = 0;
-        int max_index = curr_rk->GetSize()-2;
+        int max_index = m_curr_rk->GetSize() - 2;
 
-        double min_der = DistDerivative(min_index,point);
-        double max_der = DistDerivative(max_index,point);
+        double min_der = _DistDerivative(min_index,point);
+        double max_der = _DistDerivative(max_index,point);
 
-        // convex function minimum search
+        // Convex function minimum search.
         while (min_index + 1 != max_index)
         {
-            int mid_index = (min_index+max_index)/2;
-            double mid_der = DistDerivative(mid_index,point);
+            int mid_index = (min_index + max_index) / 2;
+            double mid_der = _DistDerivative(mid_index,point);
 
             if (mid_der*max_der > 0) {max_der = mid_der; max_index = mid_index;}
             else                     {min_der = mid_der; min_index = mid_index;}
         }
 
-        // minimal distance from two lines
-        Vector orig    = GetPoint(max_index).AsVector();
-        Vector orient1 = GetPoint(max_index + 1).AsVector() - orig;
-        Vector orient2 = GetPoint(max_index - 1).AsVector() - orig;
+        // Minimal distance from two lines.
+        Vector orig    = _GetPoint(max_index).AsVector();
+        Vector orient1 = _GetPoint(max_index + 1).AsVector() - orig;
+        Vector orient2 = _GetPoint(max_index - 1).AsVector() - orig;
 
         double dist1 = LineSqDist(orig,orient1,orient1.Magnitude(),point);
         double dist2 = LineSqDist(orig,orient2,orient2.Magnitude(),point);
@@ -164,50 +147,50 @@ namespace X17
         return std::min(dist1,dist2);
     }
 
-    void RKFit::SumSqDist(int& npar, double* gin, double& sumsq, double* par, int iflag)
+    void RKFit::_SumSqDist(int& npar, double* gin, double& sumsq, double* par, int iflag)
     {
-        kin_en = par[0];
+        m_kin_en = par[0];
         
-        if (curr_rk != nullptr) delete curr_rk;
-        curr_rk = GetTrackRK(*magfield,electron,step,kin_en,origin,orientation);
-        curr_rk->Run();
+        if (m_curr_rk != nullptr) delete m_curr_rk;
+        m_curr_rk = GetTrackRK(*m_magfield,m_electron,m_step,m_kin_en,m_origin,m_orientation);
+        m_curr_rk->Integrate();
         
         sumsq = 0;
-        for (auto p : fit_data) sumsq += p.count*GetSqDist(p.AsVector());
+        for (auto p : m_fit_data) sumsq += p.count * _GetSqDist(p.AsVector());
     }
 
     RKFit::RKFit(Field<Vector>* magfield, const bool& electron, const double& step, const Vector& origin,
             const Vector& orientation, const std::vector<RecoPoint>& fit_data)
-        : magfield(magfield), electron(electron), step(step), origin(origin), orientation(orientation), fit_data(fit_data)
+        : m_magfield(magfield), m_electron(electron), m_step(step), m_origin(origin), m_orientation(orientation), m_fit_data(fit_data)
     { lastfit = this; }
 
     void RKFit::SetFitter(int parameters, bool print)
     {        
-        fitter = TVirtualFitter::Fitter(nullptr,parameters); // the second number is number of parameters
-        fitter->SetFCN(this->Eval);
+        m_fitter = TVirtualFitter::Fitter(nullptr,parameters);
+        m_fitter->SetFCN(this->_Eval);
 
         if(!print)
         {
             double arg = -1;
-            fitter->ExecuteCommand("SET PRINTOUT",&arg,1);
-            fitter->ExecuteCommand("SET NOW", &arg ,1);
+            m_fitter->ExecuteCommand("SET PRINTOUT",&arg,1);
+            m_fitter->ExecuteCommand("SET NOW", &arg ,1);
         }
     }
 
     void RKFit::FitRK(double max_iter, double toleration)
     {
-        fitter->SetParameter(0,"kin_en",kin_en,1000,1000000,16000000);
+        m_fitter->SetParameter(0,"kin_en",m_kin_en,1000,1000000,16000000);
 
-        double arglist[2] = {max_iter,toleration};  // max iterations, step size (toleration)
-        fitter->ExecuteCommand("MIGRAD",arglist,2); // last one num of prints (verbosity)
+        double arglist[2] = {max_iter,toleration};    // Maximum iterations, step size (toleration).
+        m_fitter->ExecuteCommand("MIGRAD",arglist,2); // The last parameter is the num of prints (verbosity).
 
-        kin_en = fitter->GetParameter(0);
-        e_err  = fitter->GetParError(0);
+        m_kin_en = m_fitter->GetParameter(0);
+        m_e_err  = m_fitter->GetParError(0);
     }
 
     void RKFit::PrintFitParams()
     {
         std::cout << "\nRK FIT RESULT:\n";
-        std::cout << "Kinetic energy:  " << kin_en << " +- " << e_err << "\n\n";
+        std::cout << "Kinetic energy:  " << m_kin_en << " +- " << m_e_err << "\n\n";
     }
 } // namespace X17

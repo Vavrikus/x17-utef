@@ -49,7 +49,7 @@ int make_map()
     // Prepare the field that will hold the final values.
     X17::Field<X17::MapPoint> map({0,-30,-8},{15,30,8},1,X17::MapPoint());
 
-    // variables for checking with the previous position
+    // Variables for checking with the previous position.
     X17::Vector v_prev(0,0,0);        // Vector for the previous position. Used for comparison with current position.
     int same_prev = 1;                // The number of entries with the same position including the current entry.
     X17::EndPoint p_avg(0,0,0,0);     // The object used for calculating of the averages.
@@ -60,8 +60,8 @@ int make_map()
     {
         map_data_in->GetEntry(i);
         
-        double percent_complete = 100*i*1.0/map_data_in->GetEntries();
-        if (floor(percent_complete) - floor(percent_complete*(i-1.0)/i) == 1) std::cout << "Progress: " << floor(percent_complete) << "\%\n";
+        double percent_complete = 100 * i * 1.0 / map_data_in->GetEntries();
+        if (floor(percent_complete) - floor(percent_complete * (i - 1.0) / i) == 1) std::cout << "Progress: " << floor(percent_complete) << "\%\n";
 
         if (point.GetInitPos() == v_prev && (i != map_data_in->GetEntries()-1))
         {
@@ -125,7 +125,7 @@ int make_map()
 
         for (int z_xyi = 0; z_xyi <= map.GetZCells(); z_xyi++)
         {
-            double z = map.GetZMin() + z_xyi*map.GetStep();
+            double z = map.GetZMin() + z_xyi * map.GetStep();
             for(MapTask* t : plot_tasks) t->Z_Loop_Start(z);
 
             for (int xi = 0; xi <= map.GetXCells(); xi++)
@@ -134,7 +134,7 @@ int make_map()
 
                 for (int yi = 0; yi <= map.GetYCells(); yi++)
                 {
-                    double y = map.GetYMin()+yi*map.GetStep();
+                    double y = map.GetYMin() + yi * map.GetStep();
                     X17::MapPoint& current = map.at(xi,yi,z_xyi);
 
                     for(MapTask* t : plot_tasks) t->XYZ_Loop(x,y,z,current);
@@ -148,10 +148,10 @@ int make_map()
 
         for (int xi = 0; xi <= map.GetXCells(); xi++)
         {
-            double x = map.GetXMin()+xi*map.GetStep();
+            double x = map.GetXMin() + xi * map.GetStep();
             for (int zi = 0; zi <= map.GetZCells(); zi++)
             {
-                double z = map.GetZMin()+zi*map.GetStep();
+                double z = map.GetZMin() + zi * map.GetStep();
                 X17::MapPoint& current = map.at(xi,y_xzi,zi);
 
                 for(MapTask* t : plot_tasks) t->ZX_Loop(z,x,current);
@@ -179,8 +179,8 @@ int make_map()
             gr->Draw("AP");
 
             X17::DefaultLayout& pads = X17::DefaultLayout::GetDefaultLayout();
-            pads.DrawPadsDistortion((i+1)*5000/16,c_pads,map);
-            //X17::DrawTrapezoid();
+            pads.DrawPadsDistortion((i + 1) * 5000 / 16, c_pads, map);
+            // X17::DrawTrapezoid();
         }
     }
 

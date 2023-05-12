@@ -1,8 +1,16 @@
+// C++ dependencies
+#include <iostream>
+#include <vector>
+
 // X17 dependencies
+#include "Field.h"
 #include "Points.h"
+#include "X17Utilities.h"
 
 namespace X17
 {
+    //// Public MicroPoint methods.
+
     void MicroPoint::MakeTTreeBranches(TTree* tree)
     {
         tree->Branch("x0",&x0);
@@ -49,6 +57,12 @@ namespace X17
         }
     }
 
+
+
+
+
+    //// Public MapPoint methods.
+
     double MapPoint::operator[](int i) const
     {
         switch (i)
@@ -72,16 +86,22 @@ namespace X17
         }
     }
 
+
+
+
+
+    //// Functions related to classes from Points.h.
+
     std::vector<TMarker3DBox*> GetDataMarkers(std::vector<RecoPoint> data, double zbin_size)
     {
         std::vector<TMarker3DBox*> markers;
         constexpr double max_size = 0.75;
 
-        // find maximal count
+        // Find maximal count.
         int max_count = 0;
         for (RecoPoint p : data) if (p.count > max_count) max_count = p.count;
 
-        // create markers
+        // Create markers.
         for (RecoPoint p : data)
         {
             using namespace constants;

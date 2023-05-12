@@ -1,8 +1,13 @@
+// C++ dependencies
+#include <algorithm>
+
 // X17 dependencies
 #include "Vector.h"
 
 namespace X17
 {
+    //// Public methods.
+
     void Vector::operator+=(const Vector& v)
     {
         this->x += v.x;
@@ -16,6 +21,12 @@ namespace X17
         y /= d;
         z /= d;
     }
+
+
+
+
+
+    //// Functions related to the Vector class.
 
     double LineSqDist(const Vector& origin, const Vector& orientation, double max_param, const Vector& point)
     {

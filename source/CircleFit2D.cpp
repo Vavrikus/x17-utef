@@ -1,5 +1,15 @@
+// C++ dependencies
+#include <cmath>
+
+// ROOT dependencies
+#include "TF1.h"
+#include "TGraph.h"
+#include "TSpline.h"
+
 // X17 dependencies
 #include "CircleFit2D.h"
+#include "Field.h"
+#include "Vector.h"
 #include "X17Utilities.h"
 
 namespace X17
@@ -16,29 +26,29 @@ namespace X17
 
     double circle_func(double* x, double* par)
     {
-        double& xx       = x[0];
-        double& radius   = par[0];
-        double& node1_x  = par[1];
-        double& node2_x  = par[2];
-        double& node1_y  = par[3];
-        double& node2_y  = par[4];
+        double& xx      = x[0];
+        double& radius  = par[0];
+        double& node1_x = par[1];
+        double& node2_x = par[2];
+        double& node1_y = par[3];
+        double& node2_y = par[4];
 
-        double x_mid = (node2_x-node1_x)/2;
-        double y_mid = (node2_y-node1_y)/2;
-        double r_mid = sqrt(pow(x_mid,2)+pow(y_mid,2));
+        double x_mid = (node2_x - node1_x) / 2;
+        double y_mid = (node2_y - node1_y) / 2;
+        double r_mid = sqrt(pow(x_mid,2) + pow(y_mid,2));
 
-        double r_c = sqrt(pow(radius,2)-pow(r_mid,2));
-        double x0 = node1_x+x_mid-y_mid*r_c/r_mid;
-        double y0 = node1_y+y_mid+x_mid*r_c/r_mid;
+        double r_c = sqrt(pow(radius,2) - pow(r_mid,2));
+        double x0 = node1_x + x_mid - y_mid * r_c / r_mid;
+        double y0 = node1_y + y_mid + x_mid * r_c / r_mid;
 
-        double a1 = (node1_x-x0)/sqrt(pow(radius,2)-pow(node1_x-x0,2));
-        double a2 = (node2_x-x0)/sqrt(pow(radius,2)-pow(node2_x-x0,2));
-        double b1 = node1_y-a1*node1_x;
-        double b2 = node2_y-a2*node2_x;
+        double a1 = (node1_x - x0) / sqrt(pow(radius,2) - pow(node1_x - x0,2));
+        double a2 = (node2_x - x0) / sqrt(pow(radius,2) - pow(node2_x - x0,2));
+        double b1 = node1_y - a1 * node1_x;
+        double b2 = node2_y - a2 * node2_x;
 
-        if (xx < node1_x) return a1*xx+b1;
-        if (xx > node2_x) return a2*xx+b2;    
-        return y0 - sqrt(pow(radius,2)-pow(xx-x0,2));
+        if (xx < node1_x) return a1 * xx + b1;
+        if (xx > node2_x) return a2 * xx + b2;    
+        return y0 - sqrt(pow(radius,2) - pow(xx - x0,2));
     }
 
     TF1* FitCircle2(TGraph* graph, const double& min, const double& max)

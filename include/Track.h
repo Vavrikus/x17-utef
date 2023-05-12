@@ -5,17 +5,18 @@
 
 // X17 dependencies
 #include "Points.h"
+#include "Vector.h"
 
 namespace X17
 {
-    /// @brief Struct for information about Runge-Kutta simulated track
+    /// @brief Struct for information about Runge-Kutta simulated track.
     struct TrackRK
     {
         bool electron;                 // True if electron, false if positron.
         std::vector<RKPoint> points;   // Simulated points.
-        Vector origin;                 // starting point of the track
-        Vector orientation;            // normalized original direction of the track
-        double kin_energy;             // kinetic energy of the track
+        Vector origin;                 // Starting point of the track.
+        Vector orientation;            // Normalized initial direction of the track.
+        double kin_energy;             // Kinetic energy of the track.
 
         TrackRK() = default;
 

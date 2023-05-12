@@ -1,18 +1,31 @@
+// C++ dependencies
+#include <iostream>
+#include <vector>
+
 // ROOT dependencies
+#include "TFile.h"
 #include "TLine.h"
+#include "TPolyLine3D.h"
+#include "TText.h"
 
 // X17 dependencies
+#include "Field.h"
 #include "PadLayout.h"
+#include "Points.h"
+#include "Reconstruction.h"
+#include "X17Utilities.h"
 
 namespace X17
 {
+    //// Public DefaultLayout methods.
+
     double DefaultLayout::GetPadHeight(const int& i, const bool& effective)
     {
         using namespace constants;
 
         double height = pad_height;
         
-        // Special cases for height
+        // Special cases for height.
         if (i == 102) height = pad_height2;
         if (i == 124) height = pad_height2;
         if (i == 127) height = pad_height3;
@@ -25,33 +38,33 @@ namespace X17
         using namespace constants;
         if(i < 1 || i > channels) std::cerr << "WARNING: Invalid channel number " << i << " (must be between 1 and " << channels << ").\n";
 
-        int triangle_row1   = 7;  // first row with smaller number of columns
-        int triangle_row2   = 10; // first row breaking the first triangle
+        int triangle_row1   = 7;  // First row with smaller number of columns.
+        int triangle_row2   = 10; // First row breaking the first triangle.
         int part1_channels  = (triangle_row1 - 1) * columns;
         int part12_channels = part1_channels + triangle(columns-1) - triangle(columns-1-triangle_row2+triangle_row1);
 
-        // Part with same length rows (first six rows)
-        if (i <= part1_channels)  {out_row = (i-1)/columns+1; out_column = i%columns;}
+        // Part with same length rows (first six rows).
+        if (i <= part1_channels)  {out_row = (i - 1) / columns + 1; out_column = i % columns;}
 
-        // First triangular part (rows 7-9)
+        // First triangular part (rows 7-9).
         else if (i <= part12_channels)
         {
-            // Maximal number in row r is diference of c-th and (c-r)th triangular number
-            out_row    = triangle_row1-1 + triangle_row(columns-1,i-part1_channels);
+            // Maximal number in row r is diference of c-th and (c-r)th triangular number.
+            out_row    = triangle_row1 - 1 + triangle_row(columns - 1, i - part1_channels);
 
-            // Column number is the offset of channel from difference of c-th and r-th triangle number
-            out_column = (i-part1_channels) - triangle(columns-1) + triangle(columns-1+triangle_row1-out_row);
+            // Column number is the offset of channel from difference of c-th and r-th triangle number.
+            out_column = (i - part1_channels) - triangle(columns - 1) + triangle(columns - 1 + triangle_row1 - out_row);
         }
 
-        // Second triangular part (rows 10-15, missing number in last row does not matter)
+        // Second triangular part (rows 10-15, missing number in last row does not matter).
         else
         {
-            int max_cols_p3 = columns-2-triangle_row2+triangle_row1;
-            out_row    = triangle_row2-1 + triangle_row(max_cols_p3,i-part12_channels);
-            out_column = (i-part12_channels) - triangle(columns-2-triangle_row2+triangle_row1) + triangle(max_cols_p3+triangle_row2-out_row);
+            int max_cols_p3 = columns - 2 - triangle_row2 + triangle_row1;
+            out_row    = triangle_row2 - 1 + triangle_row(max_cols_p3, i - part12_channels);
+            out_column = (i - part12_channels) - triangle(columns - 2 - triangle_row2 + triangle_row1) + triangle(max_cols_p3 + triangle_row2 - out_row);
         }
 
-        if (out_column == 0) out_column = 12; // Number 0 corresponds to 12th column
+        if (out_column == 0) out_column = 12; // Number 0 corresponds to 12th column.
 
         out_height = GetPadHeight(i);
     }
@@ -59,35 +72,35 @@ namespace X17
     {
         using namespace constants;
 
-        int column; // Column number of given pad (0 corresponds to 12)
-        int row;    // Row (diagonal) number of given pad
+        int column; // Column number of given pad (0 corresponds to 12).
+        int row;    // Row (diagonal) number of given pad.
 
-        double i_pad_height; // Height of the i-th pad
+        double i_pad_height; // Height of the i-th pad.
         
         GetPadInfo(i,column,row,i_pad_height);
 
-        out_x = xmax - (column-1)*(pad_width+pad_offset) - pad_width/2;
-        out_y = -(yhigh + pad1_offset - (row-1)*(pad_height + pad_offset) - (column-1)*pad_stag - i_pad_height/2);
+        out_x = xmax - (column - 1) * (pad_width + pad_offset) - pad_width / 2;
+        out_y = -(yhigh + pad1_offset - (row - 1) * (pad_height + pad_offset) - (column - 1) * pad_stag - i_pad_height / 2);
     }
 
     void DefaultLayout::GetPadCorners(const int& i, double& out_xlow, double& out_ylow, double& out_xhigh, double& out_yhigh, bool nogaps)
     {   
         using namespace constants;
 
-        double gaps_correction = 0; // removes gaps if nogaps is true
+        double gaps_correction = 0; // Removes gaps if nogaps is true.
         if (nogaps) gaps_correction = pad_offset / 2.0;
 
-        int column; // Column number of given pad (0 corresponds to 12)
-        int row;    // Row (diagonal) number of given pad
+        int column; // Column number of given pad (0 corresponds to 12).
+        int row;    // Row (diagonal) number of given pad.
 
-        double i_pad_height; // Height of the i-th pad
+        double i_pad_height; // Height of the i-th pad.
         
         GetPadInfo(i,column,row,i_pad_height);
 
-        out_xhigh = xmax - (column-1)*(pad_width+pad_offset) + gaps_correction;
-        out_ylow  = -(yhigh + pad1_offset - (row-1)*(pad_height+pad_offset) - (column-1)*pad_stag + gaps_correction);
-        out_xlow  = out_xhigh - pad_width - 2*gaps_correction;
-        out_yhigh = out_ylow - (-i_pad_height - 2*gaps_correction);
+        out_xhigh = xmax - (column - 1) * (pad_width + pad_offset) + gaps_correction;
+        out_ylow  = -(yhigh + pad1_offset - (row - 1) * (pad_height + pad_offset) - (column - 1) * pad_stag + gaps_correction);
+        out_xlow  = out_xhigh - pad_width - 2 * gaps_correction;
+        out_yhigh = out_ylow - (-i_pad_height - 2 * gaps_correction);
     }
 
     int DefaultLayout::GetPad(const double& x, const double& y)
@@ -117,10 +130,10 @@ namespace X17
             double x1,y1,x2,y2;
             GetPadCorners(i,x1,y1,x2,y2,nogaps);
 
-            pad_lines.push_back(new TLine(x1,y1,x1,y2)); // left
-            pad_lines.push_back(new TLine(x2,y1,x2,y2)); // right
-            pad_lines.push_back(new TLine(x1,y1,x2,y1)); // bottom
-            pad_lines.push_back(new TLine(x1,y2,x2,y2)); // top
+            pad_lines.push_back(new TLine(x1,y1,x1,y2)); // Left line.
+            pad_lines.push_back(new TLine(x2,y1,x2,y2)); // Right line.
+            pad_lines.push_back(new TLine(x1,y1,x2,y1)); // Bottom line.
+            pad_lines.push_back(new TLine(x1,y2,x2,y2)); // Top line.
 
             // double xc,yc;
             // GetPadCenter(i,xc,yc);
@@ -171,7 +184,7 @@ namespace X17
     {
         using namespace constants;
 
-        // Get map from initial to final electron positions from file
+        // Get map from initial to final electron positions from file.
         if (map == nullptr)
         {
             TFile* inFile2 = new TFile("/home/vavrik/work/X17/data/ion_map/map.root");
@@ -201,10 +214,10 @@ namespace X17
             RecoPoint topleft     = Reconstruct(*map,EndPoint{x2,y1,0,time});
             RecoPoint topright    = Reconstruct(*map,EndPoint{x2,y2,0,time});
 
-            pad_lines.push_back(new TLine(-bottomleft.y,  bottomleft.x,  -topleft.y,     topleft.x));     // left
-            pad_lines.push_back(new TLine(-bottomright.y, bottomright.x, -topright.y,    topright.x));    // right
-            pad_lines.push_back(new TLine(-bottomleft.y,  bottomleft.x,  -bottomright.y, bottomright.x)); // bottom
-            pad_lines.push_back(new TLine(-topleft.y,     topleft.x,     -topright.y,    topright.x));    // top
+            pad_lines.push_back(new TLine(-bottomleft.y,  bottomleft.x,  -topleft.y,     topleft.x));     // Left line.
+            pad_lines.push_back(new TLine(-bottomright.y, bottomright.x, -topright.y,    topright.x));    // Right line.
+            pad_lines.push_back(new TLine(-bottomleft.y,  bottomleft.x,  -bottomright.y, bottomright.x)); // Bottom line.
+            pad_lines.push_back(new TLine(-topleft.y,     topleft.x,     -topright.y,    topright.x));    // Top line.
         }
         
         for(auto l : pad_lines) l->Draw("same");

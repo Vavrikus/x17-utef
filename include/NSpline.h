@@ -13,18 +13,18 @@ namespace X17
 		typedef std::function<double(double*,double*)> EvalFn;
 
 	private:
-		double nodes_x[N];        // The x-coordinates of spline nodes.
-		bool FixDerStart = false; // Is the derivative at the start fixed in fit?
-		bool FixDerEnd   = false; // Is the derivative at the end fixed in fit?
-		double der_start;         // Derivative at the start of the spline.
-		double der_end;           // Derivative at the end of the spline.
+		double m_nodes_x[N];          // The x-coordinates of spline nodes.
+		bool m_fix_der_start = false; // Is the derivative at the start fixed in fit?
+		bool m_fix_der_end   = false; // Is the derivative at the end fixed in fit?
+		double m_der_start;           // Derivative at the start of the spline.
+		double m_der_end;             // Derivative at the end of the spline.
 
 	public:
 		/// @brief Constructor for NSpline.
 		/// @param nodes_x An array of N doubles representing the x-coordinates of the nodes.
 		NSpline(const double nodes_x[N])
 		{
-			for (int i = 0; i < N; ++i) this->nodes_x[i] = nodes_x[i];
+			for (int i = 0; i < N; ++i) this->m_nodes_x[i] = nodes_x[i];
 		}
 
 		/// @brief Constructor for NSpline that generates a set of evenly spaced nodes between min and max.
@@ -32,16 +32,16 @@ namespace X17
 		/// @param max The maximum x-value of the spline.
 		NSpline(double min, double max)
 		{
-			for (int i = 0; i < N; i++) this->nodes_x[i] = min+(i/(N-1.0))*(max-min);
+			for (int i = 0; i < N; i++) this->m_nodes_x[i] = min + (i / (N - 1.0)) * (max - min);
 		}
 		
 		/// @brief Set the starting derivative for the spline and fix it in fit.
 		/// @param der_start The value of the starting derivative.
-		void SetDerStart(double der_start) {this->der_start = der_start; FixDerStart = true;}
+		void SetDerStart(double der_start) {this->m_der_start = der_start; m_fix_der_start = true;}
 
 		/// @brief Set the ending derivative for the spline and fix it in fit.
 		/// @param der_start The value of the ending derivative.
-		void SetDerEnd(double der_end) {this->der_end = der_end; FixDerEnd = true;}
+		void SetDerEnd(double der_end) {this->m_der_end = der_end; m_fix_der_end = true;}
 
 		/// @brief Evaluates the NSpline at a given x-value.
 		/// @param x A pointer to an array of doubles representing the x-value at which to evaluate the spline.
@@ -63,3 +63,6 @@ namespace X17
 	template<int nodes>
 	TSpline3* FitSplines(TGraph* graph, const double& min, const double& max);
 } // namespace X17
+
+// Templated function definitions.
+#include "NSpline.inl"
