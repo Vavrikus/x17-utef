@@ -29,12 +29,12 @@ namespace X17
         for(int zi = 0; zi < magfield.GetZCells(); zi++)
         {
             const Vector& v = magfield.at(xi,yi,zi);
-            const double m2cm = 100;
+            
             double x = magfield.GetXMin() + magfield.GetStep()*xi;
             double y = magfield.GetYMin() + magfield.GetStep()*yi;
             double z = magfield.GetZMin() + magfield.GetStep()*zi;
 
-            if (IsInSector(m2cm*x,m2cm*y,m2cm*z,dist))
+            if (IsInSector(x,y,z,dist))
             {
                 if (v.SqMagnitude() < min_magnitude_sq || min_magnitude_sq == -1) 
                     min_magnitude_sq = v.SqMagnitude();
@@ -57,13 +57,13 @@ namespace X17
         for(int zi = 0; zi < magfield.GetZCells(); zi++)
         {
             const Vector& v = magfield.at(xi,yi,zi);
-            const double m2cm = 100;
+            
             double x = magfield.GetXMin() + magfield.GetStep()*xi;
             double y = magfield.GetYMin() + magfield.GetStep()*yi;
             double z = magfield.GetZMin() + magfield.GetStep()*zi;
 
 
-            if (IsInSector(m2cm*x,m2cm*y,m2cm*z,dist))
+            if (IsInSector(x,y,z,dist))
             {
                 using namespace constants;
 

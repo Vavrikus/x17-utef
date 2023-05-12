@@ -13,7 +13,7 @@ using namespace X17;
 int reco_track()
 {
     // Loading the magnetic field data.
-    X17::Field<X17::Vector>* magfield = X17::LoadField("../data/elmag/VecB2.txt",{-0.2,-0.3,-0.3},{0.2,0.3,0.3},0.005);
+    X17::Field<X17::Vector>* magfield = X17::LoadField("../data/elmag/VecB2.txt",{-20,-30,-30},{20,30,30},0.5);
 
     // Loading the ionization electron drift map.
     TFile* map_input = new TFile("../data/ion_map/map.root");

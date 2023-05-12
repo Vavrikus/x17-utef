@@ -64,19 +64,21 @@ namespace X17
 
             double xnode, ynode, b, c, d;
             sp_fit->GetCoeff(i_node, xnode, ynode, b, c, d);
+
+            // Calculate the radius [m] of the track from the fitted spline.
             double dx   = x - xnode;
             double der  = b + dx * (2 * c + 3 * d * dx);
             double der2 = 2 * c + 6 * d * dx;
-            double r    = 0.01 * pow(1 + der * der, 1.5) / der2;
+            double r    = cm2m * pow(1 + der * der, 1.5) / der2;
             
-            Vector B      = magfield.GetField(x / 100, 0, (8 - sp_fit->Eval(x)) / 100);
+            Vector B      = magfield.GetField(x, 0, 8 - sp_fit->Eval(x));
             double betasq = 1 / (1 + pow((E0 / (c * r * B.x)), 2));
             double Ekin   = E0 * (1 / sqrt(1 - betasq) - 1);
 
             if (x > 4)
                 energy->AddPoint(x, Ekin / 1e6);
             if (r < 1 && r > 0)
-                radius->AddPoint(x, r * 100);
+                radius->AddPoint(x, r * m2cm);
 
             magnetic->AddPoint(x, B.y);
         }
@@ -84,21 +86,21 @@ namespace X17
 
     void RecoEnergy(TF1* fit, const Field<Vector>& magfield, TGraph* magnetic, double min, double max, double step)
     {
-        double r = fit->GetParameter(0)/100;
-        const double clight = 299792458;
-        const double E0 = 510998.95;
+        using namespace constants;
 
-        // mean magnetic field
-        Vector B = magfield.GetField((max+min)/200,0,(8-fit->Eval((max+min)/2))/100);
+        double r = cm2m * fit->GetParameter(0);
+
+        // Mean magnetic field.
+        Vector B = magfield.GetField((max + min) / 2, 0, 8 - fit->Eval((max + min) / 2));
 
         for (double x = min; x <= max; x += step)
         {
-            Vector B2 = magfield.GetField(x/100,0,(8-fit->Eval(x))/100);
+            Vector B2 = magfield.GetField(x, 0, 8-fit->Eval(x));
             magnetic->AddPoint(x,B2.y);
         }
         
-        double betasq = 1/(1+pow((E0/(clight*r*B.y)),2));
-        double Ekin = E0*(1/sqrt(1-betasq)-1);
+        double betasq = 1 / (1 + pow((E0 / (c * r * B.y)), 2));
+        double Ekin = E0 * (1 / sqrt(1 - betasq) - 1);
 
         std::cout << "Kinetic energy: " << Ekin << " eV, By: " << B.y << " T, beta: ";
         std::cout << sqrt(betasq) << "\n";

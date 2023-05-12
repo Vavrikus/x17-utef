@@ -67,7 +67,7 @@ namespace X17
 
     /// @brief Calculates the electromagnetic field tensor at a given position.
     /// @param magfield Vector field representing the magnetic field.
-    /// @param position The position at which to calculate the electromagnetic field.
+    /// @param position The position at which to calculate the electromagnetic field [m].
     /// @return A 4x4 matrix representing the electromagnetic field tensor.
     Matrix<4,4> GetEMtensor(const Field<Vector>& magfield, const Vector& position);
 

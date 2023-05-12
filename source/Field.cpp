@@ -25,8 +25,13 @@ namespace X17
             {                
                 if (X != "")
                 {
-                    double x,y,z,vx,vy,vz;
-                    x = stod(X); y = stod(Y); z = stod(Z);
+                    using namespace constants;
+
+                    double x,y,z;    // Coordinates of the point in space [cm].
+                    double vx,vy,vz; // Components of the vector in given point.
+                    
+                    // Magnetic and electric field data files contain coordinates in meters.
+                    x = m2cm*stod(X); y = m2cm*stod(Y); z = m2cm*stod(Z);
                     vx = stod(VX); vy = stod(VY); vz = stod(VZ);
 
                     *(field->GetPoint(x,y,z)) = Vector{vx,vy,vz};

@@ -60,8 +60,9 @@ namespace X17
     {
         using namespace constants;
 
-        Vector b = magfield.GetField(position);
+        Vector b = magfield.GetField(m2cm * position);
 
+        // The electric field in the TPC has units of [V/cm] so we transform to [V/m].
         return Matrix<4,4>({0,                -m2cm*efield.x/c, -m2cm*efield.y/c, -m2cm*efield.z/c,
                             m2cm*efield.x/c,  0,                 b.z,             -b.y,
                             m2cm*efield.y/c, -b.z,              0,                 b.x,

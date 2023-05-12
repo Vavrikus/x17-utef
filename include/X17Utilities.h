@@ -14,6 +14,7 @@ namespace X17
             constexpr double E0   = 510998.95;       // Electron rest energy [eV]
             constexpr double m0   = e*E0/(c*c);      // Electron rest mass [kg]
             constexpr double m2cm = 100.0;           // Conversion m --> cm
+            constexpr double cm2m = 0.01;            // Conversion cm --> m
 
         // Target parameters
             constexpr double target_radius = 0.1; // Radius of the target [cm]
