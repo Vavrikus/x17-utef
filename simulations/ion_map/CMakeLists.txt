@@ -29,6 +29,9 @@ add_library(X17_source_lib STATIC ${SOURCES})
 
 # ---Build executable---------------------------------------------------------------------
 add_executable(ion_electrons ion_electrons.cpp)
+add_executable(make_map make_map.cpp)
 
 target_link_libraries(ion_electrons Garfield::Garfield ${ROOT_LIBRARIES} X17_source_lib)
+target_link_libraries(make_map Garfield::Garfield ${ROOT_LIBRARIES} X17_source_lib)
 target_include_directories(ion_electrons PRIVATE ../../include)
+target_include_directories(make_map PRIVATE ../../include)

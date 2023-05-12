@@ -104,6 +104,14 @@ namespace X17
             point /= d;
             t /= d;
         }
+
+        /// @brief Squares the Endpoint object.
+        /// @return EndPoint object with all coordinates squared.
+        EndPoint Square() { return EndPoint(x*x,y*y,z*z,t*t); }
+
+        /// @brief Calculates the square root of the EndPoint object.
+        /// @return EndPoint object with all coordinates equal to the square root of the original coordinates.
+        EndPoint SquareRoot() { return EndPoint(sqrt(x),sqrt(y),sqrt(z),sqrt(t)); }
     };
 
     /// @brief Adds two endpoints component-wise and returns the result.
@@ -228,6 +236,14 @@ namespace X17
         /// @param p The EndPoint with (x,y,z,t) coordinates. [cm] and [ns]
         /// @param d The EndPoint with (x,y,z,t) coordinates deviations. [cm] and [ns]
         MapPoint(const EndPoint& p, const EndPoint& d) : point(p), dev(d) { }
+
+        /// @brief Assignment operator.
+        /// @param p The MapPoint to be assigned to this MapPoint.
+        void operator=(const MapPoint& p)
+        {
+            point = p.point;
+            dev   = p.dev;
+        }
 
         /// @brief Add another map point to this map point.
         /// @param[in] p The map point to add.

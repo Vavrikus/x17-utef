@@ -27,9 +27,9 @@ template<typename T>
 T stdev(std::vector<T> values, T average)
 {
     T sqdev_sum = static_cast<T>(0);
-    for (T d : values) sqdev_sum += pow((d - average), 2);
+    for (T d : values) sqdev_sum += (d - average).Square();
 
-    return sqrt(sqdev_sum / values.size());
+    return (sqdev_sum / values.size()).SquareRoot();
 }
 
 /// @brief Returns random number between given minimal and maximal value.

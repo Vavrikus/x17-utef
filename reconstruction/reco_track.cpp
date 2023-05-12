@@ -8,8 +8,6 @@
 
 #include "RecoTasks.h"
 
-using namespace X17;
-
 int reco_track()
 {
     // Loading the magnetic field data.
