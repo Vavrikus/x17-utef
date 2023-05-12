@@ -37,4 +37,4 @@ T stdev(std::vector<T> values, T average)
 /// @param min The minimal value.
 /// @param max The maximal value.
 /// @return A random number between given minimal and maximal value.
-double RandomMinMax(TRandom3* rand, double min, double max) { return min + (max-min)*rand->Rndm(); }
+inline double RandomMinMax(TRandom3* rand, double min, double max) { return min + (max-min)*rand->Rndm(); }
