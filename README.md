@@ -1,13 +1,9 @@
 # X17 TPC simulation and reconstruction
-C++ code in this project uses ROOT and Garfield++ to simulate and reconstruct electron and positron tracks inside TPC. The workflow is split between several scripts.
+C++ code in this project uses ROOT and Garfield++ to simulate and reconstruct electron and positron tracks inside the atypic TPC of the X17 project. The workflow is split between several scripts.
 
 ## Installation
-The user needs to have ROOT installed (built on 6.26/06), for running simulations Garfield++ has to be installed. Currently used simulation results are provided. ROOT scripts can be run using the ROOT command:
-
-```bash
-root name_of_script.cpp
-```
-Simulation scripts have to be compiled before running:
+The user needs to have ROOT installed (built on 6.26/06), for running simulations Garfield++ has to be installed. Currently used simulation results are provided.
+Scripts have to be compiled before running:
 
 ```bash
 cd /script_folder/build
@@ -15,6 +11,17 @@ cmake ..
 make
 ./script_name
 ```
+
+It is also possible to compile all of the scripts at once:
+
+```bash
+cd /path/to/project/folder
+mkdir build && cd build
+cmake ..
+make
+```
+
+All of the binaries will be saved to the newly made build folder.
 
 ### Map simulation
 The map of the ionization electron drift can be simulated on MetaCentrum:
@@ -31,7 +38,7 @@ The map of the ionization electron drift can be simulated on MetaCentrum:
 
 
 ## Usage
-The project uses the following folder structure (headers and less important files ommited):
+The project uses the following folder structure:
 - **The project folder**
     - **.vscode**
         - *root-on-vscode.code-workspace* -- useful setup for using ROOT and Garfield++ in Visual Studio Code with Intellisense and debuging tool (some paths may need adjusting)
@@ -45,9 +52,9 @@ The project uses the following folder structure (headers and less important file
         - **single_track**
             - Contains files with single simulated track for different settings
     - **include**
-        - Contains headers for the project (headers also include all definitions)
+        - Contains headers for the project with doxygen comments (and .inl files with definitions of templated functions)
     - **presentations**
-        - Contains presentation from 07-03-2023 seminar (tex and pdf files)
+        - Contains presentation from 07-03-2023 seminar and from 28-04-2023 meeting (tex and pdf files)
     - **reconstruction**
         - *reco_track.cpp* -- script for track reconstruction
     - **remote**
@@ -68,3 +75,5 @@ The project uses the following folder structure (headers and less important file
         - **single_track**
             - *gas_table.cpp* -- script for generating the gas table for AvalancheMC simulation (not necessary for microscopic tracking)
             - *make_track.cpp* -- script for single track simulation
+    - **source**
+        - Contains all .cpp files common to the reconstruction and simulation scripts.
