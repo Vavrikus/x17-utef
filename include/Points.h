@@ -76,6 +76,14 @@ namespace X17
         /// @param p The endpoint to be copied.
         EndPoint(const EndPoint& p) = default;
 
+        /// @brief Squares the Endpoint object.
+        /// @return EndPoint object with all coordinates squared.
+        EndPoint Square() { return EndPoint(x*x,y*y,z*z,t*t); }
+
+        /// @brief Calculates the square root of the EndPoint object.
+        /// @return EndPoint object with all coordinates equal to the square root of the original coordinates.
+        EndPoint SquareRoot() { return EndPoint(sqrt(x),sqrt(y),sqrt(z),sqrt(t)); }
+
         /// @brief Assignment operator.
         /// @param p The endpoint to be assigned.
         void operator=(const EndPoint& other)
@@ -105,32 +113,22 @@ namespace X17
             t /= d;
         }
 
-        /// @brief Squares the Endpoint object.
-        /// @return EndPoint object with all coordinates squared.
-        EndPoint Square() { return EndPoint(x*x,y*y,z*z,t*t); }
+        /// @brief Adds two endpoints component-wise and returns the result.
+        /// @param p2 The second endpoint.
+        /// @return The sum of the two endpoints.
+        EndPoint operator+(EndPoint p2)
+        {
+            return EndPoint{point + p2.point, t + p2.t};
+        }
 
-        /// @brief Calculates the square root of the EndPoint object.
-        /// @return EndPoint object with all coordinates equal to the square root of the original coordinates.
-        EndPoint SquareRoot() { return EndPoint(sqrt(x),sqrt(y),sqrt(z),sqrt(t)); }
+        /// @brief Subtracts two endpoints component-wise.
+        /// @param p2 The second endpoint.
+        /// @return EndPoint The difference between the two endpoints.
+        EndPoint operator-(EndPoint p2)
+        {
+            return EndPoint{point - p2.point, t - p2.t};
+        }
     };
-
-    /// @brief Adds two endpoints component-wise and returns the result.
-    /// @param p1 The first endpoint.
-    /// @param p2 The second endpoint.
-    /// @return The sum of the two endpoints.
-    inline EndPoint operator+(EndPoint p1, EndPoint p2)
-    {
-        return EndPoint{p1.point + p2.point, p1.t + p2.t};
-    }
-
-    /// @brief Subtracts two endpoints component-wise.
-    /// @param p1 The first endpoint.
-    /// @param p2 The second endpoint.
-    /// @return EndPoint The difference between the two endpoints.
-    inline EndPoint operator-(EndPoint p1, EndPoint p2)
-    {
-        return EndPoint{p1.point - p2.point, p1.t - p2.t};
-    }
 
     /// @brief Scalar multiplication of a endpoint.
     /// @param d The scalar to multiply with.
@@ -258,25 +256,23 @@ namespace X17
         /// @return The value of the component.
         /// @throws std::out_of_range if i is out of range.
         double operator[](int i) const;
+
+        /// @brief Adds two map points component-wise and returns the result.
+        /// @param p2 The second map point.
+        /// @return The sum of the two map points.
+        MapPoint operator+(MapPoint p2)
+        {
+            return MapPoint{point + p2.point, dev + p2.dev};
+        }
+
+        /// @brief Subtracts two map points component-wise.
+        /// @param p2 The second map point.
+        /// @return MapPoint The difference between the two map points.
+        MapPoint operator-(MapPoint p2)
+        {
+            return MapPoint{point - p2.point, dev - p2.dev};
+        }
     };
-
-    /// @brief Adds two map points component-wise and returns the result.
-    /// @param p1 The first map point.
-    /// @param p2 The second map point.
-    /// @return The sum of the two map points.
-    inline MapPoint operator+(MapPoint p1, MapPoint p2)
-    {
-        return MapPoint{p1.point + p2.point, p1.dev + p2.dev};
-    }
-
-    /// @brief Subtracts two map points component-wise.
-    /// @param p1 The first map point.
-    /// @param p2 The second map point.
-    /// @return MapPoint The difference between the two map points.
-    inline MapPoint operator-(MapPoint p1, MapPoint p2)
-    {
-        return MapPoint{p1.point - p2.point, p1.dev - p2.dev};
-    }
 
     /// @brief Scalar multiplication of a map point.
     /// @param d The scalar to multiply with.

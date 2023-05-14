@@ -30,9 +30,9 @@ namespace X17
     //// Public methods.
 
     template <typename T>
-    Field<T>::Field(const Vector& min_corner, const Vector& max_corner, const double& step, const T& def_value)
+    Field<T>::Field(Vector min_corner, Vector max_corner, double step, const T& def_value)
         : m_xmin(min_corner.x), m_xmax(max_corner.x), m_ymin(min_corner.y), m_ymax(max_corner.y),
-            m_zmin(min_corner.z), m_zmax(max_corner.z), m_step_size(step), m_def_value(def_value)
+          m_zmin(min_corner.z), m_zmax(max_corner.z), m_step_size(step), m_def_value(def_value)
     {
         // Determine the number of grid points along each axis.
         this->m_num_x_cells = round((max_corner.x - min_corner.x) / step) + 1;

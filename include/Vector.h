@@ -21,19 +21,6 @@ namespace X17
         /// @param z The z component of the vector.
         Vector(double x, double y, double z) : x(x), y(y), z(z) { }
 
-        /// @brief Add another vector to this vector.
-        /// @param[in] v The vector to add.
-        void operator+=(Vector v);
-
-        /// @brief Divide each component of the vector by a scalar.
-        /// @param d The scalar to divide by.
-        void operator/=(double d);
-
-        /// @brief Equality operator for comparing two Vector objects. All components must be equal.
-        /// @param v The vector to compare with.
-        /// @return True if the vectors are equal, false otherwise.
-        bool operator==(Vector v) const { return (x == v.x) && (y == v.y) && (z == v.z); }
-
         /// @brief Compute the square of the magnitude of this vector.
         /// @return The square of the magnitude.
         double SqMagnitude() const { return x * x + y * y + z * z; }
@@ -57,25 +44,65 @@ namespace X17
         /// @param[in] other The other vector.
         /// @return The square of the distance.
         double SqDist(Vector other) const { return pow(x - other.x, 2) + pow(y - other.y, 2) + pow(z - other.z, 2); }
+
+        /// @brief Add another vector to this vector.
+        /// @param[in] v The vector to add.
+        void operator+=(Vector v);
+
+        /// @brief Divide each component of the vector by a scalar.
+        /// @param d The scalar to divide by.
+        void operator/=(double d);
+
+        /// @brief Equality operator for comparing two Vector objects. All components must be equal.
+        /// @param v The vector to compare with.
+        /// @return True if the vectors are equal, false otherwise.
+        bool operator==(Vector v) const { return (x == v.x) && (y == v.y) && (z == v.z); }
+
+        /// @brief Adds two vectors component-wise and returns the result.
+        /// @param v2 The second vector.
+        /// @return The sum of the two vectors.
+        Vector operator+(Vector v2) const
+        {
+            return Vector{x + v2.x, y + v2.y, z + v2.z};
+        }
+
+        /// @brief Subtracts two vectors component-wise.
+        /// @param v2 The second vector.
+        /// @return Vector The difference between the two vectors.
+        Vector operator-(Vector v2) const
+        {
+            return Vector{x - v2.x, y - v2.y, z - v2.z};
+        }
+
+        /// @brief Scalar multiplication of a vector.
+        /// @param d The scalar to multiply with.
+        /// @return The scaled vector.
+        Vector operator*(double d) const
+        {
+            return Vector{d * x, d * y, d * z};
+        }
+
+        /// @brief Divide a vector by a scalar.
+        /// @param d The scalar to divide by (cannot be zero).
+        /// @return The resulting vector.
+        /// @throw std::invalid_argument if d is zero (only if DEBUG defined).
+        Vector operator/(double d) const
+        {
+        #ifdef DEBUG
+            if (d == 0) throw std::invalid_argument("division by zero");
+        #endif
+
+            return Vector{x / d, y / d, z / d};
+        }
+        
+        /// @brief Compute the dot product of two vectors.
+        /// @param v2 The second vector.
+        /// @return The dot product.
+        double operator*(Vector v2) const
+        {
+            return x * v2.x + y * v2.y + z * v2.z;
+        }
     };
-
-    /// @brief Adds two vectors component-wise and returns the result.
-    /// @param v1 The first vector.
-    /// @param v2 The second vector.
-    /// @return The sum of the two vectors.
-    inline Vector operator+(Vector v1, Vector v2)
-    {
-        return Vector{v1.x + v2.x, v1.y + v2.y, v1.z + v2.z};
-    }
-
-    /// @brief Subtracts two vectors component-wise.
-    /// @param v1 The first vector.
-    /// @param v2 The second vector.
-    /// @return Vector The difference between the two vectors.
-    inline Vector operator-(Vector v1, Vector v2)
-    {
-        return Vector{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};
-    }
 
     /// @brief Scalar multiplication of a vector.
     /// @param d The scalar to multiply with.
@@ -84,38 +111,6 @@ namespace X17
     inline Vector operator*(double d, Vector v)
     {
         return Vector{d * v.x, d * v.y, d * v.z};
-    }
-
-    /// @brief Scalar multiplication of a vector.
-    /// @param v The vector to multiply.
-    /// @param d The scalar to multiply with.
-    /// @return The scaled vector.
-    inline Vector operator*(Vector v, double d)
-    {
-        return Vector{d * v.x, d * v.y, d * v.z};
-    }
-
-    /// @brief Divide a vector by a scalar.
-    /// @param v The vector to be divided.
-    /// @param d The scalar to divide by (cannot be zero).
-    /// @return The resulting vector.
-    /// @throw std::invalid_argument if d is zero (only if DEBUG defined).
-    inline Vector operator/(Vector v, double d)
-    {
-    #ifdef DEBUG
-        if (d == 0) throw std::invalid_argument("division by zero");
-    #endif
-
-        return Vector{v.x / d, v.y / d, v.z / d};
-    }
-    
-    /// @brief Compute the dot product of two vectors.
-    /// @param v1 The first vector.
-    /// @param v2 The second vector.
-    /// @return The dot product.
-    inline double operator*(Vector v1, Vector v2)
-    {
-        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
     }
 
     /// @brief Normalize a vector. Divides the vector by its magnitude to produce a unit vector in the same direction.
