@@ -21,7 +21,7 @@ cmake ..
 make
 ```
 
-All of the binaries will be saved to the newly made build folder.
+All of the binaries will be saved to the newly made build folder. This might lead to errors in the scripts whenever relative paths are used.
 
 ### Map simulation
 The map of the ionization electron drift can be simulated on MetaCentrum:

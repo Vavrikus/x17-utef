@@ -76,7 +76,7 @@ int make_map()
             {
                 same_prev++;
                 p_vec.push_back(point.end);
-                p_avg = point.end; // CHECK IF CORRECT!
+                p_avg += point.end;
             }
 
             p_avg /= same_prev;

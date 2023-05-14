@@ -219,7 +219,7 @@ public:
     {
         g_xz = new TGraphErrors();
         g_xz->SetName("g_xz");
-        g_xz->SetTitle("Map of electron displacement (x = 0)");
+        g_xz->SetTitle("Map of electron displacement (y = 0)");
         g_xz->SetMarkerColor(2);
         g_xz->SetMarkerStyle(6);
         g_xz->GetXaxis()->SetTitle("x [cm]");
