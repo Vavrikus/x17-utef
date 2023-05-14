@@ -18,10 +18,10 @@ namespace X17
     {
         using namespace constants;
 
-        if (z < zmin      || z > zmax-dist) return false;
-        if (x < xmin+dist || x > xmax-dist) return false;
+        if (z < zmin + dist || z > zmax) return false;
+        if (x < xmin + dist || x > xmax - dist) return false;
 
-        double dy = dist / std::sqrt(1 + 1/yxslope); // Change of allowed y (absolute value) for slanted surface.
+        double dy = dist / std::sqrt(1 + 1 / yxslope); // Change of allowed y (absolute value) for slanted surface.
         if (std::abs(y) + dy > yxslope * x + yintersect) return false;
         
         return true;   
