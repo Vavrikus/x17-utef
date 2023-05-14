@@ -92,7 +92,7 @@ namespace X17
 
     //// Functions related to classes from Points.h.
 
-    std::vector<TMarker3DBox*> GetDataMarkers(std::vector<RecoPoint> data, double zbin_size)
+    std::vector<TMarker3DBox*> GetDataMarkers(const std::vector<RecoPoint>& data, double zbin_size)
     {
         std::vector<TMarker3DBox*> markers;
         constexpr double max_size = 0.75;

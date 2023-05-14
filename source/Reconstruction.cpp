@@ -127,7 +127,7 @@ namespace X17
         else             {i_min = i_mid[var]; i_max = i_min + 1;}
     }
     
-    void PrintCube(const Field<MapPoint>& map, const int (&indices)[6], const EndPoint& end_point)
+    void PrintCube(const Field<MapPoint>& map, const int (&indices)[6], EndPoint end_point)
     {
         std::cout << "Cube for (x1,y1,t1) = (" << end_point.x << "," << end_point.y << "," << end_point.t << "): \n";
         for (int i = 0; i < 8; i++)
@@ -159,11 +159,11 @@ namespace X17
         }
     }
 
-    RecoPoint Reconstruct(const Field<MapPoint>& map, const EndPoint& end_point)
+    RecoPoint Reconstruct(const Field<MapPoint>& map, EndPoint end_point)
     {
-        const double& x1 = end_point.x;
-        const double& y1 = end_point.y;
-        const double& t1 = end_point.t;
+        double x1 = end_point.x;
+        double y1 = end_point.y;
+        double t1 = end_point.t;
 
         // Find 8 closest points using binary search (assuming ordering).
         int ximin = 0;                   // Starting minimal search x index.
@@ -200,13 +200,13 @@ namespace X17
         return RecoPoint(xout,yout,zout,1);
     }
 
-    double Offset(const MapPoint& p, const double& x1, const double& y1, const double& t1)
+    double Offset(MapPoint p, double x1, double y1, double t1)
     {
         constexpr double tfact = 0.00327; // Time is measured at different scale, it needs weight.
         return sqrt(pow(x1 - p.point.x, 2) + pow(y1 - p.point.y, 2) + pow(tfact*(t1 - p.point.t), 2));
     }
 
-    RecoPoint ReconstructOld(const Field<MapPoint>& map, const double& x1, const double& y1, const double& t1, const double& max_err)
+    RecoPoint ReconstructOld(const Field<MapPoint>& map, double x1, double y1, double t1, double max_err)
     {
         // Start looking at the same position.
         double x = x1;

@@ -9,7 +9,7 @@ namespace X17
 {
     //// Public methods.
 
-    void MapJob::GetParameters(int argc, char* argv[])
+    void MapJob::SetParameters(int argc, char* argv[])
     {
         // Check the number of paramaters passed to main function.
         if (argc < 4)
@@ -35,7 +35,7 @@ namespace X17
 
     void MapJob::SetElectronBounds()
     {
-        _GetStepParameters();
+        _SetStepParameters();
         n_el = nz * nxy;
         zsum = (zmax - zmin) * nxy * nz - nxy * step * nz * (nz - 1)/2;
 
@@ -53,7 +53,7 @@ namespace X17
 
     //// Private methods.
 
-    void MapJob::_GetStepParameters()
+    void MapJob::_SetStepParameters()
     {
         nx  = floor((xmax - xmin) / step) + 1; // Number of x steps in each iteration.
         nz  = floor((zmax - zmin) / step) + 1; // Number of z steps in each iteration.
@@ -75,7 +75,7 @@ namespace X17
         }
     }
 
-    double MapJob::_Zsum(int n_electrons)
+    double MapJob::_Zsum(int n_electrons) const
     {
         int full_layers = floor(n_electrons / nxy); // Full z layers.
         int remainder   = n_electrons % nxy;        // The number of electrons in the incomplete z layer on top.
@@ -83,7 +83,7 @@ namespace X17
         return (zmax - zmin)*nxy*full_layers - nxy*step*full_layers*(full_layers - 1)/2 + remainder*(zmax - zmin - full_layers*step);
     }
 
-    int MapJob::_Noptimal(int l_id)
+    int MapJob::_Noptimal(int l_id) const
     {
         if (l_id == 0) return 0; // Id 0 is not used but best minimal index of id 1 depends on this.
 

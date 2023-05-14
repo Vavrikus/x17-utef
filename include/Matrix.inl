@@ -133,7 +133,7 @@ namespace X17
     }
 
     template <int M, int N>
-    Matrix<M,N> operator*(const double& d, const Matrix<M,N>& A)
+    Matrix<M,N> operator*(double d, const Matrix<M,N>& A)
     {
         Matrix<M,N> result;
         for (int i = 0; i < M * N; i++)
@@ -144,7 +144,7 @@ namespace X17
     }
 
     template <int M, int N>
-    Matrix<M,N> operator/(const Matrix<M,N>& A,const double& d)
+    Matrix<M,N> operator/(const Matrix<M,N>& A, double d)
     {
         Matrix<M,N> result;
         for (int i = 0; i < M * N; i++)

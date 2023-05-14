@@ -34,23 +34,23 @@ namespace X17
         /// @brief Parses command line arguments and sets job parameters.
         /// @param argc Number of command line arguments.
         /// @param argv Array of command line arguments.
-        void GetParameters(int argc, char* argv[]);
+        void SetParameters(int argc, char* argv[]);
 
         /// @brief Calculates number of electrons and total distance to propagate for current job. Sets minimal and maximal electron index.
         void SetElectronBounds();
 
     private:
         /// @brief Calculates number of steps in x and y directions for each z step and stores result in member variables.
-        void _GetStepParameters();
+        void _SetStepParameters();
 
         /// @brief Calculates total distance to propagate for given number of electrons.
         /// @param n_electrons Number of electrons to simulate.
         /// @return Total distance to propagate electrons.
-        double _Zsum(int n_electrons);
+        double _Zsum(int n_electrons) const;
 
         /// @brief Finds optimal maximal index of electron for given job's id.
         /// @param l_id Job id.
         /// @return Optimal maximal index of electron.
-        int _Noptimal(int l_id);
+        int _Noptimal(int l_id) const;
     };
 } // namespace X17

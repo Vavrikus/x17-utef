@@ -58,7 +58,7 @@ namespace X17
         /// @brief Constructor for the 3D circle fitting algorithm that smoothly attaches lines.
         /// @param orig The origin of the first line [cm].
         /// @param orient The orientation vector of the first line.
-        CircleFit3D(const Vector& orig, const Vector& orient);
+        CircleFit3D(Vector orig, Vector orient);
 
         /// @brief Deleted copy constructor. 
         CircleFit3D(const CircleFit3D&) = delete;
@@ -68,7 +68,7 @@ namespace X17
 
         /// @brief Get the current fit data points.
         /// @return The vector of RecoPoints used for fitting.
-        std::vector<RecoPoint> GetData() { return m_fit_data; }
+        std::vector<RecoPoint> GetData() const { return m_fit_data; }
 
         /// @brief Add a new RecoPoint to the fit data.
         /// @param x The x-coordinate of the RecoPoint.
@@ -104,37 +104,37 @@ namespace X17
         void FitCircle3D(double max_iter = 500, double toleration = 0.001);
 
         /// @brief Prints the fitting parameters of the circle with their errors.
-        void PrintFitParams();
+        void PrintFitParams() const;
 
         /// @brief Generates a TGraph2D representing the fitted circle with attached lines.
         /// @param step The step size between points in the TGraph2D.
         /// @param dist The distance from the TPC walls within which the points are included.
         /// @return A TGraph2D representing the fitted circle with attached lines.
-        TGraph2D* GetGraph(double step = 0.1, double dist = 0);
+        TGraph2D* GetGraph(double step = 0.1, double dist = 0) const;
 
         /// @brief Calculates the energy of a charged particle moving along the 3D circle fit.
         /// @param magfield The magnetic field data used for the calculation.
         /// @param middle Boolean flag indicating whether to use the middle field of the circle (true) or the average field (false).
         /// @return The kinetic energy of the particle.
-        double GetEnergy(const Field<Vector>& magfield, bool middle = true);
+        double GetEnergy(const Field<Vector>& magfield, bool middle = true) const;
 
         /// @brief Returns a graph representing the energy along the track in the given magnetic field.
         /// @param magfield The magnetic field data used for the calculation.
         /// @param step The step size for the parameter along the track.
         /// @return A TGraph object representing the energy as a function of the parameter.
-        TGraph* GetEnergyGraph(const Field<Vector>& magfield, double step = 0.1);
+        TGraph* GetEnergyGraph(const Field<Vector>& magfield, double step = 0.1) const;
 
     private:
         /// @brief Returns a point on the line.
         /// @param param The parameter that defines the position on the line.
         /// @param first_line Whether to return a point on the first line or the second line.
         /// @return A point on the specified line.
-        Vector _GetLinePoint(double param, bool first_line);
+        Vector _GetLinePoint(double param, bool first_line) const;
 
         /// @brief Calculates a point on the circle described by the current instance.
         /// @param varphi The angle (in radians) at which to calculate the point. Zero coresponds to the beginning of the arc.
         /// @return A vector representing the point on the circle.
-        Vector _GetCirclePoint(double varphi);
+        Vector _GetCirclePoint(double varphi) const;
 
         /// @brief Updates the curve parameters based on the current m_orientation, m_length, m_radius, m_alpha, and m_phi_max values.
         /// This function calculates the new values of m_cos_theta, m_sin_theta, m_cos_phi, m_sin_phi, m_cos_alpha, m_sin_alpha, m_originc,
@@ -146,21 +146,21 @@ namespace X17
         /// @param point The point to calculate the distance from.
         /// @param first_line Flag indicating whether to use the first line (true) or the second line (false).
         /// @return The squared distance between the point and the line.
-        double _LineSqDist(const RecoPoint& point, bool first_line);
+        double _LineSqDist(RecoPoint point, bool first_line) const;
 
         /// @brief Calculate the squared distance between a given point and the circular trajectory.
         /// @param point The point to calculate the distance from.
         /// @return The squared distance between the point and the circular trajectory.
-        double _CircleSqDist(const RecoPoint& point);
+        double _CircleSqDist(RecoPoint point) const;
 
         /// @brief Computes the squared distance between the given point and the curve.
         /// @param point The point to compute the squared distance from.
         /// @return The squared distance between the point and the curve.
-        double _SqDistance(const RecoPoint& point);
+        double _SqDistance(RecoPoint point) const;
 
         /// @brief Calculates the sum of squared distances from each point in the m_fit_data vector to the curve. Each distance is scaled by the count/charge.
         /// @return The sum of squared distances from each point in m_fit_data to the curve.
-        double _SumSq();
+        double _SumSq() const;
 
         /// @brief Calculate the sum of squared distances for a given set of parameters.
         /// @param npar The number of parameters.
@@ -183,12 +183,12 @@ namespace X17
         /// @param magfield Pointer to an object containing the magnetic field information.
         /// @param step Step size to use when sampling the circular path. Default value is 0.1.
         /// @return The average magnetic field vector over the circular path.
-        Vector _GetAvgField(const Field<Vector>& magfield, double step = 0.1);
+        Vector _GetAvgField(const Field<Vector>& magfield, double step = 0.1) const;
 
         /// @brief Get the magnetic field at the point on the circle that passes through the middle of the X17 detector in the x direction.
         /// @param magfield The magnetic field vector field to sample from.
         /// @param tolerance The maximum deviation from the middle of the detector in the x direction for which to stop the binary search. Default is 0.0001.
         /// @return The magnetic field vector at the point on the circle that passes through the middle of the X17 detector in the x direction.
-        Vector _GetMiddleField(const Field<Vector>& magfield, double tolerance = 0.0001);
+        Vector _GetMiddleField(const Field<Vector>& magfield, double tolerance = 0.0001) const;
     };
 } // namespace X17

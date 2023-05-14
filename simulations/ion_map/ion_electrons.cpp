@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     TApplication app("app", &argc, argv);
 
     X17::MapJob job;
-    job.GetParameters(argc,argv);
+    job.SetParameters(argc,argv);
     job.SetElectronBounds();
 
     // Set the output file, name dependend on the job's id.

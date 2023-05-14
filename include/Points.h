@@ -86,7 +86,7 @@ namespace X17
 
         /// @brief Add another endpoint to this endpoint.
         /// @param[in] p The endpoint to add.
-        void operator+=(const EndPoint& p)
+        void operator+=(EndPoint p)
         {
             this->point += p.point;
             this->t += p.t;
@@ -95,11 +95,11 @@ namespace X17
         /// @brief Division by a scalar component-wise.
         /// @param d The scalar to divide with.
         /// @return The scaled endpoint.
-        EndPoint operator/(const double& d) { return EndPoint(point / d, t / d); }
+        EndPoint operator/(double d) { return EndPoint(point / d, t / d); }
 
         /// @brief Division by a scalar component-wise.
         /// @param d The scalar to divide with.
-        void operator/=(const double& d)
+        void operator/=(double d)
         {
             point /= d;
             t /= d;
@@ -118,7 +118,7 @@ namespace X17
     /// @param p1 The first endpoint.
     /// @param p2 The second endpoint.
     /// @return The sum of the two endpoints.
-    inline EndPoint operator+(const EndPoint& p1, const EndPoint& p2)
+    inline EndPoint operator+(EndPoint p1, EndPoint p2)
     {
         return EndPoint{p1.point + p2.point, p1.t + p2.t};
     }
@@ -127,7 +127,7 @@ namespace X17
     /// @param p1 The first endpoint.
     /// @param p2 The second endpoint.
     /// @return EndPoint The difference between the two endpoints.
-    inline EndPoint operator-(const EndPoint& p1, const EndPoint& p2)
+    inline EndPoint operator-(EndPoint p1, EndPoint p2)
     {
         return EndPoint{p1.point - p2.point, p1.t - p2.t};
     }
@@ -136,7 +136,7 @@ namespace X17
     /// @param d The scalar to multiply with.
     /// @param p The endpoint to multiply.
     /// @return The scaled endpoint.
-    inline EndPoint operator*(const double& d, const EndPoint& p)
+    inline EndPoint operator*(double d, EndPoint p)
     {
         return EndPoint{d*p.point, d*p.t};
     }
@@ -235,7 +235,7 @@ namespace X17
         /// @brief Constructor for initializing a MapPoint object with given values.
         /// @param p The EndPoint with (x,y,z,t) coordinates ([cm] and [ns]).
         /// @param d The EndPoint with (x,y,z,t) coordinates deviations ([cm] and [ns]).
-        MapPoint(const EndPoint& p, const EndPoint& d) : point(p), dev(d) { }
+        MapPoint(EndPoint p, EndPoint d) : point(p), dev(d) { }
 
         /// @brief Assignment operator.
         /// @param p The MapPoint to be assigned to this MapPoint.
@@ -247,7 +247,7 @@ namespace X17
 
         /// @brief Add another map point to this map point.
         /// @param[in] p The map point to add.
-        void operator+=(const MapPoint& p)
+        void operator+=(MapPoint p)
         {
             this->point += p.point;
             this->dev += p.dev;
@@ -264,7 +264,7 @@ namespace X17
     /// @param p1 The first map point.
     /// @param p2 The second map point.
     /// @return The sum of the two map points.
-    inline MapPoint operator+(const MapPoint& p1, const MapPoint& p2)
+    inline MapPoint operator+(MapPoint p1, MapPoint p2)
     {
         return MapPoint{p1.point + p2.point, p1.dev + p2.dev};
     }
@@ -273,7 +273,7 @@ namespace X17
     /// @param p1 The first map point.
     /// @param p2 The second map point.
     /// @return MapPoint The difference between the two map points.
-    inline MapPoint operator-(const MapPoint& p1, const MapPoint& p2)
+    inline MapPoint operator-(MapPoint p1, MapPoint p2)
     {
         return MapPoint{p1.point - p2.point, p1.dev - p2.dev};
     }
@@ -282,7 +282,7 @@ namespace X17
     /// @param d The scalar to multiply with.
     /// @param p The map point to multiply.
     /// @return The scaled map point.
-    inline MapPoint operator*(const double& d, const MapPoint& p)
+    inline MapPoint operator*(double d, MapPoint p)
     {
         return MapPoint{d*p.point, d*p.dev};
     }
@@ -321,7 +321,7 @@ namespace X17
         Vector AsVector() const { return point.point; }
     };
 
-    std::vector<TMarker3DBox*> GetDataMarkers(std::vector<RecoPoint> data, double zbin_size = 0.3);
+    std::vector<TMarker3DBox*> GetDataMarkers(const std::vector<RecoPoint>& data, double zbin_size = 0.3);
 
     /// @brief A struct for storing the simulated (later maybe also real) data from the TPC readout.
     struct DataPoint

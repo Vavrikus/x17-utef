@@ -6,7 +6,7 @@ namespace X17
 	//// Public methods.
 
 	template<int N>
-	double NSpline<N>::Eval(double* x, double* par)
+	double NSpline<N>::Eval(double* x, double* par) const
 	{
 		/*Fit parameters:
 		par[0-N-1]=X of nodes (to be fixed in the fit!)
@@ -36,7 +36,7 @@ namespace X17
 	}
 
 	template<int N>
-	typename NSpline<N>::EvalFn NSpline<N>::GetEval()
+	typename NSpline<N>::EvalFn NSpline<N>::GetEval() const
 	{
 		return [this](double* a, double* b)
 		{
@@ -51,19 +51,19 @@ namespace X17
 	//// Functions related to the NSpline class.
 
 	template<int nodes>
-	TSpline3* FitSplines(TGraph* graph, const double& min, const double& max)
+	TSpline3* FitSplines(TGraph* graph, double min, double max)
 	{
 		double nodes_x[nodes];
-		for (int i = 0; i < nodes; i++) nodes_x[i] = min+(i/(nodes-1.0))*(max-min);
+		for (int i = 0; i < nodes; i++) nodes_x[i] = min + (i / (nodes - 1.0)) * (max - min);
 
 		NSpline<nodes>* s = new NSpline<nodes>(nodes_x);
 
-		TF1* fit = new TF1("fit",s->GetEval(),min,max,2*nodes+2);
+		TF1* fit = new TF1("fit", s->GetEval(), min, max, 2 * nodes + 2);
 		graph->Fit(fit,"M","",min,max);
 
 		double* fit_pars = fit->GetParameters();
 		double nodes_y[nodes];
-		for(int i = nodes; i < 2*nodes; i++) nodes_y[i-nodes]=fit_pars[i];
+		for(int i = nodes; i < 2*nodes; i++) nodes_y[i - nodes]=fit_pars[i];
 		double beg1 = fit_pars[2*nodes];
 		double end1 = fit_pars[2*nodes+1];
 		

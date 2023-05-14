@@ -25,14 +25,14 @@ class Hist_YX_DX : public MapTask
 public:
     Hist_YX_DX(X17::Field<X17::MapPoint>* map) : MapTask(map) { }
 
-    void Z_Loop_Start(const double& z) override
+    void Z_Loop_Start(double z) override
     {
         std::string h_dx_name = "h_yx_dx_" + std::to_string(z);
         std::string h_dx_title = "XY plane dx (z = " + std::to_string(z) + ");x [cm];y [cm]";
         v_yx_dx.push_back(new TH2F(h_dx_name.c_str(),h_dx_title.c_str(),map->GetYCells(),map->GetYMin(),map->GetYMax(),map->GetXCells(),map->GetXMin(),map->GetXMax()));
     }
 
-    void XYZ_Loop(const double& x, const double& y, const double& z, const X17::MapPoint& current) override
+    void XYZ_Loop(double x, double y, double z, X17::MapPoint current) override
     {
         if(current.x != 0) v_yx_dx.back()->Fill(y,x,current.x-x);
     }
@@ -50,14 +50,14 @@ class Hist_YX_DY : public MapTask
 public:
     Hist_YX_DY(X17::Field<X17::MapPoint>* map) : MapTask(map) { }
 
-    void Z_Loop_Start(const double& z) override
+    void Z_Loop_Start(double z) override
     {
         std::string h_dy_name = "h_yx_dy_" + std::to_string(z);
         std::string h_dy_title = "XY plane dy (z = " + std::to_string(z) + ");x [cm];y [cm]";
         v_yx_dy.push_back(new TH2F(h_dy_name.c_str(),h_dy_title.c_str(),map->GetYCells(),map->GetYMin(),map->GetYMax(),map->GetXCells(),map->GetXMin(),map->GetXMax()));
     }
 
-    void XYZ_Loop(const double& x, const double& y, const double& z, const X17::MapPoint& current) override
+    void XYZ_Loop(double x, double y, double z, X17::MapPoint current) override
     {
         if(current.y != 0) v_yx_dy.back()->Fill(y, x, current.y - y);
     }
@@ -77,14 +77,14 @@ class Hist_YX_T1 : public MapTask
 public:
     Hist_YX_T1(X17::Field<X17::MapPoint>* map, double xmin, double xmax, double ymin, double ymax) : MapTask(map),xmin(xmin),xmax(xmax),ymin(ymin),ymax(ymax) { }
 
-    void Z_Loop_Start(const double& z) override
+    void Z_Loop_Start(double z) override
     {
         std::string h_t1_name = "h_yx_t1_" + std::to_string(z);
         std::string h_t1_title = "XY plane t1 (z = " + std::to_string(z) + ");x [cm];y [cm]";
         v_yx_t1.push_back(new TH2F(h_t1_name.c_str(),h_t1_title.c_str(),map->GetYCells(),map->GetYMin(),map->GetYMax(),map->GetXCells(),map->GetXMin(),map->GetXMax()));
     }
 
-    void XYZ_Loop(const double& x, const double& y, const double& z, const X17::MapPoint& current) override
+    void XYZ_Loop(double x, double y, double z, X17::MapPoint current) override
     {
         if(current.t != 0) v_yx_t1.back()->Fill(y,x,current.t);
     }
@@ -118,7 +118,7 @@ class Graph_YX : public MapTask
 public:
     Graph_YX(X17::Field<X17::MapPoint>* map, double xmin, double xmax, double ymin, double ymax) : MapTask(map),xmin(xmin),xmax(xmax),ymin(ymin),ymax(ymax) { }
 
-    void Z_Loop_Start(const double& z) override
+    void Z_Loop_Start(double z) override
     {
         std::string g_yx_name = "g_yx_" + std::to_string(z);
         std::string g_yx_title = "Map of electron readout positions, z = " + std::to_string(z);
@@ -133,7 +133,7 @@ public:
         v_g_yx.back()->GetYaxis()->SetTitle("x [cm]");
     }
 
-    void XYZ_Loop(const double& x, const double& y, const double& z, const X17::MapPoint& current) override
+    void XYZ_Loop(double x, double y, double z, X17::MapPoint current) override
     {
         if((current.x != 0) && (current.y != 0))
         {
@@ -182,7 +182,7 @@ class Graph_ZT : public MapTask
 public:
     Graph_ZT(X17::Field<X17::MapPoint>* map) : MapTask(map) { }
 
-    void Z_Loop_Start(const double& z) override
+    void Z_Loop_Start(double z) override
     {
         g_zt = new TGraph();
 
@@ -194,7 +194,7 @@ public:
         g_zt->GetYaxis()->SetTitle("t [ns]");
     }
 
-    void XYZ_Loop(const double& x, const double& y, const double& z, const X17::MapPoint& current) override
+    void XYZ_Loop(double x, double y, double z, X17::MapPoint current) override
     {
         g_zt->AddPoint(z,current.t);
     }
@@ -226,7 +226,7 @@ public:
         g_xz->GetYaxis()->SetTitle("z [cm]");
     }
 
-    void ZX_Loop(const double& z, const double& x, const X17::MapPoint& current) override
+    void ZX_Loop(double z, double x, X17::MapPoint current) override
     {
         g_xz->AddPoint(current.x,z);
         g_xz->SetPointError(g_xz->GetN() - 1, current.xdev, 0);
@@ -264,7 +264,7 @@ public:
         g_xt->GetYaxis()->SetTitle("t [ns]");
     }
 
-    void ZX_Loop(const double& z, const double& x, const X17::MapPoint& current) override
+    void ZX_Loop(double z, double x, X17::MapPoint current) override
     {        
         g_xt->AddPoint(x,current.t);
         g_xt->SetPointError(g_xt->GetN() - 1, current.xdev, current.tdev);
@@ -294,7 +294,7 @@ public:
         xz_t1 = new TH2F("h_xz_t1","XZ plane t1;x [cm];z [cm]",map->GetXCells(),map->GetXMin(),map->GetXMax(),map->GetZCells(),map->GetZMin(),map->GetZMax());
     }
 
-    void ZX_Loop(const double& z, const double& x, const X17::MapPoint& current) override
+    void ZX_Loop(double z, double x, X17::MapPoint current) override
     {        
         xz_t1->Fill(x,z,current.t);
     }

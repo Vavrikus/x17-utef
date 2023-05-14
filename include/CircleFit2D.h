@@ -13,7 +13,7 @@ namespace X17
     /// @param min The lower bound of the fit [cm].
     /// @param max The upper bound of the fit [cm].
     /// @return The fitted function.
-    TF1* FitCircle(TGraph* graph, const double& min, const double& max);
+    TF1* FitCircle(TGraph* graph, double min, double max);
 
     /// @brief A function for circular arc with smoothly attached lines at endpoints (nodes).
     /// @param x The variable x [cm].
@@ -26,7 +26,7 @@ namespace X17
     /// @param min The lower bound of the fit [cm].
     /// @param max The upper bound of the fit [cm].
     /// @return The fitted function.
-    TF1* FitCircle2(TGraph* graph, const double& min, const double& max);
+    TF1* FitCircle2(TGraph* graph, double min, double max);
 
     /// @brief A function for energy reconstruction from spline fit.
     /// @param sp_fit Fitted splines.

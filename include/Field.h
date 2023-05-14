@@ -123,7 +123,7 @@ namespace X17
         /// @param z The z-coordinate of the point to retrieve [cm].
         /// @return A pointer to the field value at the specified coordinates.
         /// @throws std::out_of_range if the specified coordinates are out of bounds.
-        T* GetPoint(const double& x, const double& y, const double& z)
+        T* GetPoint(double x, double y, double z)
         {
             int xi, yi, zi;
             _GetPointIndices(x, y, z, xi, yi, zi);
@@ -137,7 +137,7 @@ namespace X17
         /// @param z The z coordinate of the point [cm].
         /// @param new_value The new value to set at the point.
         /// @throws std::out_of_range if the specified coordinates are out of bounds.
-        void SetPoint(const double& x, const double& y, const double& z, const T& new_value)
+        void SetPoint(double& x, double& y, double& z, const T& new_value)
         {
             *(this->GetPoint(x,y,z)) = new_value;
         }
@@ -146,7 +146,7 @@ namespace X17
         /// @param position The vector with position of the point [cm].
         /// @param new_value The new value to set at the point.
         /// @throws std::out_of_range if the specified coordinates are out of bounds.
-        void SetPoint(const Vector& position, const T& new_value)
+        void SetPoint(Vector position, const T& new_value)
         {
             *(this->GetPoint(position.x,position.y,position.z)) = new_value;
         }
@@ -161,7 +161,7 @@ namespace X17
         /// @brief Returns the trilinearly interpolated value of the field at the specified position.
         /// @param vec The Vector object representing the position to interpolate the field at [cm].
         /// @return The interpolated value of the field at the specified position.
-        T GetField(const Vector& vec) const
+        T GetField(Vector vec) const
         {
             return GetField(vec.x,vec.y,vec.z);
         }
@@ -175,7 +175,7 @@ namespace X17
         /// @param yi Output parameter that will be set to the y-index of the corresponding grid cell.
         /// @param zi Output parameter that will be set to the z-index of the corresponding grid cell.
         /// @throws std::out_of_range if the specified coordinates are out of bounds.
-        void _GetPointIndices(const double& x, const double& y, const double& z, int& xi, int& yi, int& zi) const;
+        void _GetPointIndices(double x, double y, double z, int& xi, int& yi, int& zi) const;
     };
 
     /// @brief Loads field data from a file and stores it in a Field<Vector>.
@@ -187,7 +187,7 @@ namespace X17
     /// @param max_corner The maximum corner of the field as a Vector object [cm].
     /// @param step The spacing between grid points.
     /// @param printInfo If true, prints information about maximal and minimal field magnitude and angle values.
-    Field<Vector>* LoadField(const char* filename, const Vector& min_corner, const Vector& max_corner, const double& step, bool printInfo = false);
+    Field<Vector>* LoadField(const char* filename, Vector min_corner, Vector max_corner, double step, bool printInfo = false);
 } // namespace X17
 
 // Templated function definitions.

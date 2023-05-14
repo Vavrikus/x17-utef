@@ -47,11 +47,11 @@ namespace X17
 		/// @param x A pointer to an array of doubles representing the x-value at which to evaluate the spline.
 		/// @param par A pointer to an array of doubles representing the parameters of the spline.
 		/// @return The value of the NSpline at the given x-value.
-		double Eval(double* x, double* par);
+		double Eval(double* x, double* par) const;
 
 		/// @brief Returns a std::function object that can be used to evaluate the NSpline.
 		/// @return A std::function object that takes two pointers to arrays of doubles and returns a double.
-		EvalFn GetEval();
+		EvalFn GetEval() const;
 	};
 
 	/// @brief Fits cubic splines to a TGraph object.
@@ -61,7 +61,7 @@ namespace X17
 	/// @param max The maximum x-coordinate value for the spline.
 	/// @return A pointer to the TSpline3 object representing the fitted spline.
 	template<int nodes>
-	TSpline3* FitSplines(TGraph* graph, const double& min, const double& max);
+	TSpline3* FitSplines(TGraph* graph, double min, double max);
 } // namespace X17
 
 // Templated function definitions.

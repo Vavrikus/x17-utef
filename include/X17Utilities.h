@@ -58,13 +58,13 @@ namespace X17
     /// @param z The z-coordinate [cm].
     /// @param dist Specifies the minimal distance from within the TPC walls except the bottom anode wall (makes volume smaller).
     /// @return True if in sector, false otherwise.
-    bool IsInSector(const double& x, const double& y, const double& z, const double& dist = 0);
+    bool IsInSector(double x, double y, double z, double dist = 0);
 
     /// @brief True if vector is in the first sector (containing positive x-axis) of the detector (trapezoidal prism).
     /// @param vec The vector representing a point in space (x,y,z) [cm].
     /// @param dist Specifies the minimal distance from within the TPC walls except the bottom anode wall (makes volume smaller).
     /// @return True if in sector, false otherwise.
-    inline bool IsInSector(const Vector& vec, const double& dist = 0)
+    inline bool IsInSector(Vector vec, double dist = 0)
     {
         return IsInSector(vec.x,vec.y,vec.z,dist);
     }
@@ -74,14 +74,14 @@ namespace X17
     /// @param out_min Output for minimal field [T].
     /// @param out_max Output for maximal field [T].
     /// @param dist Specifies the minimal distance from within the TPC walls except the bottom anode wall (makes volume smaller).
-    void GetMinMaxField(const Field<Vector>& magfield, double& out_min, double& out_max, const double& dist);
+    void GetMinMaxField(const Field<Vector>& magfield, double& out_min, double& out_max, double dist);
 
     /// @brief Returns minimal (magnetic) field angle to electric field (along positive y-axis) inside first sector TPC volume.
     /// @param magfield Magnetic field data.
     /// @param out_min Output for minimal angle [rad].
     /// @param out_max Output for maximal angle [rad].
     /// @param dist Specifies the minimal distance from within the TPC walls except the bottom anode wall (makes volume smaller).
-    void GetMinMaxFieldAngle(const Field<Vector>& magfield, double& out_min, double& out_max, const double& dist);
+    void GetMinMaxFieldAngle(const Field<Vector>& magfield, double& out_min, double& out_max, double dist);
 
     /// @brief Draws lines around the approximate sensitive area (walls of TPC).
     /// @param yxformat If true, the y-coordinate is drawn on the x-axis and vice versa.

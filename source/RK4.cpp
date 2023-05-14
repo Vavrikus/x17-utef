@@ -15,7 +15,9 @@
 
 namespace X17
 {
-    Matrix<8,1> GetInitParams(const double& kin_en, const Vector& origin, const Vector& orientation)
+    //// Functions related to the RK4 templated class.
+
+    Matrix<8,1> GetInitParams(double kin_en, Vector origin, Vector orientation)
     {
         using namespace constants;
 
@@ -39,7 +41,7 @@ namespace X17
         });
     }
 
-    Matrix<4,4> GetEMtensor(const Field<Vector>& magfield, const Vector& position)
+    Matrix<4,4> GetEMtensor(const Field<Vector>& magfield, Vector position)
     {
         using namespace constants;
 
@@ -52,7 +54,7 @@ namespace X17
                              m2cm*efield.z/c,  b.y,              -b.x,              0                });
     }
 
-    void EMMotion(const Field<Vector>& magfield, const bool& electron, const double& tau, const Matrix<8,1>& params, Matrix<8,1>& output)
+    void EMMotion(const Field<Vector>& magfield, bool electron, double tau, const Matrix<8,1>& params, Matrix<8,1>& output)
     {
         using namespace constants;
 
@@ -74,16 +76,16 @@ namespace X17
         });
     }
 
-    bool IsOutOfSector(const double& tau, const Matrix<8,1>& params)
+    bool IsOutOfSector(double tau, const Matrix<8,1>& params)
     {
         using namespace constants;
         return (!IsInSector(m2cm * params.at(1,0), m2cm * params.at(2,0), m2cm * params.at(3,0),-0.5)) && (m2cm * params.at(1,0) > xmin);
     }
 
-    RK4<8>* GetTrackRK(const Field<Vector>& magfield, const bool& electron, const double& step, const double& kin_en, const Vector& origin, const Vector& orientation)
+    RK4<8>* GetTrackRK(const Field<Vector>& magfield, bool electron, double step, double kin_en, Vector origin, Vector orientation)
     {
         Matrix<8,1> init = GetInitParams(kin_en,origin,orientation);
-        auto f = [&magfield, electron](const double& t, const Matrix<8, 1>& y, Matrix<8, 1>& dydt) {
+        auto f = [&magfield, electron](double t, const Matrix<8, 1>& y, Matrix<8, 1>& dydt) {
             EMMotion(magfield, electron, t, y, dydt);
         };
         return new RK4<8>(0,step,f,init,IsOutOfSector);
@@ -103,22 +105,70 @@ namespace X17
         return output;
     }
 
+    //// Class RKFit static variables.
+
     RKFit* RKFit::lastfit = nullptr;
 
-    RKPoint RKFit::_GetPoint(const int& index) const
+    
+    
+    
+    
+    //// Public methods of the RKFit class.
+
+    RKFit::RKFit(Field<Vector>* magfield, bool electron, double step, Vector origin, Vector orientation, const std::vector<RecoPoint>& fit_data)
+        : m_magfield(magfield), m_electron(electron), m_step(step), m_origin(origin), m_orientation(orientation), m_fit_data(fit_data)
+    { lastfit = this; }
+
+    void RKFit::SetFitter(int parameters, bool print)
+    {        
+        m_fitter = TVirtualFitter::Fitter(nullptr,parameters);
+        m_fitter->SetFCN(this->_Eval);
+
+        if(!print)
+        {
+            double arg = -1;
+            m_fitter->ExecuteCommand("SET PRINTOUT",&arg,1);
+            m_fitter->ExecuteCommand("SET NOW", &arg ,1);
+        }
+    }
+
+    void RKFit::FitRK(double max_iter, double toleration)
+    {
+        m_fitter->SetParameter(0,"kin_en",m_kin_en,1000,1000000,16000000);
+
+        double arglist[2] = {max_iter,toleration};    // Maximum iterations, step size (toleration).
+        m_fitter->ExecuteCommand("MIGRAD",arglist,2); // The last parameter is the num of prints (verbosity).
+
+        m_kin_en = m_fitter->GetParameter(0);
+        m_e_err  = m_fitter->GetParError(0);
+    }
+
+    void RKFit::PrintFitParams() const
+    {
+        std::cout << "\nRK FIT RESULT:\n";
+        std::cout << "Kinetic energy:  " << m_kin_en << " +- " << m_e_err << "\n\n";
+    }
+
+
+
+
+
+    //// Private methods of the RKFit class.
+
+    RKPoint RKFit::_GetPoint(int index) const
     {
         using namespace constants;
         auto rk_pts = m_curr_rk->GetResults();
         return RKPoint(m2cm * rk_pts[index].at(1,0), m2cm * rk_pts[index].at(2,0), m2cm * rk_pts[index].at(3,0), 1e+9 * rk_pts[index].at(0,0));
     }
 
-    double RKFit::_SqDist(const int& index, const Vector& point)
+    double RKFit::_SqDist(int index, Vector point) const
     {
         RKPoint rk_point = _GetPoint(index);
         return rk_point.AsVector().SqDist(point);
     }
 
-    double RKFit::_GetSqDist(const Vector& point)
+    double RKFit::_GetSqDist(Vector point) const
     {
         int min_index = 0;
         int max_index = m_curr_rk->GetSize() - 2;
@@ -157,40 +207,5 @@ namespace X17
         
         sumsq = 0;
         for (auto p : m_fit_data) sumsq += p.count * _GetSqDist(p.AsVector());
-    }
-
-    RKFit::RKFit(Field<Vector>* magfield, const bool& electron, const double& step, const Vector& origin,
-            const Vector& orientation, const std::vector<RecoPoint>& fit_data)
-        : m_magfield(magfield), m_electron(electron), m_step(step), m_origin(origin), m_orientation(orientation), m_fit_data(fit_data)
-    { lastfit = this; }
-
-    void RKFit::SetFitter(int parameters, bool print)
-    {        
-        m_fitter = TVirtualFitter::Fitter(nullptr,parameters);
-        m_fitter->SetFCN(this->_Eval);
-
-        if(!print)
-        {
-            double arg = -1;
-            m_fitter->ExecuteCommand("SET PRINTOUT",&arg,1);
-            m_fitter->ExecuteCommand("SET NOW", &arg ,1);
-        }
-    }
-
-    void RKFit::FitRK(double max_iter, double toleration)
-    {
-        m_fitter->SetParameter(0,"kin_en",m_kin_en,1000,1000000,16000000);
-
-        double arglist[2] = {max_iter,toleration};    // Maximum iterations, step size (toleration).
-        m_fitter->ExecuteCommand("MIGRAD",arglist,2); // The last parameter is the num of prints (verbosity).
-
-        m_kin_en = m_fitter->GetParameter(0);
-        m_e_err  = m_fitter->GetParError(0);
-    }
-
-    void RKFit::PrintFitParams()
-    {
-        std::cout << "\nRK FIT RESULT:\n";
-        std::cout << "Kinetic energy:  " << m_kin_en << " +- " << m_e_err << "\n\n";
     }
 } // namespace X17

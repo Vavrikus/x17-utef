@@ -14,7 +14,7 @@ namespace X17
 {
     //// Useful functions for X17.
 
-    bool IsInSector(const double& x, const double& y, const double& z, const double& dist)
+    bool IsInSector(double x, double y, double z, double dist)
     {
         using namespace constants;
 
@@ -27,7 +27,7 @@ namespace X17
         return true;   
     }
     
-    void GetMinMaxField(const Field<Vector>& magfield, double& out_min, double& out_max, const double& dist)
+    void GetMinMaxField(const Field<Vector>& magfield, double& out_min, double& out_max, double dist)
     {
         double min_magnitude_sq = -1;
         double max_magnitude_sq = -1;
@@ -55,7 +55,7 @@ namespace X17
         out_max = std::sqrt(max_magnitude_sq);
     }
 
-    void GetMinMaxFieldAngle(const Field<Vector>& magfield, double& out_min, double& out_max, const double& dist)
+    void GetMinMaxFieldAngle(const Field<Vector>& magfield, double& out_min, double& out_max, double dist)
     {
         double min_angle = -1;
         double max_angle = -1;

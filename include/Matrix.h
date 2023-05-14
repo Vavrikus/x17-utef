@@ -31,7 +31,7 @@ namespace X17
 
         /// @brief Multiply each element in the matrix by a scalar.
         /// @param d The scalar to multiply the elements by.
-        void operator*=(const double& d)
+        void operator*=(double d)
         {
             for (double& element : elements) element *= d;
         }
@@ -87,7 +87,7 @@ namespace X17
     /// @param A The matrix to multiply with the scalar.
     /// @return The resulting matrix of the element-wise multiplication.
     template <int M, int N>
-    Matrix<M,N> operator*(const double& d, const Matrix<M,N>& A);
+    Matrix<M,N> operator*(double d, const Matrix<M,N>& A);
 
     /// @brief Divide each element of a matrix by a scalar.
     /// @tparam M Number of rows of the matrix.
@@ -96,7 +96,7 @@ namespace X17
     /// @param d Scalar to divide the matrix by.
     /// @return Matrix result of dividing each element of A by d.
     template <int M, int N>
-    Matrix<M,N> operator/(const Matrix<M,N>& A,const double& d);
+    Matrix<M,N> operator/(const Matrix<M,N>& A, double d);
 
     /// @brief Multiplies two matrices A and B, and returns the result C = A*B.
     /// @tparam M Number of rows of matrix A and C.

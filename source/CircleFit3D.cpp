@@ -19,7 +19,7 @@ namespace X17
 
     //// Public methods.
 
-    CircleFit3D::CircleFit3D(const Vector& orig, const Vector& orient)
+    CircleFit3D::CircleFit3D(Vector orig, Vector orient)
     {
         this->m_origin      = orig;
         this->m_orientation = orient;
@@ -64,7 +64,7 @@ namespace X17
         _UpdateCurve();
     }
     
-    void CircleFit3D::PrintFitParams()
+    void CircleFit3D::PrintFitParams() const
     {
         std::cout << "\nCIRCLE FIT PARAMETERS:\n";
         std::cout << "Length:  " << m_length  << " +- " << m_l_err   << "\n";
@@ -73,7 +73,7 @@ namespace X17
         std::cout << "Phi_max: " << m_phi_max << " +- " << m_phi_err << "\n\n";
     }
 
-    TGraph2D* CircleFit3D::GetGraph(double step, double dist)
+    TGraph2D* CircleFit3D::GetGraph(double step, double dist) const
     {
         TGraph2D* fit_graph = new TGraph2D();
         
@@ -110,7 +110,7 @@ namespace X17
         return fit_graph;
     }
 
-    double CircleFit3D::GetEnergy(const Field<Vector>& magfield, bool middle)
+    double CircleFit3D::GetEnergy(const Field<Vector>& magfield, bool middle) const
     {
         using namespace constants;
 
@@ -126,7 +126,7 @@ namespace X17
         return Ekin;
     }
 
-    TGraph* CircleFit3D::GetEnergyGraph(const Field<Vector>& magfield, double step)
+    TGraph* CircleFit3D::GetEnergyGraph(const Field<Vector>& magfield, double step) const
     {
         using namespace constants;
 
@@ -158,13 +158,13 @@ namespace X17
 
     //// Private methods.
     
-    Vector CircleFit3D::_GetLinePoint(double param, bool first_line)
+    Vector CircleFit3D::_GetLinePoint(double param, bool first_line) const
     {
         if (first_line) return m_origin  + param * m_orientation;
         else            return m_origin2 + param * m_orientation2;
     }
 
-    Vector CircleFit3D::_GetCirclePoint(double varphi)
+    Vector CircleFit3D::_GetCirclePoint(double varphi) const
     {
         double cos_varphi = cos(varphi);
         double sin_varphi = sin(varphi);
@@ -205,22 +205,22 @@ namespace X17
                                 -sin_varphi *  m_cos_alpha*m_sin_theta + cos_varphi*m_cos_theta };
     }
 
-    double CircleFit3D::_LineSqDist(const RecoPoint& point, bool first_line)
+    double CircleFit3D::_LineSqDist(RecoPoint point, bool first_line) const
     {
-        Vector *orig,*orient;
-        if (first_line) { orig = &m_origin;  orient = &m_orientation;  }
-        else            { orig = &m_origin2; orient = &m_orientation2; }
+        Vector orig,orient;
+        if (first_line) { orig = m_origin;  orient = m_orientation;  }
+        else            { orig = m_origin2; orient = m_orientation2; }
 
-        double t_close = *orient*(point.AsVector()-*orig)/orient->SqMagnitude();
+        double t_close = orient * (point.AsVector() - orig) / orient.SqMagnitude();
         if (first_line  && (t_close > m_length)) t_close = m_length;
         if (!first_line && (t_close < 0))      t_close = 0;
 
-        Vector line_vector = *orig+t_close*(*orient)-point.AsVector();
+        Vector line_vector = orig + t_close * orient - point.AsVector();
 
         return line_vector.SqMagnitude();
     }
 
-    double CircleFit3D::_CircleSqDist(const RecoPoint& point)
+    double CircleFit3D::_CircleSqDist(RecoPoint point) const
     {
         Vector projection = (point.AsVector()-m_center)-((point.AsVector()-m_center)*m_normal)*m_normal;
         projection.Normalize();
@@ -233,7 +233,7 @@ namespace X17
         return find_min(circle_vector.SqMagnitude(),arc_beg_vector.SqMagnitude(),arc_end_vector.SqMagnitude());
     }
     
-    double CircleFit3D::_SqDistance(const RecoPoint& point)
+    double CircleFit3D::_SqDistance(RecoPoint point) const
     {
         double sqdist1 = _LineSqDist(point,true);
         double sqdist2 = _CircleSqDist(point);
@@ -242,7 +242,7 @@ namespace X17
         return find_min(sqdist1,sqdist2,sqdist3);
     }
 
-    double CircleFit3D::_SumSq()
+    double CircleFit3D::_SumSq() const
     {
         double sum = 0;
         for (RecoPoint point : m_fit_data) sum += point.count*_SqDistance(point);
@@ -266,7 +266,7 @@ namespace X17
         return lastfit->_EvalSumSq(npar,gin,sumsq,par,iflag);
     }
 
-    Vector CircleFit3D::_GetAvgField(const Field<Vector>& magfield, double step)
+    Vector CircleFit3D::_GetAvgField(const Field<Vector>& magfield, double step) const
     {
         int i = 0;
         double param = 0;
@@ -286,7 +286,7 @@ namespace X17
         return bfield/i;
     }
     
-    Vector CircleFit3D::_GetMiddleField(const Field<Vector>& magfield, double tolerance)
+    Vector CircleFit3D::_GetMiddleField(const Field<Vector>& magfield, double tolerance) const
     {
         using namespace constants;
 

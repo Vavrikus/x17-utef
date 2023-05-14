@@ -9,7 +9,7 @@ namespace X17
     //// Private methods.
 
     template <typename T>
-    void Field<T>::_GetPointIndices(const double& x, const double& y, const double& z, int& xi, int& yi, int& zi) const
+    void Field<T>::_GetPointIndices(double x, double y, double z, int& xi, int& yi, int& zi) const
     {
         // Check if the point is out of bounds.
         if(x < m_xmin || x > m_xmax || y < m_ymin || y > m_ymax || z < m_zmin || z > m_zmax)

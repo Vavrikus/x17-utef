@@ -19,7 +19,7 @@ namespace X17
 {
     //// Public DefaultLayout methods.
 
-    double DefaultLayout::GetPadHeight(const int& i, const bool& effective)
+    double DefaultLayout::GetPadHeight(int i, bool effective) const
     {
         using namespace constants;
 
@@ -33,7 +33,7 @@ namespace X17
         return height;
     }
 
-    void DefaultLayout::GetPadInfo(const int& i, int& out_column, int& out_row, double& out_height)
+    void DefaultLayout::GetPadInfo(int i, int& out_column, int& out_row, double& out_height) const
     {
         using namespace constants;
         if(i < 1 || i > channels) std::cerr << "WARNING: Invalid channel number " << i << " (must be between 1 and " << channels << ").\n";
@@ -68,7 +68,7 @@ namespace X17
 
         out_height = GetPadHeight(i);
     }
-    void DefaultLayout::GetPadCenter(const int& i, double& out_x, double& out_y)
+    void DefaultLayout::GetPadCenter(int i, double& out_x, double& out_y) const
     {
         using namespace constants;
 
@@ -83,7 +83,7 @@ namespace X17
         out_y = -(yhigh + pad1_offset - (row - 1) * (pad_height + pad_offset) - (column - 1) * pad_stag - i_pad_height / 2);
     }
 
-    void DefaultLayout::GetPadCorners(const int& i, double& out_xlow, double& out_ylow, double& out_xhigh, double& out_yhigh, bool nogaps)
+    void DefaultLayout::GetPadCorners(int i, double& out_xlow, double& out_ylow, double& out_xhigh, double& out_yhigh, bool nogaps) const
     {   
         using namespace constants;
 
@@ -103,7 +103,7 @@ namespace X17
         out_yhigh = out_ylow - (-i_pad_height - 2 * gaps_correction);
     }
 
-    int DefaultLayout::GetPad(const double& x, const double& y)
+    int DefaultLayout::GetPad(double x, double y) const
     {
         using namespace constants;
 
@@ -117,7 +117,7 @@ namespace X17
         return -1;        
     }
 
-    void DefaultLayout::DrawPads(bool nogaps, TCanvas* c)
+    void DefaultLayout::DrawPads(bool nogaps, TCanvas* c) const
     {
         using namespace constants;
 
@@ -155,7 +155,7 @@ namespace X17
         DrawTrapezoid(false);
     }
 
-    void DefaultLayout::DrawPads3D(const double height)
+    void DefaultLayout::DrawPads3D(const double height) const
     {
         using namespace constants;
 
@@ -180,7 +180,7 @@ namespace X17
         for(auto l : pad_lines)   l->Draw("AL");
     }
 
-    void DefaultLayout::DrawPadsDistortion(const double& time, TCanvas* c, Field<MapPoint>* map)
+    void DefaultLayout::DrawPadsDistortion(double time, TCanvas* c, Field<MapPoint>* map) const
     {
         using namespace constants;
 

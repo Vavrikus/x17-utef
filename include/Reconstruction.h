@@ -41,19 +41,19 @@ namespace X17
     ///                The array should contain indices for {xmin, xmax, ymin, ymax, zmin, zmax}.
     /// @param end_point The electron endpoint to be checked.
     /// @return void.
-    void PrintCube(const Field<MapPoint>& map, const int (&indices)[6], const EndPoint& end_point);
+    void PrintCube(const Field<MapPoint>& map, const int (&indices)[6], EndPoint end_point);
 
     /// @brief Reconstructs an EndPoint using interpolation from the ionization electron drift map.
     /// @param map The 3D map of ionization electron drift used for interpolation.
     /// @param end_point An EndPoint object that represents the point in 3D space to be reconstructed. (x1,y1,t1)
     /// @return A RecoPoint object that represents the reconstructed point in 3D space. (x0,y0,z0)
-    RecoPoint Reconstruct(const Field<MapPoint>& map, const EndPoint& end_point);
+    RecoPoint Reconstruct(const Field<MapPoint>& map, EndPoint end_point);
 
     /// @brief Reconstructs an EndPoint using interpolation from the ionization electron drift map.
     /// @param map The 3D map of ionization electron drift used for interpolation.
     /// @param point An MicroPoint object that represents the simulated point in 3D space to be reconstructed. (x1,y1,t1)
     /// @return A RecoPoint object that represents the reconstructed point in 3D space. (x0,y0,z0)
-    inline RecoPoint Reconstruct(const Field<MapPoint>& map, const MicroPoint& point) { return Reconstruct(map, point.end); }
+    inline RecoPoint Reconstruct(const Field<MapPoint>& map, MicroPoint point) { return Reconstruct(map, point.end); }
 
     /// @brief Estimates the distance between two points, with given coordinates and time values in a SensorData object. The time value is weighted by a factor.
     /// @param p The MapPoint from which we want to calculate distance.
@@ -61,7 +61,7 @@ namespace X17
     /// @param y1 The final y-coordinate.
     /// @param t1 The final time.
     /// @return The estimated distance between points.
-    double Offset(const MapPoint& p, const double& x1, const double& y1, const double& t1);
+    double Offset(MapPoint p, double x1, double y1, double t1);
 
     /// @brief Reconstructs a point with given final coordinates using the map of ion electron drift. Uses gradient descend. Old function.
     /// @param map The field map to use for reconstruction.
@@ -70,5 +70,5 @@ namespace X17
     /// @param t1 The time of the initial point.
     /// @param max_err The maximum allowed error between reconstructed point and actual point.
     /// @return The reconstructed point.
-    RecoPoint ReconstructOld(const Field<MapPoint>& map, const double& x1, const double& y1, const double& t1, const double& max_err);
+    RecoPoint ReconstructOld(const Field<MapPoint>& map, double x1, double y1, double t1, double max_err);
 } // namespace X17

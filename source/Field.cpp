@@ -11,7 +11,7 @@ namespace X17
 {
     //// Functions related to the Field class.
 
-    Field<Vector>* LoadField(const char* filename, const Vector& min_corner, const Vector& max_corner, const double& step, bool printInfo)
+    Field<Vector>* LoadField(const char* filename, Vector min_corner, Vector max_corner, double step, bool printInfo)
     {
         Field<Vector>* field = new Field<Vector>(min_corner,max_corner,step,{0,0,0});
 

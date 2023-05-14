@@ -8,14 +8,14 @@ namespace X17
 {
     //// Public methods.
 
-    void Vector::operator+=(const Vector& v)
+    void Vector::operator+=(Vector v)
     {
         this->x += v.x;
         this->y += v.y;
         this->z += v.z;
     }
 
-    void Vector::operator/=(const double& d)
+    void Vector::operator/=(double d)
     {
         x /= d;
         y /= d;
@@ -28,7 +28,7 @@ namespace X17
 
     //// Functions related to the Vector class.
 
-    double LineSqDist(const Vector& origin, const Vector& orientation, double max_param, const Vector& point)
+    double LineSqDist(Vector origin, Vector orientation, double max_param, Vector point)
     {
         // Normalize the orientation vector to ensure correct computations.
         Vector norm_orientation = orientation;

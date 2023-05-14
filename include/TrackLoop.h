@@ -21,19 +21,19 @@ namespace X17
         TrackLoop* m_loop = nullptr; // The loop that will run this task.
     public:
         /// @brief To be run before any loops.
-        virtual void PreTrackLoop()     { }
+        virtual void PreTrackLoop() { }
 
         /// @brief To be run inside the track loop before the electron loop.
-        virtual void PreElectronLoop()  { }
+        virtual void PreElectronLoop() { }
 
         /// @brief To be run during the electron loop on each track.
-        virtual void ElectronLoop()     { }
+        virtual void ElectronLoop() { }
 
         /// @brief To be run inside the track loop.
         virtual void PostElectronLoop() { }
 
         /// @brief To be run after all loops.
-        virtual void PostTrackLoop()    { }
+        virtual void PostTrackLoop() { }
     };
 
     class TrackLoop

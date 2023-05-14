@@ -14,7 +14,7 @@
 
 namespace X17
 {
-    TF1* FitCircle(TGraph* graph, const double& min, const double& max)
+    TF1* FitCircle(TGraph* graph, double min, double max)
     {
         TF1* circle = new TF1("circle","[2]-sqrt([0]^2-(x-[1])^2)",min,max);
         circle->SetParameter(0,5);
@@ -51,7 +51,7 @@ namespace X17
         return y0 - sqrt(pow(radius,2) - pow(xx - x0,2));
     }
 
-    TF1* FitCircle2(TGraph* graph, const double& min, const double& max)
+    TF1* FitCircle2(TGraph* graph, double min, double max)
     {
         TF1* circle = new TF1("circle",circle_func,min,max,5);
         circle->SetParameter(0,50);
