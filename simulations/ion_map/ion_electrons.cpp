@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 
     // Set the gas mixture.
     MediumMagboltz gas;
-    gas.SetComposition("ar", 90., "co2", 10.); std::cout << "BAD GAS COMPOSITION!!!!\n"; // Change to 70/30, set temperature, etc.
+    gas.SetComposition("ar", 70., "co2", 30.); // std::cout << "BAD GAS COMPOSITION!!!!\n"; // Change to 70/30, set temperature, etc.
 
     // Add magnetic and electric field.
     ComponentGrid grid;
@@ -74,31 +74,30 @@ int main(int argc, char *argv[])
 
     // The actual simulation.
     int i_el = 0; // Current index of the electron.
-    for (double z = job.zmin; z <= job.zmax; z+=job.step)
-    for (double y = job.ymin; y <= job.ymax; y+=job.step)
-    for (double x = job.xmin; x <= job.xmax; x+=job.step)
+    for (double z = job.zmin; z <= job.zmax; z += job.step)
+    for (double y = job.ymin; y <= job.ymax; y += job.step)
+    for (double x = job.xmin; x <= job.xmax; x += job.step)
     {
         // Only inside of the first sector.
-        if((y - sqrt(3) * x <= 0) && (y + sqrt(3) * x > 0))
-        {
-            i_el++;
+        if(!((job.SectorLineDist(x,y,false) <= 0) && (job.SectorLineDist(x,y,true) >= 0))) continue;
+        i_el++;
 
-            // Check if this electron is supposed to be simulated by job with this id.
-            if (!((i_el < job.min_el)||(i_el > job.max_el)))
-            {
-                for (int j = 0; j < job.iterations; j++)
-                {                        
-                    int status;
-                    aval.AvalancheElectron(x, y, z, 0, 0.1, 0, 0, 0);
-                    aval.GetElectronEndpoint(0,point.x0,point.y0,point.z0,point.t0,point.e0,point.x1,point.y1,point.z1,point.t1,point.e1,status);
-                    electrons.Fill();
-                }
-            }
+        // Check if this electron is supposed to be simulated by job with this id.
+        if (((i_el < job.min_el)||(i_el > job.max_el))) continue;
+
+        // Actual for loop for electron generation.
+        for (int j = 0; j < job.iterations; j++)
+        {                        
+            int status;
+            aval.AvalancheElectron(x, y, z, 0, 0.1, 0, 0, 0);
+            aval.GetElectronEndpoint(0,point.x0,point.y0,point.z0,point.t0,point.e0,point.x1,point.y1,point.z1,point.t1,point.e1,status);
+            electrons.Fill();
+            // std::cout << "X: " << x << " Y: " << y << " Z: " << z << "\n";
         }
     }
 
-    outFile.Write();
-    outFile.Close();
+    // outFile.Write();
+    // outFile.Close();
 
     return 0;
 }

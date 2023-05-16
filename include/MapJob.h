@@ -2,6 +2,12 @@
 
 namespace X17
 {
+    // Tangent of 30 degrees for the sector condition.
+    const double tan30 = sqrt(3)/3;
+
+    // Number of steps to offset on the negative x-axis for the sector condition.
+    const double x_offset = 3;
+
     /// @brief Struct representing a simulation job for simulating ionization electrons map.
     struct MapJob
     {
@@ -13,7 +19,7 @@ namespace X17
         double step;    // Spacing of the grid [cm].
 
         // Ranges for simulation.
-        // 1st sector condition (y-sqrt(3)*x<=0)&&(y+sqrt(3)*x>0) has to be satisfied later.
+        // First sector condition has to be satisfied later.
         double xmin =  0;  // Minimum x coordinate of simulation area.
         double xmax =  15; // Maximum x coordinate of simulation area.
         double ymin = -30; // Minimum y coordinate of simulation area.
@@ -31,6 +37,13 @@ namespace X17
         double zsum; // Total distance to propagate all electrons (per iteration).
 
     public:
+        /// @brief Returns the vertical distance from one of the lines specifying the sector boundaries.
+        /// @param x The x-coordinate.
+        /// @param y The y-coordinate.
+        /// @param min If the minimal or maximal y line should be used.
+        /// @return Vertical distance from one of the lines specifying the sector boundaries.
+        double SectorLineDist(double x, double y, bool min);
+
         /// @brief Parses command line arguments and sets job parameters.
         /// @param argc Number of command line arguments.
         /// @param argv Array of command line arguments.

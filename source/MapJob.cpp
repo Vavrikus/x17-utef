@@ -9,6 +9,12 @@ namespace X17
 {
     //// Public methods.
 
+    double MapJob::SectorLineDist(double x, double y, bool min)
+    {
+        if (min) return y + tan30 * (x + x_offset * step);
+        else     return y - tan30 * (x + x_offset * step);
+    }
+
     void MapJob::SetParameters(int argc, char* argv[])
     {
         // Check the number of paramaters passed to main function.
@@ -31,13 +37,16 @@ namespace X17
         if (iterations <= 0) std::cerr << "ERROR: Parameter iterations has to be positive.\n";
 
         std::cout << "Running with parameters:\n" << "max_id: " << max_id << ", id: " << id << ", step (cm): " << step << ", iterations: " << iterations << ".\n";
+
+        // Give extra offset to the minimal x-coordinate.
+        xmin -= x_offset * step;
     }
 
     void MapJob::SetElectronBounds()
     {
         _SetStepParameters();
         n_el = nz * nxy;
-        zsum = (zmax - zmin) * nxy * nz - nxy * step * nz * (nz - 1)/2;
+        zsum = (zmax - zmin) * nxy * nz - nxy * step * nz * (nz - 1) / 2;
 
         std::cout << "Expecting " << n_el << " electrons across all simulations, total propagation distance (per iteration) " << zsum << ".\n";
 
@@ -62,15 +71,15 @@ namespace X17
         // Iterate over x and add up y steps to get nxy.
         for (int i = 0; i < nx; i++) 
         {
-            double x     = xmin + i * step;                         // Current x value.
-            int nymin    = floor((-ymin - x * sqrt(3)) / step) + 1; // The minimal number of y steps to satisfy minimal sector condition.
-            double ymin2 = ymin + nymin * step;                     // The smallest y to satisfy minimal sector condition.
+            double x     = xmin + i * step;                                // Current x value.
+            int nymin    = floor(-SectorLineDist(x,ymin,true) / step) + 1; // The minimal number of y steps to satisfy minimal sector condition.
+            double ymin2 = ymin + nymin * step;                            // The smallest y to satisfy minimal sector condition.
 
             double ny; // Number of y steps for current x iteration.
 
             // If maximal sector condition cannot be satisfied set ny to 0, otherwise calculate it.
             if (ymin2 > (x * sqrt(3))) ny = 0;
-            else ny = floor((x * sqrt(3) - ymin2) / step) + 1;
+            else ny = floor(-SectorLineDist(x,ymin2,false) / step) + 1;
             nxy += ny;
         }
     }
@@ -96,7 +105,7 @@ namespace X17
         {
             if(_Zsum(current_el) > l_id*opt_zsum) max_el = current_el;
             else min_el = current_el;
-            current_el  = (max_el + min_el)/2;
+            current_el  = (max_el + min_el) / 2;
         }  
 
         return max_el;
