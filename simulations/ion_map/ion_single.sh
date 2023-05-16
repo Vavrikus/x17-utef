@@ -32,7 +32,10 @@ test -n "$SCRATCHDIR" || { echo >&2 "Variable SCRATCHDIR is not set!"; exit 1; }
 
 # copy input file "h2o.com" to scratch directory
 # if the copy operation fails, issue error message and exit
-cp $BUILDDIR/ion_electrons $MAGDIR/VecE2.txt $MAGDIR/VecB2.txt  $SCRATCHDIR || { echo >&2 "Error while copying input file(s)!"; exit 2; }
+mkdir -p $SCRATCHDIR/simulations/ion_map/build
+mkdir -p $SCRATCHDIR/data/elmag
+cp $BUILDDIR/ion_electrons $SCRATCHDIR/simulations/ion_map/build || { echo >&2 "Error while copying input file(s)!"; exit 2; }
+cp $MAGDIR/VecE2.txt $MAGDIR/VecB2.txt  $SCRATCHDIR/data/elmag || { echo >&2 "Error while copying input file(s)!"; exit 2; }
 
 # move into scratch directory
 cd $SCRATCHDIR
