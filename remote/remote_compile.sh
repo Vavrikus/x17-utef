@@ -6,6 +6,7 @@ i="meta"
 echo "Connecting to ${i}"
 
 ssh ${i} '
+    export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
     source /etc/profile.d/20_meta_modules.sh
     cd /storage/projects/utefx17/martin/
     cd simulations/ion_map/
