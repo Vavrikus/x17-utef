@@ -96,8 +96,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    // outFile.Write();
-    // outFile.Close();
+    outFile.Write();
+    outFile.Close();
 
     return 0;
 }

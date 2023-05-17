@@ -26,6 +26,9 @@ source /storage/projects/utefx17/SourceCode/ROOT/install/bin/thisroot.sh
 source /storage/projects/utefx17/SourceCode/geant4/geant4-v11.0.3-install/bin/geant4.sh
 source /storage/projects/utefx17/SourceCode/garfield/install/share/Garfield/setupGarfield.sh
 
+# Set the LD_LIBRARY_PATH to include the path to the GSL library
+export LD_LIBRARY_PATH="/storage/projects/utefx17/SourceCode/libgsl-dev/gsl-2.7-install/lib:$LD_LIBRARY_PATH"
+
 # test if scratch directory is set
 # if scratch directory is not set, issue error message and exit
 test -n "$SCRATCHDIR" || { echo >&2 "Variable SCRATCHDIR is not set!"; exit 1; }
@@ -38,10 +41,12 @@ cp $BUILDDIR/ion_electrons $SCRATCHDIR/simulations/ion_map/build || { echo >&2 "
 cp $MAGDIR/VecE2.txt $MAGDIR/VecB2.txt  $SCRATCHDIR/data/elmag || { echo >&2 "Error while copying input file(s)!"; exit 2; }
 
 # move into scratch directory
-cd $SCRATCHDIR
+cd $SCRATCHDIR/simulations/ion_map/build
 
 # run Gaussian 03 with h2o.com as input and save the results into h2o.out file
 # if the calculation ends with an error, issue error message an exit
+# echo "LD_LIBRARY_PATH:"
+# echo $LD_LIBRARY_PATH
 ./ion_electrons $PAR1 $PAR2 $PAR3 $PAR4 >ion$PAR2.out || { echo >&2 "Calculation ended up erroneously (with a code $?) !!"; exit 3; }
 
 # move the output to user's DATADIR or exit in case of failure

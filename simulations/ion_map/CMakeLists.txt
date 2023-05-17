@@ -20,7 +20,9 @@ include(${ROOT_USE_FILE})
 include_directories(${ROOT_INCLUDE_DIRS})
 link_directories(${ROOT_LIBRARY_DIR})
 
-find_package(GSL REQUIRED)
+# find_package(GSL REQUIRED)
+include_directories(/storage/projects/utefx17/SourceCode/libgsl-dev/gsl-2.7-install/include)
+link_directories(/storage/projects/utefx17/SourceCode/libgsl-dev/gsl-2.7-install/lib)
 
 # ---Add subdirectory containing source code----------------------------------------------
 include_directories(../../include)
