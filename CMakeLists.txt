@@ -28,23 +28,15 @@ file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
 add_library(X17_source_lib STATIC ${SOURCES})
 
 # ---Build executables--------------------------------------------------------------------
-add_executable(reco_track reconstruction/reco_track.cpp)
-add_executable(ion_electrons simulations/ion_map/ion_electrons.cpp)
-add_executable(make_map simulations/ion_map/make_map.cpp)
-add_executable(rk_tracks simulations/rk_tracks/rk_tracks.cpp)
-add_executable(make_track simulations/single_track/make_track.cpp)
-add_executable(gas_table simulations/single_track/gas_table.cpp)
+# Create the build folder for the root project
+set(PROJECT_BUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build)
+file(MAKE_DIRECTORY ${PROJECT_BUILD_DIR})
 
-target_link_libraries(reco_track Garfield::Garfield ${ROOT_LIBRARIES} X17_source_lib)
-target_link_libraries(ion_electrons Garfield::Garfield ${ROOT_LIBRARIES} X17_source_lib)
-target_link_libraries(make_map Garfield::Garfield ${ROOT_LIBRARIES} X17_source_lib)
-target_link_libraries(rk_tracks Garfield::Garfield ${ROOT_LIBRARIES} X17_source_lib)
-target_link_libraries(make_track Garfield::Garfield ${ROOT_LIBRARIES} X17_source_lib)
-target_link_libraries(gas_table Garfield::Garfield ${ROOT_LIBRARIES} X17_source_lib)
+# Create a list of subdirectories (assuming 'subdir1' and 'subdir2')
+set(SUBDIRECTORIES reconstruction simulations/ion_map simulations/single_track simulations/rk_tracks)
 
-target_include_directories(reco_track PRIVATE include)
-target_include_directories(ion_electrons PRIVATE include)
-target_include_directories(make_map PRIVATE include)
-target_include_directories(rk_tracks PRIVATE include)
-target_include_directories(make_track PRIVATE include)
-target_include_directories(gas_table PRIVATE include)
+# Iterate over each subdirectory
+foreach(subdirectory ${SUBDIRECTORIES})
+    # Add the subdirectory
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/${subdirectory})
+endforeach()

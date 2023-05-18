@@ -22,11 +22,6 @@ link_directories(${ROOT_LIBRARY_DIR})
 
 find_package(GSL REQUIRED)
 
-# ---Add subdirectory containing source code----------------------------------------------
-include_directories(../../include)
-file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../../source/*.cpp")
-add_library(X17_source_lib STATIC ${SOURCES})
-
 # ---Build executables--------------------------------------------------------------------
 add_executable(make_track make_track.cpp)
 add_executable(gas_table gas_table.cpp)

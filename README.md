@@ -5,13 +5,6 @@ C++ code in this project uses ROOT and Garfield++ to simulate and reconstruct el
 The user needs to have ROOT installed (built on 6.26/06), for running simulations Garfield++ has to be installed. Currently used simulation results are provided.
 Scripts have to be compiled before running:
 
-```bash
-cd /script_folder/build
-cmake ..
-make
-./script_name
-```
-
 It is also possible to compile all of the scripts at once:
 
 ```bash
@@ -19,6 +12,7 @@ cd /path/to/project/folder
 mkdir build && cd build
 cmake ..
 make
+./script_name
 ```
 
 All of the binaries will be saved to the newly made build folder. This might lead to errors in the scripts whenever relative paths are used.
@@ -26,11 +20,11 @@ All of the binaries will be saved to the newly made build folder. This might lea
 ### Map simulation
 The map of the ionization electron drift can be simulated on MetaCentrum:
 1. Files need to be synchronized and compiled (can be achieved by adjusting *sync.sh* and *remote_compile.sh*).
-2. Directory *data* should be cleared so no files get overwritten.
+2. Directory *data/ion_map/new_sample* should be cleared so no files get overwritten.
 3. Simulation is started by executing *ion_multiple.sh*:
 
     ```bash
-    ./ion_multiple.sh num_of_threads step_size_cm
+    ./ion_multiple.sh num_of_threads step_size_cm num_of_iterations_per_electron
     ```
     Make sure wall time and memory inside *ion_single.sh* are sufficient.
 4. After job finishes, output files ion(id).root and ion(id).out are sent into the data directory. You can fetch them by adjusting *fetch_data.sh*.

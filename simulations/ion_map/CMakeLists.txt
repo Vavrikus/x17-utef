@@ -24,12 +24,7 @@ link_directories(${ROOT_LIBRARY_DIR})
 include_directories(/storage/projects/utefx17/SourceCode/libgsl-dev/gsl-2.7-install/include)
 link_directories(/storage/projects/utefx17/SourceCode/libgsl-dev/gsl-2.7-install/lib)
 
-# ---Add subdirectory containing source code----------------------------------------------
-include_directories(../../include)
-file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../../source/*.cpp")
-add_library(X17_source_lib STATIC ${SOURCES})
-
-# ---Build executable---------------------------------------------------------------------
+# ---Build executables--------------------------------------------------------------------
 add_executable(ion_electrons ion_electrons.cpp)
 add_executable(make_map make_map.cpp)
 

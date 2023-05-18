@@ -22,12 +22,7 @@ link_directories(${ROOT_LIBRARY_DIR})
 
 find_package(GSL REQUIRED)
 
-# ---Add subdirectory containing source code----------------------------------------------
-include_directories(../../include)
-file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../../source/*.cpp")
-add_library(X17_source_lib STATIC ${SOURCES})
-
-# ---Build executable---------------------------------------------------------------------
+# ---Build executables--------------------------------------------------------------------
 add_executable(rk_tracks rk_tracks.cpp)
 
 target_link_libraries(rk_tracks Garfield::Garfield ${ROOT_LIBRARIES} X17_source_lib)
