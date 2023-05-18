@@ -1,4 +1,5 @@
 // C++ dependencies
+#include <iomanip>
 #include <iostream>
 #include <cmath>
 
@@ -79,11 +80,14 @@ int main(int argc, char *argv[])
     for (double x = job.xmin; x <= job.xmax; x += job.step)
     {
         // Only inside of the first sector.
-        if(!((job.SectorLineDist(x,y,false) <= 0) && (job.SectorLineDist(x,y,true) >= 0))) continue;
+        if((job.SectorLineDist(x,y,false) > 0) || (job.SectorLineDist(x,y,true) < 0)) continue;
         i_el++;
 
         // Check if this electron is supposed to be simulated by job with this id.
         if (((i_el < job.min_el)||(i_el > job.max_el))) continue;
+
+        std::cout << "Progress: " << i_el - job.min_el + 1 << "/" << job.max_el - job.min_el + 1;
+        std::cout << "   z: " << std::setw(4) << z << " cm   y: " << std::setw(4) << y << " cm   x: " << std::setw(4) << x << " cm\n";
 
         // Actual for loop for electron generation.
         for (int j = 0; j < job.iterations; j++)
@@ -92,7 +96,6 @@ int main(int argc, char *argv[])
             aval.AvalancheElectron(x, y, z, 0, 0.1, 0, 0, 0);
             aval.GetElectronEndpoint(0,point.x0,point.y0,point.z0,point.t0,point.e0,point.x1,point.y1,point.z1,point.t1,point.e1,status);
             electrons.Fill();
-            // std::cout << "X: " << x << " Y: " << y << " Z: " << z << "\n";
         }
     }
 

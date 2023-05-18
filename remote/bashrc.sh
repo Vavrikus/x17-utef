@@ -1,3 +1,6 @@
+#trying to suppress version info errors
+export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
+
 #setting home alias for x17 directory
 alias home='cd /storage/projects/utefx17/martin;pwd'
 
@@ -28,9 +31,6 @@ esac
 
 #sourcing ROOT (causes annoying version info errors)
 source /storage/projects/utefx17/SourceCode/ROOT/install/bin/thisroot.sh
-
-#trying to suppress version info errors
-export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
 
 #trimming long directory output
 export PROMPT_DIRTRIM=1

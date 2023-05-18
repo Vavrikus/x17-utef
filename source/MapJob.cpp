@@ -78,7 +78,11 @@ namespace X17
             double ny; // Number of y steps for current x iteration.
 
             // If maximal sector condition cannot be satisfied set ny to 0, otherwise calculate it.
-            if (ymin2 > (x * sqrt(3))) ny = 0;
+            if (SectorLineDist(x,ymin2,false) > 0)
+            {
+                if (x == xmin) ny = 1;
+                else ny = 0;
+            }
             else ny = floor(-SectorLineDist(x,ymin2,false) / step) + 1;
             nxy += ny;
         }
@@ -103,7 +107,7 @@ namespace X17
         int current_el = max_el / 2;
         while (min_el != current_el)
         {
-            if(_Zsum(current_el) > l_id*opt_zsum) max_el = current_el;
+            if(_Zsum(current_el) > l_id * opt_zsum) max_el = current_el;
             else min_el = current_el;
             current_el  = (max_el + min_el) / 2;
         }  
