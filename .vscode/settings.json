@@ -1,5 +1,4 @@
 {
-    "cmake.configureOnOpen": false,
-    "cmake.sourceDirectory": "${workspaceFolder}/electron_positron_tracks",
-    "C_Cpp.errorSquiggles": "enabled"
+  "cmake.configureOnOpen": false,
+  "C_Cpp.errorSquiggles": "enabled"
 }
