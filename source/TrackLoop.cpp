@@ -29,7 +29,7 @@ namespace X17
         for (int i = 0; i < single_track->GetEntries(); i++)
         {
             single_track->GetEntry(i);
-            if (IsInSector(curr_micro.x1,curr_micro.y1,0) && IsInSector(curr_micro.GetInitPos(),-0.01))
+            if (IsInSector(curr_micro.x1(),curr_micro.y1(),0) && IsInSector(curr_micro.GetInitPos(),-0.01))
             {
                 n_electrons++;
                 curr_reco = Reconstruct(*map,curr_micro);

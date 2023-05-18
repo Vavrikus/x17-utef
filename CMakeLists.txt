@@ -2,12 +2,27 @@
 # Use the code in this section for standalone projects
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 project(X17)
+
+# Find the Garfield package
 if(NOT TARGET Garfield::Garfield)
-  find_package(Garfield REQUIRED)
+  find_package(Garfield REQUIRED HINTS "/home/vavrik/work/source/garfield/build/CMake")
 endif()
 # ########################################################################################
 
-add_compile_options(-O3) # enable maximum optimization
+# Set default build type to Release if not specified
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+# Enable debug symbols and disable optimization for Debug build type
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
+endif()
+
+# Enable optimization for Release build type
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O3")
+endif()
 
 # ---Root---------------------------------------------------------------------------------
 message(STATUS "Looking for ROOT")
@@ -32,7 +47,7 @@ add_library(X17_source_lib STATIC ${SOURCES})
 set(PROJECT_BUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build)
 file(MAKE_DIRECTORY ${PROJECT_BUILD_DIR})
 
-# Create a list of subdirectories (assuming 'subdir1' and 'subdir2')
+# Create a list of subdirectories
 set(SUBDIRECTORIES reconstruction simulations/ion_map simulations/single_track simulations/rk_tracks)
 
 # Iterate over each subdirectory

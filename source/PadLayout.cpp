@@ -214,10 +214,10 @@ namespace X17
             RecoPoint topleft     = Reconstruct(*map,EndPoint{x2,y1,0,time});
             RecoPoint topright    = Reconstruct(*map,EndPoint{x2,y2,0,time});
 
-            pad_lines.push_back(new TLine(-bottomleft.y,  bottomleft.x,  -topleft.y,     topleft.x));     // Left line.
-            pad_lines.push_back(new TLine(-bottomright.y, bottomright.x, -topright.y,    topright.x));    // Right line.
-            pad_lines.push_back(new TLine(-bottomleft.y,  bottomleft.x,  -bottomright.y, bottomright.x)); // Bottom line.
-            pad_lines.push_back(new TLine(-topleft.y,     topleft.x,     -topright.y,    topright.x));    // Top line.
+            pad_lines.push_back(new TLine(-bottomleft.y(),  bottomleft.x(),  -topleft.y(),     topleft.x()));     // Left line.
+            pad_lines.push_back(new TLine(-bottomright.y(), bottomright.x(), -topright.y(),    topright.x()));    // Right line.
+            pad_lines.push_back(new TLine(-bottomleft.y(),  bottomleft.x(),  -bottomright.y(), bottomright.x())); // Bottom line.
+            pad_lines.push_back(new TLine(-topleft.y(),     topleft.x(),     -topright.y(),    topright.x()));    // Top line.
         }
         
         for(auto l : pad_lines) l->Draw("same");

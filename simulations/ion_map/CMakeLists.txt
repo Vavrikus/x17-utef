@@ -7,8 +7,6 @@ if(NOT TARGET Garfield::Garfield)
 endif()
 # ########################################################################################
 
-add_compile_options(-O3) # enable maximum optimization
-
 # ---Root---------------------------------------------------------------------------------
 message(STATUS "Looking for ROOT")
 find_package(ROOT REQUIRED)

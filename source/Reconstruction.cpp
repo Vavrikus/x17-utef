@@ -129,12 +129,12 @@ namespace X17
     
     void PrintCube(const Field<MapPoint>& map, const int (&indices)[6], EndPoint end_point)
     {
-        std::cout << "Cube for (x1,y1,t1) = (" << end_point.x << "," << end_point.y << "," << end_point.t << "): \n";
+        std::cout << "Cube for (x1,y1,t1) = (" << end_point.x() << "," << end_point.y() << "," << end_point.t << "): \n";
         for (int i = 0; i < 8; i++)
         {
             const auto [xi,yi,zi] = CubeCorner(indices,i);
             std::cout << "000: [" << xi << "][" << yi << "][" << zi << "],";
-            std::cout << " (x,y,t) = (" << map.at(xi,yi,zi).point.x << "," << map.at(xi,yi,zi).point.y << "," << map.at(xi,yi,zi).point.t << ")\n";
+            std::cout << " (x,y,t) = (" << map.at(xi,yi,zi).point.x() << "," << map.at(xi,yi,zi).point.y() << "," << map.at(xi,yi,zi).point.t << ")\n";
         }
 
         std::cout << "\n";
@@ -144,13 +144,13 @@ namespace X17
         for (int y : {indices[2], indices[3]})
         for (int z : {indices[4], indices[5]})
         {
-            if (map.at(x, y, z).point.x > end_point.x)
+            if (map.at(x, y, z).point.x() > end_point.x())
                 std::cerr << "INFO: Minimal x bound not minimal.\n";
-            if (map.at(x, y, z).point.x < end_point.x)
+            if (map.at(x, y, z).point.x() < end_point.x())
                 std::cerr << "INFO: Maximal x bound not maximal.\n";
-            if (map.at(x, y, z).point.y > end_point.y)
+            if (map.at(x, y, z).point.y() > end_point.y())
                 std::cerr << "INFO: Minimal y bound not minimal.\n";
-            if (map.at(x, y, z).point.y < end_point.y)
+            if (map.at(x, y, z).point.y() < end_point.y())
                 std::cerr << "INFO: Maximal y bound not maximal.\n";
             if (map.at(x, y, z).point.t > end_point.t)
                 std::cerr << "INFO: Minimal z bound not minimal.\n";
@@ -161,8 +161,8 @@ namespace X17
 
     RecoPoint Reconstruct(const Field<MapPoint>& map, EndPoint end_point)
     {
-        double x1 = end_point.x;
-        double y1 = end_point.y;
+        double x1 = end_point.x();
+        double y1 = end_point.y();
         double t1 = end_point.t;
 
         // Find 8 closest points using binary search (assuming ordering).
@@ -180,8 +180,8 @@ namespace X17
         // Some part of the field is initialized with zeros and isn't therefore ordered.
         if(i_mid[0] != 0)
         {
-            while(map.at(i_mid[0],yimin,i_mid[2]).point.y == 0) yimin++;
-            while(map.at(i_mid[0],yimax,i_mid[2]).point.y == 0) yimax--;
+            while(map.at(i_mid[0],yimin,i_mid[2]).point.y() == 0) yimin++;
+            while(map.at(i_mid[0],yimax,i_mid[2]).point.y() == 0) yimax--;
         }
 
         FindMapMinMaxIndex(map,yimin,yimax,i_mid,1,y1);
@@ -203,7 +203,7 @@ namespace X17
     double Offset(MapPoint p, double x1, double y1, double t1)
     {
         constexpr double tfact = 0.00327; // Time is measured at different scale, it needs weight.
-        return sqrt(pow(x1 - p.point.x, 2) + pow(y1 - p.point.y, 2) + pow(tfact*(t1 - p.point.t), 2));
+        return sqrt(pow(x1 - p.point.x(), 2) + pow(y1 - p.point.y(), 2) + pow(tfact*(t1 - p.point.t), 2));
     }
 
     RecoPoint ReconstructOld(const Field<MapPoint>& map, double x1, double y1, double t1, double max_err)

@@ -34,7 +34,7 @@ public:
 
     void XYZ_Loop(double x, double y, double z, X17::MapPoint current) override
     {
-        if(current.x != 0) v_yx_dx.back()->Fill(y,x,current.x-x);
+        if(current.x() != 0) v_yx_dx.back()->Fill(y,x,current.x()-x);
     }
 
     void PostLoop() override
@@ -59,7 +59,7 @@ public:
 
     void XYZ_Loop(double x, double y, double z, X17::MapPoint current) override
     {
-        if(current.y != 0) v_yx_dy.back()->Fill(y, x, current.y - y);
+        if(current.y() != 0) v_yx_dy.back()->Fill(y, x, current.y() - y);
     }
 
     void PostLoop() override
@@ -86,7 +86,7 @@ public:
 
     void XYZ_Loop(double x, double y, double z, X17::MapPoint current) override
     {
-        if(current.t != 0) v_yx_t1.back()->Fill(y,x,current.t);
+        if(current.t() != 0) v_yx_t1.back()->Fill(y,x,current.t());
     }
 
     void PostLoop() override
@@ -135,11 +135,11 @@ public:
 
     void XYZ_Loop(double x, double y, double z, X17::MapPoint current) override
     {
-        if((current.x != 0) && (current.y != 0))
+        if((current.x() != 0) && (current.y() != 0))
         {
-            v_g_yx.back()->AddPoint(current.y,current.x);
-            v_g_yx.back()->SetPointError(v_g_yx.back()->GetN()-1,current.ydev,current.xdev);
-            TArrow* arrow = new TArrow(y,x,current.y,current.x);
+            v_g_yx.back()->AddPoint(current.y(),current.x());
+            v_g_yx.back()->SetPointError(v_g_yx.back()->GetN()-1,current.ydev(),current.xdev());
+            TArrow* arrow = new TArrow(y,x,current.y(),current.x());
             arrows.push_back(arrow);
         }
     }
@@ -196,7 +196,7 @@ public:
 
     void XYZ_Loop(double x, double y, double z, X17::MapPoint current) override
     {
-        g_zt->AddPoint(z,current.t);
+        g_zt->AddPoint(z,current.t());
     }
 
     void PostLoop() override
@@ -228,9 +228,9 @@ public:
 
     void ZX_Loop(double z, double x, X17::MapPoint current) override
     {
-        g_xz->AddPoint(current.x,z);
-        g_xz->SetPointError(g_xz->GetN() - 1, current.xdev, 0);
-        TArrow* arrow = new TArrow(x,z,current.x,z);
+        g_xz->AddPoint(current.x(),z);
+        g_xz->SetPointError(g_xz->GetN() - 1, current.xdev(), 0);
+        TArrow* arrow = new TArrow(x,z,current.x(),z);
         v_g_xz_arrows.push_back(arrow);
     }
 
@@ -266,8 +266,8 @@ public:
 
     void ZX_Loop(double z, double x, X17::MapPoint current) override
     {        
-        g_xt->AddPoint(x,current.t);
-        g_xt->SetPointError(g_xt->GetN() - 1, current.xdev, current.tdev);
+        g_xt->AddPoint(x,current.t());
+        g_xt->SetPointError(g_xt->GetN() - 1, current.xdev(), current.tdev());
     }
 
     void PostLoop() override
@@ -296,7 +296,7 @@ public:
 
     void ZX_Loop(double z, double x, X17::MapPoint current) override
     {        
-        xz_t1->Fill(x,z,current.t);
+        xz_t1->Fill(x,z,current.t());
     }
 
     void PostLoop() override

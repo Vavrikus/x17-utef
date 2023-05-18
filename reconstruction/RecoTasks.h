@@ -58,8 +58,8 @@ class XZPlotTask : public RecoTask
         MicroPoint micro = m_loop->curr_micro;
         RecoPoint reco = m_loop->curr_reco;
 
-        xz->AddPoint(micro.x0,8-micro.z0);
-        xz_reco->AddPoint(reco.x,8-reco.z);
+        xz->AddPoint(micro.x0(),8-micro.z0());
+        xz_reco->AddPoint(reco.x(),8-reco.z());
     }
 
     void PostElectronLoop() override
@@ -113,8 +113,8 @@ class XYPlotTask : public RecoTask
         MicroPoint micro = m_loop->curr_micro;
         RecoPoint reco = m_loop->curr_reco;
 
-        xy->AddPoint(micro.x0,micro.y0);
-        xy_reco->AddPoint(reco.x,reco.y);
+        xy->AddPoint(micro.x0(),micro.y0());
+        xy_reco->AddPoint(reco.x(),reco.y());
     }
 
     void PostElectronLoop() override
@@ -156,10 +156,10 @@ class GraphResTask : public RecoTask
         MicroPoint micro = m_loop->curr_micro;
         RecoPoint reco = m_loop->curr_reco;
 
-        gx_res->AddPoint(micro.x0, reco.x - micro.x0);
-        gy_res->AddPoint(micro.x0, reco.y - micro.y0);
-        gz_res->AddPoint(micro.x0, reco.z - micro.z0);
-        gr_res->AddPoint(micro.x0, sqrt(pow((reco.x - micro.x0),2) + pow((reco.y - micro.y0),2) + pow((reco.z-micro.z0),2)));
+        gx_res->AddPoint(micro.x0(), reco.x() - micro.x0());
+        gy_res->AddPoint(micro.x0(), reco.y() - micro.y0());
+        gz_res->AddPoint(micro.x0(), reco.z() - micro.z0());
+        gr_res->AddPoint(micro.x0(), sqrt(pow((reco.x() - micro.x0()),2) + pow((reco.y() - micro.y0()),2) + pow((reco.z()-micro.z0()),2)));
     }
 
     void PostElectronLoop() override
@@ -212,10 +212,10 @@ class HistResTask : public RecoTask
         MicroPoint micro = m_loop->curr_micro;
         RecoPoint reco = m_loop->curr_reco;
 
-        hx_res->Fill(reco.x - micro.x0);
-        hy_res->Fill(reco.y - micro.y0);
-        hz_res->Fill(reco.z - micro.z0);
-        hr_res->Fill(sqrt(pow((reco.x - micro.x0),2) + pow((reco.y - micro.y0),2) + pow((reco.z - micro.z0),2)));        
+        hx_res->Fill(reco.x() - micro.x0());
+        hy_res->Fill(reco.y() - micro.y0());
+        hz_res->Fill(reco.z() - micro.z0());
+        hr_res->Fill(sqrt(pow((reco.x() - micro.x0()),2) + pow((reco.y() - micro.y0()),2) + pow((reco.z() - micro.z0()),2)));
     }
 
     void PostElectronLoop() override
@@ -252,14 +252,14 @@ class RecoPadsTask : public RecoTask
     {
         MicroPoint micro = m_loop->curr_micro;
 
-        int channel = DefaultLayout::GetDefaultLayout().GetPad(micro.x1,micro.y1);
-        int timebin = micro.t1 / 100.0;
+        int channel = DefaultLayout::GetDefaultLayout().GetPad(micro.x1(),micro.y1());
+        int timebin = micro.t1() / 100.0;
 
         if(timebin > timebins - 1) std::cerr << "ERROR: Invalid timebin: " << timebin << std::endl;
-        if(channel == -1) std::cerr << "ERROR: No pad hit found. Coordinates x,y: " << micro.x1 << ", " << micro.y1 << std::endl;
+        if(channel == -1) std::cerr << "ERROR: No pad hit found. Coordinates x,y: " << micro.x1() << ", " << micro.y1() << std::endl;
 
         padhits[channel-1][timebin]++;
-        g_xyz->AddPoint(micro.x0,micro.y0,micro.z0);
+        g_xyz->AddPoint(micro.x0(),micro.y0(),micro.z0());
     }
 
     void PostElectronLoop() override
@@ -278,7 +278,7 @@ class RecoPadsTask : public RecoTask
                     DefaultLayout::GetDefaultLayout().GetPadCenter(i+1,xpad,ypad);
 
                     RecoPoint reco = Reconstruct(*(m_loop->map),EndPoint(xpad,ypad,zmax,time));
-                    g_xyz_reco->AddPoint(reco.x,reco.y,reco.z);
+                    g_xyz_reco->AddPoint(reco.x(),reco.y(),reco.z());
                 }
             }        
         }
@@ -319,7 +319,7 @@ class CircleAndRKFitTask : public RecoTask
     {
         cfit3d = new CircleFit3D({constants::xmin,0,0},{1,0,0});
         MicroPoint micro = m_loop->curr_micro;
-        cfit3d->AddPoint(micro.x0,micro.y0,micro.z0,1);
+        cfit3d->AddPoint(micro.x0(),micro.y0(),micro.z0(),1);
     }
 
     void PostElectronLoop() override
@@ -355,8 +355,8 @@ class CircleAndRKFitTask : public RecoTask
                     DefaultLayout::GetDefaultLayout().GetPadCenter(i+1,xpad,ypad);
 
                     RecoPoint reco = Reconstruct(*(m_loop->map),EndPoint(xpad,ypad,zmax,time));
-                    cfit3d_reco->AddPoint(reco.x,reco.y,reco.z,reco_task->padhits[i][j]);
-                    reco_data.emplace_back(reco.x,reco.y,reco.z,reco_task->padhits[i][j]);
+                    cfit3d_reco->AddPoint(reco.x(),reco.y(),reco.z(),reco_task->padhits[i][j]);
+                    reco_data.emplace_back(reco.x(),reco.y(),reco.z(),reco_task->padhits[i][j]);
                 }
             }        
         }
@@ -474,7 +474,7 @@ class CircleFitEnergyTask : public RecoTask
         const TrackRK* track = m_loop->curr_rk;
         RKPoint p = m_loop->curr_rkpoint;
 
-        cfit->AddPoint(p);tracks.back()->AddPoint(p.x,p.y,p.z);//g_2d->AddPoint(p.x,p.y,p.z);
+        cfit->AddPoint(p);tracks.back()->AddPoint(p.x(),p.y(),p.z());//g_2d->AddPoint(p.x,p.y,p.z);
     }
 
     void PostElectronLoop() override
@@ -570,7 +570,7 @@ class PlotSelectionTask : public RecoTask
         RKPoint p = m_loop->curr_rkpoint;
 
         cfit->AddPoint(p);
-        tracks.back()->AddPoint(p.x,p.y,p.z);
+        tracks.back()->AddPoint(p.x(),p.y(),p.z());
     }
 
     void PostElectronLoop() override

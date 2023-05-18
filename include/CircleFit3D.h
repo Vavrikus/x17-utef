@@ -83,7 +83,7 @@ namespace X17
 
         /// @brief Add a new RecoPoint to the fit data.
         /// @param p The RKPoint with necessary coordinate information.
-        void AddPoint(RKPoint p) { m_fit_data.emplace_back(p.x,p.y,p.z,1); }
+        void AddPoint(RKPoint p) { m_fit_data.emplace_back(p.x(),p.y(),p.z(),1); }
 
         /// @brief Set the m_alpha angle for the circle fit.
         /// @param electron If true, set m_alpha to 0; if false, set m_alpha to pi.

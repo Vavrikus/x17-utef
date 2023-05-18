@@ -13,15 +13,15 @@ namespace X17
 
     void MicroPoint::MakeTTreeBranches(TTree* tree)
     {
-        tree->Branch("x0",&x0);
-        tree->Branch("y0",&y0);
-        tree->Branch("z0",&z0);
-        tree->Branch("t0",&t0);
+        tree->Branch("x0",&start.point.x);
+        tree->Branch("y0",&start.point.y);
+        tree->Branch("z0",&start.point.z);
+        tree->Branch("t0",&start.t);
         tree->Branch("e0",&e0);
-        tree->Branch("x1",&x1);
-        tree->Branch("y1",&y1);
-        tree->Branch("z1",&z1);
-        tree->Branch("t1",&t1);
+        tree->Branch("x1",&end.point.x);
+        tree->Branch("y1",&end.point.y);
+        tree->Branch("z1",&end.point.z);
+        tree->Branch("t1",&end.t);
         tree->Branch("e1",&e1);
     }
 
@@ -30,29 +30,29 @@ namespace X17
         if (old_data)
         {
             std::cout << "MAKE SURE TO CHANGE THE COORDINATE ASSIGNMENT IF USING NEW SIMULATIONS!!!!!!!\n";
-            chain->SetBranchAddress("z0",&x0);
-            chain->SetBranchAddress("x0",&y0);
-            chain->SetBranchAddress("y0",&z0);
-            chain->SetBranchAddress("t0",&t0);
+            chain->SetBranchAddress("z0",&start.point.x);
+            chain->SetBranchAddress("x0",&start.point.y);
+            chain->SetBranchAddress("y0",&start.point.z);
+            chain->SetBranchAddress("t0",&start.t);
             chain->SetBranchAddress("e0",&e0);
-            chain->SetBranchAddress("z1",&x1);
-            chain->SetBranchAddress("x1",&y1);
-            chain->SetBranchAddress("y1",&z1);
-            chain->SetBranchAddress("t1",&t1);
+            chain->SetBranchAddress("z1",&end.point.x);
+            chain->SetBranchAddress("x1",&end.point.y);
+            chain->SetBranchAddress("y1",&end.point.z);
+            chain->SetBranchAddress("t1",&end.t);
             chain->SetBranchAddress("e1",&e1);
         }
 
         else
         {
-            chain->SetBranchAddress("x0",&x0);
-            chain->SetBranchAddress("y0",&y0);
-            chain->SetBranchAddress("z0",&z0);
-            chain->SetBranchAddress("t0",&t0);
+            chain->SetBranchAddress("x0",&start.point.x);
+            chain->SetBranchAddress("y0",&start.point.y);
+            chain->SetBranchAddress("z0",&start.point.z);
+            chain->SetBranchAddress("t0",&start.t);
             chain->SetBranchAddress("e0",&e0);
-            chain->SetBranchAddress("x1",&x1);
-            chain->SetBranchAddress("y1",&y1);
-            chain->SetBranchAddress("z1",&z1);
-            chain->SetBranchAddress("t1",&t1);
+            chain->SetBranchAddress("x1",&end.point.x);
+            chain->SetBranchAddress("y1",&end.point.y);
+            chain->SetBranchAddress("z1",&end.point.z);
+            chain->SetBranchAddress("t1",&end.t);
             chain->SetBranchAddress("e1",&e1);
         }
     }
@@ -68,13 +68,13 @@ namespace X17
         switch (i)
         {
         case 0:
-            return this->point.x;
+            return this->point.point.x;
             break;
         case 1:
-            return this->point.y;
+            return this->point.point.y;
             break;
         case 2:
-            return this->point.z;
+            return this->point.point.z;
             break;
         case 3:
             return this->point.t;
@@ -111,7 +111,7 @@ namespace X17
             double ylen = rel_size * pad_height / 2.0;
             double zlen = rel_size * zbin_size  / 2.0;
 
-            markers.push_back(new TMarker3DBox(p.x,p.y,p.z,xlen,ylen,zlen,0,0));
+            markers.push_back(new TMarker3DBox(p.x(),p.y(),p.z(),xlen,ylen,zlen,0,0));
         }
         
         return markers;

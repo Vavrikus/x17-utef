@@ -9,6 +9,7 @@
 #include "TGraph.h"
 #include "TStyle.h"
 
+#define DEBUG
 // X17 dependencies
 #include "Field.h"
 #include "MapTask.h"
@@ -23,7 +24,7 @@
 /// @param max_id The maximum ID number of the files to load.
 /// @param folder The folder containing the files to load. Default is "../../data/ion_map/sample_1.0/".
 /// @return A TChain pointer containing the loaded data.
-TChain* LoadData(int max_id, std::string folder = "../../data/ion_map/sample_1.0/")
+TChain* LoadData(int max_id, std::string folder = "../../../data/ion_map/sample_1.0/")
 {
     TChain* map_data = new TChain("map_data","Data from ionization electrons simulation.");
 
@@ -37,7 +38,7 @@ TChain* LoadData(int max_id, std::string folder = "../../data/ion_map/sample_1.0
 }
 
 int make_map()
-{    
+{
     // Load data from all files (results of individual jobs).
     TChain* map_data_in = LoadData(200);
     std::cout << "Number of simulated electrons: " << map_data_in->GetEntries() << "\n";
@@ -95,8 +96,8 @@ int make_map()
     }
 
     // Save the compiled map.
-    TFile* outfile = new TFile("../../data/ion_map/map.root","RECREATE");
-    outfile->WriteObject(&map,"map");
+    // outfile->WriteObject(&map,"map");
+    TFile* outfile = new TFile("../../../data/ion_map/map.root","RECREATE");
 
     // Plotting.
     bool MakePlots = true;
@@ -163,7 +164,7 @@ int make_map()
         outfile->Close();
 
         // Drawing the distortion of the pads.
-        TFile* mapfile = new TFile("../../data/ion_map/map.root");
+        TFile* mapfile = new TFile("../../../data/ion_map/map.root");
         X17::Field<X17::MapPoint>* map = (X17::Field<X17::MapPoint>*)mapfile->Get("map");
         TCanvas* c_pads = new TCanvas("c_pads", "Pads distortion for different times.");
         c_pads->Divide(4,4);

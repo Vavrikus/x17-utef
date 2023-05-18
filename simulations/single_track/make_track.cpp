@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
             aval.AvalancheElectron(xe, ye, ze, te, 0.1, dxe, dye, dze);
             // Move electrons that hit the mesh plane into the amplification gap.
             int status;
-            aval.GetElectronEndpoint(0, point.x0, point.y0, point.z0, point.t0, point.e0, point.x1, point.y1, point.z1, point.t1, point.e1, status);
+            aval.GetElectronEndpoint(0, point.start.point.x, point.start.point.y, point.start.point.z, point.start.t, point.e0, point.end.point.x, point.end.point.y, point.end.point.z, point.end.t, point.e1, status);
             electrons.Fill();
             k++;
         }

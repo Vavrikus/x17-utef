@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
         {                        
             int status;
             aval.AvalancheElectron(x, y, z, 0, 0.1, 0, 0, 0);
-            aval.GetElectronEndpoint(0,point.x0,point.y0,point.z0,point.t0,point.e0,point.x1,point.y1,point.z1,point.t1,point.e1,status);
+            aval.GetElectronEndpoint(0,point.start.point.x,point.start.point.y,point.start.point.z,point.start.t,point.e0,point.end.point.x,point.end.point.y,point.end.point.z,point.end.t,point.e1,status);
             electrons.Fill();
         }
     }

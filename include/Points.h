@@ -19,11 +19,6 @@ namespace X17
         Vector point; // Initial coordinates [cm].
         double t;     // Initial time [ns] (should be close to 0).
 
-        // References for easier access.
-        double& x = point.x; // The x-coordinate [cm].
-        double& y = point.y; // The y-coordinate [cm].
-        double& z = point.z; // The z-coordinate [cm].
-
         /// @brief Default constructor that initializes the coordinates to 0 and time to -1.
         StartPoint() : point(), t(-1) { }
 
@@ -33,6 +28,18 @@ namespace X17
         /// @param z The z-coordinate [cm].
         /// @param t The starting time [ns].
         StartPoint(double x, double y, double z, double t) : point(x, y, z), t(t) { }
+
+        /// @brief Getter for the x variable.
+        /// @return The x-coordinate [cm].
+        double x() const { return point.x; }
+
+        /// @brief Getter for the y variable.
+        /// @return The y-coordinate [cm].
+        double y() const { return point.y; }
+
+        /// @brief Getter for the z variable.
+        /// @return The z-coordinate [cm].
+        double z() const { return point.z; }
 
         /// @brief Assignment operator.
         /// @param other The object to be assigned to this object.
@@ -48,11 +55,6 @@ namespace X17
     {
         Vector point; // Final coordinates [cm].
         double t;     // Final time [ns].
-        
-        // References for easier access.
-        double& x = point.x; // The x-coordinate [cm].
-        double& y = point.y; // The y-coordinate [cm].
-        double& z = point.z; // The z-coordinate [cm].
 
         /// @brief Default constructor that initializes the coordinates to 0 and time to -1.
         EndPoint() : point(), t(-1) { }
@@ -76,13 +78,25 @@ namespace X17
         /// @param p The endpoint to be copied.
         EndPoint(const EndPoint& p) = default;
 
+        /// @brief Getter for the x variable.
+        /// @return The x-coordinate [cm].
+        double x() const { return point.x; }
+
+        /// @brief Getter for the y variable.
+        /// @return The y-coordinate [cm].
+        double y() const { return point.y; }
+
+        /// @brief Getter for the z variable.
+        /// @return The z-coordinate [cm].
+        double z() const { return point.z; }
+
         /// @brief Squares the Endpoint object.
         /// @return EndPoint object with all coordinates squared.
-        EndPoint Square() { return EndPoint(x*x,y*y,z*z,t*t); }
+        EndPoint Square() { return EndPoint(point.x*point.x,point.y*point.y,point.z*point.z,t*t); }
 
         /// @brief Calculates the square root of the EndPoint object.
         /// @return EndPoint object with all coordinates equal to the square root of the original coordinates.
-        EndPoint SquareRoot() { return EndPoint(sqrt(x),sqrt(y),sqrt(z),sqrt(t)); }
+        EndPoint SquareRoot() { return EndPoint(sqrt(point.x),sqrt(point.y),sqrt(point.z),sqrt(t)); }
 
         /// @brief Assignment operator.
         /// @param p The endpoint to be assigned.
@@ -153,19 +167,41 @@ namespace X17
         EndPoint end;     // Final coordinates of the electron ([cm] and [ns]).
         double e0;        // Initial energy [eV].
         double e1;        // Final energy [eV].
-        
-        // References for easier access.
-        double& x0 = start.x; // The initial x-coordinate [cm].
-        double& y0 = start.y; // The initial y-coordinate [cm].
-        double& z0 = start.z; // The initial z-coordinate [cm].
-        double& t0 = start.t; // The initial time [ns].
-        double& x1 = end.x;   // The final x-coordinate [cm].
-        double& y1 = end.y;   // The final y-coordinate [cm].
-        double& z1 = end.z;   // The final z-coordinate [cm].
-        double& t1 = end.t;   // The final time [ns].
 
         /// @brief The default constructor. Initializes time to -1, everything else to 0.
         MicroPoint() : start(), end(), e0(0), e1(0) { }
+
+        /// @brief Getter for the initial x variable.
+        /// @return Initial x-coordinate [cm].
+        double x0() const { return start.x(); }
+
+        /// @brief Getter for the initial y variable.
+        /// @return Initial y-coordinate [cm].
+        double y0() const { return start.y(); }
+
+        /// @brief Getter for the initial z variable.
+        /// @return Initial z-coordinate [cm].
+        double z0() const { return start.z(); }
+
+        /// @brief Getter for the initial t variable.
+        /// @return Initial time [ns].
+        double t0() const { return start.t; }
+
+        /// @brief Getter for the final x variable.
+        /// @return Final x-coordinate [cm].
+        double x1() const { return end.x(); }
+
+        /// @brief Getter for the final y variable.
+        /// @return Final y-coordinate [cm].
+        double y1() const { return end.y(); }
+
+        /// @brief Getter for the final z variable.
+        /// @return Final z-coordinate [cm].
+        double z1() const { return end.z(); }
+
+        /// @brief Getter for the final t variable.
+        /// @return Final time [ns].
+        double t1() const { return end.t; }
 
         /// @brief Returns the initial position of the ionization electron.
         /// @return The initial position of the electron.
@@ -186,12 +222,6 @@ namespace X17
     {
         StartPoint point; // Track point coordinates ([cm] and [ns]).
 
-        // References for easier access.
-        double& x = point.x; // The simulated x-coordinate [cm].
-        double& y = point.y; // The simulated y-coordinate [cm].
-        double& z = point.z; // The simulated z-coordinate [cm].
-        double& t = point.t; // The simulated time [ns].
-
         /// @brief Default constructor.
         RKPoint() : point() { }
 
@@ -201,6 +231,18 @@ namespace X17
         /// @param z The z-coordinate [cm].
         /// @param t The time [ns].
         RKPoint(double x, double y, double z, double t) : point(x,y,z,t) { }
+
+        /// @brief Getter for the x variable.
+        /// @return The x-coordinate [cm].
+        double x() const { return point.x(); }
+
+        /// @brief Getter for the y variable.
+        /// @return The y-coordinate [cm].
+        double y() const { return point.y(); }
+
+        /// @brief Getter for the z variable.
+        /// @return The z-coordinate [cm].
+        double z() const { return point.z(); }
 
         /// @brief Assignment operator.
         /// @param other The RKPoint to assign.
@@ -217,16 +259,6 @@ namespace X17
         EndPoint point; // The average final point of the ionization electrons ([cm] and [ns]).
         EndPoint dev;   // The standard deviations of individual points ([cm] and [ns]).
 
-        // References for easier access.
-        double& x = point.x;  // The x-coordinate [cm].
-        double& y = point.y;  // The y-coordinate [cm].
-        double& z = point.z;  // The z-coordinate [cm].
-        double& t = point.t;  // The time [ns].
-        double& xdev = dev.x; // The x-coordinate deviation [cm].
-        double& ydev = dev.y; // The y-coordinate deviation [cm].
-        double& zdev = dev.z; // The z-coordinate deviation [cm].
-        double& tdev = dev.t; // The time deviation [ns].
-
         /// @brief Default constructor. Coordinates x,y,z set to zero, time to -1.
         MapPoint() : point(), dev() { }
 
@@ -234,6 +266,38 @@ namespace X17
         /// @param p The EndPoint with (x,y,z,t) coordinates ([cm] and [ns]).
         /// @param d The EndPoint with (x,y,z,t) coordinates deviations ([cm] and [ns]).
         MapPoint(EndPoint p, EndPoint d) : point(p), dev(d) { }
+
+        /// @brief Getter for the x variable.
+        /// @return The x-coordinate [cm].
+        double x() const { return point.x(); }
+
+        /// @brief Getter for the y variable.
+        /// @return The y-coordinate [cm].
+        double y() const { return point.y(); }
+
+        /// @brief Getter for the z variable.
+        /// @return The z-coordinate [cm].
+        double z() const { return point.z(); }
+
+        /// @brief Getter for the t variable.
+        /// @return Time [ns].
+        double t() const { return point.t; }
+
+        /// @brief Getter for the x variable deviation.
+        /// @return The x-coordinate deviation [cm].
+        double xdev() const { return dev.x(); }
+
+        /// @brief Getter for the y variable deviation.
+        /// @return The y-coordinate deviation [cm].
+        double ydev() const { return dev.y(); }
+
+        /// @brief Getter for the z variable deviation.
+        /// @return The z-coordinate deviation [cm].
+        double zdev() const { return dev.z(); }
+
+        /// @brief Getter for the t variable deviation.
+        /// @return Time deviation [ns].
+        double tdev() const { return dev.t; }
 
         /// @brief Assignment operator.
         /// @param p The MapPoint to be assigned to this MapPoint.
@@ -289,11 +353,6 @@ namespace X17
         StartPoint point; // The reconstructed coordinates. [cm]
         double count;     // The number of electrons or charge.
 
-        // References for easier access
-        double& x = point.x; // The x-coordinate [cm].
-        double& y = point.y; // The y-coordinate [cm].
-        double& z = point.z; // The z-coordinate [cm].
-
         /// @brief Default constructor. Coordinates x,y,z set to zero, time to -1.
         RecoPoint() : point() { }
 
@@ -303,6 +362,18 @@ namespace X17
         /// @param z The z-coordinate [cm].
         /// @param count The number of electrons or charge.
         RecoPoint(double x, double y, double z, int count) : point(x,y,z,-1), count(count) { }
+
+        /// @brief Getter for the x variable.
+        /// @return The x-coordinate [cm].
+        double x() const { return point.x(); }
+
+        /// @brief Getter for the y variable.
+        /// @return The y-coordinate [cm].
+        double y() const { return point.y(); }
+
+        /// @brief Getter for the z variable.
+        /// @return The z-coordinate [cm].
+        double z() const { return point.z(); }
 
         /// @brief Assignment operator.
         /// @param other The object to be assigned to this object.
