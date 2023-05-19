@@ -1,26 +1,6 @@
-# ########################################################################################
-# Use the code in this section for standalone projects
+# Check CMake version.
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 project(X17)
-if(NOT TARGET Garfield::Garfield)
-  find_package(Garfield REQUIRED)
-endif()
-# ########################################################################################
-
-add_compile_options(-O3) # enable maximum optimization
-
-# ---Root---------------------------------------------------------------------------------
-message(STATUS "Looking for ROOT")
-find_package(ROOT REQUIRED)
-message(STATUS "ROOT ${ROOT_VERSION} found at ${ROOT_BINDIR}")
-
-set(CMAKE_CXX_FLAGS "${ROOT_CXX_FLAGS}")
-
-include(${ROOT_USE_FILE})
-include_directories(${ROOT_INCLUDE_DIRS})
-link_directories(${ROOT_LIBRARY_DIR})
-
-find_package(GSL REQUIRED)
 
 # ---Build executables--------------------------------------------------------------------
 add_executable(reco_track reco_track.cpp)

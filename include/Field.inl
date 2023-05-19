@@ -1,5 +1,6 @@
 // C++ dependencies
 #include <algorithm>
+#include <stdexcept>
 
 // X17 dependencies
 #include "Field.h"

@@ -32,6 +32,9 @@ namespace X17
         std::vector<T> m_data; // Array of values representing the field. Filled in the order x,y,z.
 
     public:
+        /// @brief Default constructor needed for ROOT saving.
+        Field() = default;
+
         /// @brief Deleted copy constructor. 
         Field(const Field&) = delete;
 
