@@ -18,6 +18,44 @@
             "ignoreFailures": true
           }
         ]
+      },
+
+      {
+        "name": "(gdb) Launch reco_track",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/build/reconstruction/reco_track",
+        "args": [],
+        "cwd": "${workspaceFolder}/build/reconstruction/",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          }
+        ]
+      },
+
+      {
+        "name": "(gdb) Launch rk_tracks",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/build/simulations/rk_tracks/rk_tracks",
+        "args": [],
+        "cwd": "${workspaceFolder}/build//simulations/rk_tracks/",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          }
+        ]
       }
     ]
   }
