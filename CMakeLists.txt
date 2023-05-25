@@ -62,6 +62,8 @@ endforeach()
 # Specify the desired folders where you want to create the link to the ROOT dictionary
 set(LINK_TARGET_FOLDER "${PROJECT_BUILD_DIR}/reconstruction")
 set(LINK_TARGET_FOLDER2 "${PROJECT_BUILD_DIR}/simulations/rk_tracks")
+set(LINK_TARGET_FOLDER3 "${PROJECT_BUILD_DIR}/simulations/single_track")
+set(LINK_TARGET_FOLDER4 "${PROJECT_BUILD_DIR}/simulations/ion_map")
 
 # Create a symbolic link to the PCM file in the desired folder
 execute_process(
@@ -76,6 +78,18 @@ execute_process(
             "${LINK_TARGET_FOLDER2}/libX17_source_lib_rdict.pcm"
     RESULT_VARIABLE LINK_RESULT2
 )
+execute_process(
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+            "${PROJECT_BUILD_DIR}/libX17_source_lib_rdict.pcm"
+            "${LINK_TARGET_FOLDER3}/libX17_source_lib_rdict.pcm"
+    RESULT_VARIABLE LINK_RESULT3
+)
+execute_process(
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+            "${PROJECT_BUILD_DIR}/libX17_source_lib_rdict.pcm"
+            "${LINK_TARGET_FOLDER4}/libX17_source_lib_rdict.pcm"
+    RESULT_VARIABLE LINK_RESULT4
+)
 
 # Check if the link creation was successful
 if(LINK_RESULT EQUAL 0)
@@ -87,4 +101,14 @@ if(LINK_RESULT2 EQUAL 0)
     message(STATUS "Symbolic link to libX17_source_lib_rdict.pcm created successfully for rk_tracks.")
 else()
     message(WARNING "Failed to create symbolic to libX17_source_lib_rdict.pcm link for rk_tracks.")
+endif()
+if(LINK_RESULT3 EQUAL 0)
+    message(STATUS "Symbolic link to libX17_source_lib_rdict.pcm created successfully for single_track.")
+else()
+    message(WARNING "Failed to create symbolic to libX17_source_lib_rdict.pcm link for single_track.")
+endif()
+if(LINK_RESULT4 EQUAL 0)
+    message(STATUS "Symbolic link to libX17_source_lib_rdict.pcm created successfully for ion_map.")
+else()
+    message(WARNING "Failed to create symbolic to libX17_source_lib_rdict.pcm link for ion_map.")
 endif()

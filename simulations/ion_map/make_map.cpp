@@ -25,9 +25,9 @@
 
 /// @brief Loads ionization electron data from files (named ion(id).root) in a specified folder.
 /// @param max_id The maximum ID number of the files to load.
-/// @param folder The folder containing the files to load. Default is "../../data/ion_map/sample_1.0/".
+/// @param folder The folder containing the files to load. Default is "../../data/ion_map/sample_2.0/".
 /// @return A TChain pointer containing the loaded data.
-TChain* LoadData(int max_id, std::string folder = "../../../data/ion_map/sample_1.0/")
+TChain* LoadData(int max_id, std::string folder = "../../../data/ion_map/sample_2.0/")
 {
     TChain* map_data = new TChain("map_data","Data from ionization electrons simulation.");
 
@@ -43,15 +43,22 @@ TChain* LoadData(int max_id, std::string folder = "../../../data/ion_map/sample_
 int make_map()
 {
     // Load data from all files (results of individual jobs).
-    TChain* map_data_in = LoadData(200);
+    const bool new_data = false;
+
+    std::string data_folder = new_data ? "../../../data/ion_map/sample_2.0/" : "../../../data/ion_map/sample_1.0/";
+    int files_count         = new_data ? 1000 : 200;
+    double step_size        = new_data ? 0.5 : 1.0;
+    double map_xmin         = new_data ? -1.5 : 0.0;
+
+    TChain* map_data_in = LoadData(files_count,data_folder);
     std::cout << "Number of simulated electrons: " << map_data_in->GetEntries() << "\n";
 
     // Set branches for TChain containing data.
     X17::MicroPoint point; // An object that will hold the information about current ionization electron loaded.
-    point.SetTChainBranches(map_data_in);
+    point.SetTChainBranches(map_data_in,!new_data);
 
     // Prepare the field that will hold the final values.
-    X17::Field<X17::MapPoint> map({0,-30,-8},{15,30,8},1,X17::MapPoint());
+    X17::Field<X17::MapPoint> map({map_xmin,-30,-8},{15,30,8},step_size,X17::MapPoint());
 
     // Variables for checking with the previous position.
     X17::Vector v_prev(0,0,0);        // Vector for the previous position. Used for comparison with current position.
@@ -99,7 +106,8 @@ int make_map()
     }
 
     // Save the compiled map.
-    TFile* outfile = new TFile("../../../data/ion_map/map.root","RECREATE");
+    data_folder += "map.root";
+    TFile* outfile = new TFile(data_folder.c_str(),"RECREATE");
     outfile->WriteObjectAny(&map,"X17::Field<X17::MapPoint>","map");
 
     // Plotting.
@@ -127,16 +135,16 @@ int make_map()
 
         for(MapTask* t : plot_tasks) t->PreLoop();
 
-        for (int z_xyi = 0; z_xyi <= map.GetZCells(); z_xyi++)
+        for (int z_xyi = 0; z_xyi < map.GetZCells(); z_xyi++)
         {
             double z = map.GetZMin() + z_xyi * map.GetStep();
             for(MapTask* t : plot_tasks) t->Z_Loop_Start(z);
 
-            for (int xi = 0; xi <= map.GetXCells(); xi++)
+            for (int xi = 0; xi < map.GetXCells(); xi++)
             {
                 double x = map.GetXMin()+xi*map.GetStep();
 
-                for (int yi = 0; yi <= map.GetYCells(); yi++)
+                for (int yi = 0; yi < map.GetYCells(); yi++)
                 {
                     double y = map.GetYMin() + yi * map.GetStep();
                     X17::MapPoint& current = map.at(xi,yi,z_xyi);
@@ -150,10 +158,10 @@ int make_map()
         double y_xz = 0;                                       // The y-coordinate of xz plots.
         int y_xzi   = round(y_xz-map.GetYMin())/map.GetStep(); // The y-coordinate index of xz plots.
 
-        for (int xi = 0; xi <= map.GetXCells(); xi++)
+        for (int xi = 0; xi < map.GetXCells(); xi++)
         {
             double x = map.GetXMin() + xi * map.GetStep();
-            for (int zi = 0; zi <= map.GetZCells(); zi++)
+            for (int zi = 0; zi < map.GetZCells(); zi++)
             {
                 double z = map.GetZMin() + zi * map.GetStep();
                 X17::MapPoint& current = map.at(xi,y_xzi,zi);
@@ -167,25 +175,25 @@ int make_map()
         outfile->Close();
 
         // Drawing the distortion of the pads.
-        TFile* mapfile = new TFile("../../../data/ion_map/map.root");
-        X17::Field<X17::MapPoint>* map2 = (X17::Field<X17::MapPoint>*)mapfile->Get("map");
-        TCanvas* c_pads = new TCanvas("c_pads", "Pads distortion for different times.");
-        c_pads->Divide(4,4);
+        // TFile* mapfile = new TFile("../../../data/ion_map/map.root");
+        // X17::Field<X17::MapPoint>* map2 = (X17::Field<X17::MapPoint>*)mapfile->Get("map");
+        // TCanvas* c_pads = new TCanvas("c_pads", "Pads distortion for different times.");
+        // c_pads->Divide(4,4);
 
-        for (int i = 0; i < 16; i++)
-        {
-            using namespace X17::constants;
+        // for (int i = 0; i < 16; i++)
+        // {
+        //     using namespace X17::constants;
             
-            c_pads->cd(i+1);
-            TGraph* gr = new TGraph();
-            gr->AddPoint(-yhigh,xmin);
-            gr->AddPoint(yhigh,xmax);
-            gr->Draw("AP");
+        //     c_pads->cd(i+1);
+        //     TGraph* gr = new TGraph();
+        //     gr->AddPoint(-yhigh,xmin);
+        //     gr->AddPoint(yhigh,xmax);
+        //     gr->Draw("AP");
 
-            X17::DefaultLayout& pads = X17::DefaultLayout::GetDefaultLayout();
-            pads.DrawPadsDistortion((i + 1) * 5000 / 16, c_pads, map2);
-            // X17::DrawTrapezoid();
-        }
+        //     X17::DefaultLayout& pads = X17::DefaultLayout::GetDefaultLayout();
+        //     pads.DrawPadsDistortion((i + 1) * 5000 / 16, c_pads, map2);
+        //     // X17::DrawTrapezoid();
+        // }
     }
 
     return 0;

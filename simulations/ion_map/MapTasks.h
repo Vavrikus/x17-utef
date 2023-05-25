@@ -147,22 +147,25 @@ public:
     void Z_Loop_End() override
     {
         vv_g_yx_arrows.push_back(arrows);
+        arrows.clear();
     }
 
     void PostLoop() override
     {
-        // for(TGraph* g : v_g_yx) g->Write();
         TCanvas* c_g_yx = new TCanvas("c_g_yx","Map of electron readout positions");
         c_g_yx->Divide(4,4);
         for (int i = 0; i < v_g_yx.size() - 1; i++)
         {
+            int j = i / map->GetStep();
+            if (j >= v_g_yx.size()) j = v_g_yx.size() - 1;
+
             c_g_yx->cd(i+1);
-            v_g_yx[i]->GetXaxis()->SetRangeUser(ymin,ymax);
-            v_g_yx[i]->GetYaxis()->SetRangeUser(xmin,xmax);
-            v_g_yx[i]->Draw("AP");
+            v_g_yx[j]->GetXaxis()->SetRangeUser(ymin,ymax);
+            v_g_yx[j]->GetYaxis()->SetRangeUser(xmin,xmax);
+            v_g_yx[j]->Draw("AP");
             X17::DrawTrapezoid();
 
-            for(TArrow* arr : vv_g_yx_arrows[i]) 
+            for(TArrow* arr : vv_g_yx_arrows[j]) 
             {
                 if(arr->GetX2() > ymin && arr->GetX2() < ymax && arr->GetY2() > xmin && arr->GetY2() < xmax)
                 {
@@ -182,7 +185,7 @@ class Graph_ZT : public MapTask
 public:
     Graph_ZT(X17::Field<X17::MapPoint>* map) : MapTask(map) { }
 
-    void Z_Loop_Start(double z) override
+    void PreLoop() override
     {
         g_zt = new TGraph();
 
@@ -196,7 +199,7 @@ public:
 
     void XYZ_Loop(double x, double y, double z, X17::MapPoint current) override
     {
-        g_zt->AddPoint(z,current.t());
+        if (current.t() != -1) g_zt->AddPoint(z,current.t());
     }
 
     void PostLoop() override
@@ -228,10 +231,13 @@ public:
 
     void ZX_Loop(double z, double x, X17::MapPoint current) override
     {
-        g_xz->AddPoint(current.x(),z);
-        g_xz->SetPointError(g_xz->GetN() - 1, current.xdev(), 0);
-        TArrow* arrow = new TArrow(x,z,current.x(),z);
-        v_g_xz_arrows.push_back(arrow);
+        if (current.t() != -1)
+        {
+            g_xz->AddPoint(current.x(),z);
+            g_xz->SetPointError(g_xz->GetN() - 1, current.xdev(), 0);
+            TArrow* arrow = new TArrow(x,z,current.x(),z);
+            v_g_xz_arrows.push_back(arrow);
+        }
     }
 
     void PostLoop() override
@@ -274,10 +280,11 @@ public:
     {
         TCanvas* c_g_xt = new TCanvas("c_g_xt","Map of ionization electron drift times");
         g_xt->Draw("AP");
-        TLine* lleft  = new TLine(6.51,0,6.51,5000);
-        TLine* lright = new TLine(14.61,0,14.61,5000);
+        TLine* lleft  = new TLine(6.51,0,6.51,18000);
+        TLine* lright = new TLine(14.61,0,14.61,18000);
         lleft->Draw();
         lright->Draw();
+        c_g_xt->SetGrid();
         c_g_xt->Write();
     }
 };
