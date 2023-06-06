@@ -5,8 +5,6 @@ C++ code in this project uses ROOT and Garfield++ to simulate and reconstruct el
 The user needs to have ROOT installed (built on 6.26/06), for running simulations Garfield++ has to be installed. Currently used simulation results are provided.
 Scripts have to be compiled before running:
 
-It is also possible to compile all of the scripts at once:
-
 ```bash
 cd /path/to/project/folder
 mkdir build && cd build
