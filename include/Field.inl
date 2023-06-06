@@ -1,6 +1,7 @@
 // C++ dependencies
 #include <algorithm>
 #include <stdexcept>
+#include <string>
 
 // X17 dependencies
 #include "Field.h"
@@ -15,7 +16,9 @@ namespace X17
         // Check if the point is out of bounds.
         if(x < m_xmin || x > m_xmax || y < m_ymin || y > m_ymax || z < m_zmin || z > m_zmax)
         {
-            throw std::out_of_range("Cannot read field out of bounds.");
+            std::string coordinates = " Coordinates: x = " + std::to_string(x) + ", y = " + std::to_string(y) + ", z = " + std::to_string(z) + ".";
+            std::string bounds = " Bounds: x: [" + std::to_string(m_xmin) + ", " + std::to_string(m_xmax) + "], y: [" + std::to_string(m_ymin) + ", " + std::to_string(m_ymax) + "], z: [" + std::to_string(m_zmin) + ", " + std::to_string(m_zmax) + "].";
+            throw std::out_of_range("Cannot read field out of bounds." + coordinates + bounds);
         }
 
         // Calculate the indices of the corresponding grid cell.

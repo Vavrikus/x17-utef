@@ -25,7 +25,8 @@ namespace X17
         this->m_orientation = orient;
         this->m_orientation.Normalize();
 
-        this->m_fitter = lastfit->m_fitter; // Setting the fitter again every time would take much more time.
+        // Setting the fitter again every time would take much more time.
+        if (lastfit != nullptr) this->m_fitter = lastfit->m_fitter;
         lastfit = this;
     }
 

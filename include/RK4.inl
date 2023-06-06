@@ -16,7 +16,7 @@ namespace X17
         while(!m_end_fn(m_step,m_current))
         {
             VectorN k1,k2,k3,k4;
-            m_dif_eq(m_param,        m_current,      k1);
+            m_dif_eq(m_param,          m_current,      k1);
             k1 *= m_step;
             m_dif_eq(m_param+m_step/2, m_current+k1/2, k2);
             k2 *= m_step;

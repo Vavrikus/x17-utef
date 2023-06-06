@@ -215,6 +215,10 @@ namespace X17
         /// @param chain Pointer to TChain object.
         /// @param old_data Boolean indicating whether the data is from old simulations with different coordinate system (zxy). Defaults to true.
         void SetTChainBranches(TChain* chain, bool old_data = true);
+
+        /// @brief Sets the branches of a TTree to this MicroPoint object. Uses different branch structure than MakeTTreeBranches.
+        /// @param tree Pointer to a TTree object.
+        void SetTTreeBranches(TTree* tree);
     };
     
     /// @brief A struct for storing a Runge-Kutta generated track point.

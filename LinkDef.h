@@ -16,5 +16,6 @@ namespace X17
     #pragma link C++ class X17::DataPoint+;
     #pragma link C++ class X17::TrackRK+;
     #pragma link C++ class X17::StartPoint+;
+    #pragma link C++ class X17::MicroPoint+;
     #endif
 } // namespace X17

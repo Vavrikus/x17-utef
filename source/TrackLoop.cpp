@@ -21,7 +21,7 @@ namespace X17
     {
         curr_micro_tree = single_track;
 
-        single_track->SetBranchAddress("point",&curr_micro);
+        curr_micro.SetTTreeBranches(single_track);
         for (RecoTask* t : m_tasks) t->PreElectronLoop();
 
         // Looping through all ionization electrons.

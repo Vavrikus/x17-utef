@@ -57,6 +57,20 @@ namespace X17
         }
     }
 
+    void MicroPoint::SetTTreeBranches(TTree* tree)
+    {
+        tree->SetBranchAddress("start.point.x",&start.point.x);
+        tree->SetBranchAddress("start.point.y",&start.point.y);
+        tree->SetBranchAddress("start.point.z",&start.point.z);
+        tree->SetBranchAddress("start.t",&start.t);
+        tree->SetBranchAddress("end.point.x",&end.point.x);
+        tree->SetBranchAddress("end.point.y",&end.point.y);
+        tree->SetBranchAddress("end.point.z",&end.point.z);
+        tree->SetBranchAddress("end.t",&end.t);
+        tree->SetBranchAddress("e0",&e0);
+        tree->SetBranchAddress("e1",&e1);
+    }
+
 
 
 

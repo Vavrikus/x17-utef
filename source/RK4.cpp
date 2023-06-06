@@ -24,10 +24,10 @@ namespace X17
         Vector n_orient = orientation;
         n_orient.Normalize();
 
-        Vector start = origin/m2cm;
+        Vector start = origin / m2cm;
 
         double gamma    = 1 + kin_en / E0;
-        double velocity = sqrt((1 - pow(1 / gamma,2)) * pow(c,2));
+        double velocity = c * sqrt(1 - pow(1.0 / gamma,2));
 
         return Matrix<8,1>({
             0,
@@ -159,7 +159,7 @@ namespace X17
     {
         using namespace constants;
         auto rk_pts = m_curr_rk->GetResults();
-        return RKPoint(m2cm * rk_pts[index].at(1,0), m2cm * rk_pts[index].at(2,0), m2cm * rk_pts[index].at(3,0), 1e+9 * rk_pts[index].at(0,0));
+        return RKPoint(m2cm * rk_pts[index].at(1,0), m2cm * rk_pts[index].at(2,0), m2cm * rk_pts[index].at(3,0), 1e+9 / c * rk_pts[index].at(0,0));
     }
 
     double RKFit::_SqDist(int index, Vector point) const

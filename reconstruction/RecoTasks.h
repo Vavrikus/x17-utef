@@ -39,6 +39,8 @@ class DriftTimeTask : public RecoTask
         tz->SetMarkerSize(0.4);
         tz->Draw("ap");
         tz->Fit("pol1","","",8.05,11);
+
+        c->Write();
     }
 };
 
@@ -94,6 +96,8 @@ class XZPlotTask : public RecoTask
         double step = 0.1;
         RecoEnergy(circle_fit,*magfield,magnetic_x,min,max,step);
         RecoEnergy(circle_fit2,*magfield,magnetic_x2,min,max,step);
+
+        c->Write();
     }
 };
 
@@ -135,6 +139,8 @@ class XYPlotTask : public RecoTask
         leg_xy->AddEntry(xy,"original");
         leg_xy->AddEntry(xy_reco,"reconstructed");
         leg_xy->Draw("same");
+
+        c->Write();
     }
 };
 
@@ -190,7 +196,9 @@ class GraphResTask : public RecoTask
         gr_res->SetTitle("Residuals;x [cm];distance [cm]");
         gr_res->SetMarkerStyle(2);
         gr_res->SetMarkerSize(0.4);
-        gr_res->Draw("ap");       
+        gr_res->Draw("ap");
+
+        c->Write();
     }
 };
 
@@ -225,7 +233,9 @@ class HistResTask : public RecoTask
         c->cd(1); hx_res->Draw();
         c->cd(2); hy_res->Draw();
         c->cd(3); hz_res->Draw();
-        c->cd(4); hr_res->Draw();       
+        c->cd(4); hr_res->Draw();
+
+        c->Write();   
     }
 };
 
@@ -234,9 +244,10 @@ class RecoPadsTask : public RecoTask
 {
     friend class CircleAndRKFitTask;
 
-    static constexpr int timebins = 50;
+    static constexpr int timebins = 200;
     int padhits[constants::channels][timebins];
     TGraph2D *g_xyz, *g_xyz_reco;
+    TCanvas* c_reco;
 
     double height = -2.5;
 
@@ -283,7 +294,7 @@ class RecoPadsTask : public RecoTask
             }        
         }
         
-        TCanvas* c = new TCanvas("c_track_xyz","Electron track reconstruction with pads and time bins");
+        c_reco = new TCanvas("c_track_xyz","Electron track reconstruction with pads and time bins");
 
         // A histogram for scalling of the axes.
         TH3F* scale = new TH3F("scale","Electron track reconstruction;x [cm]; y [cm];z [cm]",1,xmin,xmax,1,-yhigh,yhigh,1,height,0);
@@ -315,9 +326,13 @@ class CircleAndRKFitTask : public RecoTask
     CircleFit3D* cfit3d = nullptr;
     RecoPadsTask* reco_task = nullptr;
 
-    void ElectronLoop() override
+    void PreElectronLoop() override
     {
         cfit3d = new CircleFit3D({constants::xmin,0,0},{1,0,0});
+    }
+
+    void ElectronLoop() override
+    {
         MicroPoint micro = m_loop->curr_micro;
         cfit3d->AddPoint(micro.x0(),micro.y0(),micro.z0(),1);
     }
@@ -394,14 +409,18 @@ class CircleAndRKFitTask : public RecoTask
         leg_xyz->AddEntry(g_rkfit,"Runge-Kutta fit");
         leg_xyz->Draw("same");
 
+        reco_task->c_reco->Write();
+
         TCanvas* c_fit3d = new TCanvas("c_fit3d","Fit 3D");
-            g_cfit3d_reco->SetTitle("Fit 3D;x [cm]; y [cm];z [cm]");
+            g_cfit3d_reco->SetTitle("Fit 3D;x [cm];y [cm];z [cm]");
             g_cfit3d_reco->Draw("LINE");
             g_cfit3d->Draw("LINE same");
             g_rkfit->Draw("LINE same");
             g_cfit3d_reco->GetYaxis()->SetNdivisions(508);
             g_cfit3d_reco->GetXaxis()->SetTitleOffset(1.5);
             g_cfit3d_reco->GetZaxis()->SetTitleOffset(1.5);
+        
+        c_fit3d->Write();
 
         TCanvas* c_energy = new TCanvas("c_energy","Energy along track");
             g_en->SetMarkerColor(kRed);
@@ -417,6 +436,8 @@ class CircleAndRKFitTask : public RecoTask
             leg_en->AddEntry(g_en,"fit original");
             leg_en->AddEntry(g_en_reco,"fit reconstructed");
             leg_en->Draw("same");
+
+        c_energy->Write();
     }
 
 public:
