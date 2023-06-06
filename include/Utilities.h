@@ -1,6 +1,7 @@
 #pragma once
 
 // C++ dependencies
+#include <string>
 #include <vector>
 
 // ROOT dependencies
@@ -37,3 +38,9 @@ T stdev(std::vector<T> values, T average)
 /// @param max The maximal value.
 /// @return A random number between given minimal and maximal value.
 inline double RandomMinMax(TRandom3* rand, double min, double max) { return min + (max - min) * rand->Rndm(); }
+
+/// @brief Function for finding next available filename in given folder.
+/// @param folder_path Folder where the search should happen.
+/// @param pattern Naming pattern of the files (such as name1.root).
+/// @return Next available filename with given patern.
+std::string GetNextFilePath(std::string folder_path, std::string pattern);

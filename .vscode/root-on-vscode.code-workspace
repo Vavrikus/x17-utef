@@ -15,6 +15,9 @@
     {
       "name": "Source",
       "path": "../../source/garfield/Source"
+    },
+    {
+      "path": "../../source/root/root_src"
     }
   ],
   "settings": {

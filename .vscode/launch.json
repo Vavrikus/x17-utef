@@ -56,6 +56,44 @@
             "ignoreFailures": true
           }
         ]
+      },
+
+      {
+        "name": "(gdb) Launch make_track",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/build/simulations/single_track/make_track",
+        "args": [],
+        "cwd": "${workspaceFolder}/build//simulations/single_track/",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          }
+        ]
+      },
+
+      {
+        "name": "(gdb) Launch micro_tracks",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/build/simulations/micro_tracks/micro_tracks",
+        "args": [],
+        "cwd": "${workspaceFolder}/build//simulations/micro_tracks/",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          }
+        ]
       }
     ]
   }

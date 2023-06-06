@@ -14,7 +14,6 @@
 #include "PadLayout.h"
 #include "RK4.h"
 #include "Track.h"
-#include "Utilities.h"
 #include "X17Utilities.h"
 
 using namespace X17::constants;
@@ -24,19 +23,6 @@ int rk_tracks()
     constexpr int n_tracks  =  100000;         // The number of tracks to be simulated by Runge-Kutta.
     constexpr double step   =  1E-13;          // The step of Runge-Kutta [s].
 
-    // Assuming that the target is in the YZ plane.
-    constexpr double x0     =  0;              // The x coordinate of simulated origin [cm].
-    constexpr double r_max  =  target_radius;  // The maximal distance from origin [cm].
-
-    constexpr double x1     =  xmin;           // The x coordinate of simulated window point [cm].
-    constexpr double y1_min = -win_width / 2;  // The minimal y coordinate of simulated window point [cm].
-    constexpr double y1_max = -y1_min;         // The maximal y coordinate of simulated window point [cm].
-    constexpr double z1_min = -win_height / 2; // The minimal z coordinate of simulated window point [cm].
-    constexpr double z1_max = -z1_min;         // The maximal z coordinate of simulated window point [cm].
-
-    constexpr double e_min  =  4e+6;           // The minimal simulated energy [eV].
-    constexpr double e_max  =  12e+6;          // The maximal simulated energy [eV].
-
     // Loading the magnetic field.
     X17::Field<X17::Vector>* magfield = X17::LoadField("../../../data/elmag/VecB2.txt",{-20,-30,-30},{20,30,30},0.5);
 
@@ -45,7 +31,6 @@ int rk_tracks()
     TRandom3* rand = new TRandom3(0);
 
     X17::TrackRK current_track;
-    X17::Vector origin,orientation;
     
     simulated_tracks->Branch("track",&current_track);
 
@@ -56,22 +41,13 @@ int rk_tracks()
     {
         if ((100 * i) % n_tracks == 0) std::cout << "Progress: " << 100*i/n_tracks << " \%\n";
 
-        // Simulation of the initial track parameters.
-        double phi = RandomMinMax(rand,0,2*M_PI);            // The azimuth of the initial point on the circle target.
-        double r   = sqrt(RandomMinMax(rand,0,r_max*r_max)); // The distance of the initial point from the circle target.
-        double y0  = r*cos(phi);                             // The y-coordinate of the initial point.
-        double z0  = r*sin(phi);                             // The z-coordinate of the initial point.
+        // Generating random initial parameters.
+        bool electron;
+        X17::Vector origin,orientation;
+        double kin_en;
 
-        double y1 = RandomMinMax(rand,y1_min,y1_max);        // The y-coordinate of the window point (TPC entry).
-        double z1 = RandomMinMax(rand,z1_min,z1_max);        // The z-coordinate of the window point (TPC entry).
+        X17::GetRandomTrackParams(rand,electron,origin,orientation,kin_en);
 
-        origin = {x1, y1, z1};                               // Setting the initial point (or origin).
-        orientation = {x1 - x0, y1 - y0, z1 - z0};           // Setting the initial orientation.
-        orientation.Normalize();
-
-        double kin_en = RandomMinMax(rand,e_min,e_max);      // The kinetic energy of the particle.
-
-        bool electron = rand->Rndm() > 0.5;                  // Choosing either electron or positron.
 
         // The actual track simulation.
         X17::RK4<8>* track = GetTrackRK(*magfield,electron,step,kin_en,origin,orientation);
@@ -81,7 +57,7 @@ int rk_tracks()
         std::vector<X17::RKPoint> points;
 
         using namespace X17::constants;
-        for (auto r : results) points.emplace_back(m2cm * r.at(1,0), m2cm * r.at(2,0), m2cm * r.at(3,0), 1e+9 * r.at(0,0));
+        for (auto r : results) points.emplace_back(m2cm * r.at(1,0), m2cm * r.at(2,0), m2cm * r.at(3,0), 1e+9 / c * r.at(0,0));
 
         current_track = X17::TrackRK(electron,points,origin,orientation,kin_en);
         simulated_tracks->Fill();
