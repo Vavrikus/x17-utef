@@ -1,0 +1,81 @@
+\documentclass[]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}   % for textcolor
+\usepackage{titlesec} % more layers of section numbering
+\usepackage{geometry} % margins
+
+\geometry{margin=3cm}
+\setcounter{secnumdepth}{4} % 4 layers of section numbering
+
+\title{Simulation and Reconstruction of Charged Particle Trajectories in an Atypic Time Projection Chamber}
+\author{Martin Vavřík}
+\date{June 2022}
+
+\begin{document}
+	
+	\maketitle
+	
+	\section{Introduction}
+		\textcolor{red}{Summary of what this thesis aims to accomplish, description of the X17 IEAP CTU project. What do we use for the simulation and reconstruction (ROOT, Garfield, MetaCentrum).}
+		
+		\subsection{ATOMKI Measurements}
+			\textcolor{red}{Short summary of results of measurements in ATOMKI.}
+			
+		\subsection{X17 IEAP CTU}
+			\textcolor{red}{Short description of our detector. Why we use atypic TPC.}
+	
+	\section{Time Projection Chamber}
+		\textcolor{red}{Description of TPC, working principle, standard vs our field layout.}
+		
+	\section{Track Simulation}
+		\textcolor{red}{Single track in positive x direction or initial parameters randomization. Needed for reconstruction testing and determining of the achievable resolution.}
+	
+		\subsection{Microscopic Simulation}
+			\textcolor{red}{Primary track simulated in HEED. Ionization electron drift simulated with AvalancheMicroscopic in Garfield.}
+			
+		\subsection{Runge-Kutta Simulation}
+			\textcolor{red}{Trajectory simulation with 4th order Runge-Kutta.}
+			
+		\subsection{Future?: Fast Simulation with the Ionization Electron Map}
+			\textcolor{red}{Primary track simulated in HEED. Readout parameters by interpolating the map. Diffusion from the map for randomization.}
+	
+	\section{Track Reconstruction}
+		\textcolor{red}{Reconstruction of one track simulated with microscopic tracking in Garfield.}
+		
+		\subsection{First Attempts}
+			\textcolor{red}{Using the same method as in standard TPC (calculating $z$ from the drift time). Gas composition 90/10.}
+			
+		\subsection{Ionization Electron Map}
+			\textcolor{red}{Explanation of the map. Simulated on MetaCentrum, workload distribution between multiple jobs. More electrons at one location to get statistics. Two methods of reconstruction using this map.}
+			
+			\subsubsection{Gradient Descent Search}
+				\textcolor{red}{Gradient descent search of a point in the original space that gets mapped to the given point of the readout space (trilinear interpolation).}
+			
+				\paragraph{Trilinear Interpolation}
+					\textcolor{red}{\newline Explanation of trilinear interpolation.}
+					
+			\subsubsection{Interpolating in the Inverse Grid}
+				\textcolor{red}{Interpolating between known points in the readout space.}
+		
+		\subsection{Discrete Reconstruction}
+			\textcolor{red}{Reconstruction with pads and time bins.}
+			
+	\section{Energy Reconstruction}
+		
+		\subsection{Cubic Spline Fit}
+			\textcolor{red}{Bad attempt at energy reconstruction using cubic splines.}
+		
+		\subsection{Circle and Lines Fit}
+			\textcolor{red}{Energy reconstruction with circle and lines fit. Trilinear interpolation of the magnetic field. Tested on Runge-Kutta sample, future testing with microscopic simulations and map simulation. Preliminary 2D version and complete 3D version.}
+		
+		\subsection{Runge-Kutta Fit}
+			\textcolor{red}{Single parameter fit with 4th order Runge-Kutta simulated track. Future testing with microscopic simulations and map simulation.}
+		
+	\section{Conclusion}
+		\textcolor{red}{Here or at the end of each section.}
+		
+	
+	\bibliography{thesis_references}
+	\bibliographystyle{unsrt}
+	
+\end{document}
