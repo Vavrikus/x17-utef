@@ -59,7 +59,7 @@
 		
 		The \textbf{Fast Simulation with Ionization Electron Map} is planned for the future, it will use the~HEED program~\cite{HEED} to simulate the~primary particle and the~Ionization Electron Map (see section~\ref{sec:map}) to simulate the~drift of secondary electrons. It should be significantly faster then the~Microscopic Simulation but offer comparable precision since it will rely on already simulated drift map.
 		
-		All of these simulations require the~knowledge of the~electromagnetic field inside the~detector. We assume uniform electric field 400~V$\cdot$cm$^{-1}$. The~magnetic field was simulated in Maxwell (\textcolor{red}{add citation? details? own subsection with figures?}) by Hugo Natal da Luz.
+		All of these simulations require the~knowledge of the~electromagnetic field inside the~detector. We assume uniform electric field 400~V$\cdot$cm$^{-1}$. The~magnetic field was simulated in Maxwell (\textcolor{red}{add citation? details? own subsection with figures? more details in section~\ref{sec:IEAP}?}) by Hugo Natal da Luz.
 	
 		\textcolor{red}{Single track in positive x direction or initial parameters randomization.}
 	
@@ -92,6 +92,12 @@
 	\section{Track Reconstruction}
 	\label{sec:track}
 		The~first stage of our reconstruction algorithm is the~reconstruction of the track of the~primary particle (electron or positron). The~results of this step are then used to determine the~energy of the~particle (see section~\ref{sec:energy}).
+		
+		\textbf{First Attempts} at a~track reconstruction were made using the~standard approach. Here we assume we know the~readout coordinates ($x'$,~$y'$,~$t$) exactly (i.e. we neglect the~pads and time bins). In standard TPC (with parallel fields) we only need to reconstruct the~$z$~coordinate from drift time using the~known drift velocity.
+		
+		Reconstruction with the~\textbf{Ionization Electron Map} (from now on referred to as \emph{the~map}) uses simulation of the~drift of the~secondary (ionization) electrons in the~volume of the detector. This simulation can then be used to interpolate the~initial position of the~secondary electrons. First attempts neglect the~pads.
+		
+		The~\textbf{Discrete Reconstruction} is made using the~map, instead of reconstructing the~exact position of each electron we reconstruct the middle point of each hit pad with time corresponding to the~middle of the~time bin. Number of electrons in each TPC~bin (consisting of the~pad and the~time bin) is counted and used as a~charge in the~energy reconstruction.
 		
 		\textcolor{red}{Reconstruction of one track simulated with microscopic tracking in Garfield.}
 		
@@ -154,7 +160,7 @@
 				\end{figure}
 		
 		\subsection{Discrete Reconstruction}
-			\textcolor{red}{Reconstruction with pads and time bins.}
+			\textcolor{red}{Reconstruction with pads and time bins. Maybe testing different pads.}
 			
 	\section{Energy Reconstruction}
 	\label{sec:energy}
