@@ -16,4 +16,6 @@ ssh ${i} '
     make
     cd ../simulations/ion_map/
     chmod +x ion_single.sh ion_multi.sh
+    cd ../micro_tracks/
+    chmod +x track_single.sh track_multi.sh
 '

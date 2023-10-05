@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     TApplication app("app", &argc, argv);
 
     // Set the output file.
-    std::string outPath = GetNextFilePath("../../../data/micro_tracks/new_tracks/","tracks(\\d+)\\.root");
+    std::string outPath = GetNextFilePath("","tracks(\\d+)\\.root"); //../../../data/micro_tracks/new_tracks/
     std::cout << "Output will be saved to: " + outPath + "\n";
 
     TFile outFile(outPath.c_str(),"RECREATE","Tracks from microscopic simulation");
