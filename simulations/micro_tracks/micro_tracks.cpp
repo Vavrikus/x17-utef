@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 {
     // Set parameters.
     int nTracks = 1;
-    if (argc < 2) nTracks = stoi(argv[1]);
+    if (argc < 2) nTracks = std::stoi(argv[1]);
 
     TApplication app("app", &argc, argv);
 

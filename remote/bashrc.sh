@@ -34,3 +34,6 @@ source /storage/projects/utefx17/SourceCode/ROOT/install/bin/thisroot.sh
 
 #trimming long directory output
 export PROMPT_DIRTRIM=1
+
+#colorful output for better readability
+PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
