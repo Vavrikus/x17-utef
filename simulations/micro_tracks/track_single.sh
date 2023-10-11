@@ -11,6 +11,10 @@ cd $(dirname $0)
 
 [ -z $PAR1 ] && echo "Parameter 1 (max_id) is missing." && exit 5
 [ -z $PAR2 ] && echo "Parameter 2 (id) is missing." && exit 5
+if [ ! -z $PAR3 ]; then
+   [ -z $PAR4 ] && echo "Parameter 4 (angle_bins) is missing." && exit 5
+   [ -z $PAR5 ] && echo "Parameter 5 (energy_bins) is missing." && exit 5
+fi
 
 # Define a DATADIR variable: directory where output will be copied to.
 # Define a BUILDDIR and MAGDIR variables: where the input files are taken from. BUILDDIR contains the executable that will be run, MAGDIR electromagnetic data.
@@ -43,7 +47,11 @@ cp $MAGDIR/VecE2.txt $MAGDIR/VecB2.txt  $SCRATCHDIR/data/elmag || { echo >&2 "Er
 cd $SCRATCHDIR/build/simulations/micro_tracks
 
 # Run the microscopic track simulation with all necessary parameters and stream its output into a text file. If the calculation ends with an error, issue error message an exit.
-./micro_tracks >tracks$PAR2.out || { echo >&2 "Calculation ended up erroneously (with a code $?) !!"; exit 3; }
+if [ -z $PAR3 ]; then
+    ./micro_tracks >tracks$PAR2.out || { echo >&2 "Calculation ended up erroneously (with a code $?) !!"; exit 3; }
+else
+    ./micro_tracks $PAR1 $PAR2 $PAR3 $PAR4 $PAR5 >tracks$PAR2.out || { echo >&2 "Calculation ended up erroneously (with a code $?) !!"; exit 3; }
+fi
 
 # Move the output files to user's DATADIR or exit in case of failure.
 (cp tracks$PAR2.out $DATADIR/ && cp tracks1.root $DATADIR/tracks$PAR2.root) || { echo >&2 "Result file(s) copying failed (with a code $?) !!"; exit 4; }

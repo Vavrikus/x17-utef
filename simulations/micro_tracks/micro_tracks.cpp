@@ -27,6 +27,7 @@
 // X17 dependencies
 #include "Points.h"
 #include "Track.h"
+#include "TrackJob.h"
 #include "Utilities.h"
 #include "X17Utilities.h"
 
@@ -36,11 +37,11 @@ using namespace X17::constants;
 // Input parameter: number of tracks to be simulated.
 int main(int argc, char *argv[])
 {
-    // Set parameters.
-    int nTracks = 1;
-    if (argc < 2) nTracks = std::stoi(argv[1]);
-
     TApplication app("app", &argc, argv);
+
+    // Set parameters.
+    X17::TrackJob job;
+    job.SetParameters(argc,argv);
 
     // Set the output file.
     std::string outPath = GetNextFilePath("","tracks(\\d+)\\.root"); //../../../data/micro_tracks/new_tracks/
@@ -79,7 +80,7 @@ int main(int argc, char *argv[])
     TRandom3* rand = new TRandom3(0);
 
     // Loop over the tracks.
-    for (int i = 0; i < nTracks; i++)
+    for (int i = job.min_set; i <= job.max_set; i++)
     {
         std::vector<X17::MicroPoint> points;
 
@@ -88,7 +89,9 @@ int main(int argc, char *argv[])
         X17::Vector origin,orientation;
         double kin_en;
 
-        X17::GetRandomTrackParams(rand,electron,origin,orientation,kin_en);
+        // Get initial track parameters (random or grid-like).
+        if (job.random) X17::GetRandomTrackParams(rand,electron,origin,orientation,kin_en);
+        else job.GetTrackParameters(i,electron,origin,orientation,kin_en);
 
         // Simulate an ionizing particle using Heed.
         TrackHeed track;
