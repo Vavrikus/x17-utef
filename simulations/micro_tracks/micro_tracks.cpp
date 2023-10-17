@@ -1,4 +1,5 @@
 // C++ dependencies
+#include <filesystem>
 #include <iostream>
 
 // ROOT dependencies
@@ -44,7 +45,8 @@ int main(int argc, char *argv[])
     job.SetParameters(argc,argv);
 
     // Set the output file.
-    std::string outPath = GetNextFilePath("","tracks(\\d+)\\.root"); //../../../data/micro_tracks/new_tracks/
+    std::string folder_path = std::filesystem::current_path().string(); // Get the current working directory.
+    std::string outPath = GetNextFilePath(folder_path,"tracks"); //../../../data/micro_tracks/new_tracks/
     std::cout << "Output will be saved to: " + outPath + "\n";
 
     TFile outFile(outPath.c_str(),"RECREATE","Tracks from microscopic simulation");

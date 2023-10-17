@@ -93,7 +93,13 @@
       "typeinfo": "cpp",
       "valarray": "cpp",
       "variant": "cpp",
-      "*.icc": "cpp"
+      "*.icc": "cpp",
+      "codecvt": "cpp",
+      "csetjmp": "cpp",
+      "csignal": "cpp",
+      "scoped_allocator": "cpp",
+      "shared_mutex": "cpp",
+      "typeindex": "cpp"
     },
     "C_Cpp.default.includePath": [
       "/home/vavrik/work/X17/include",

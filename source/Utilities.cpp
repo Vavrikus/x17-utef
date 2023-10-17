@@ -5,10 +5,11 @@
 // X17 dependencies
 #include "Utilities.h"
 
-std::string GetNextFilePath(std::string folder_path, std::string pattern)
+std::string GetNextFilePath(std::string folder_path, std::string prefix, std::string suffix)
 {
-    std::regex filePattern("tracks(\\d+)\\.root"); // Regular expression to match the file pattern.
-    int next_file_index = 1;                       // Start with the default next file index of 1.
+    std::string regex_patern = prefix + "(\\d+)\\" + suffix;
+    std::regex filePattern(regex_patern); // Regular expression to match the file pattern.
+    int next_file_index = 1;              // Start with the default next file index of 1.
 
     // Iterate over files in the folder.
     for (const auto& entry : std::filesystem::directory_iterator(folder_path))
@@ -28,6 +29,6 @@ std::string GetNextFilePath(std::string folder_path, std::string pattern)
         }
     }
 
-    std::string next_filename = "tracks" + std::to_string(next_file_index) + ".root"; // Generate the next file name.
-    return folder_path + next_filename;
+    std::string next_filename = prefix + std::to_string(next_file_index) + suffix; // Generate the next file name.
+    return folder_path + "/" + next_filename;
 }

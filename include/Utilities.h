@@ -39,8 +39,9 @@ T stdev(std::vector<T> values, T average)
 /// @return A random number between given minimal and maximal value.
 inline double RandomMinMax(TRandom3* rand, double min, double max) { return min + (max - min) * rand->Rndm(); }
 
-/// @brief Function for finding next available filename in given folder.
+/// @brief Function for finding next available filename in given folder (such as name1.root).
 /// @param folder_path Folder where the search should happen.
-/// @param pattern Naming pattern of the files (such as name1.root).
+/// @param prefix Name prefix of the files.
+/// @param suffix Suffix of the file (default is .root).
 /// @return Next available filename with given patern.
-std::string GetNextFilePath(std::string folder_path, std::string pattern);
+std::string GetNextFilePath(std::string folder_path, std::string prefix, std::string suffix = ".root");
