@@ -38,8 +38,6 @@ using namespace X17::constants;
 // Input parameter: number of tracks to be simulated.
 int main(int argc, char *argv[])
 {
-    TApplication app("app", &argc, argv);
-
     // Set parameters.
     X17::TrackJob job;
     job.SetParameters(argc,argv);
@@ -70,7 +68,7 @@ int main(int argc, char *argv[])
     Sensor sensor;
     sensor.AddComponent(&grid);
     constexpr double space = 1; // Extra space on the sensor so electrons always end on zmax.
-    sensor.SetArea(-space, xmin-space, zmin-space, xmax+space, space, zmax);
+    sensor.SetArea(xmin-space, -yhigh-space, zmin-space, xmax+space, yhigh+space, zmax);
 
     // We use microscopic tracking for the electron avalanche simulation.
     AvalancheMicroscopic aval;
@@ -156,8 +154,6 @@ int main(int argc, char *argv[])
 
     outFile.Write();
     outFile.Close();
-
-    app.Run(true);
 
     return 0;
 }
