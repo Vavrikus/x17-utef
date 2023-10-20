@@ -1,0 +1,8 @@
+18199594.meta-pbs.metacentrum.cz is running on node zenon15.cerit-sc.cz in a scratch directory /scratch.ssd/martinvavrik/job_18199594.meta-pbs.metacentrum.cz
+18199595.meta-pbs.metacentrum.cz is running on node zenon15.cerit-sc.cz in a scratch directory /scratch.ssd/martinvavrik/job_18199595.meta-pbs.metacentrum.cz
+18199743.meta-pbs.metacentrum.cz is running on node kirke9.meta.zcu.cz in a scratch directory /scratch.ssd/martinvavrik/job_18199743.meta-pbs.metacentrum.cz
+18199744.meta-pbs.metacentrum.cz is running on node kirke30.meta.zcu.cz in a scratch directory /scratch.ssd/martinvavrik/job_18199744.meta-pbs.metacentrum.cz
+18330685.meta-pbs.metacentrum.cz is running on node zenon41.cerit-sc.cz in a scratch directory /scratch.ssd/martinvavrik/job_18330685.meta-pbs.metacentrum.cz
+18330686.meta-pbs.metacentrum.cz is running on node zenon41.cerit-sc.cz in a scratch directory /scratch.ssd/martinvavrik/job_18330686.meta-pbs.metacentrum.cz
+18334261.meta-pbs.metacentrum.cz is running on node zenon9.cerit-sc.cz in a scratch directory /scratch.ssd/martinvavrik/job_18334261.meta-pbs.metacentrum.cz
+18334260.meta-pbs.metacentrum.cz is running on node zenon41.cerit-sc.cz in a scratch directory /scratch.ssd/martinvavrik/job_18334260.meta-pbs.metacentrum.cz
