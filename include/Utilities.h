@@ -45,3 +45,8 @@ inline double RandomMinMax(TRandom3* rand, double min, double max) { return min 
 /// @param suffix Suffix of the file (default is .root).
 /// @return Next available filename with given patern.
 std::string GetNextFilePath(std::string folder_path, std::string prefix, std::string suffix = ".root");
+
+/// @brief Function for determining the sign of a number.
+/// @param x The number sign of which will be determined.
+/// @return Returns 1 for positive, 0 for zero and -1 for negative x.
+int sign(double x);

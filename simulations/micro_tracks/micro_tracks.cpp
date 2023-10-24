@@ -94,83 +94,88 @@ int main(int argc, char *argv[])
         // Get initial track parameters (random or grid-like).
         if (job.random) X17::GetRandomTrackParams(rand,electron,origin,orientation,kin_en);
         else job.GetTrackParameters(i,electron,origin,orientation,kin_en);
-
-        // Simulate an ionizing particle using Heed.
-        TrackHeed track;
-        if (electron) track.SetParticle("electron");
-        else          track.SetParticle("positron");
-
-        track.SetKineticEnergy(kin_en); // Set the particle kinetic energy [eV].
-        track.SetSensor(&sensor);
-        track.EnableMagneticField();
-        track.EnableElectricField();
-        track.DisableDeltaElectronTransport();  // This will disable secondary electrons in the track.
-        track.EnablePhotonReabsorption(false);  // Enable/disable fluorescence reabsorption.
         
-        // Get the default parameters.
-        double maxrange = 0., rforstraight = 0., stepstraight = 0., stepcurved = 0.;
-        track.GetSteppingLimits(maxrange, rforstraight, stepstraight, stepcurved);
+        std::cout << "TRACK No." << i << ":\n";
+        std::cout << "   electron: " << electron << " Ek: " << kin_en << " origin: (" << origin.x << "," << origin.y << "," << origin.z << ")\n";
+        std::cout << "   orientation: (" << orientation.x << "," << orientation.y << "," << orientation.z << ")\n";
+        std::cout << "   theta: " << asin(orientation.z) << " phi: " << acos(orientation.x/cos(asin(orientation.z)))*sign(orientation.y) << "\n";
 
-        // Reduce the step size [rad].
-        stepcurved = 0.04;
-        maxrange = 0.2;
-        track.SetSteppingLimits(maxrange, rforstraight, stepstraight, stepcurved);
+        // // Simulate an ionizing particle using Heed.
+        // TrackHeed track;
+        // if (electron) track.SetParticle("electron");
+        // else          track.SetParticle("positron");
 
-        // Set the starting point and momentum vector of the particle.
-        double xt = origin.x;      // [cm]
-        double yt = origin.y;      // [cm]
-        double zt = origin.z;      // [cm]
-        double ti = 0;             // [ns]
-        double px = orientation.x;
-        double py = orientation.y;
-        double pz = orientation.z;
+        // track.SetKineticEnergy(kin_en); // Set the particle kinetic energy [eV].
+        // track.SetSensor(&sensor);
+        // track.EnableMagneticField();
+        // track.EnableElectricField();
+        // track.DisableDeltaElectronTransport();  // This will disable secondary electrons in the track.
+        // track.EnablePhotonReabsorption(false);  // Enable/disable fluorescence reabsorption.
+        
+        // // Get the default parameters.
+        // double maxrange = 0., rforstraight = 0., stepstraight = 0., stepcurved = 0.;
+        // track.GetSteppingLimits(maxrange, rforstraight, stepstraight, stepcurved);
 
-        // Simulate the track.
-        track.NewTrack(xt, yt, zt, ti, px, py, pz);
+        // // Reduce the step size [rad].
+        // stepcurved = 0.04;
+        // maxrange = 0.2;
+        // track.SetSteppingLimits(maxrange, rforstraight, stepstraight, stepcurved);
 
-        // Loop over the clusters.
-        double xc, yc, zc, tc, ec, extra;
-        int nc;
-        int n_electron = 0;
-        while (track.GetCluster(xc, yc, zc, tc, nc, ec, extra)) 
-        {
-            for (int j = 0; j < nc; ++j) 
-            {
-                X17::MicroPoint point;
-                double xe, ye, ze, te, ee, dxe, dye, dze;
-                track.GetElectron(j, xe, ye, ze, te, ee, dxe, dye, dze);
+        // // Set the starting point and momentum vector of the particle.
+        // double xt = origin.x;      // [cm]
+        // double yt = origin.y;      // [cm]
+        // double zt = origin.z;      // [cm]
+        // double ti = 0;             // [ns]
+        // double px = orientation.x;
+        // double py = orientation.y;
+        // double pz = orientation.z;
 
-                n_electron++;
-                std::cout << "Distance to origin: " << sqrt(xe*xe+ye*ye+ze*ze) << "  time " << te << "  number " << n_electron << "\n";
+        // // Simulate the track.
+        // track.NewTrack(xt, yt, zt, ti, px, py, pz);
 
-                // Simulate the drift/avalanche of this electron.
-                aval.AvalancheElectron(xe, ye, ze, te, ee, dxe, dye, dze);
+        // // Loop over the clusters.
+        // double xc, yc, zc, tc, ec, extra;
+        // int nc;
+        // int n_electron = 0;
+        // while (track.GetCluster(xc, yc, zc, tc, nc, ec, extra)) 
+        // {
+        //     for (int j = 0; j < nc; ++j) 
+        //     {
+        //         X17::MicroPoint point;
+        //         double xe, ye, ze, te, ee, dxe, dye, dze;
+        //         track.GetElectron(j, xe, ye, ze, te, ee, dxe, dye, dze);
 
-                // Move electrons that hit the mesh plane into the amplification gap.
-                int status;
-                aval.GetElectronEndpoint(0, point.start.point.x, point.start.point.y, point.start.point.z, point.start.t, point.e0, point.end.point.x, point.end.point.y, point.end.point.z, point.end.t, point.e1, status);
-                points.push_back(point);
+        //         n_electron++;
+        //         std::cout << "Distance to origin: " << sqrt(xe*xe+ye*ye+ze*ze) << "  time " << te << "  number " << n_electron << "\n";
 
-                // Save driftlines.
-                std::vector<X17::DriftLinePoint> driftline;
+        //         // Simulate the drift/avalanche of this electron.
+        //         aval.AvalancheElectron(xe, ye, ze, te, ee, dxe, dye, dze);
 
-                for (int k = 0; k < aval.GetNumberOfElectronDriftLinePoints(); k++)
-                {
-                    X17::DriftLinePoint point;
-                    aval.GetElectronDriftLinePoint(point.point.x,point.point.y,point.point.z,point.t,k);
-                    driftline.push_back(point);
-                }
+        //         // Move electrons that hit the mesh plane into the amplification gap.
+        //         int status;
+        //         aval.GetElectronEndpoint(0, point.start.point.x, point.start.point.y, point.start.point.z, point.start.t, point.e0, point.end.point.x, point.end.point.y, point.end.point.z, point.end.t, point.e1, status);
+        //         points.push_back(point);
 
-                driftlines.push_back(driftline);
-            }
-        }
+        //         // Save driftlines.
+        //         std::vector<X17::DriftLinePoint> driftline;
 
-        microtrack = X17::TrackMicro(electron,points,origin,orientation,kin_en,driftlines);
-        tracks.Fill();
+        //         for (int k = 0; k < aval.GetNumberOfElectronDriftLinePoints(); k++)
+        //         {
+        //             X17::DriftLinePoint point;
+        //             aval.GetElectronDriftLinePoint(point.point.x,point.point.y,point.point.z,point.t,k);
+        //             driftline.push_back(point);
+        //         }
+
+        //         driftlines.push_back(driftline);
+        //     }
+        // }
+
+        // microtrack = X17::TrackMicro(electron,points,origin,orientation,kin_en,driftlines);
+        // tracks.Fill();
     }
 
-    outFile.Write();
-    outFile.Close();
+    // outFile.Write();
+    // outFile.Close();
 
     return 0;
 }

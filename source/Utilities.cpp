@@ -32,3 +32,10 @@ std::string GetNextFilePath(std::string folder_path, std::string prefix, std::st
     std::string next_filename = prefix + std::to_string(next_file_index) + suffix; // Generate the next file name.
     return folder_path + "/" + next_filename;
 }
+
+int sign(double x) 
+{
+    if (x > 0)      return  1;
+    else if (x < 0) return -1;
+    else            return  0;
+}
