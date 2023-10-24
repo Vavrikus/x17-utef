@@ -22,8 +22,8 @@ namespace X17
         constexpr double z1_min = -win_height / 2; // The minimal z coordinate of simulated window point [cm].
         constexpr double z1_max = -z1_min;         // The maximal z coordinate of simulated window point [cm].
 
-        constexpr double e_min  =  4e+6;           // The minimal simulated energy [eV].
-        constexpr double e_max  =  12e+6;          // The maximal simulated energy [eV].
+        constexpr double e_min  =  3e+6;           // The minimal simulated energy [eV].
+        constexpr double e_max  =  13e+6;          // The maximal simulated energy [eV].
         
 
         // Simulation of the initial track parameters.

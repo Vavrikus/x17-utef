@@ -43,6 +43,8 @@ namespace X17
         Vector orientation;             // Normalized initial direction of the track.
         double kin_energy;              // Kinetic energy of the particle.
 
+        std::vector<std::vector<DriftLinePoint>> driftlines; // Simulated drift lines of each electron.
+
         /// @brief Default constructor.
         TrackMicro() = default;
 
@@ -52,8 +54,9 @@ namespace X17
         /// @param orig Starting point of the track.
         /// @param orient Normalized initial direction of the track.
         /// @param Ek Kinetic energy of the particle.
-        TrackMicro(bool e, const std::vector<MicroPoint>& pts, Vector orig, Vector orient, double Ek)
-            : electron(e), points(pts), origin(orig), orientation(orient), kin_energy(Ek) { }
+        /// @param dlines Vector of drift lines.
+        TrackMicro(bool e, const std::vector<MicroPoint>& pts, Vector orig, Vector orient, double Ek, const std::vector<std::vector<DriftLinePoint>>& dlines)
+            : electron(e), points(pts), origin(orig), orientation(orient), kin_energy(Ek), driftlines(dlines) { }
     };
 
     /// @brief Generates random initial parameters for track simulation.

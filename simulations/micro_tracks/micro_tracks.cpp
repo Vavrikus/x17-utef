@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
     aval.SetSensor(&sensor);
     aval.EnableSignalCalculation(); 
     aval.EnableMagneticField();
+    aval.EnableDriftLines();
 
     // Random number generator for the simulation.
     TRandom3* rand = new TRandom3(0);
@@ -83,6 +84,7 @@ int main(int argc, char *argv[])
     for (int i = job.min_set; i <= job.max_set; i++)
     {
         std::vector<X17::MicroPoint> points;
+        std::vector<std::vector<X17::DriftLinePoint>> driftlines;
 
         // Generate random initial parameters of the track.
         bool electron;
@@ -129,6 +131,7 @@ int main(int argc, char *argv[])
         // Loop over the clusters.
         double xc, yc, zc, tc, ec, extra;
         int nc;
+        int n_electron = 0;
         while (track.GetCluster(xc, yc, zc, tc, nc, ec, extra)) 
         {
             for (int j = 0; j < nc; ++j) 
@@ -137,18 +140,32 @@ int main(int argc, char *argv[])
                 double xe, ye, ze, te, ee, dxe, dye, dze;
                 track.GetElectron(j, xe, ye, ze, te, ee, dxe, dye, dze);
 
+                n_electron++;
+                std::cout << "Distance to origin: " << sqrt(xe*xe+ye*ye+ze*ze) << "  time " << te << "  number " << n_electron << "\n";
+
                 // Simulate the drift/avalanche of this electron.
-                aval.AvalancheElectron(xe, ye, ze, te, 0.1, dxe, dye, dze);
+                aval.AvalancheElectron(xe, ye, ze, te, ee, dxe, dye, dze);
 
                 // Move electrons that hit the mesh plane into the amplification gap.
                 int status;
                 aval.GetElectronEndpoint(0, point.start.point.x, point.start.point.y, point.start.point.z, point.start.t, point.e0, point.end.point.x, point.end.point.y, point.end.point.z, point.end.t, point.e1, status);
-                
                 points.push_back(point);
+
+                // Save driftlines.
+                std::vector<X17::DriftLinePoint> driftline;
+
+                for (int k = 0; k < aval.GetNumberOfElectronDriftLinePoints(); k++)
+                {
+                    X17::DriftLinePoint point;
+                    aval.GetElectronDriftLinePoint(point.point.x,point.point.y,point.point.z,point.t,k);
+                    driftline.push_back(point);
+                }
+
+                driftlines.push_back(driftline);
             }
         }
 
-        microtrack = X17::TrackMicro(electron,points,origin,orientation,kin_en);
+        microtrack = X17::TrackMicro(electron,points,origin,orientation,kin_en,driftlines);
         tracks.Fill();
     }
 

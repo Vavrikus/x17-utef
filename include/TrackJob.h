@@ -25,8 +25,8 @@ namespace X17
         double theta_min = -theta_max;                                      // The minimal simulated theta [rad].
         double phi_max = atan((constants::win_width/2)/constants::xmin);    // The maximal simulated phi [rad].
         double phi_min = -phi_max;                                          // The minimal simulated phi [rad].
-        double E_max = 12e+6;                                               // The maximal simulated energy [eV].
-        double E_min = 4e+6;                                                // THe minimal simulated energy [eV].
+        double E_max = 13e+6;                                               // The maximal simulated energy [eV].
+        double E_min = 3e+6;                                                // THe minimal simulated energy [eV].
 
         int n_sets;  // Total number of unique track parameter sets in all jobs.
         int min_set; // Lowest identifying number of track parameter set in this job.
