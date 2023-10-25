@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
                 driftlines.push_back(driftline);
             }
 
-            break; // Only for fast testing (simulates only one electron)!!!
+            // break; // Only for fast testing (simulates only one electron)!!!
         }
 
         microtrack = X17::TrackMicro(electron,points,origin,orientation,kin_en,driftlines);
