@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N ionElectronTracks
-#PBS -l select=1:ncpus=1:mem=8gb:scratch_local=500mb
-#PBS -l walltime=24:00:00 
+#PBS -l select=1:ncpus=1:mem=8gb:scratch_local=2gb
+#PBS -l walltime=168:00:00 
 #(((PBS -m ae)))
 
 # The 4 lines above are options for scheduling system. Email notification will be sent when the job aborts (a) or ends (e).
@@ -54,7 +54,7 @@ else
 fi
 
 # Move the output files to user's DATADIR or exit in case of failure.
-(cp tracks$PAR2.out $DATADIR/ && cp tracks1.root $DATADIR/tracks$PAR2.root) || { echo >&2 "Result file(s) copying failed (with a code $?) !!"; exit 4; }
+(cp tracks$PAR2.out $DATADIR/ && cp tracks_full1.root $DATADIR/tracks_full$PAR2.root && cp tracks_small1.root $DATADIR/tracks_small$PAR2.root) || { echo >&2 "Result file(s) copying failed (with a code $?) !!"; exit 4; }
 
 # Clean the SCRATCH directory.
 clean_scratch

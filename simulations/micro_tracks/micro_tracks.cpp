@@ -35,23 +35,30 @@
 using namespace Garfield;
 using namespace X17::constants;
 
-// Input parameter: number of tracks to be simulated.
+// Input parameters: max_id, id, iterations, angle_bins, energy_bins (for grid-like simulation).
+// For random simulation of one track run with no parameters.
 int main(int argc, char *argv[])
 {
     // Set parameters.
     X17::TrackJob job;
     job.SetParameters(argc,argv);
 
-    // Set the output file.
+    // Set the output files.
     std::string folder_path = std::filesystem::current_path().string(); // Get the current working directory.
-    std::string outPath = GetNextFilePath(folder_path,"tracks"); //../../../data/micro_tracks/new_tracks/
-    std::cout << "Output will be saved to: " + outPath + "\n";
+    std::string outPath  = GetNextFilePath(folder_path,"tracks_full");  // Big file containing the drift lines.
+    std::string outPath2 = GetNextFilePath(folder_path,"tracks_small"); // Small file without the drift lines.
+    std::cout << "Full output will be saved to: " + outPath + "\n";
+    std::cout << "Small output will be saved to: " + outPath2 + "\n";
 
-    TFile outFile(outPath.c_str(),"RECREATE","Tracks from microscopic simulation");
-    TTree tracks("tracks","Tree of simulated microscopic tracks");
+    TFile outFile(outPath.c_str(),"RECREATE","Tracks from microscopic simulation (with drift lines)");
+
+    TTree tracks("tracks_full","Tree of simulated microscopic tracks (with drift lines)");
+    TTree tracks2("tracks_small","Tree of simulated microscopic tracks (no drift lines)");
 
     X17::TrackMicro microtrack;
-    tracks.Branch("track",&microtrack);
+    X17::TrackMicro microtrack2;
+    tracks.Branch("track_full",&microtrack);
+    tracks2.Branch("track_small",&microtrack2);
 
     // Set the gas mixture.
     MediumMagboltz gas;
@@ -100,82 +107,96 @@ int main(int argc, char *argv[])
         std::cout << "   orientation: (" << orientation.x << "," << orientation.y << "," << orientation.z << ")\n";
         std::cout << "   theta: " << asin(orientation.z) << " phi: " << acos(orientation.x/cos(asin(orientation.z)))*sign(orientation.y) << "\n";
 
-        // // Simulate an ionizing particle using Heed.
-        // TrackHeed track;
-        // if (electron) track.SetParticle("electron");
-        // else          track.SetParticle("positron");
+        // Simulate an ionizing particle using Heed.
+        TrackHeed track;
+        if (electron) track.SetParticle("electron");
+        else          track.SetParticle("positron");
 
-        // track.SetKineticEnergy(kin_en); // Set the particle kinetic energy [eV].
-        // track.SetSensor(&sensor);
-        // track.EnableMagneticField();
-        // track.EnableElectricField();
-        // track.DisableDeltaElectronTransport();  // This will disable secondary electrons in the track.
-        // track.EnablePhotonReabsorption(false);  // Enable/disable fluorescence reabsorption.
+        track.SetKineticEnergy(kin_en); // Set the particle kinetic energy [eV].
+        track.SetSensor(&sensor);
+        track.EnableMagneticField();
+        track.EnableElectricField();
+        track.DisableDeltaElectronTransport();  // This will disable secondary electrons in the track.
+        track.EnablePhotonReabsorption(false);  // Enable/disable fluorescence reabsorption.
         
-        // // Get the default parameters.
-        // double maxrange = 0., rforstraight = 0., stepstraight = 0., stepcurved = 0.;
-        // track.GetSteppingLimits(maxrange, rforstraight, stepstraight, stepcurved);
+        // Get the default parameters.
+        double maxrange = 0., rforstraight = 0., stepstraight = 0., stepcurved = 0.;
+        track.GetSteppingLimits(maxrange, rforstraight, stepstraight, stepcurved);
 
-        // // Reduce the step size [rad].
-        // stepcurved = 0.04;
-        // maxrange = 0.2;
-        // track.SetSteppingLimits(maxrange, rforstraight, stepstraight, stepcurved);
+        // Reduce the step size [rad].
+        stepcurved = 0.04;
+        maxrange = 0.2;
+        track.SetSteppingLimits(maxrange, rforstraight, stepstraight, stepcurved);
 
-        // // Set the starting point and momentum vector of the particle.
-        // double xt = origin.x;      // [cm]
-        // double yt = origin.y;      // [cm]
-        // double zt = origin.z;      // [cm]
-        // double ti = 0;             // [ns]
-        // double px = orientation.x;
-        // double py = orientation.y;
-        // double pz = orientation.z;
+        // Set the starting point and momentum vector of the particle.
+        double xt = origin.x;      // [cm]
+        double yt = origin.y;      // [cm]
+        double zt = origin.z;      // [cm]
+        double ti = 0;             // [ns]
+        double px = orientation.x;
+        double py = orientation.y;
+        double pz = orientation.z;
 
-        // // Simulate the track.
-        // track.NewTrack(xt, yt, zt, ti, px, py, pz);
+        // Simulate the track.
+        track.NewTrack(xt, yt, zt, ti, px, py, pz);
 
-        // // Loop over the clusters.
-        // double xc, yc, zc, tc, ec, extra;
-        // int nc;
-        // int n_electron = 0;
-        // while (track.GetCluster(xc, yc, zc, tc, nc, ec, extra)) 
-        // {
-        //     for (int j = 0; j < nc; ++j) 
-        //     {
-        //         X17::MicroPoint point;
-        //         double xe, ye, ze, te, ee, dxe, dye, dze;
-        //         track.GetElectron(j, xe, ye, ze, te, ee, dxe, dye, dze);
+        // Loop over the clusters.
+        double xc, yc, zc, tc, ec, extra;
+        int nc;
+        int n_electron = 0;
+        while (track.GetCluster(xc, yc, zc, tc, nc, ec, extra)) 
+        {
+            for (int j = 0; j < nc; ++j) 
+            {
+                X17::MicroPoint point;
+                double xe, ye, ze, te, ee, dxe, dye, dze;
+                track.GetElectron(j, xe, ye, ze, te, ee, dxe, dye, dze);
 
-        //         n_electron++;
-        //         std::cout << "Distance to origin: " << sqrt(xe*xe+ye*ye+ze*ze) << "  time " << te << "  number " << n_electron << "\n";
+                n_electron++;
+                std::cout << "Distance to origin: " << sqrt(xe*xe+ye*ye+ze*ze) << "  time " << te << "  number " << n_electron << "\n";
 
-        //         // Simulate the drift/avalanche of this electron.
-        //         aval.AvalancheElectron(xe, ye, ze, te, ee, dxe, dye, dze);
+                // Simulate the drift/avalanche of this electron.
+                aval.AvalancheElectron(xe, ye, ze, te, ee, dxe, dye, dze);
 
-        //         // Move electrons that hit the mesh plane into the amplification gap.
-        //         int status;
-        //         aval.GetElectronEndpoint(0, point.start.point.x, point.start.point.y, point.start.point.z, point.start.t, point.e0, point.end.point.x, point.end.point.y, point.end.point.z, point.end.t, point.e1, status);
-        //         points.push_back(point);
+                // Move electrons that hit the mesh plane into the amplification gap.
+                int status;
+                aval.GetElectronEndpoint(0, point.start.point.x, point.start.point.y, point.start.point.z, point.start.t, point.e0, point.end.point.x, point.end.point.y, point.end.point.z, point.end.t, point.e1, status);
+                points.push_back(point);
 
-        //         // Save driftlines.
-        //         std::vector<X17::DriftLinePoint> driftline;
+                // Save driftlines.
+                std::vector<X17::DriftLinePoint> driftline;
 
-        //         for (int k = 0; k < aval.GetNumberOfElectronDriftLinePoints(); k++)
-        //         {
-        //             X17::DriftLinePoint point;
-        //             aval.GetElectronDriftLinePoint(point.point.x,point.point.y,point.point.z,point.t,k);
-        //             driftline.push_back(point);
-        //         }
+                for (int k = 0; k < aval.GetNumberOfElectronDriftLinePoints(); k++)
+                {
+                    X17::DriftLinePoint dl_point;
+                    aval.GetElectronDriftLinePoint(dl_point.point.x,dl_point.point.y,dl_point.point.z,dl_point.t,k);
+                    driftline.push_back(dl_point);
+                }
 
-        //         driftlines.push_back(driftline);
-        //     }
-        // }
+                driftlines.push_back(driftline);
+            }
 
-        // microtrack = X17::TrackMicro(electron,points,origin,orientation,kin_en,driftlines);
-        // tracks.Fill();
+            break; // Only for fast testing (simulates only one electron)!!!
+        }
+
+        microtrack = X17::TrackMicro(electron,points,origin,orientation,kin_en,driftlines);
+        microtrack2 = X17::TrackMicro(electron,points,origin,orientation,kin_en,{});
+        
+        tracks.Fill();
+        tracks2.Fill();
     }
 
-    // outFile.Write();
-    // outFile.Close();
+    // Write the file with complete data.
+    outFile.cd();
+    tracks.Write();
+    outFile.Close();
+
+    // Write the file with no drift lines.
+    TFile outFile2(outPath2.c_str(),"RECREATE","Tracks from microscopic simulation (no drift lines)");
+
+    outFile2.cd();
+    tracks2.Write();
+    outFile2.Close();    
 
     return 0;
 }

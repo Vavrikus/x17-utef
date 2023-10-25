@@ -1,0 +1,2 @@
+18390301.meta-pbs.metacentrum.cz is running on node zenon41.cerit-sc.cz in a scratch directory /scratch.ssd/martinvavrik/job_18390301.meta-pbs.metacentrum.cz
+18390302.meta-pbs.metacentrum.cz is running on node zenon41.cerit-sc.cz in a scratch directory /scratch.ssd/martinvavrik/job_18390302.meta-pbs.metacentrum.cz

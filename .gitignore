@@ -16,6 +16,7 @@
 /data/single_track/originalMC/
 /data/single_track/original_v2/
 /data/single_track/track1/
+/data/micro_tracks/random_02/*.root
 
 # No tests
 /tests/
