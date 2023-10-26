@@ -1,0 +1,4 @@
+/var/spool/pbs/mom_priv/jobs/18409340.meta-pbs.metacentrum.cz.SC: line 30: /storage/projects/utefx17/martin/data/micro_tracks/new_tracks/jobs_info.txt: No such file or directory
+cp: cannot stat '/storage/projects/utefx17/martin/data/micro_tracks/new_tracks/../../elmag/VecE2.txt': No such file or directory
+cp: cannot stat '/storage/projects/utefx17/martin/data/micro_tracks/new_tracks/../../elmag/VecB2.txt': No such file or directory
+Error while copying input file(s)!

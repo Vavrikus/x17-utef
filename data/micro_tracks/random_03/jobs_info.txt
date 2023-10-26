@@ -1,0 +1,2 @@
+18409348.meta-pbs.metacentrum.cz is running on node kirke2.meta.zcu.cz in a scratch directory /scratch.ssd/martinvavrik/job_18409348.meta-pbs.metacentrum.cz
+18409349.meta-pbs.metacentrum.cz is running on node kirke2.meta.zcu.cz in a scratch directory /scratch.ssd/martinvavrik/job_18409349.meta-pbs.metacentrum.cz

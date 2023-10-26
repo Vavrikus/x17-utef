@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -N ionElectronTracks
-#PBS -l select=1:ncpus=1:mem=8gb:scratch_local=2gb
+#PBS -l select=1:ncpus=1:mem=8gb:scratch_local=10gb
 #PBS -l walltime=168:00:00 
 #(((PBS -m ae)))
 

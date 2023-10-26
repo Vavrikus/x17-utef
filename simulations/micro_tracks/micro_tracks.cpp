@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
                 track.GetElectron(j, xe, ye, ze, te, ee, dxe, dye, dze);
 
                 n_electron++;
-                std::cout << "Distance to origin: " << sqrt(xe*xe+ye*ye+ze*ze) << "  time " << te << "  number " << n_electron << "\n";
+                std::cout << "Distance to origin: " << sqrt(xe*xe+ye*ye+ze*ze) << "  time " << te << "  number " << n_electron << std::endl;
 
                 // Simulate the drift/avalanche of this electron.
                 aval.AvalancheElectron(xe, ye, ze, te, ee, dxe, dye, dze);
