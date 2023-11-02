@@ -163,10 +163,10 @@ int main(int argc, char *argv[])
                 aval.GetElectronEndpoint(0, point.start.point.x, point.start.point.y, point.start.point.z, point.start.t, point.e0, point.end.point.x, point.end.point.y, point.end.point.z, point.end.t, point.e1, status);
                 points.push_back(point);
 
-                // Save driftlines.
+                // Save driftlines. (Every 10th point)
                 std::vector<X17::DriftLinePoint> driftline;
 
-                for (int k = 0; k < aval.GetNumberOfElectronDriftLinePoints(); k++)
+                for (int k = 0; k < aval.GetNumberOfElectronDriftLinePoints(); k+=10)
                 {
                     X17::DriftLinePoint dl_point;
                     aval.GetElectronDriftLinePoint(dl_point.point.x,dl_point.point.y,dl_point.point.z,dl_point.t,k);

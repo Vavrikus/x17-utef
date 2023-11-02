@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -N ionElectronTracks
-#PBS -l select=1:ncpus=1:mem=8gb:scratch_local=10gb
+#PBS -l select=1:ncpus=1:mem=20gb:scratch_local=10gb
 #PBS -l walltime=168:00:00 
 #(((PBS -m ae)))
 
@@ -46,15 +46,33 @@ cp $MAGDIR/VecE2.txt $MAGDIR/VecB2.txt  $SCRATCHDIR/data/elmag || { echo >&2 "Er
 # Move into scratch directory into the folder that contains the executable.
 cd $SCRATCHDIR/build/simulations/micro_tracks
 
-# Run the microscopic track simulation with all necessary parameters and stream its output into a text file. If the calculation ends with an error, issue error message an exit.
+# Run the microscopic track simulation with all necessary parameters and stream its output into a text file.
 if [ -z $PAR3 ]; then
-    ./micro_tracks >tracks$PAR2.out || { echo >&2 "Calculation ended up erroneously (with a code $?) !!"; exit 3; }
+    ./micro_tracks >tracks$PAR2.out
 else
-    ./micro_tracks $PAR1 $PAR2 $PAR3 $PAR4 $PAR5 >tracks$PAR2.out || { echo >&2 "Calculation ended up erroneously (with a code $?) !!"; exit 3; }
+    ./micro_tracks $PAR1 $PAR2 $PAR3 $PAR4 $PAR5 >tracks$PAR2.out
 fi
 
-# Move the output files to user's DATADIR or exit in case of failure.
-(cp tracks$PAR2.out $DATADIR/ && cp tracks_full1.root $DATADIR/tracks_full$PAR2.root && cp tracks_small1.root $DATADIR/tracks_small$PAR2.root) || { echo >&2 "Result file(s) copying failed (with a code $?) !!"; exit 4; }
+# Check the exit status of the simulation.
+if [ $? -ne 0 ]; then
+    # Simulation ended with an error.
+    echo >&2 "Calculation ended up erroneously (with a code $?) !!"
+    # Create a subdirectory in DATADIR with a name based on the number of error.
+    error_directory="$DATADIR/error$?"
+    mkdir -p "$error_directory"
+
+    # Move the output files to DATADIR or the error directory.
+    cp tracks$PAR2.out $error_directory || { echo >&2 "Result file copying failed (with a code $?) !!"; }
+    cp tracks_full1.root $error_directory/tracks_full$PAR2.root || { echo >&2 "Result file copying failed (with a code $?) !!"; }
+    cp tracks_small1.root $error_directory/tracks_small$PAR2.root || { echo >&2 "Result file copying failed (with a code $?) !!"; }
+    exit 3
+else
+    # Simulation was successful.
+    # Move the output files to user's DATADIR or exit in case of failure.
+    cp tracks$PAR2.out $DATADIR/ || { echo >&2 "Result file(s) copying failed (with a code $?) !!"; exit 4; }
+    cp tracks_full1.root $DATADIR/tracks_full$PAR2.root || { echo >&2 "Result file(s) copying failed (with a code $?) !!"; exit 4; }
+    cp tracks_small1.root $DATADIR/tracks_small$PAR2.root || { echo >&2 "Result file(s) copying failed (with a code $?) !!"; exit 4; }
+fi
 
 # Clean the SCRATCH directory.
 clean_scratch
