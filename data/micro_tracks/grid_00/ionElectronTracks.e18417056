@@ -1,0 +1,277 @@
+ERROR in cling::CIFactory::createCI(): cannot extract standard library include paths!
+Invoking:
+  LC_ALL=C x86_64-linux-gnu-g++-8   -xc++ -E -v /dev/null 2>&1 | sed -n -e '/^.include/,${' -e '/^ \/.*++/p' -e '}'
+Results was:
+With exit code 0
+Error in <TCling::RegisterModule>: Cannot open shared library /scratch.ssd/martinvavrik/job_18417056.meta-pbs.metacentrum.cz/build/simulations/micro_tracks/micro_tracks for dictionary libX17_source_lib:
+  /scratch.ssd/martinvavrik/job_18417056.meta-pbs.metacentrum.cz/build/simulations/micro_tracks/micro_tracks: cannot dynamically load position-independent executable
+Error in <TCling::LoadPCM>: ROOT PCM /scratch.ssd/martinvavrik/job_18417056.meta-pbs.metacentrum.cz/build/simulations/micro_tracks/libX17_source_lib_rdict.pcm file does not exist
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libASImageGui_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libASImage_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libEG_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libEve_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libFitPanel_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libFoam_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libFumili_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libGX11TTF_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libGX11_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libGed_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libGenVector_G__GenVector32_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libGenVector_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libGenetic_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libGeomBuilder_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libGeomPainter_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libGuiBld_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libGuiHtml_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libGui_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libGviz3d_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libHistFactory_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libHistPainter_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libHtml_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libMLP_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libMathMore_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libMinuit2_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libMinuit_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libNetxNG_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libPgSQL_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libPhysics_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libPostscript_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libProofBench_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libProofDraw_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libProofPlayer_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libProof_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libQuadp_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libRCsg_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libRGL_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libRHTTPSniff_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libRHTTP_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libRMySQL_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libROOTBrowsable_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libROOTBrowserv7_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libROOTDataFrame_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libROOTEve_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libROOTFitPanelv7_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libROOTGpadv7_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libROOTGraphicsPrimitives_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libROOTHistDraw_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libROOTHist_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libROOTNTuple_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libROOTTMVASofie_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libROOTTPython_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libROOTVecOps_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libROOTWebDisplay_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libRSQLite_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libRecorder_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libRooFitCore_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libRooFitHS3_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libRooFitMore_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libRooFitRDataFrameHelpers_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libRooFit_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libRooStats_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libRootAuth_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libSPlot_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libSQLIO_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libSessionViewer_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libSmatrix_G__Smatrix32_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libSmatrix_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libSpectrumPainter_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libSpectrum_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libTMVAGui_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libTMVA_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libTreePlayer_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libTreeViewer_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libUnfold_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libWebGui6_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libX3d_rdict.pcm
+
+Info in <TCling::LoadPCM>: In-memory ROOT PCM candidate /auto/brno12-cerit/nfs4/projects/utefx17/SourceCode/ROOT/install/lib/libXMLParser_rdict.pcm
+
+ComponentGrid::LoadMesh:
+   Warning: Expected 1185921 lines, read 1185922.
+ComponentGrid::LoadData:
+    Error reading line 1185922.
+    Node (80, 120, 120) has already been set.
+ComponentGrid::LoadData:
+    Error reading line 1185922.
+    Node (80, 120, 120) has already been set.
+MediumMagboltz::GetElectronCollisionRate:
+    Rate at 54.1237 eV is not included in the current table.
+    Increasing energy range to 56.8299 eV.
+AvalancheMicroscopic::TransportElectrons: Increasing null-collision rate by 5%.
+MediumMagboltz::GetElectronCollisionRate:
+    Rate at 84.7668 eV is not included in the current table.
+    Increasing energy range to 89.0052 eV.
+AvalancheMicroscopic::TransportElectrons: Increasing null-collision rate by 5%.
+AvalancheMicroscopic::TransportElectrons: Increasing null-collision rate by 5%.
+MediumMagboltz::GetElectronCollisionRate:
+    Rate at 98.2999 eV is not included in the current table.
+    Increasing energy range to 103.215 eV.
+AvalancheMicroscopic::TransportElectrons: Increasing null-collision rate by 5%.
+MediumMagboltz::GetElectronCollisionRate:
+    Rate at 109.108 eV is not included in the current table.
+    Increasing energy range to 114.564 eV.
+AvalancheMicroscopic::TransportElectrons: Increasing null-collision rate by 5%.
+MediumMagboltz::GetElectronCollisionRate:
+    Rate at 209.401 eV is not included in the current table.
+    Increasing energy range to 219.871 eV.
+AvalancheMicroscopic::TransportElectrons: Increasing null-collision rate by 5%.
+MediumMagboltz::GetElectronCollisionRate:
+    Rate at 324.465 eV is not included in the current table.
+    Increasing energy range to 340.689 eV.
+MediumMagboltz::GetElectronCollisionRate:
+    Rate at 347.766 eV is not included in the current table.
+    Increasing energy range to 365.155 eV.
+MediumMagboltz::GetElectronCollisionRate:
+    Rate at 615.539 eV is not included in the current table.
+    Increasing energy range to 646.316 eV.
+MediumMagboltz::GetElectronCollisionRate:
+    Rate at 1338.27 eV is not included in the current table.
+    Increasing energy range to 1405.18 eV.
+Error in <TBufferFile::WriteByteCount>: bytecount too large (more than 1073741822)
+MediumMagboltz::GetElectronCollisionRate:
+    Rate at 2531.65 eV is not included in the current table.
+    Increasing energy range to 2658.23 eV.
+
+ *** Break *** segmentation violation
+
+
+
+===========================================================
+There was a crash.
+This is the entire stack trace of all threads:
+===========================================================
+#0  0x000014f66dbf7706 in __GI___wait4 (pid=286781, stat_loc=stat_loc
+entry=0x7ffc07e23888, options=options
+entry=0, usage=usage
+entry=0x0) at ../sysdeps/unix/sysv/linux/wait4.c:27
+#1  0x000014f66dbf76c7 in __GI___waitpid (pid=<optimized out>, stat_loc=stat_loc
+entry=0x7ffc07e23888, options=options
+entry=0) at waitpid.c:38
+#2  0x000014f66db75aa7 in do_system (line=<optimized out>) at ../sysdeps/posix/system.c:172
+#3  0x000014f67170be83 in TUnixSystem::StackTrace() () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libCore.so
+#4  0x000014f67170e8b5 in TUnixSystem::DispatchSignals(ESignals) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libCore.so
+#5  <signal handler called>
+#6  0x000014f6711302c6 in TBufferFile::WriteVersion(TClass const*, bool) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#7  0x000014f671130db2 in TBufferFile::WriteClassBuffer(TClass const*, void*) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#8  0x000014f6711a701f in TGenCollectionStreamer::WriteObjects(int, TBuffer&) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#9  0x000014f6711a93c2 in TGenCollectionStreamer::Streamer(TBuffer&) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#10 0x000014f671177a82 in TCollectionStreamer::Streamer(TBuffer&, void*, int, TClass*) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#11 0x000014f6711a701f in TGenCollectionStreamer::WriteObjects(int, TBuffer&) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#12 0x000014f6711a93c2 in TGenCollectionStreamer::Streamer(TBuffer&) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#13 0x000014f671177a82 in TCollectionStreamer::Streamer(TBuffer&, void*, int, TClass*) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#14 0x000014f67112b375 in TBufferFile::WriteFastArray(void*, TClass const*, int, TMemberStreamer*) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#15 0x000014f6713848f5 in int TStreamerInfo::WriteBufferAux<char**>(TBuffer&, char** const&, TStreamerInfo::TCompInfo* const*, int, int, int, int, int) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#16 0x000014f6711f7f7d in TStreamerInfoActions::GenericWriteAction(TBuffer&, void*, TStreamerInfoActions::TConfiguration const*) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#17 0x000014f67112adf5 in TBufferFile::ApplySequence(TStreamerInfoActions::TActionSequence const&, void*) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#18 0x000014f670f73184 in TBranch::FillImpl(ROOT::Internal::TBranchIMTHelper*) [clone .part.109] () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libTree.so
+#19 0x000014f670f8044d in TBranchElement::FillImpl(ROOT::Internal::TBranchIMTHelper*) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libTree.so
+#20 0x000014f670f80164 in TBranchElement::FillImpl(ROOT::Internal::TBranchIMTHelper*) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libTree.so
+#21 0x000014f670fe7e5e in TTree::Fill() () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libTree.so
+#22 0x00005601d50f43f1 in main ()
+===========================================================
+
+
+The lines below might hint at the cause of the crash.
+You may get help by asking at the ROOT forum https://root.cern/forum
+Only if you are really convinced it is a bug in ROOT then please submit a
+report at https://root.cern/bugs Please post the ENTIRE stack trace
+from above as an attachment in addition to anything else
+that might help us fixing this issue.
+===========================================================
+#6  0x000014f6711302c6 in TBufferFile::WriteVersion(TClass const*, bool) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#7  0x000014f671130db2 in TBufferFile::WriteClassBuffer(TClass const*, void*) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#8  0x000014f6711a701f in TGenCollectionStreamer::WriteObjects(int, TBuffer&) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#9  0x000014f6711a93c2 in TGenCollectionStreamer::Streamer(TBuffer&) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#10 0x000014f671177a82 in TCollectionStreamer::Streamer(TBuffer&, void*, int, TClass*) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#11 0x000014f6711a701f in TGenCollectionStreamer::WriteObjects(int, TBuffer&) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#12 0x000014f6711a93c2 in TGenCollectionStreamer::Streamer(TBuffer&) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#13 0x000014f671177a82 in TCollectionStreamer::Streamer(TBuffer&, void*, int, TClass*) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#14 0x000014f67112b375 in TBufferFile::WriteFastArray(void*, TClass const*, int, TMemberStreamer*) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#15 0x000014f6713848f5 in int TStreamerInfo::WriteBufferAux<char**>(TBuffer&, char** const&, TStreamerInfo::TCompInfo* const*, int, int, int, int, int) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#16 0x000014f6711f7f7d in TStreamerInfoActions::GenericWriteAction(TBuffer&, void*, TStreamerInfoActions::TConfiguration const*) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#17 0x000014f67112adf5 in TBufferFile::ApplySequence(TStreamerInfoActions::TActionSequence const&, void*) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libRIO.so
+#18 0x000014f670f73184 in TBranch::FillImpl(ROOT::Internal::TBranchIMTHelper*) [clone .part.109] () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libTree.so
+#19 0x000014f670f8044d in TBranchElement::FillImpl(ROOT::Internal::TBranchIMTHelper*) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libTree.so
+#20 0x000014f670f80164 in TBranchElement::FillImpl(ROOT::Internal::TBranchIMTHelper*) () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libTree.so
+#21 0x000014f670fe7e5e in TTree::Fill() () from /storage/projects/utefx17/SourceCode/ROOT/install/lib/libTree.so
+#22 0x00005601d50f43f1 in main ()
+===========================================================
+
+
+Calculation ended up erroneously (with a code 139) !!
