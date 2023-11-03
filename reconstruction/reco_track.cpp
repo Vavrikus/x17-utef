@@ -36,6 +36,10 @@ int reco_track()
     TFile* input2 = new TFile("../../data/rk_tracks/rk_tracks.root");
     TTree* rk_tracks = (TTree*)input2->Get("rk_tracks");
 
+    // Loading file with microscopic tracks. (To be replaced with TChain and multiple files later.)
+    std::string micro_tracks_folder = "../../data/micro_tracks/grid_00/";
+    TFile* input3 = new TFile((micro_tracks_folder + "tracks_small33.root").c_str());
+    TTree* micro_tracks = (TTree*)input3->Get("tracks_small");
 
     // TrackLoop for single microscopic track.
     TrackLoop* single_loop = new TrackLoop(map,magfield);
@@ -56,13 +60,28 @@ int reco_track()
     rk_loop->AddTask(new CircleFitEnergyTask());
     // rk_loop->AddTask(new PlotSelectionTask());
 
+
+    // TrackLoop for multiple microscopic tracks.
+    TrackLoop* multi_loop = new TrackLoop(map,magfield);
+    // multi_loop->AddTask(new DriftTimeTask());
+    multi_loop->AddTask(new XZPlotTask());
+    multi_loop->AddTask(new XYPlotTask());
+    multi_loop->AddTask(new GraphResTask());
+    multi_loop->AddTask(new HistResTask());
+
+    RecoPadsTask* t2 = new RecoPadsTask();
+    multi_loop->AddTask(t2);
+    multi_loop->AddTask(new CircleAndRKFitTask(t2));
+
     gErrorIgnoreLevel = 6001;
 
     // Processing.
-    TFile out_file((single_track_folder + "track_plots.root").c_str(),"RECREATE","Tracks from microscopic simulation");
-    single_loop->ProcessSingle(single_track);
-    out_file.Close();
+    // TFile out_file((single_track_folder + "track_plots.root").c_str(),"RECREATE","Tracks from microscopic simulation");
+    // single_loop->ProcessSingle(single_track);
+    // out_file.Close();
     // rk_loop->ProcessRK(rk_tracks);
+    TFile test_file((micro_tracks_folder + "track_plots33.root").c_str(),"RECREATE","Tracks from microscopic simulation");
+    multi_loop->ProcessMulti(micro_tracks,1);
 
     return 0;
 }

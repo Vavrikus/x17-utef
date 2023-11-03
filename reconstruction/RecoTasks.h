@@ -84,18 +84,18 @@ class XZPlotTask : public RecoTask
         leg_xz->Draw("same");
 
         // Fitting both tracks with circles.
-        double min = 0;
-        double max = 15;
-        TF1* circle_fit  = FitCircle2(xz,min,max);
-        TF1* circle_fit2 = FitCircle2(xz_reco,min,max);
+        // double min = 0;
+        // double max = 15;
+        // TF1* circle_fit  = FitCircle2(xz,min,max);
+        // TF1* circle_fit2 = FitCircle2(xz_reco,min,max);
 
-        TGraph* magnetic_x  = new TGraph();
-        TGraph* magnetic_x2 = new TGraph();
+        // TGraph* magnetic_x  = new TGraph();
+        // TGraph* magnetic_x2 = new TGraph();
 
-        Field<Vector>* magfield = m_loop->magfield;
-        double step = 0.1;
-        RecoEnergy(circle_fit,*magfield,magnetic_x,min,max,step);
-        RecoEnergy(circle_fit2,*magfield,magnetic_x2,min,max,step);
+        // Field<Vector>* magfield = m_loop->magfield;
+        // double step = 0.1;
+        // RecoEnergy(circle_fit,*magfield,magnetic_x,min,max,step);
+        // RecoEnergy(circle_fit2,*magfield,magnetic_x2,min,max,step);
 
         c->Write();
     }
@@ -328,7 +328,8 @@ class CircleAndRKFitTask : public RecoTask
 
     void PreElectronLoop() override
     {
-        cfit3d = new CircleFit3D({constants::xmin,0,0},{1,0,0});
+        if(m_loop->curr_loop == TrackLoop::SINGLE) cfit3d = new CircleFit3D({constants::xmin,0,0},{1,0,0});
+        else if(m_loop->curr_loop == TrackLoop::MULTI) cfit3d = new CircleFit3D(m_loop->curr_microtrack->origin,m_loop->curr_microtrack->orientation);
     }
 
     void ElectronLoop() override
@@ -340,6 +341,8 @@ class CircleAndRKFitTask : public RecoTask
     void PostElectronLoop() override
     {
         using namespace X17::constants;
+
+        if(m_loop->curr_loop == TrackLoop::MULTI) std::cout << "Simulated energy: " << m_loop->curr_microtrack->kin_energy << " eV.";
 
         cfit3d->SetFitter(4);
         cfit3d->FitCircle3D();
@@ -354,10 +357,12 @@ class CircleAndRKFitTask : public RecoTask
         g_cfit3d->SetLineWidth(2);
         g_cfit3d->Draw("LINE same");
 
-        std::cout << "Reconstructed energy: " << cfit3d->GetEnergy(*magfield,true) << " (middle field), " << cfit3d->GetEnergy(*magfield,false) << " (average field).\n";
+        std::cout << "Reconstructed energy (circle fit no pads): " << cfit3d->GetEnergy(*magfield,true) << " (middle field), " << cfit3d->GetEnergy(*magfield,false) << " (average field).\n";
 
         std::vector<RecoPoint> reco_data;
-        CircleFit3D* cfit3d_reco = new CircleFit3D({0,0,0},{1,0,0});
+        CircleFit3D* cfit3d_reco;
+        if(m_loop->curr_loop == TrackLoop::SINGLE) cfit3d_reco = new CircleFit3D({0,0,0},{1,0,0});
+        else if(m_loop->curr_loop == TrackLoop::MULTI) cfit3d_reco = new CircleFit3D(m_loop->curr_microtrack->origin,m_loop->curr_microtrack->orientation);
 
         for (int i = 0; i < channels; i++)
         {
@@ -389,9 +394,11 @@ class CircleAndRKFitTask : public RecoTask
         g_cfit3d_reco->SetLineWidth(2);
         g_cfit3d_reco->Draw("LINE same");
 
-        std::cout << "Reconstructed energy: " << cfit3d_reco->GetEnergy(*magfield,true) << " (middle field), " << cfit3d_reco->GetEnergy(*magfield,false) << " (average field).\n";
+        std::cout << "Reconstructed energy (circle fit with pads): " << cfit3d_reco->GetEnergy(*magfield,true) << " (middle field), " << cfit3d_reco->GetEnergy(*magfield,false) << " (average field).\n";
 
-        RKFit* rkfit = new RKFit(magfield,true,1E-13,{0,0,0},{1,0,0},cfit3d_reco->GetData());
+        RKFit* rkfit;
+        if(m_loop->curr_loop == TrackLoop::SINGLE) rkfit = new RKFit(magfield,true,1E-13,{0,0,0},{1,0,0},cfit3d_reco->GetData());
+        else if(m_loop->curr_loop == TrackLoop::MULTI) rkfit = new RKFit(magfield,m_loop->curr_microtrack->electron,1E-13,m_loop->curr_microtrack->origin,m_loop->curr_microtrack->orientation,cfit3d_reco->GetData());
         rkfit->SetEnergy(cfit3d_reco->GetEnergy(*magfield,true));
         rkfit->SetFitter();
         rkfit->FitRK();

@@ -19,6 +19,8 @@ namespace X17
 
     void TrackLoop::ProcessSingle(TTree* single_track)
     {
+        curr_loop = SINGLE;
+
         curr_micro_tree = single_track;
 
         curr_micro.SetTTreeBranches(single_track);
@@ -42,8 +44,47 @@ namespace X17
         for (RecoTask* t : m_tasks) t->PostElectronLoop();
     }
 
+    void TrackLoop::ProcessMulti(TTree* micro_tracks, int n_process)
+    {
+        curr_loop = MULTI;
+
+        micro_tracks->SetBranchAddress("track_small",&curr_microtrack);
+        for (RecoTask* t : m_tasks) t->PreTrackLoop();
+
+        int n_tracks = micro_tracks->GetEntries();
+        for (int i = 0; i < n_tracks; i++)
+        {
+            micro_tracks->GetEntry(i);
+            if((100 * i) % n_tracks == 0) std::cout << "Progress: " << 100 * i / n_tracks << " \%\n";
+            std::cout << "Track " << i+1 << " out of " << n_tracks << ".\n";
+
+            for (RecoTask* t : m_tasks) t->PreElectronLoop();
+
+            int n_electrons = 0;
+            for (MicroPoint p : curr_microtrack->points) 
+            {
+                curr_micro = p;
+                
+                if (IsInSector(curr_micro.x1(),curr_micro.y1(),0) && IsInSector(curr_micro.GetInitPos(),-0.01))
+                {
+                    n_electrons++;
+                    curr_reco = Reconstruct(*map,curr_micro);
+                    for (RecoTask* t : m_tasks) t->ElectronLoop();
+                }
+            }
+
+            for (RecoTask* t : m_tasks) t->PostElectronLoop();
+
+            if (i == n_process - 1) break;
+        }
+        
+        for (RecoTask* t : m_tasks) t->PostTrackLoop();
+    }
+
     void TrackLoop::ProcessRK(TTree* rk_tracks, int n_process)
     {
+        curr_loop = RK;
+
         rk_tracks->SetBranchAddress("track",&curr_rk);
         for (RecoTask* t : m_tasks) t->PreTrackLoop();
 
