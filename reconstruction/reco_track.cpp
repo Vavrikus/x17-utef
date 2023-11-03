@@ -38,7 +38,7 @@ int reco_track()
 
     // Loading file with microscopic tracks. (To be replaced with TChain and multiple files later.)
     std::string micro_tracks_folder = "../../data/micro_tracks/grid_00/";
-    TFile* input3 = new TFile((micro_tracks_folder + "tracks_small33.root").c_str());
+    TFile* input3 = new TFile((micro_tracks_folder + "tracks_small59.root").c_str());
     TTree* micro_tracks = (TTree*)input3->Get("tracks_small");
 
     // TrackLoop for single microscopic track.
@@ -80,7 +80,7 @@ int reco_track()
     // single_loop->ProcessSingle(single_track);
     // out_file.Close();
     // rk_loop->ProcessRK(rk_tracks);
-    TFile test_file((micro_tracks_folder + "track_plots33.root").c_str(),"RECREATE","Tracks from microscopic simulation");
+    TFile test_file((micro_tracks_folder + "track_plots59.root").c_str(),"RECREATE","Tracks from microscopic simulation");
     multi_loop->ProcessMulti(micro_tracks);
 
     return 0;

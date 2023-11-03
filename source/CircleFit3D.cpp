@@ -47,7 +47,7 @@ namespace X17
     {
         m_fitter->SetParameter(0,"length",m_length,0.01,-10,5);
         m_fitter->SetParameter(1,"alpha",m_alpha,0.001,-M_PI/2,(3/2)*M_PI);
-        m_fitter->SetParameter(2,"radius",m_radius,0.01,10,50);
+        m_fitter->SetParameter(2,"radius",m_radius,0.01,5,50);
         m_fitter->SetParameter(3,"phi_max",m_phi_max,0.001,0.15,M_PI/1.5);
 
         double arglist[2] = {max_iter,toleration};    // Maximal number of iterations, step size (toleration).

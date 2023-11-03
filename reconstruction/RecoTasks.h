@@ -66,6 +66,14 @@ class XZPlotTask : public RecoTask
 
         xz->AddPoint(micro.x0(),8-micro.z0());
         xz_reco->AddPoint(reco.x(),8-reco.z());
+
+        if(abs(reco.z()-micro.z0()) > 0.5) 
+        {
+            std::cout << "High z deviation: " << reco.z()-micro.z0() << "\n";
+            std::cout << "Simulated coordinates:     x0 = " << micro.x0() << ", y0 = " << micro.y0() << ", z0 = " << micro.z0() << ", t0 = " << micro.t0() << ", e0 = " << micro.e0 << "\n";
+            std::cout << "                           x1 = " << micro.x1() << ", y1 = " << micro.y1() << ", z1 = " << micro.z1() << ", t1 = " << micro.t1() << ", e1 = " << micro.e1 << "\n";
+            std::cout << "Reconstructed coordinates: x  = " << reco.x()   << ", y  = " << reco.y()   << ", z  = " << reco.z()   << ", count = " << reco.count << "\n\n";
+        }
     }
 
     void PostElectronLoop() override
@@ -257,7 +265,7 @@ class RecoPadsTask : public RecoTask
     TGraph2D *g_xyz, *g_xyz_reco;
     TCanvas* c_reco;
 
-    double height = -2.5;
+    double height = -8;
 
     void PreElectronLoop() override
     {
@@ -306,7 +314,7 @@ class RecoPadsTask : public RecoTask
         c_reco = new TCanvas(c_reco_name.c_str(),"Electron track reconstruction with pads and time bins");
 
         // A histogram for scalling of the axes.
-        TH3F* scale = new TH3F("scale","Electron track reconstruction;x [cm]; y [cm];z [cm]",1,xmin,xmax,1,-yhigh,yhigh,1,height,0);
+        TH3F* scale = new TH3F("scale","Electron track reconstruction;x [cm]; y [cm];z [cm]",1,xmin,xmax,1,-yhigh,yhigh,1,height,-height);
         scale->Draw("");
         gStyle->SetOptStat(0);
         scale->GetXaxis()->SetTitleOffset(1.5);
@@ -420,11 +428,11 @@ class CircleAndRKFitTask : public RecoTask
         g_rkfit->Draw("LINE same");
 
         TLegend* leg_xyz = new TLegend(0.741,0.742,0.956,0.931);
-        leg_xyz->AddEntry(reco_task->g_xyz,"original");
-        leg_xyz->AddEntry(g_cfit3d,"fit");
-        leg_xyz->AddEntry(reco_task->g_xyz_reco,"reconstructed");
-        leg_xyz->AddEntry(g_cfit3d_reco,"fit");
-        leg_xyz->AddEntry(g_rkfit,"Runge-Kutta fit");
+        leg_xyz->AddEntry(reco_task->g_xyz,"original trajectory");
+        leg_xyz->AddEntry(g_cfit3d,"original trajectory fit by circle");
+        leg_xyz->AddEntry(reco_task->g_xyz_reco,"reconstructed trajectory (with pads)");
+        leg_xyz->AddEntry(g_cfit3d_reco,"reconstructed trajectory fit by circle");
+        leg_xyz->AddEntry(g_rkfit,"reconstructed trajectory fit by Runge-Kutta");
         leg_xyz->Draw("same");
 
         reco_task->c_reco->Write();
