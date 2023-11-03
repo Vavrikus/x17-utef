@@ -1,5 +1,8 @@
 #pragma once
 
+// C++ dependencies
+#include <string>
+
 // ROOT dependencies
 #include "TCanvas.h"
 #include "TFile.h"
@@ -29,7 +32,8 @@ class DriftTimeTask : public RecoTask
 {
     void PostElectronLoop() override
     {
-        TCanvas* c = new TCanvas("c_drift","Drift time");
+        std::string c_name = "c_drift" + to_string(m_loop->curr_track_index);
+        TCanvas* c = new TCanvas(c_name.c_str(),"Drift time");
 
         TTree* electrons = m_loop->curr_micro_tree;
         electrons->Draw("t1:8-z0","z1>7.0");
@@ -66,7 +70,8 @@ class XZPlotTask : public RecoTask
 
     void PostElectronLoop() override
     {
-        TCanvas* c = new TCanvas("c_track_xz","Electron track reconstruction");
+        std::string c_name = "c_track_xz" + to_string(m_loop->curr_track_index);
+        TCanvas* c = new TCanvas(c_name.c_str(),"Electron track reconstruction");
 
         xz_reco->SetTitle("Electron track reconstruction;x [cm]; distance to readout [cm]");
         xz_reco->SetMarkerStyle(2);
@@ -123,7 +128,8 @@ class XYPlotTask : public RecoTask
 
     void PostElectronLoop() override
     {
-        TCanvas* c = new TCanvas("c_track_xy","Electron track reconstruction");
+        std::string c_name = "c_track_xy" + to_string(m_loop->curr_track_index);
+        TCanvas* c = new TCanvas(c_name.c_str(),"Electron track reconstruction");
 
         xy_reco->SetTitle("Electron track reconstruction;x [cm]; y [cm]");
         xy_reco->SetMarkerStyle(2);
@@ -170,7 +176,8 @@ class GraphResTask : public RecoTask
 
     void PostElectronLoop() override
     {
-        TCanvas* c = new TCanvas("c_fit_res","Reconstruction residuals");
+        std::string c_name = "c_fit_res" + to_string(m_loop->curr_track_index);
+        TCanvas* c = new TCanvas(c_name.c_str(),"Reconstruction residuals");
 
         c->Divide(2,2);
         
@@ -228,7 +235,8 @@ class HistResTask : public RecoTask
 
     void PostElectronLoop() override
     {
-        TCanvas* c = new TCanvas("c_fit_res2","Reconstruction residuals");
+        std::string c_name = "c_fit_res2" + to_string(m_loop->curr_track_index);
+        TCanvas* c = new TCanvas(c_name.c_str(),"Reconstruction residuals");
         c->Divide(2,2);
         c->cd(1); hx_res->Draw();
         c->cd(2); hy_res->Draw();
@@ -294,7 +302,8 @@ class RecoPadsTask : public RecoTask
             }        
         }
         
-        c_reco = new TCanvas("c_track_xyz","Electron track reconstruction with pads and time bins");
+        std::string c_reco_name = "c_track_xyz" + to_string(m_loop->curr_track_index);
+        c_reco = new TCanvas(c_reco_name.c_str(),"Electron track reconstruction with pads and time bins");
 
         // A histogram for scalling of the axes.
         TH3F* scale = new TH3F("scale","Electron track reconstruction;x [cm]; y [cm];z [cm]",1,xmin,xmax,1,-yhigh,yhigh,1,height,0);
@@ -344,7 +353,8 @@ class CircleAndRKFitTask : public RecoTask
 
         if(m_loop->curr_loop == TrackLoop::MULTI) std::cout << "Simulated energy: " << m_loop->curr_microtrack->kin_energy << " eV.";
 
-        cfit3d->SetFitter(4);
+        cfit3d->SetFitter(4,false);
+        if(m_loop->curr_loop == TrackLoop::MULTI) cfit3d->SetAlpha(m_loop->curr_microtrack->electron);
         cfit3d->FitCircle3D();
         cfit3d->PrintFitParams();
 
@@ -384,7 +394,8 @@ class CircleAndRKFitTask : public RecoTask
         auto reco_markers = GetDataMarkers(reco_data);
         for (auto m : reco_markers) m->Draw("same");
 
-        cfit3d_reco->SetFitter(4);
+        cfit3d_reco->SetFitter(4,false);
+        if(m_loop->curr_loop == TrackLoop::MULTI) cfit3d_reco->SetAlpha(m_loop->curr_microtrack->electron);
         cfit3d_reco->FitCircle3D();
         cfit3d_reco->PrintFitParams();
 
@@ -418,7 +429,9 @@ class CircleAndRKFitTask : public RecoTask
 
         reco_task->c_reco->Write();
 
-        TCanvas* c_fit3d = new TCanvas("c_fit3d","Fit 3D");
+
+        std::string c_fit3d_name = "c_fit3d" + to_string(m_loop->curr_track_index);
+        TCanvas* c_fit3d = new TCanvas(c_fit3d_name.c_str(),"Fit 3D");
             g_cfit3d_reco->SetTitle("Fit 3D;x [cm];y [cm];z [cm]");
             g_cfit3d_reco->Draw("LINE");
             g_cfit3d->Draw("LINE same");
@@ -429,7 +442,8 @@ class CircleAndRKFitTask : public RecoTask
         
         c_fit3d->Write();
 
-        TCanvas* c_energy = new TCanvas("c_energy","Energy along track");
+        std::string c_energy_name = "c_energy" + to_string(m_loop->curr_track_index);
+        TCanvas* c_energy = new TCanvas(c_energy_name.c_str(),"Energy along track");
             g_en->SetMarkerColor(kRed);
             g_en->SetMarkerSize(1);
             g_en->SetMarkerStyle(2);
@@ -517,7 +531,7 @@ class CircleFitEnergyTask : public RecoTask
         h_energy_diff[floor(track->kin_energy / 1e+6) - 4]->Fill((track->kin_energy+cfit->GetEnergy(*(m_loop->magfield))-track->kin_energy) / 1e+6);
         if (abs(cfit->GetEnergy(*(m_loop->magfield))-track->kin_energy) > Ediff_max)
         {
-            std::cout << "\n Electon track? --> " << track->electron << "\n";
+            std::cout << "\n Electron track? --> " << track->electron << "\n";
             cfit->PrintFitParams();
             fits.push_back(cfit->GetGraph());
         }

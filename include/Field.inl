@@ -1,5 +1,6 @@
 // C++ dependencies
 #include <algorithm>
+#include <cmath>
 #include <stdexcept>
 #include <string>
 
@@ -14,12 +15,15 @@ namespace X17
     void Field<T>::_GetPointIndices(double x, double y, double z, int& xi, int& yi, int& zi) const
     {
         // Check if the point is out of bounds.
-        if(x < m_xmin || x > m_xmax || y < m_ymin || y > m_ymax || z < m_zmin || z > m_zmax)
+        if (x < m_xmin || x > m_xmax || y < m_ymin || y > m_ymax || z < m_zmin || z > m_zmax)
         {
             std::string coordinates = " Coordinates: x = " + std::to_string(x) + ", y = " + std::to_string(y) + ", z = " + std::to_string(z) + ".";
             std::string bounds = " Bounds: x: [" + std::to_string(m_xmin) + ", " + std::to_string(m_xmax) + "], y: [" + std::to_string(m_ymin) + ", " + std::to_string(m_ymax) + "], z: [" + std::to_string(m_zmin) + ", " + std::to_string(m_zmax) + "].";
             throw std::out_of_range("Cannot read field out of bounds." + coordinates + bounds);
         }
+
+        // Check if any of the coordinates is invalid.
+        if (std::isnan(x) || std::isnan(y) || std::isnan(z)) throw std::runtime_error("Cannot read field at NaN coordinates.");
 
         // Calculate the indices of the corresponding grid cell.
         xi = round((x - m_xmin) / m_step_size);

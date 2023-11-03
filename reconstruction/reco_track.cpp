@@ -81,7 +81,7 @@ int reco_track()
     // out_file.Close();
     // rk_loop->ProcessRK(rk_tracks);
     TFile test_file((micro_tracks_folder + "track_plots33.root").c_str(),"RECREATE","Tracks from microscopic simulation");
-    multi_loop->ProcessMulti(micro_tracks,1);
+    multi_loop->ProcessMulti(micro_tracks);
 
     return 0;
 }

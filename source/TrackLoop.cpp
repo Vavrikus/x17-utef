@@ -54,6 +54,8 @@ namespace X17
         int n_tracks = micro_tracks->GetEntries();
         for (int i = 0; i < n_tracks; i++)
         {
+            curr_track_index = i;
+
             micro_tracks->GetEntry(i);
             if((100 * i) % n_tracks == 0) std::cout << "Progress: " << 100 * i / n_tracks << " \%\n";
             std::cout << "Track " << i+1 << " out of " << n_tracks << ".\n";
@@ -64,7 +66,7 @@ namespace X17
             for (MicroPoint p : curr_microtrack->points) 
             {
                 curr_micro = p;
-                
+
                 if (IsInSector(curr_micro.x1(),curr_micro.y1(),0) && IsInSector(curr_micro.GetInitPos(),-0.01))
                 {
                     n_electrons++;

@@ -50,6 +50,7 @@ namespace X17
         RKPoint curr_rkpoint;        // Current point on the current Runge-Kutta track.
 
         TrackMicro* curr_microtrack; // Current microscopically simulated track.
+        int curr_track_index;        // Index of the current track in the file(s).
 
         /// @brief Enumeration of the type of the loop currently running.
         enum LoopType { NONE, SINGLE, MULTI, RK };
