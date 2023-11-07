@@ -265,14 +265,17 @@ class RecoPadsTask : public RecoTask
     TGraph2D *g_xyz, *g_xyz_reco;
     TCanvas* c_reco;
 
-    double height = -8;
+    double height; // Height at which the pads will be drawn.
 
     void PreElectronLoop() override
     {
         for (int i = 0; i < constants::channels; i++) for (int j = 0; j < timebins; j++) {padhits[i][j] = 0;}
 
-        g_xyz      = new TGraph2D();
-        g_xyz_reco = new TGraph2D();
+        if (m_loop->make_track_plots)
+        {
+            g_xyz      = new TGraph2D();
+            g_xyz_reco = new TGraph2D();
+        }
     }
 
     void ElectronLoop() override
@@ -282,11 +285,12 @@ class RecoPadsTask : public RecoTask
         int channel = DefaultLayout::GetDefaultLayout().GetPad(micro.x1(),micro.y1());
         int timebin = micro.t1() / 100.0;
 
-        if(timebin > timebins - 1) std::cerr << "ERROR: Invalid timebin: " << timebin << std::endl;
-        if(channel == -1) std::cerr << "ERROR: No pad hit found. Coordinates x,y: " << micro.x1() << ", " << micro.y1() << std::endl;
+        if (timebin > timebins - 1) std::cerr << "ERROR: Invalid timebin: " << timebin << std::endl;
+        if (channel == -1) std::cerr << "ERROR: No pad hit found. Coordinates x,y: " << micro.x1() << ", " << micro.y1() << std::endl;
 
         padhits[channel-1][timebin]++;
-        g_xyz->AddPoint(micro.x0(),micro.y0(),micro.z0());
+        
+        if (m_loop->make_track_plots) g_xyz->AddPoint(micro.x0(),micro.y0(),micro.z0());
     }
 
     void PostElectronLoop() override
@@ -305,32 +309,35 @@ class RecoPadsTask : public RecoTask
                     DefaultLayout::GetDefaultLayout().GetPadCenter(i+1,xpad,ypad);
 
                     RecoPoint reco = Reconstruct(*(m_loop->map),EndPoint(xpad,ypad,zmax,time));
-                    g_xyz_reco->AddPoint(reco.x(),reco.y(),reco.z());
+                    if (m_loop->make_track_plots) g_xyz_reco->AddPoint(reco.x(),reco.y(),reco.z());
                 }
             }        
         }
         
-        std::string c_reco_name = "c_track_xyz" + to_string(m_loop->curr_track_index);
-        c_reco = new TCanvas(c_reco_name.c_str(),"Electron track reconstruction with pads and time bins");
+        if (m_loop->make_track_plots)
+        {
+            std::string c_reco_name = "c_track_xyz" + to_string(m_loop->curr_track_index);
+            c_reco = new TCanvas(c_reco_name.c_str(),"Electron track reconstruction with pads and time bins");
 
-        // A histogram for scalling of the axes.
-        TH3F* scale = new TH3F("scale","Electron track reconstruction;x [cm]; y [cm];z [cm]",1,xmin,xmax,1,-yhigh,yhigh,1,height,-height);
-        scale->Draw("");
-        gStyle->SetOptStat(0);
-        scale->GetXaxis()->SetTitleOffset(1.5);
-        scale->GetZaxis()->SetTitleOffset(1.5);
-        
-        g_xyz_reco->SetTitle("Electron track reconstruction;x [cm]; y [cm];z [cm]");
-        g_xyz_reco->SetMarkerStyle(2);
-        g_xyz_reco->SetMarkerSize(0.4);
-        g_xyz_reco->Draw("p same");
+            // A histogram for scalling of the axes.
+            TH3F* scale = new TH3F("scale","Electron track reconstruction;x [cm]; y [cm];z [cm]",1,xmin,xmax,1,-yhigh,yhigh,1,height,-height);
+            scale->Draw("");
+            gStyle->SetOptStat(0);
+            scale->GetXaxis()->SetTitleOffset(1.5);
+            scale->GetZaxis()->SetTitleOffset(1.5);
+            
+            g_xyz_reco->SetTitle("Electron track reconstruction;x [cm]; y [cm];z [cm]");
+            g_xyz_reco->SetMarkerStyle(2);
+            g_xyz_reco->SetMarkerSize(0.4);
+            g_xyz_reco->Draw("p same");
 
-        g_xyz->SetMarkerColor(2);
-        g_xyz->SetMarkerStyle(7);
-        g_xyz->SetMarkerSize(1.2);
-        g_xyz->Draw("p same");
+            g_xyz->SetMarkerColor(2);
+            g_xyz->SetMarkerStyle(7);
+            g_xyz->SetMarkerSize(1.2);
+            g_xyz->Draw("p same");
 
-        DefaultLayout::GetDefaultLayout().DrawPads3D(height);
+            DefaultLayout::GetDefaultLayout().DrawPads3D(height);
+        }
     }
 
 public:
@@ -342,6 +349,43 @@ class CircleAndRKFitTask : public RecoTask
 {
     CircleFit3D* cfit3d = nullptr;
     RecoPadsTask* reco_task = nullptr;
+
+    TH3F* h_all;
+    TH2F* h_theta_phi;
+    TH2F* h_theta_energy;
+    TH2F* h_phi_energy;
+
+    void PreTrackLoop() override
+    {
+        // Binning.
+        int angle_bins  = 21;
+        int energy_bins = 11;
+
+        // Ranges for simulation.
+        double theta_max = atan((constants::win_height/2)/constants::xmin); // The maximal simulated theta [rad].
+        double theta_min = -theta_max;                                      // The minimal simulated theta [rad].
+        double phi_max = atan((constants::win_width/2)/constants::xmin);    // The maximal simulated phi [rad].
+        double phi_min = -phi_max;                                          // The minimal simulated phi [rad].
+        double E_max = 13e+6;                                               // The maximal simulated energy [eV].
+        double E_min = 3e+6;                                                // THe minimal simulated energy [eV].
+
+        // Adjusting boundaries for the extra bin.
+        phi_max   = phi_min   + (phi_max  - phi_min)   * angle_bins  / (angle_bins  - 1);
+        theta_max = theta_min + (theta_max- theta_min) * angle_bins  / (angle_bins  - 1);
+        E_max     = E_min     + (E_max    - E_min)     * energy_bins / (energy_bins - 1);
+
+        // Histogram titles.
+        const char* h_all_title          = "Energy resolution (ΔE/E);Phi [deg];Theta [deg];Simulated energy [MeV];ΔE/E";
+        const char* h_theta_phi_title    = "Energy resolution (ΔE/E);Phi [deg];Theta [deg];ΔE/E";
+        const char* h_theta_energy_title = "Energy resolution (ΔE/E);Theta [deg];Simulated energy [MeV];ΔE/E";
+        const char* h_phi_energy_title   = "Energy resolution (ΔE/E);Phi [deg];Simulated energy [MeV];ΔE/E";
+
+        // Histogram initializations.
+        h_all          = new TH3F("h_all",h_all_title,angle_bins,phi_min,phi_max,angle_bins,theta_min,theta_max,energy_bins,E_min,E_max);
+        h_theta_phi    = new TH2F("h_theta_phi",h_theta_phi_title,angle_bins,phi_min,phi_max,angle_bins,theta_min,theta_max);
+        h_theta_energy = new TH2F("h_theta_energy",h_theta_energy_title,angle_bins,theta_min,theta_max,energy_bins,E_min,E_max);
+        h_phi_energy   = new TH2F("h_phi_energy",h_phi_energy_title,angle_bins,phi_min,phi_max,energy_bins,E_min,E_max);
+    }
 
     void PreElectronLoop() override
     {
@@ -367,13 +411,6 @@ class CircleAndRKFitTask : public RecoTask
         cfit3d->PrintFitParams();
 
         Field<Vector>* magfield = m_loop->magfield;
-
-        TGraph2D* g_cfit3d = cfit3d->GetGraph(0.1,0);
-        TGraph* g_en = cfit3d->GetEnergyGraph(*magfield);
-
-        g_cfit3d->SetLineColor(kGreen);
-        g_cfit3d->SetLineWidth(2);
-        g_cfit3d->Draw("LINE same");
 
         std::cout << "Reconstructed energy (circle fit no pads): " << cfit3d->GetEnergy(*magfield,true) << " (middle field), " << cfit3d->GetEnergy(*magfield,false) << " (average field).\n";
 
@@ -407,12 +444,6 @@ class CircleAndRKFitTask : public RecoTask
         cfit3d_reco->FitCircle3D();
         cfit3d_reco->PrintFitParams();
 
-        TGraph2D* g_cfit3d_reco = cfit3d_reco->GetGraph(0.1,0);
-        TGraph* g_en_reco = cfit3d_reco->GetEnergyGraph(*magfield);
-        g_cfit3d_reco->SetLineColor(kBlue);
-        g_cfit3d_reco->SetLineWidth(2);
-        g_cfit3d_reco->Draw("LINE same");
-
         std::cout << "Reconstructed energy (circle fit with pads): " << cfit3d_reco->GetEnergy(*magfield,true) << " (middle field), " << cfit3d_reco->GetEnergy(*magfield,false) << " (average field).\n";
 
         RKFit* rkfit;
@@ -422,51 +453,87 @@ class CircleAndRKFitTask : public RecoTask
         rkfit->SetFitter();
         rkfit->FitRK();
         rkfit->PrintFitParams();
-        TGraph2D* g_rkfit = rkfit->GetFitGraph();
-        g_rkfit->SetLineColor(kMagenta);
-        g_rkfit->SetLineWidth(2);
-        g_rkfit->Draw("LINE same");
 
-        TLegend* leg_xyz = new TLegend(0.741,0.742,0.956,0.931);
-        leg_xyz->AddEntry(reco_task->g_xyz,"original trajectory");
-        leg_xyz->AddEntry(g_cfit3d,"original trajectory fit by circle");
-        leg_xyz->AddEntry(reco_task->g_xyz_reco,"reconstructed trajectory (with pads)");
-        leg_xyz->AddEntry(g_cfit3d_reco,"reconstructed trajectory fit by circle");
-        leg_xyz->AddEntry(g_rkfit,"reconstructed trajectory fit by Runge-Kutta");
-        leg_xyz->Draw("same");
-
-        reco_task->c_reco->Write();
-
-
-        std::string c_fit3d_name = "c_fit3d" + to_string(m_loop->curr_track_index);
-        TCanvas* c_fit3d = new TCanvas(c_fit3d_name.c_str(),"Fit 3D");
-            g_cfit3d_reco->SetTitle("Fit 3D;x [cm];y [cm];z [cm]");
-            g_cfit3d_reco->Draw("LINE");
+        if (m_loop->make_track_plots)
+        {
+            TGraph2D* g_cfit3d = cfit3d->GetGraph(0.1,0);
+            TGraph* g_en = cfit3d->GetEnergyGraph(*magfield);
+            g_cfit3d->SetLineColor(kGreen);
+            g_cfit3d->SetLineWidth(2);
             g_cfit3d->Draw("LINE same");
+
+
+            TGraph2D* g_cfit3d_reco = cfit3d_reco->GetGraph(0.1,0);
+            TGraph* g_en_reco = cfit3d_reco->GetEnergyGraph(*magfield);
+            g_cfit3d_reco->SetLineColor(kBlue);
+            g_cfit3d_reco->SetLineWidth(2);
+            g_cfit3d_reco->Draw("LINE same");
+
+
+            TGraph2D* g_rkfit = rkfit->GetFitGraph();
+            g_rkfit->SetLineColor(kMagenta);
+            g_rkfit->SetLineWidth(2);
             g_rkfit->Draw("LINE same");
-            g_cfit3d_reco->GetYaxis()->SetNdivisions(508);
-            g_cfit3d_reco->GetXaxis()->SetTitleOffset(1.5);
-            g_cfit3d_reco->GetZaxis()->SetTitleOffset(1.5);
-        
-        c_fit3d->Write();
 
-        std::string c_energy_name = "c_energy" + to_string(m_loop->curr_track_index);
-        TCanvas* c_energy = new TCanvas(c_energy_name.c_str(),"Energy along track");
-            g_en->SetMarkerColor(kRed);
-            g_en->SetMarkerSize(1);
-            g_en->SetMarkerStyle(2);
-            g_en->Draw("AP");
-            g_en_reco->SetMarkerColor(kBlue);
-            g_en_reco->SetMarkerSize(1);
-            g_en_reco->SetMarkerStyle(2);
-            g_en_reco->Draw("P same");
+            TLegend* leg_xyz = new TLegend(0.741,0.742,0.956,0.931);
+            leg_xyz->AddEntry(reco_task->g_xyz,"original trajectory");
+            leg_xyz->AddEntry(g_cfit3d,"original trajectory fit by circle");
+            leg_xyz->AddEntry(reco_task->g_xyz_reco,"reconstructed trajectory (with pads)");
+            leg_xyz->AddEntry(g_cfit3d_reco,"reconstructed trajectory fit by circle");
+            leg_xyz->AddEntry(g_rkfit,"reconstructed trajectory fit by Runge-Kutta");
+            leg_xyz->Draw("same");
 
-            TLegend* leg_en = new TLegend(0.129,0.786,0.360,0.887);
-            leg_en->AddEntry(g_en,"fit original");
-            leg_en->AddEntry(g_en_reco,"fit reconstructed");
-            leg_en->Draw("same");
+            reco_task->c_reco->Write();
 
-        c_energy->Write();
+
+            std::string c_fit3d_name = "c_fit3d" + to_string(m_loop->curr_track_index);
+            TCanvas* c_fit3d = new TCanvas(c_fit3d_name.c_str(),"Fit 3D");
+                g_cfit3d_reco->SetTitle("Fit 3D;x [cm];y [cm];z [cm]");
+                g_cfit3d_reco->Draw("LINE");
+                g_cfit3d->Draw("LINE same");
+                g_rkfit->Draw("LINE same");
+                g_cfit3d_reco->GetYaxis()->SetNdivisions(508);
+                g_cfit3d_reco->GetXaxis()->SetTitleOffset(1.5);
+                g_cfit3d_reco->GetZaxis()->SetTitleOffset(1.5);
+            
+            c_fit3d->Write();
+
+            std::string c_energy_name = "c_energy" + to_string(m_loop->curr_track_index);
+            TCanvas* c_energy = new TCanvas(c_energy_name.c_str(),"Energy along track");
+                g_en->SetMarkerColor(kRed);
+                g_en->SetMarkerSize(1);
+                g_en->SetMarkerStyle(2);
+                g_en->Draw("AP");
+                g_en_reco->SetMarkerColor(kBlue);
+                g_en_reco->SetMarkerSize(1);
+                g_en_reco->SetMarkerStyle(2);
+                g_en_reco->Draw("P same");
+
+                TLegend* leg_en = new TLegend(0.129,0.786,0.360,0.887);
+                leg_en->AddEntry(g_en,"fit original");
+                leg_en->AddEntry(g_en_reco,"fit reconstructed");
+                leg_en->Draw("same");
+
+            c_energy->Write();
+        }
+
+        double track_E      = m_loop->curr_microtrack->kin_energy;
+        double track_theta  = asin(m_loop->curr_microtrack->orientation.z);
+        double track_phi    = acos(m_loop->curr_microtrack->orientation.x/cos(asin(m_loop->curr_microtrack->orientation.z)))*sign(m_loop->curr_microtrack->orientation.y);
+        double E_resolution = (rkfit->GetEnergy()-track_E)/track_E;
+
+        if (m_loop->curr_loop == TrackLoop::MULTI)
+        {
+            h_all->Fill(track_phi,track_theta,track_E,E_resolution);
+            // h_theta_phi->Fill(track_phi,track_theta,track_E,E_resolution);
+            // h_theta_energy->Fill(track_phi,track_theta,track_E,E_resolution);
+            // h_phi_energy->Fill(track_phi,track_theta,track_E,E_resolution);
+        }
+    }
+
+    void PostTrackLoop() override
+    {
+        h_all->Write();
     }
 
 public:

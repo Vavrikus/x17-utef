@@ -55,7 +55,9 @@ namespace X17
         /// @brief Enumeration of the type of the loop currently running.
         enum LoopType { NONE, SINGLE, MULTI, RK };
 
-        LoopType curr_loop = NONE; // Type of the current loop.
+        LoopType curr_loop = NONE;    // Type of the current loop.
+
+        bool make_track_plots = true; // Should the tracks be ploted?
         
     private:
         std::vector<RecoTask*> m_tasks; // Vector of all tasks to be run.

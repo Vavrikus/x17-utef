@@ -128,6 +128,10 @@ namespace X17
         /// @param fit_data A vector of RecoPoint objects representing the fit data.
         RKFit(Field<Vector>* magfield, bool electron, double step, Vector origin, Vector orientation, const std::vector<RecoPoint>& fit_data);
 
+        /// @brief Getter for the kinetic energy.
+        /// @return Kinetic energy [eV].
+        double GetEnergy() {return m_kin_en;}
+
         /// @brief Sets the kinetic energy of the particle being tracked.
         /// @param kin_en The kinetic energy to set.
         void SetEnergy(double kin_en) { this->m_kin_en = kin_en; }

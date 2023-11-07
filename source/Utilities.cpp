@@ -1,6 +1,11 @@
 // C++ dependencies
 #include <filesystem>
+#include <iostream>
 #include <regex>
+#include <string>
+
+// ROOT dependencies
+#include "TChain.h"
 
 // X17 dependencies
 #include "Utilities.h"
@@ -38,4 +43,19 @@ int sign(double x)
     if (x > 0)      return  1;
     else if (x < 0) return -1;
     else            return  0;
+}
+
+void AddFilesToTChain(TChain* chain, std::string prefix, std::string suffix, int start, int end)
+{
+    for (int i = start; i <= end; ++i) 
+    {
+        std::string filename = prefix + std::to_string(i) + suffix;
+        
+        // Check if the file exists, if it doesn't print a warning.
+        if (std::filesystem::exists(filename))
+        {
+            chain->Add(filename.c_str());
+        } 
+        else std::cerr << "Warning: File " << filename << " does not exist. Skipping." << std::endl;
+    }
 }

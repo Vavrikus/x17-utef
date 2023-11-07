@@ -13,6 +13,7 @@
 // X17 dependencies
 #include "Field.h"
 #include "TrackLoop.h"
+#include "Utilities.h"
 
 #include "RecoTasks.h"
 
@@ -37,9 +38,14 @@ int reco_track()
     TTree* rk_tracks = (TTree*)input2->Get("rk_tracks");
 
     // Loading file with microscopic tracks. (To be replaced with TChain and multiple files later.)
+    // std::string micro_tracks_folder = "../../data/micro_tracks/grid_00/";
+    // TFile* input3 = new TFile((micro_tracks_folder + "tracks_small59.root").c_str());
+    // TTree* micro_tracks = (TTree*)input3->Get("tracks_small");
+
+    // Loading all files with the microscopic tracks.
     std::string micro_tracks_folder = "../../data/micro_tracks/grid_00/";
-    TFile* input3 = new TFile((micro_tracks_folder + "tracks_small59.root").c_str());
-    TTree* micro_tracks = (TTree*)input3->Get("tracks_small");
+    TChain* micro_tracks = new TChain("tracks_small");
+    AddFilesToTChain(micro_tracks,micro_tracks_folder + "tracks_small",".root",1,2000);
 
     // TrackLoop for single microscopic track.
     TrackLoop* single_loop = new TrackLoop(map,magfield);
@@ -63,11 +69,13 @@ int reco_track()
 
     // TrackLoop for multiple microscopic tracks.
     TrackLoop* multi_loop = new TrackLoop(map,magfield);
+    multi_loop->make_track_plots = false;
+
     // multi_loop->AddTask(new DriftTimeTask());
-    multi_loop->AddTask(new XZPlotTask());
-    multi_loop->AddTask(new XYPlotTask());
-    multi_loop->AddTask(new GraphResTask());
-    multi_loop->AddTask(new HistResTask());
+    // multi_loop->AddTask(new XZPlotTask());
+    // multi_loop->AddTask(new XYPlotTask());
+    // multi_loop->AddTask(new GraphResTask());
+    // multi_loop->AddTask(new HistResTask());
 
     RecoPadsTask* t2 = new RecoPadsTask();
     multi_loop->AddTask(t2);
@@ -80,7 +88,8 @@ int reco_track()
     // single_loop->ProcessSingle(single_track);
     // out_file.Close();
     // rk_loop->ProcessRK(rk_tracks);
-    TFile test_file((micro_tracks_folder + "track_plots59.root").c_str(),"RECREATE","Tracks from microscopic simulation");
+
+    TFile out_file((micro_tracks_folder + "tracks_fit.root").c_str(),"RECREATE","Tracks from microscopic simulation");
     multi_loop->ProcessMulti(micro_tracks);
 
     return 0;

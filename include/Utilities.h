@@ -50,3 +50,11 @@ std::string GetNextFilePath(std::string folder_path, std::string prefix, std::st
 /// @param x The number sign of which will be determined.
 /// @return Returns 1 for positive, 0 for zero and -1 for negative x.
 int sign(double x);
+
+/// @brief Function for adding multiple files (with enumerated names) to a TChain. Example file name file1.root
+/// @param chain TChain to which the files will be added.
+/// @param prefix The prefix part of the filename (file1.root --> file).
+/// @param suffix The suffix part of the filename (file1.root --> .root).
+/// @param start The first index of the filename.
+/// @param end The last index of the filename.
+void AddFilesToTChain(TChain* chain, std::string prefix, std::string suffix, int start, int end);
