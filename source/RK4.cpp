@@ -79,7 +79,7 @@ namespace X17
     bool IsOutOfSector(double tau, const Matrix<8,1>& params)
     {
         using namespace constants;
-        return (!IsInSector(m2cm * params.at(1,0), m2cm * params.at(2,0), m2cm * params.at(3,0),-0.5)) && (m2cm * params.at(1,0) > xmin);
+        return (!IsInSector(m2cm * params.at(1,0), m2cm * params.at(2,0), m2cm * params.at(3,0),-0.5)); // && (m2cm * params.at(1,0) > xmin);
     }
 
     RK4<8>* GetTrackRK(const Field<Vector>& magfield, bool electron, double step, double kin_en, Vector origin, Vector orientation)

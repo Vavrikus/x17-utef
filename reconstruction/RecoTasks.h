@@ -406,7 +406,7 @@ class CircleAndRKFitTask : public RecoTask
         if(m_loop->curr_loop == TrackLoop::MULTI) std::cout << "Simulated energy: " << m_loop->curr_microtrack->kin_energy << " eV.";
 
         cfit3d->SetFitter(4,false);
-        if(m_loop->curr_loop == TrackLoop::MULTI) cfit3d->SetAlpha(m_loop->curr_microtrack->electron);
+        if(m_loop->curr_loop == TrackLoop::MULTI) cfit3d->SetParameters(0,10,1.5,m_loop->curr_microtrack->electron);
         cfit3d->FitCircle3D();
         cfit3d->PrintFitParams();
 
@@ -440,7 +440,7 @@ class CircleAndRKFitTask : public RecoTask
         for (auto m : reco_markers) m->Draw("same");
 
         cfit3d_reco->SetFitter(4,false);
-        if(m_loop->curr_loop == TrackLoop::MULTI) cfit3d_reco->SetAlpha(m_loop->curr_microtrack->electron);
+        if(m_loop->curr_loop == TrackLoop::MULTI) cfit3d_reco->SetParameters(0,10,1.5,m_loop->curr_microtrack->electron);
         cfit3d_reco->FitCircle3D();
         cfit3d_reco->PrintFitParams();
 

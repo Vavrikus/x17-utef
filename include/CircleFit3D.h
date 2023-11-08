@@ -28,7 +28,7 @@ namespace X17
         Vector m_orientation;              // Orientation vector of the first line. Used for theta and phi calculation.
         double m_length;                   // Length of the first line (also max parameter value) [cm].
         double m_alpha;                    // Rotation angle of the arc around the first line (if 0 curves towards negative z) [rad].
-        double m_radius;                   // Radius of the arc [rad].
+        double m_radius;                   // Radius of the arc [cm].
         double m_phi_max;                  // Maximal angle on the arc [rad].
 
         double m_cos_theta; // Cosine of theta.
@@ -97,6 +97,20 @@ namespace X17
         /// @param parameters Number of fitting parameters.
         /// @param print If true, the fit will printout the fitting status. If false, the fit will be silent.
         void SetFitter(int parameters = 4, bool print = true);
+
+        /// @brief Set initial values of parameters.
+        /// @param length Length of the first line (also max parameter value) [cm].
+        /// @param radius Radius of the arc [cm].
+        /// @param phi_max Maximal angle on the arc [rad].
+        /// @param electron If true, set m_alpha to 0; if false, set m_alpha to pi.
+        void SetParameters(double length, double radius, double phi_max, bool electron)
+        {
+            SetAlpha(electron);
+
+            m_length  = length;
+            m_radius  = radius;
+            m_phi_max = phi_max;
+        }
 
         /// @brief Fits a 3D circle using a maximum of max_iter iterations and the given toleration.
         /// @param max_iter Maximum number of iterations for the fit. Defaults to 500.
