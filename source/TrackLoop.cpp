@@ -57,6 +57,7 @@ namespace X17
             curr_track_index = i;
 
             micro_tracks->GetEntry(i);
+            if(curr_microtrack->electron) continue; // ONLY FOR TEST!!!
             if((100 * i) % n_tracks == 0) std::cout << "Progress: " << 100 * i / n_tracks << " \%\n";
             std::cout << "Track " << i+1 << " out of " << n_tracks << ".\n";
 

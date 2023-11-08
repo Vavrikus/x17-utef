@@ -355,6 +355,8 @@ class CircleAndRKFitTask : public RecoTask
     TH2F* h_theta_phi;
     TH2F* h_theta_energy;
     TH2F* h_phi_energy;
+    TH2F* h_deltaenergy_energy;
+    TH1F* h_delta_energy;
 
     void PreTrackLoop() override
     {
@@ -386,6 +388,7 @@ class CircleAndRKFitTask : public RecoTask
         h_theta_phi    = new TH2F("h_theta_phi",h_theta_phi_title,angle_bins,phi_min,phi_max,angle_bins,theta_min,theta_max);
         h_theta_energy = new TH2F("h_theta_energy",h_theta_energy_title,angle_bins,theta_min,theta_max,energy_bins,E_min,E_max);
         h_phi_energy   = new TH2F("h_phi_energy",h_phi_energy_title,angle_bins,phi_min,phi_max,energy_bins,E_min,E_max);
+        h_deltaenergy_energy = new TH2F("h_deltaenergy_energy","",energy_bins,E_min,E_max,100,-50,50);
     }
 
     void PreElectronLoop() override
@@ -526,6 +529,7 @@ class CircleAndRKFitTask : public RecoTask
         if (m_loop->curr_loop == TrackLoop::MULTI)
         {
             h_all->Fill(track_phi,track_theta,track_E/1e+6,E_resolution);
+            h_deltaenergy_energy->Fill(track_E/1e+6,E_resolution);
             // h_theta_phi->Fill(track_phi,track_theta,track_E,E_resolution);
             // h_theta_energy->Fill(track_phi,track_theta,track_E,E_resolution);
             // h_phi_energy->Fill(track_phi,track_theta,track_E,E_resolution);
@@ -535,6 +539,7 @@ class CircleAndRKFitTask : public RecoTask
     void PostTrackLoop() override
     {
         h_all->Write();
+        h_deltaenergy_energy->Write();
     }
 
 public:
