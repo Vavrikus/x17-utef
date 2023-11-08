@@ -12,6 +12,7 @@
 #include "TH2F.h"
 #include "TH3F.h"
 #include "TLegend.h"
+#include "TMath.h"
 #include "TStyle.h"
 #include "TTree.h"
 
@@ -362,12 +363,12 @@ class CircleAndRKFitTask : public RecoTask
         int energy_bins = 11;
 
         // Ranges for simulation.
-        double theta_max = atan((constants::win_height/2)/constants::xmin); // The maximal simulated theta [rad].
-        double theta_min = -theta_max;                                      // The minimal simulated theta [rad].
-        double phi_max = atan((constants::win_width/2)/constants::xmin);    // The maximal simulated phi [rad].
-        double phi_min = -phi_max;                                          // The minimal simulated phi [rad].
-        double E_max = 13e+6;                                               // The maximal simulated energy [eV].
-        double E_min = 3e+6;                                                // THe minimal simulated energy [eV].
+        double theta_max = (180/TMath::Pi())*atan((constants::win_height/2)/constants::xmin); // The maximal simulated theta [rad].
+        double theta_min = -theta_max;                                                        // The minimal simulated theta [rad].
+        double phi_max = (180/TMath::Pi())*atan((constants::win_width/2)/constants::xmin);    // The maximal simulated phi [rad].
+        double phi_min = -phi_max;                                                            // The minimal simulated phi [rad].
+        double E_max = 13;                                                                    // The maximal simulated energy [MeV].
+        double E_min = 3;                                                                     // THe minimal simulated energy [MeV].
 
         // Adjusting boundaries for the extra bin.
         phi_max   = phi_min   + (phi_max  - phi_min)   * angle_bins  / (angle_bins  - 1);
@@ -375,10 +376,10 @@ class CircleAndRKFitTask : public RecoTask
         E_max     = E_min     + (E_max    - E_min)     * energy_bins / (energy_bins - 1);
 
         // Histogram titles.
-        const char* h_all_title          = "Energy resolution (ΔE/E);Phi [deg];Theta [deg];Simulated energy [MeV];ΔE/E";
-        const char* h_theta_phi_title    = "Energy resolution (ΔE/E);Phi [deg];Theta [deg];ΔE/E";
-        const char* h_theta_energy_title = "Energy resolution (ΔE/E);Theta [deg];Simulated energy [MeV];ΔE/E";
-        const char* h_phi_energy_title   = "Energy resolution (ΔE/E);Phi [deg];Simulated energy [MeV];ΔE/E";
+        const char* h_all_title          = "Energy resolution (#DeltaE/E);Phi [deg];Theta [deg];Simulated energy [MeV];#DeltaE/E [\%]";
+        const char* h_theta_phi_title    = "Energy resolution (#DeltaE/E);Phi [deg];Theta [deg];#DeltaE/E [\%]";
+        const char* h_theta_energy_title = "Energy resolution (#DeltaE/E);Theta [deg];Simulated energy [MeV];#DeltaE/E [\%]";
+        const char* h_phi_energy_title   = "Energy resolution (#DeltaE/E);Phi [deg];Simulated energy [MeV];#DeltaE/E [\%]";
 
         // Histogram initializations.
         h_all          = new TH3F("h_all",h_all_title,angle_bins,phi_min,phi_max,angle_bins,theta_min,theta_max,energy_bins,E_min,E_max);
@@ -518,13 +519,13 @@ class CircleAndRKFitTask : public RecoTask
         }
 
         double track_E      = m_loop->curr_microtrack->kin_energy;
-        double track_theta  = asin(m_loop->curr_microtrack->orientation.z);
-        double track_phi    = acos(m_loop->curr_microtrack->orientation.x/cos(asin(m_loop->curr_microtrack->orientation.z)))*sign(m_loop->curr_microtrack->orientation.y);
-        double E_resolution = (rkfit->GetEnergy()-track_E)/track_E;
+        double track_theta  = (180/TMath::Pi())*asin(m_loop->curr_microtrack->orientation.z);
+        double track_phi    = (180/TMath::Pi())*acos(m_loop->curr_microtrack->orientation.x/cos(asin(m_loop->curr_microtrack->orientation.z)))*sign(m_loop->curr_microtrack->orientation.y);
+        double E_resolution = 100*(rkfit->GetEnergy()-track_E)/track_E;
 
         if (m_loop->curr_loop == TrackLoop::MULTI)
         {
-            h_all->Fill(track_phi,track_theta,track_E,E_resolution);
+            h_all->Fill(track_phi,track_theta,track_E/1e+6,E_resolution);
             // h_theta_phi->Fill(track_phi,track_theta,track_E,E_resolution);
             // h_theta_energy->Fill(track_phi,track_theta,track_E,E_resolution);
             // h_phi_energy->Fill(track_phi,track_theta,track_E,E_resolution);
