@@ -130,7 +130,11 @@ namespace X17
 
         /// @brief Getter for the kinetic energy.
         /// @return Kinetic energy [eV].
-        double GetEnergy() {return m_kin_en;}
+        double GetEnergy() { return m_kin_en; }
+
+        /// @brief Getter for the kinetic energy error.
+        /// @return Error of the kinetic energy [eV].
+        double GetEnergyError() { return m_e_err; }
 
         /// @brief Sets the kinetic energy of the particle being tracked.
         /// @param kin_en The kinetic energy to set.

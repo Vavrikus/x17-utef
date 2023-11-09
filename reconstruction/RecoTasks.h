@@ -33,7 +33,7 @@ class DriftTimeTask : public RecoTask
 {
     void PostElectronLoop() override
     {
-        std::string c_name = "c_drift" + to_string(m_loop->curr_track_index);
+        std::string c_name = "c_drift" + std::to_string(m_loop->curr_track_index);
         TCanvas* c = new TCanvas(c_name.c_str(),"Drift time");
 
         TTree* electrons = m_loop->curr_micro_tree;
@@ -79,7 +79,7 @@ class XZPlotTask : public RecoTask
 
     void PostElectronLoop() override
     {
-        std::string c_name = "c_track_xz" + to_string(m_loop->curr_track_index);
+        std::string c_name = "c_track_xz" + std::to_string(m_loop->curr_track_index);
         TCanvas* c = new TCanvas(c_name.c_str(),"Electron track reconstruction");
 
         xz_reco->SetTitle("Electron track reconstruction;x [cm]; distance to readout [cm]");
@@ -137,7 +137,7 @@ class XYPlotTask : public RecoTask
 
     void PostElectronLoop() override
     {
-        std::string c_name = "c_track_xy" + to_string(m_loop->curr_track_index);
+        std::string c_name = "c_track_xy" + std::to_string(m_loop->curr_track_index);
         TCanvas* c = new TCanvas(c_name.c_str(),"Electron track reconstruction");
 
         xy_reco->SetTitle("Electron track reconstruction;x [cm]; y [cm]");
@@ -185,7 +185,7 @@ class GraphResTask : public RecoTask
 
     void PostElectronLoop() override
     {
-        std::string c_name = "c_fit_res" + to_string(m_loop->curr_track_index);
+        std::string c_name = "c_fit_res" + std::to_string(m_loop->curr_track_index);
         TCanvas* c = new TCanvas(c_name.c_str(),"Reconstruction residuals");
 
         c->Divide(2,2);
@@ -244,7 +244,7 @@ class HistResTask : public RecoTask
 
     void PostElectronLoop() override
     {
-        std::string c_name = "c_fit_res2" + to_string(m_loop->curr_track_index);
+        std::string c_name = "c_fit_res2" + std::to_string(m_loop->curr_track_index);
         TCanvas* c = new TCanvas(c_name.c_str(),"Reconstruction residuals");
         c->Divide(2,2);
         c->cd(1); hx_res->Draw();
@@ -260,6 +260,7 @@ class HistResTask : public RecoTask
 class RecoPadsTask : public RecoTask
 {
     friend class CircleAndRKFitTask;
+    friend class FitAndSaveTask;
 
     static constexpr int timebins = 200;
     int padhits[constants::channels][timebins];
@@ -317,7 +318,7 @@ class RecoPadsTask : public RecoTask
         
         if (m_loop->make_track_plots)
         {
-            std::string c_reco_name = "c_track_xyz" + to_string(m_loop->curr_track_index);
+            std::string c_reco_name = "c_track_xyz" + std::to_string(m_loop->curr_track_index);
             c_reco = new TCanvas(c_reco_name.c_str(),"Electron track reconstruction with pads and time bins");
 
             // A histogram for scalling of the axes.
@@ -490,7 +491,7 @@ class CircleAndRKFitTask : public RecoTask
             reco_task->c_reco->Write();
 
 
-            std::string c_fit3d_name = "c_fit3d" + to_string(m_loop->curr_track_index);
+            std::string c_fit3d_name = "c_fit3d" + std::to_string(m_loop->curr_track_index);
             TCanvas* c_fit3d = new TCanvas(c_fit3d_name.c_str(),"Fit 3D");
                 g_cfit3d_reco->SetTitle("Fit 3D;x [cm];y [cm];z [cm]");
                 g_cfit3d_reco->Draw("LINE");
@@ -502,7 +503,7 @@ class CircleAndRKFitTask : public RecoTask
             
             c_fit3d->Write();
 
-            std::string c_energy_name = "c_energy" + to_string(m_loop->curr_track_index);
+            std::string c_energy_name = "c_energy" + std::to_string(m_loop->curr_track_index);
             TCanvas* c_energy = new TCanvas(c_energy_name.c_str(),"Energy along track");
                 g_en->SetMarkerColor(kRed);
                 g_en->SetMarkerSize(1);
@@ -545,7 +546,6 @@ class CircleAndRKFitTask : public RecoTask
 public:
     CircleAndRKFitTask(RecoPadsTask* t) : reco_task(t) { }
 };
-
 
 
 
@@ -726,4 +726,128 @@ class PlotSelectionTask : public RecoTask
 
 public:
     PlotSelectionTask(double E_max = 3.5e+6) : E_max(E_max) {}
+};
+
+
+
+
+
+
+
+
+
+
+class FitAndSaveTask : public RecoTask
+{
+    CircleFit3D* cfit3d = nullptr;
+    RecoPadsTask* reco_task = nullptr;
+
+    TTree* tracks_info;
+    TrackInfo curr_info;
+
+    void PreTrackLoop() override
+    {
+        tracks_info = new TTree("tracks_info","Simulated and reconstructed track information.");
+        tracks_info->Branch("track_info",&curr_info);
+    }
+
+    void PreElectronLoop() override
+    {
+        if(m_loop->curr_loop == TrackLoop::SINGLE) cfit3d = new CircleFit3D({constants::xmin,0,0},{1,0,0});
+        else if(m_loop->curr_loop == TrackLoop::MULTI) cfit3d = new CircleFit3D(m_loop->curr_microtrack->origin,m_loop->curr_microtrack->orientation);
+    }
+
+    void ElectronLoop() override
+    {
+        MicroPoint micro = m_loop->curr_micro;
+        cfit3d->AddPoint(micro.x0(),micro.y0(),micro.z0(),1);
+    }
+
+    void PostElectronLoop() override
+    {
+        using namespace X17::constants;
+
+        std::cout << "Simulated energy: " << m_loop->curr_microtrack->kin_energy << " eV.";
+
+        cfit3d->SetFitter(4,false);
+        cfit3d->SetParameters(0,10,1.5,m_loop->curr_microtrack->electron);
+        cfit3d->FitCircle3D();
+        cfit3d->PrintFitParams();
+
+        Field<Vector>* magfield = m_loop->magfield;
+        double cfit3d_E_mid = cfit3d->GetEnergy(*magfield,true);
+        double cfit3d_E_avg = cfit3d->GetEnergy(*magfield,false);
+
+        std::cout << "Reconstructed energy (circle fit no pads): " << cfit3d_E_mid << " (middle field), " << cfit3d_E_avg << " (average field).\n";
+
+        std::vector<RecoPoint> reco_data;
+        CircleFit3D* cfit3d_reco;
+        if(m_loop->curr_loop == TrackLoop::SINGLE) cfit3d_reco = new CircleFit3D({0,0,0},{1,0,0});
+        else if(m_loop->curr_loop == TrackLoop::MULTI) cfit3d_reco = new CircleFit3D(m_loop->curr_microtrack->origin,m_loop->curr_microtrack->orientation);
+
+        for (int i = 0; i < channels; i++)
+        {
+            for (int j = 0; j < reco_task->timebins; j++)
+            {
+                if(reco_task->padhits[i][j] != 0)
+                {
+                    double time = 100 * j + 50;
+                    double xpad,ypad;
+                    DefaultLayout::GetDefaultLayout().GetPadCenter(i+1,xpad,ypad);
+
+                    RecoPoint reco = Reconstruct(*(m_loop->map),EndPoint(xpad,ypad,zmax,time));
+                    cfit3d_reco->AddPoint(reco.x(),reco.y(),reco.z(),reco_task->padhits[i][j]);
+                    reco_data.emplace_back(reco.x(),reco.y(),reco.z(),reco_task->padhits[i][j]);
+                }
+            }        
+        }
+
+        auto reco_markers = GetDataMarkers(reco_data);
+        for (auto m : reco_markers) m->Draw("same");
+
+        cfit3d_reco->SetFitter(4,false);
+        if(m_loop->curr_loop == TrackLoop::MULTI) cfit3d_reco->SetParameters(0,10,1.5,m_loop->curr_microtrack->electron);
+        cfit3d_reco->FitCircle3D();
+        cfit3d_reco->PrintFitParams();
+
+        double cfit3d_reco_E_mid = cfit3d_reco->GetEnergy(*magfield,true);
+        double cfit3d_reco_E_avg = cfit3d_reco->GetEnergy(*magfield,false);
+
+        std::cout << "Reconstructed energy (circle fit with pads): " << cfit3d_reco_E_mid << " (middle field), " << cfit3d_reco_E_avg << " (average field).\n";
+
+        RKFit* rkfit;
+        if(m_loop->curr_loop == TrackLoop::SINGLE) rkfit = new RKFit(magfield,true,1E-13,{0,0,0},{1,0,0},cfit3d_reco->GetData());
+        else if(m_loop->curr_loop == TrackLoop::MULTI) rkfit = new RKFit(magfield,m_loop->curr_microtrack->electron,1E-13,m_loop->curr_microtrack->origin,m_loop->curr_microtrack->orientation,cfit3d_reco->GetData());
+        rkfit->SetEnergy(cfit3d_reco_E_mid);
+        rkfit->SetFitter();
+        rkfit->FitRK();
+        rkfit->PrintFitParams();
+
+        double track_E      = m_loop->curr_microtrack->kin_energy;
+        double track_theta  = (180/TMath::Pi())*asin(m_loop->curr_microtrack->orientation.z);
+        double track_phi    = (180/TMath::Pi())*acos(m_loop->curr_microtrack->orientation.x/cos(asin(m_loop->curr_microtrack->orientation.z)))*sign(m_loop->curr_microtrack->orientation.y);
+        double E_resolution = 100*(rkfit->GetEnergy()-track_E)/track_E;
+
+        curr_info.electron   = m_loop->curr_microtrack->electron;
+        curr_info.theta      = track_theta;
+        curr_info.phi        = track_phi;
+        curr_info.kin_energy = track_E/1e+6;
+
+        curr_info.cfit_nopads_energy_mid = cfit3d_E_mid/1e+6;
+        curr_info.cfit_nopads_energy_avg = cfit3d_E_avg/1e+6;
+        curr_info.cfit_pads_energy_mid   = cfit3d_reco_E_mid/1e+6;
+        curr_info.cfit_pads_energy_avg   = cfit3d_reco_E_avg/1e+6;
+        curr_info.rkfit_energy           = rkfit->GetEnergy()/1e+6;
+        curr_info.rkfit_energy_err       = rkfit->GetEnergyError()/1e+6;
+
+        tracks_info->Fill();
+    }
+
+    void PostTrackLoop() override
+    {
+        tracks_info->Write();
+    }
+
+public:
+    FitAndSaveTask(RecoPadsTask* t) : reco_task(t) { }
 };

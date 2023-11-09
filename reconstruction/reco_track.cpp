@@ -79,7 +79,8 @@ int reco_track()
 
     RecoPadsTask* t2 = new RecoPadsTask();
     multi_loop->AddTask(t2);
-    multi_loop->AddTask(new CircleAndRKFitTask(t2));
+    // multi_loop->AddTask(new CircleAndRKFitTask(t2));
+    multi_loop->AddTask(new FitAndSaveTask(t2));
 
     gErrorIgnoreLevel = 6001;
 
@@ -89,7 +90,7 @@ int reco_track()
     // out_file.Close();
     // rk_loop->ProcessRK(rk_tracks);
 
-    TFile out_file((micro_tracks_folder + "tracks_fit.root").c_str(),"RECREATE","Tracks from microscopic simulation");
+    TFile out_file((micro_tracks_folder + "reco_tracks.root").c_str(),"RECREATE","Tracks from microscopic simulation");
     multi_loop->ProcessMulti(micro_tracks);
 
     return 0;

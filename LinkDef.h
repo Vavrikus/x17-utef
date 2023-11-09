@@ -19,5 +19,6 @@ namespace X17
     #pragma link C++ class X17::DriftLinePoint+;
     #pragma link C++ class X17::TrackRK+;
     #pragma link C++ class X17::TrackMicro+;
+    #pragma link C++ class X17::TrackInfo+;
     #endif
 } // namespace X17

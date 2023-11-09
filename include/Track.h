@@ -39,9 +39,9 @@ namespace X17
     {
         bool electron;                  // True if electron, false if positron.
         std::vector<MicroPoint> points; // Simulated points.
-        Vector origin;                  // Starting point of the track.
+        Vector origin;                  // Starting point of the track [cm].
         Vector orientation;             // Normalized initial direction of the track.
-        double kin_energy;              // Kinetic energy of the particle.
+        double kin_energy;              // Kinetic energy of the particle [eV].
 
         std::vector<std::vector<DriftLinePoint>> driftlines; // Simulated drift lines of each electron.
 
@@ -66,4 +66,21 @@ namespace X17
     /// @param orient Normalized initial direction of the track.
     /// @param e_kin Kinetic energy of the particle.
     void GetRandomTrackParams(TRandom3* rand, bool& electron, Vector& origin, Vector& orient, double& e_kin);
+
+    /// @brief Struct for simulated and reconstructed information about a track.
+    struct TrackInfo
+    {
+        bool electron;     // True if electron, false if positron.
+        double theta;      // Angle theta of entry into the TPC [deg].
+        double phi;        // Angle phi of entry into the TPC [deg].
+        double kin_energy; // Simulated kinetic energy of the particle [MeV].
+
+        double cfit_nopads_energy_mid; // Circle fit energy (not accounting for pads) [MeV] calculated using middle field.
+        double cfit_nopads_energy_avg; // Circle fit energy (not accounting for pads) [MeV] calculated using average field.
+        double cfit_pads_energy_mid;   // Circle fit energy (accounting for pads) [MeV] calculated using middle field.
+        double cfit_pads_energy_avg;   // Circle fit energy (accounting for pads) [MeV] calculated using average field.
+        double rkfit_energy;           // Runge-Kutta fit energy (accounting for pads) [MeV].
+        double rkfit_energy_err;       // Runge-Kutta fit energy error (accounting for pads) [MeV].
+    };
+    
 } // namespace X17
