@@ -43,7 +43,7 @@ int reco_track()
     // TTree* micro_tracks = (TTree*)input3->Get("tracks_small");
 
     // Loading all files with the microscopic tracks.
-    std::string micro_tracks_folder = "../../data/micro_tracks/grid_00/";
+    std::string micro_tracks_folder = "../../data/micro_tracks/new_tracks/";
     TChain* micro_tracks = new TChain("tracks_small");
     AddFilesToTChain(micro_tracks,micro_tracks_folder + "tracks_small",".root",1,2000);
 

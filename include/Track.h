@@ -81,6 +81,10 @@ namespace X17
         double cfit_pads_energy_avg;   // Circle fit energy (accounting for pads) [MeV] calculated using average field.
         double rkfit_energy;           // Runge-Kutta fit energy (accounting for pads) [MeV].
         double rkfit_energy_err;       // Runge-Kutta fit energy error (accounting for pads) [MeV].
+
+        /// @brief Function for calculating the relative error of the Runge-Kutta energy reconstruction.
+        /// @return The relative error ΔE/E in % of the Runge-Kutta energy reconstruction.
+        double GetRKRelError() { return 100 * (rkfit_energy - kin_energy) / kin_energy; }
     };
     
 } // namespace X17
