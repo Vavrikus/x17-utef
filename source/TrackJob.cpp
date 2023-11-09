@@ -52,8 +52,8 @@ namespace X17
     void TrackJob::GetTrackParameters(int n_set, bool& electron, Vector& origin, Vector& orient, double& e_kin)
     {
         // Getting bin info from the value of n_set.
-        electron = n_set % 2;
-        int quotient = n_set / 2;
+        electron     = (n_set - 1) % 2;
+        int quotient = (n_set - 1) / 2;
 
         int phi_bin = quotient % angle_bins; // Bin number for phi between 0 and angle_bins - 1.
         quotient /= angle_bins;
