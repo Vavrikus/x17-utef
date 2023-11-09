@@ -51,9 +51,17 @@ int main(int argc, char const *argv[])
     double res_bins = 201;
 
     // Adjusting boundaries for the extra bin.
-    phi_max   = phi_min   + (phi_max  - phi_min)   * angle_bins  / (angle_bins  - 1);
-    theta_max = theta_min + (theta_max- theta_min) * angle_bins  / (angle_bins  - 1);
-    E_max     = E_min     + (E_max    - E_min)     * energy_bins / (energy_bins - 1);
+    phi_max   = phi_min   + (phi_max   - phi_min)   * angle_bins  / (angle_bins  - 1);
+    theta_max = theta_min + (theta_max - theta_min) * angle_bins  / (angle_bins  - 1);
+    E_max     = E_min     + (E_max     - E_min)     * energy_bins / (energy_bins - 1);
+
+    // Shifting angle bin boundaries by half a bin in order to avoid rounding error problems.
+    double phi_shift   = (phi_max - phi_min) / (2 * angle_bins);
+    double theta_shift = (theta_max - theta_min) / (2 * angle_bins);
+    phi_min   -= phi_shift;
+    phi_max   -= phi_shift;
+    theta_min -= theta_shift;
+    theta_max -= theta_shift;
 
     // Histogram titles.
     const char* h_all_title                = "Energy resolution (#DeltaE/E);Phi [deg];Theta [deg];Simulated energy [MeV]";
@@ -68,6 +76,9 @@ int main(int argc, char const *argv[])
     TH2F* he_theta_phi          = new TH2F("he_theta_phi",h_theta_phi_title,angle_bins,phi_min,phi_max,angle_bins,theta_min,theta_max);
     TH2F* he_theta_energy       = new TH2F("he_theta_energy",h_theta_energy_title,angle_bins,theta_min,theta_max,energy_bins,E_min,E_max);
     TH2F* he_phi_energy         = new TH2F("he_phi_energy",h_phi_energy_title,angle_bins,phi_min,phi_max,energy_bins,E_min,E_max);
+    TH2F* he_theta_phi_abs      = new TH2F("he_theta_phi_abs",h_theta_phi_title,angle_bins,phi_min,phi_max,angle_bins,theta_min,theta_max);
+    TH2F* he_theta_energy_abs   = new TH2F("he_theta_energy_abs",h_theta_energy_title,angle_bins,theta_min,theta_max,energy_bins,E_min,E_max);
+    TH2F* he_phi_energy_abs     = new TH2F("he_phi_energy_abs",h_phi_energy_title,angle_bins,phi_min,phi_max,energy_bins,E_min,E_max);
     TH2F* he_deltaenergy_energy = new TH2F("he_deltaenergy_energy",h_deltaenergy_energy_title,energy_bins,E_min,E_max,res_bins,res_min,res_max);
     TH1F* he_delta_energy       = new TH1F("he_delta_energy",h_delta_energy_title,res_bins,res_min,res_max);
 
@@ -75,6 +86,9 @@ int main(int argc, char const *argv[])
     TH2F* hp_theta_phi          = new TH2F("hp_theta_phi",h_theta_phi_title,angle_bins,phi_min,phi_max,angle_bins,theta_min,theta_max);
     TH2F* hp_theta_energy       = new TH2F("hp_theta_energy",h_theta_energy_title,angle_bins,theta_min,theta_max,energy_bins,E_min,E_max);
     TH2F* hp_phi_energy         = new TH2F("hp_phi_energy",h_phi_energy_title,angle_bins,phi_min,phi_max,energy_bins,E_min,E_max);
+    TH2F* hp_theta_phi_abs      = new TH2F("hp_theta_phi_abs",h_theta_phi_title,angle_bins,phi_min,phi_max,angle_bins,theta_min,theta_max);
+    TH2F* hp_theta_energy_abs   = new TH2F("hp_theta_energy_abs",h_theta_energy_title,angle_bins,theta_min,theta_max,energy_bins,E_min,E_max);
+    TH2F* hp_phi_energy_abs     = new TH2F("hp_phi_energy_abs",h_phi_energy_title,angle_bins,phi_min,phi_max,energy_bins,E_min,E_max);
     TH2F* hp_deltaenergy_energy = new TH2F("hp_deltaenergy_energy",h_deltaenergy_energy_title,energy_bins,E_min,E_max,res_bins,res_min,res_max);
     TH1F* hp_delta_energy       = new TH1F("hp_delta_energy",h_delta_energy_title,res_bins,res_min,res_max);
 
@@ -92,16 +106,24 @@ int main(int argc, char const *argv[])
     AverageCounter e_theta_phi[angle_bins][angle_bins];
     AverageCounter e_theta_energy[angle_bins][energy_bins];
     AverageCounter e_phi_energy[angle_bins][energy_bins];
+    AverageCounter e_theta_phi_abs[angle_bins][angle_bins];
+    AverageCounter e_theta_energy_abs[angle_bins][energy_bins];
+    AverageCounter e_phi_energy_abs[angle_bins][energy_bins];
 
     AverageCounter p_theta_phi[angle_bins][angle_bins];
     AverageCounter p_theta_energy[angle_bins][energy_bins];
     AverageCounter p_phi_energy[angle_bins][energy_bins];
+    AverageCounter p_theta_phi_abs[angle_bins][angle_bins];
+    AverageCounter p_theta_energy_abs[angle_bins][energy_bins];
+    AverageCounter p_phi_energy_abs[angle_bins][energy_bins];
 
     // Initialize arrays to zero.
     for (int i = 0; i < angle_bins; i++) for (int j = 0; j < angle_bins; j++)
     {
         e_theta_phi[i][j] = {0,0};
         p_theta_phi[i][j] = {0,0};
+        e_theta_phi_abs[i][j] = {0,0};
+        p_theta_phi_abs[i][j] = {0,0};
     }
     for (int i = 0; i < angle_bins; i++) for (int j = 0; j < energy_bins; j++)
     {
@@ -109,6 +131,11 @@ int main(int argc, char const *argv[])
         e_phi_energy[i][j]   = {0,0};
         p_theta_energy[i][j] = {0,0};
         p_phi_energy[i][j]   = {0,0};
+
+        e_theta_energy_abs[i][j] = {0,0};
+        e_phi_energy_abs[i][j]   = {0,0};
+        p_theta_energy_abs[i][j] = {0,0};
+        p_phi_energy_abs[i][j]   = {0,0};
     }
 
     for (int i = 0; i < tracks_info->GetEntries(); i++)
@@ -132,10 +159,16 @@ int main(int argc, char const *argv[])
             e_theta_phi[phi_bin][theta_bin].value       += rk_resolution;
             e_theta_energy[theta_bin][energy_bin].value += rk_resolution;
             e_phi_energy[phi_bin][energy_bin].value     += rk_resolution;
+            e_theta_phi_abs[phi_bin][theta_bin].value       += abs(rk_resolution);
+            e_theta_energy_abs[theta_bin][energy_bin].value += abs(rk_resolution);
+            e_phi_energy_abs[phi_bin][energy_bin].value     += abs(rk_resolution);
 
             e_theta_phi[phi_bin][theta_bin].numbers++;
             e_theta_energy[theta_bin][energy_bin].numbers++;
             e_phi_energy[phi_bin][energy_bin].numbers++;
+            e_theta_phi_abs[phi_bin][theta_bin].numbers++;
+            e_theta_energy_abs[theta_bin][energy_bin].numbers++;
+            e_phi_energy_abs[phi_bin][energy_bin].numbers++;
         }
 
         else
@@ -147,32 +180,44 @@ int main(int argc, char const *argv[])
             p_theta_phi[phi_bin][theta_bin].value       += rk_resolution;
             p_theta_energy[theta_bin][energy_bin].value += rk_resolution;
             p_phi_energy[phi_bin][energy_bin].value     += rk_resolution;
+            p_theta_phi_abs[phi_bin][theta_bin].value       += abs(rk_resolution);
+            p_theta_energy_abs[theta_bin][energy_bin].value += abs(rk_resolution);
+            p_phi_energy_abs[phi_bin][energy_bin].value     += abs(rk_resolution);
 
             p_theta_phi[phi_bin][theta_bin].numbers++;
             p_theta_energy[theta_bin][energy_bin].numbers++;
             p_phi_energy[phi_bin][energy_bin].numbers++;
+            p_theta_phi_abs[phi_bin][theta_bin].numbers++;
+            p_theta_energy_abs[theta_bin][energy_bin].numbers++;
+            p_phi_energy_abs[phi_bin][energy_bin].numbers++;
         }
     }
 
     // Fill 2D histograms from arrays.
     for (int i = 0; i < angle_bins; i++) for (int j = 0; j < angle_bins; j++)
     {
-        double phi = phi_min + (phi_max - phi_min) * i / angle_bins;
-        double theta = theta_min + (theta_max - theta_min) * j / angle_bins;
+        double phi = phi_min + (phi_max - phi_min) * (i + 0.5) / angle_bins;
+        double theta = theta_min + (theta_max - theta_min) * (j + 0.5) / angle_bins;
 
         he_theta_phi->Fill(phi,theta,e_theta_phi[i][j].Average());
+        he_theta_phi_abs->Fill(phi,theta,e_theta_phi_abs[i][j].Average());
         hp_theta_phi->Fill(phi,theta,p_theta_phi[i][j].Average());
+        hp_theta_phi_abs->Fill(phi,theta,p_theta_phi_abs[i][j].Average());
     }
     for (int i = 0; i < angle_bins; i++) for (int j = 0; j < energy_bins; j++)
     {
-        double phi   = phi_min + (phi_max - phi_min) * i / angle_bins;
-        double theta = theta_min + (theta_max - theta_min) * i / angle_bins;
+        double phi   = phi_min + (phi_max - phi_min) * (i + 0.5) / angle_bins;
+        double theta = theta_min + (theta_max - theta_min) * (i + 0.5) / angle_bins;
         double e_kin = E_min + (E_max - E_min) * j / energy_bins;
 
         he_theta_energy->Fill(theta,e_kin,e_theta_energy[i][j].Average());
         he_phi_energy->Fill(phi,e_kin,e_phi_energy[i][j].Average());
         hp_theta_energy->Fill(theta,e_kin,p_theta_energy[i][j].Average());
         hp_phi_energy->Fill(phi,e_kin,p_phi_energy[i][j].Average());
+        he_theta_energy_abs->Fill(theta,e_kin,e_theta_energy_abs[i][j].Average());
+        he_phi_energy_abs->Fill(phi,e_kin,e_phi_energy_abs[i][j].Average());
+        hp_theta_energy_abs->Fill(theta,e_kin,p_theta_energy_abs[i][j].Average());
+        hp_phi_energy_abs->Fill(phi,e_kin,p_phi_energy_abs[i][j].Average());
     }
 
     gStyle->SetPalette(kTemperatureMap);
@@ -181,6 +226,9 @@ int main(int argc, char const *argv[])
     he_theta_phi->Write();
     he_theta_energy->Write();
     he_phi_energy->Write();
+    he_theta_phi_abs->Write();
+    he_theta_energy_abs->Write();
+    he_phi_energy_abs->Write();
     he_deltaenergy_energy->Write();
     he_delta_energy->Write();
 
@@ -188,6 +236,9 @@ int main(int argc, char const *argv[])
     hp_theta_phi->Write();
     hp_theta_energy->Write();
     hp_phi_energy->Write();
+    hp_theta_phi_abs->Write();
+    hp_theta_energy_abs->Write();
+    hp_phi_energy_abs->Write();
     hp_deltaenergy_energy->Write();
     hp_delta_energy->Write();
 
