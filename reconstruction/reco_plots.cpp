@@ -72,6 +72,8 @@ int main(int argc, char const *argv[])
     const char* h_theta_energy_title       = "Energy resolution (#DeltaE/E);Theta [deg];Simulated energy [MeV];#DeltaE/E [\%]";
     const char* h_phi_energy_title         = "Energy resolution (#DeltaE/E);Phi [deg];Simulated energy [MeV];#DeltaE/E [\%]";
     const char* h_deltaenergy_energy_title = "Energy resolution dependence on energy;Simulated energy [MeV];#DeltaE/E [\%]";
+    const char* h_deltaenergy_phi_title    = "Energy resolution dependence on energy;Phi [deg];#DeltaE/E [\%]";
+    const char* h_deltaenergy_theta_title  = "Energy resolution dependence on energy;Theta [deg];#DeltaE/E [\%]";
     const char* h_delta_energy_title       = "Energy resolution of Runge-Kutta reconstruction (with pads);#DeltaE/E [\%];#NoE";
 
     // Histogram initializations.
@@ -83,6 +85,8 @@ int main(int argc, char const *argv[])
     TH2F* he_theta_energy_abs   = new TH2F("he_theta_energy_abs",h_theta_energy_title,angle_bins,theta_min,theta_max,energy_bins,E_min,E_max);
     TH2F* he_phi_energy_abs     = new TH2F("he_phi_energy_abs",h_phi_energy_title,angle_bins,phi_min,phi_max,energy_bins,E_min,E_max);
     TH2F* he_deltaenergy_energy = new TH2F("he_deltaenergy_energy",h_deltaenergy_energy_title,energy_bins,E_min,E_max,res_bins_small,res_min,res_max);
+    TH2F* he_deltaenergy_phi    = new TH2F("he_deltaenergy_phi",h_deltaenergy_phi_title,angle_bins,phi_min,phi_max,res_bins_small,res_min,res_max);
+    TH2F* he_deltaenergy_theta  = new TH2F("he_deltaenergy_theta",h_deltaenergy_theta_title,angle_bins,theta_min,theta_max,res_bins_small,res_min,res_max);
     TH1F* he_delta_energy       = new TH1F("he_delta_energy",h_delta_energy_title,res_bins,res_min,res_max);
 
     TH3F* hp_all                = new TH3F("hp_all",h_all_title,angle_bins,phi_min,phi_max,angle_bins,theta_min,theta_max,energy_bins,E_min,E_max);
@@ -93,6 +97,8 @@ int main(int argc, char const *argv[])
     TH2F* hp_theta_energy_abs   = new TH2F("hp_theta_energy_abs",h_theta_energy_title,angle_bins,theta_min,theta_max,energy_bins,E_min,E_max);
     TH2F* hp_phi_energy_abs     = new TH2F("hp_phi_energy_abs",h_phi_energy_title,angle_bins,phi_min,phi_max,energy_bins,E_min,E_max);
     TH2F* hp_deltaenergy_energy = new TH2F("hp_deltaenergy_energy",h_deltaenergy_energy_title,energy_bins,E_min,E_max,res_bins_small,res_min,res_max);
+    TH2F* hp_deltaenergy_phi    = new TH2F("hp_deltaenergy_phi",h_deltaenergy_phi_title,angle_bins,phi_min,phi_max,res_bins_small,res_min,res_max);
+    TH2F* hp_deltaenergy_theta  = new TH2F("hp_deltaenergy_theta",h_deltaenergy_theta_title,angle_bins,theta_min,theta_max,res_bins_small,res_min,res_max);
     TH1F* hp_delta_energy       = new TH1F("hp_delta_energy",h_delta_energy_title,res_bins,res_min,res_max);
 
     // Struct for 2D histogram data computation.
@@ -157,6 +163,8 @@ int main(int argc, char const *argv[])
         {
             he_all->Fill(curr_info->phi,curr_info->theta,curr_info->kin_energy,rk_resolution);
             he_deltaenergy_energy->Fill(curr_info->kin_energy,rk_resolution);
+            he_deltaenergy_phi->Fill(curr_info->phi,rk_resolution);
+            he_deltaenergy_theta->Fill(curr_info->theta,rk_resolution);
             he_delta_energy->Fill(rk_resolution);
 
             e_theta_phi[phi_bin][theta_bin].value       += rk_resolution;
@@ -178,6 +186,8 @@ int main(int argc, char const *argv[])
         {
             hp_all->Fill(curr_info->phi,curr_info->theta,curr_info->kin_energy,rk_resolution);
             hp_deltaenergy_energy->Fill(curr_info->kin_energy,rk_resolution);
+            hp_deltaenergy_phi->Fill(curr_info->phi,rk_resolution);
+            hp_deltaenergy_theta->Fill(curr_info->theta,rk_resolution);
             hp_delta_energy->Fill(rk_resolution);
 
             p_theta_phi[phi_bin][theta_bin].value       += rk_resolution;
@@ -315,9 +325,13 @@ int main(int argc, char const *argv[])
     c_p_phi_energy_abs->Write();
 
     he_deltaenergy_energy->Write();
+    he_deltaenergy_phi->Write();
+    he_deltaenergy_theta->Write();
     he_delta_energy->Write();
 
     hp_deltaenergy_energy->Write();
+    hp_deltaenergy_phi->Write();
+    hp_deltaenergy_theta->Write();
     hp_delta_energy->Write();
 
     return 0;
