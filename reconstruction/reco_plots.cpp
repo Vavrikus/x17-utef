@@ -4,11 +4,13 @@
 #include <string>
 
 // ROOT dependencies
+#include "TCanvas.h"
 #include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TH3F.h"
 #include "TMath.h"
+#include "TPaletteAxis.h"
 #include "TStyle.h"
 #include "TTree.h"
 
@@ -49,6 +51,7 @@ int main(int argc, char const *argv[])
     double res_min = -50;
     double res_max = -res_min;
     double res_bins = 201;
+    double res_bins_small = 101;
 
     // Adjusting boundaries for the extra bin.
     phi_max   = phi_min   + (phi_max   - phi_min)   * angle_bins  / (angle_bins  - 1);
@@ -65,9 +68,9 @@ int main(int argc, char const *argv[])
 
     // Histogram titles.
     const char* h_all_title                = "Energy resolution (#DeltaE/E);Phi [deg];Theta [deg];Simulated energy [MeV]";
-    const char* h_theta_phi_title          = "Energy resolution (#DeltaE/E);Phi [deg];Theta [deg]";
-    const char* h_theta_energy_title       = "Energy resolution (#DeltaE/E);Theta [deg];Simulated energy [MeV]";
-    const char* h_phi_energy_title         = "Energy resolution (#DeltaE/E);Phi [deg];Simulated energy [MeV]";
+    const char* h_theta_phi_title          = "Energy resolution (#DeltaE/E);Phi [deg];Theta [deg];#DeltaE/E [\%]";
+    const char* h_theta_energy_title       = "Energy resolution (#DeltaE/E);Theta [deg];Simulated energy [MeV];#DeltaE/E [\%]";
+    const char* h_phi_energy_title         = "Energy resolution (#DeltaE/E);Phi [deg];Simulated energy [MeV];#DeltaE/E [\%]";
     const char* h_deltaenergy_energy_title = "Energy resolution dependence on energy;Simulated energy [MeV];#DeltaE/E [\%]";
     const char* h_delta_energy_title       = "Energy resolution of Runge-Kutta reconstruction (with pads);#DeltaE/E [\%];#NoE";
 
@@ -79,7 +82,7 @@ int main(int argc, char const *argv[])
     TH2F* he_theta_phi_abs      = new TH2F("he_theta_phi_abs",h_theta_phi_title,angle_bins,phi_min,phi_max,angle_bins,theta_min,theta_max);
     TH2F* he_theta_energy_abs   = new TH2F("he_theta_energy_abs",h_theta_energy_title,angle_bins,theta_min,theta_max,energy_bins,E_min,E_max);
     TH2F* he_phi_energy_abs     = new TH2F("he_phi_energy_abs",h_phi_energy_title,angle_bins,phi_min,phi_max,energy_bins,E_min,E_max);
-    TH2F* he_deltaenergy_energy = new TH2F("he_deltaenergy_energy",h_deltaenergy_energy_title,energy_bins,E_min,E_max,res_bins,res_min,res_max);
+    TH2F* he_deltaenergy_energy = new TH2F("he_deltaenergy_energy",h_deltaenergy_energy_title,energy_bins,E_min,E_max,res_bins_small,res_min,res_max);
     TH1F* he_delta_energy       = new TH1F("he_delta_energy",h_delta_energy_title,res_bins,res_min,res_max);
 
     TH3F* hp_all                = new TH3F("hp_all",h_all_title,angle_bins,phi_min,phi_max,angle_bins,theta_min,theta_max,energy_bins,E_min,E_max);
@@ -89,7 +92,7 @@ int main(int argc, char const *argv[])
     TH2F* hp_theta_phi_abs      = new TH2F("hp_theta_phi_abs",h_theta_phi_title,angle_bins,phi_min,phi_max,angle_bins,theta_min,theta_max);
     TH2F* hp_theta_energy_abs   = new TH2F("hp_theta_energy_abs",h_theta_energy_title,angle_bins,theta_min,theta_max,energy_bins,E_min,E_max);
     TH2F* hp_phi_energy_abs     = new TH2F("hp_phi_energy_abs",h_phi_energy_title,angle_bins,phi_min,phi_max,energy_bins,E_min,E_max);
-    TH2F* hp_deltaenergy_energy = new TH2F("hp_deltaenergy_energy",h_deltaenergy_energy_title,energy_bins,E_min,E_max,res_bins,res_min,res_max);
+    TH2F* hp_deltaenergy_energy = new TH2F("hp_deltaenergy_energy",h_deltaenergy_energy_title,energy_bins,E_min,E_max,res_bins_small,res_min,res_max);
     TH1F* hp_delta_energy       = new TH1F("hp_delta_energy",h_delta_energy_title,res_bins,res_min,res_max);
 
     // Struct for 2D histogram data computation.
@@ -220,25 +223,100 @@ int main(int argc, char const *argv[])
         hp_phi_energy_abs->Fill(phi,e_kin,p_phi_energy_abs[i][j].Average());
     }
 
-    gStyle->SetPalette(kTemperatureMap);
+    // Set the contour levels symmetrically around zero
+    int ncont = 201;  // Number of contour levels (adjust as needed)
+    Double_t contours[ncont + 1];
+    for (int i = 0; i <= ncont; ++i) contours[i] = -10 + i * (20.0 / ncont);
     
-    he_all->Write();
-    he_theta_phi->Write();
-    he_theta_energy->Write();
-    he_phi_energy->Write();
-    he_theta_phi_abs->Write();
-    he_theta_energy_abs->Write();
-    he_phi_energy_abs->Write();
+    TCanvas* c_e_all = new TCanvas("c_e_all","");
+    gStyle->SetPalette(kLightTemperature);
+    he_all->SetStats(0);
+    he_all->Draw("box2 z");
+    he_all->SetContour(ncont,contours);
+    c_e_all->Write();
+
+    TCanvas* c_p_all = new TCanvas("c_p_all","");
+    gStyle->SetPalette(kLightTemperature);
+    hp_all->SetStats(0);
+    hp_all->Draw("box2 z");
+    hp_all->SetContour(ncont,contours);
+    c_p_all->Write();
+
+    TCanvas* c_e_theta_phi = new TCanvas("c_e_theta_phi","");
+    gStyle->SetPalette(kLightTemperature);
+    he_theta_phi->SetStats(0);
+    he_theta_phi->Draw("lego2z");
+    he_theta_phi->SetContour(ncont,contours);
+    c_e_theta_phi->Write();
+
+    TCanvas* c_p_theta_phi = new TCanvas("c_p_theta_phi","");
+    gStyle->SetPalette(kLightTemperature);
+    hp_theta_phi->SetStats(0);
+    hp_theta_phi->Draw("lego2z");
+    hp_theta_phi->SetContour(ncont,contours);
+    c_p_theta_phi->Write();
+
+    TCanvas* c_e_theta_energy = new TCanvas("c_e_theta_energy","");
+    gStyle->SetPalette(kLightTemperature);
+    he_theta_energy->SetStats(0);
+    he_theta_energy->Draw("lego2z");
+    he_theta_energy->SetContour(ncont,contours);
+    c_e_theta_energy->Write();
+
+    TCanvas* c_p_theta_energy = new TCanvas("c_p_theta_energy","");
+    gStyle->SetPalette(kLightTemperature);
+    hp_theta_energy->SetStats(0);
+    hp_theta_energy->Draw("lego2z");
+    hp_theta_energy->SetContour(ncont,contours);
+    c_p_theta_energy->Write();
+
+    TCanvas* c_e_phi_energy = new TCanvas("c_e_phi_energy","");
+    gStyle->SetPalette(kLightTemperature);
+    he_phi_energy->SetStats(0);
+    he_phi_energy->Draw("lego2z");
+    he_phi_energy->SetContour(ncont,contours);
+    c_e_phi_energy->Write();
+
+    TCanvas* c_p_phi_energy = new TCanvas("c_p_phi_energy","");
+    gStyle->SetPalette(kLightTemperature);
+    hp_phi_energy->SetStats(0);
+    hp_phi_energy->Draw("lego2z");
+    hp_phi_energy->SetContour(ncont,contours);
+    c_p_phi_energy->Write();
+
+    TCanvas* c_e_theta_phi_abs = new TCanvas("c_e_theta_phi_abs","");
+    he_theta_phi_abs->SetStats(0);
+    he_theta_phi_abs->Draw("lego2z");
+    c_e_theta_phi_abs->Write();
+
+    TCanvas* c_p_theta_phi_abs = new TCanvas("c_p_theta_phi_abs","");
+    hp_theta_phi_abs->SetStats(0);
+    hp_theta_phi_abs->Draw("lego2z");
+    c_p_theta_phi_abs->Write();
+
+    TCanvas* c_e_theta_energy_abs = new TCanvas("c_e_theta_energy_abs","");
+    he_theta_energy_abs->SetStats(0);
+    he_theta_energy_abs->Draw("lego2z");
+    c_e_theta_energy_abs->Write();
+
+    TCanvas* c_p_theta_energy_abs = new TCanvas("c_p_theta_energy_abs","");
+    hp_theta_energy_abs->SetStats(0);
+    hp_theta_energy_abs->Draw("lego2z");
+    c_p_theta_energy_abs->Write();
+
+    TCanvas* c_e_phi_energy_abs = new TCanvas("c_e_phi_energy_abs","");
+    he_phi_energy_abs->SetStats(0);
+    he_phi_energy_abs->Draw("lego2z");
+    c_e_phi_energy_abs->Write();
+
+    TCanvas* c_p_phi_energy_abs = new TCanvas("c_p_phi_energy_abs","");
+    hp_phi_energy_abs->SetStats(0);
+    hp_phi_energy_abs->Draw("lego2z");
+    c_p_phi_energy_abs->Write();
+
     he_deltaenergy_energy->Write();
     he_delta_energy->Write();
 
-    hp_all->Write();
-    hp_theta_phi->Write();
-    hp_theta_energy->Write();
-    hp_phi_energy->Write();
-    hp_theta_phi_abs->Write();
-    hp_theta_energy_abs->Write();
-    hp_phi_energy_abs->Write();
     hp_deltaenergy_energy->Write();
     hp_delta_energy->Write();
 
