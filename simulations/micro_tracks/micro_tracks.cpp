@@ -87,8 +87,8 @@ int main(int argc, char *argv[])
     // Random number generator for the simulation.
     TRandom3* rand = new TRandom3(0);
 
-    // Loop over the tracks.
-    for (int i = job.min_set; i <= job.max_set; i++)
+    // Loop over the tracks. Generate each track as many times as is the given number of iterations.
+    for (int i = job.min_set; i <= job.max_set; i++) for(int j = 0; j < job.iterations; j++)
     {
         std::vector<X17::MicroPoint> points;
         std::vector<std::vector<X17::DriftLinePoint>> driftlines;
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
         if (job.random) X17::GetRandomTrackParams(rand,electron,origin,orientation,kin_en);
         else job.GetTrackParameters(i,electron,origin,orientation,kin_en);
         
-        std::cout << "TRACK No." << i << ":\n";
+        std::cout << "TRACK No." << i << ", iteration " << j+1 << ":\n";
         std::cout << "   electron: " << electron << " Ek: " << kin_en << " origin: (" << origin.x << "," << origin.y << "," << origin.z << ")\n";
         std::cout << "   orientation: (" << orientation.x << "," << orientation.y << "," << orientation.z << ")\n";
         std::cout << "   theta: " << asin(orientation.z) << " phi: " << acos(orientation.x/cos(asin(orientation.z)))*sign(orientation.y) << "\n";

@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N ionElectronTracks
 #PBS -l select=1:ncpus=1:mem=20gb:scratch_local=10gb
-#PBS -l walltime=168:00:00 
+#PBS -l walltime=336:00:00 
 #(((PBS -m ae)))
 
 # The 4 lines above are options for scheduling system. Email notification will be sent when the job aborts (a) or ends (e).
@@ -48,9 +48,9 @@ cd $SCRATCHDIR/build/simulations/micro_tracks
 
 # Run the microscopic track simulation with all necessary parameters and stream its output into a text file.
 if [ -z $PAR3 ]; then
-    ./micro_tracks >tracks$PAR2.out
+    ./micro_tracks &> tracks$PAR2.out
 else
-    ./micro_tracks $PAR1 $PAR2 $PAR3 $PAR4 $PAR5 >tracks$PAR2.out
+    ./micro_tracks $PAR1 $PAR2 $PAR3 $PAR4 $PAR5 &> tracks$PAR2.out
 fi
 
 # Check the exit status of the simulation.

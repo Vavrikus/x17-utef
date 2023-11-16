@@ -12,10 +12,19 @@ namespace X17
     {
         if (argc == 1)
         {
-            random  = true;
-            min_set = 1;
-            max_set = 1;
-            std::cout << "Running random generation, no extra parameters needed.\n";
+            random     = true;
+            min_set    = 1;
+            max_set    = 1;
+            iterations = 1;
+            std::cout << "\nRunning random generation of a single track, no extra parameters needed.\n\n";
+        }
+        else if (argc == 2)
+        {
+            random     = true;
+            min_set    = 1;
+            max_set    = 1;
+            iterations = std::stoi(argv[1]);
+            std::cout << "\nRunning random generation of " << iterations << " tracks.\n\n";
         }
         else
         {
@@ -40,12 +49,16 @@ namespace X17
             if (angle_bins <= 1)  std::cerr << "ERROR: Parameter angle_bins has to be greater than 1.\n";
             if (energy_bins <= 1) std::cerr << "ERROR: Parameter energy_bins has to be greater than 1.\n";
 
-            std::cout << "Running with parameters:\n" << "max_id: " << max_id << ", id: " << id << ", iterations: " << iterations;
+            std::cout << "\nRunning with parameters:\n" << "max_id: " << max_id << ", id: " << id << ", iterations: " << iterations;
             std::cout << ", angle_bins: " << angle_bins << ", energy_bins: " << energy_bins << ".\n";
 
+            // Integer division to avoid rounding error problems.
             n_sets  = 2 * angle_bins * angle_bins * energy_bins;
-            min_set = floor(n_sets * (id - 1) * (1.0 / max_id)) + 1;
-            max_set = floor(n_sets * id * (1.0 / max_id));
+            min_set = ((n_sets * (id - 1)) / max_id) + 1;
+            max_set = (n_sets * id ) / max_id;
+
+            std::cout << "Number of unique tracks in all jobs: " << n_sets << ", in this job tracks from " << min_set << " to " << max_set;
+            std::cout << " will be simulated.\n\n";
         }
     }
 
