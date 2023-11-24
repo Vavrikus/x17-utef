@@ -23,7 +23,7 @@
 	\end{frame}
 }
 
-\title[OFTPC track simulation \& reconstruction]{Simulation and reconstruction of charged particle trajectories in an orthogonal fields time projection chamber (OFTPC)}
+\title[OFTPC track simulation \& reconstruction]{Simulation and reconstruction of charged particle trajectories in a time projection chamber with orthogonal fields (OFTPC)}
 %\subtitle{Subtitle}
 \author[M.~Vavřík]{\foreignlanguage{czech}{Martin Vavřík}\vspace{0.5cm}\\martin.vavrik@cvut.cz\\IEAP CTU PRAGUE\\}
 \logo{\includegraphics[width=0.08\textwidth]{../images/logo}}
@@ -42,46 +42,52 @@
 	
 	\section{Motivation}
 	\begin{frame}
-		\frametitle{Motivation}
+		\frametitle{Motivation: ATOMKI measurements}
 		\begin{itemize}
-			\item Measurement of anomalies in angular correlation of electron and positron internally produced in excited $ {}^8\text{Be} $ and $ {}^4\text{He} $
-				\begin{columns}
-				\column{0.45 \textwidth}
-				\begin{figure}
-					\centering
-					\begin{minipage}[t][4.3cm]{\textwidth}
-						\centering
-						\includegraphics[width=0.81\linewidth]{../images/diagram.png}\newline
-					\end{minipage}
-					\caption{Two out of the six TPC chambers.\cite{poster}}
-					\label{fig:dia}
-				\end{figure}
-				\column{0.45 \textwidth}
-				\begin{figure}
-					\centering
-					%$ $\newline
-					\begin{minipage}[t][4.3cm]{\textwidth}
-						\centering
-						\includegraphics[width=0.81\linewidth]{../images/diagram2.png}\newline
-					\end{minipage}
-					\caption{TPC with triple gas electron multiplier (GEM) readout.\cite{poster}}
-					\label{fig:dia2}
-				\end{figure}
-				\end{columns}
+			\item Measurement of anomalies in the angular correlation of an~electron-positron pair internally produced in excited $ {}^8\text{Be} $ and $ {}^4\text{He} $
 		\end{itemize}
+	\end{frame}
+	\begin{frame}
+		\frametitle{OFTPC: Detector Configuration}
+		\begin{itemize}
+			\item Time Projection Chamber with Orthogonal Fields -- electric and magnetic field perpendicular
+		\end{itemize}
+		\begin{columns}
+			\column{0.47 \textwidth}
+			\begin{figure}
+				\centering
+				\begin{minipage}[t][4.1cm]{\textwidth}
+					\centering
+					\includegraphics[width=0.83\linewidth]{../images/diagram.png}\newline
+				\end{minipage}
+				\caption{Two out of the six TPC chambers.~\cite{poster}}
+				\label{fig:dia}
+			\end{figure}
+			\column{0.47 \textwidth}
+			\begin{figure}
+				\centering
+				\begin{minipage}[t][4.1cm]{\textwidth}
+					\centering
+					\includegraphics[width=0.73\linewidth]{../images/diagram2.png}\newline
+				\end{minipage}
+				\caption{TPC with a triple gas electron multiplier (GEM) readout.~\cite{poster}}
+				\label{fig:dia2}
+			\end{figure}
+		\end{columns}
 	\end{frame}
 
 	\begin{frame}
-		\frametitle{X17 detector}
+		\frametitle{OFTPC: Reasons and Complications}
 		\begin{itemize}
-			\item For energy reconstruction, tracks in the time projection chamber (TPC) will be used
+			\item No solenoid -- permanent magnets used to generate the field
+			\item Space constraints -- granularity of the TPC readout limited in order to fit one SAMPA/SRS hybrid in each of the six sectors
 			\begin{itemize}
-				\item Atypical TPC (magnetic field is perpendicular instead of parallel to electric)
-				\item This interferes with the direction of the drift of electrons
-				\item Energy can be determined using curvature of the track in the inhomogeneous magnetic field
-				\item Magnetic field data from simulation is used
+				\item Parallel fields would bend particles parallel to readout, requiring much larger number of pads
+				\item These trajectories would extend to more than one sector, requiring alternative architecture of the detector
 			\end{itemize}
-			\item \textcolor{red}{Less information about how TPCs work, more information about reasons for OFTPC.}
+			\item Inhomogeneous magnetic field (simulated using Maxwell~\textcolor{red}{Add citation!})
+			\item This interferes with the direction of the drift of secondary electrons
+			\item Curvature of the track is not constant in this field (deviation from circle)
 		\end{itemize}
 	\end{frame}
 	
@@ -89,16 +95,16 @@
 	\begin{frame}
 		\frametitle{Track simulation}
 		\begin{itemize}
-			\item We use Garfield++ for track simulation
+			\item Garfield++ used for track simulation
 			\begin{itemize}
-				\item Primary relativistic particle simulated using Heed program~\cite{heed}
-				\item Secondary ionization electrons simulated using microscopic tracking (uses equation of motion)
+				\item Primary relativistic particle simulated using the HEED program~\cite{heed}
+				\item Secondary ionization electrons simulated using microscopic tracking (uses equations of motion)
 				\begin{itemize}\item Relatively slow (typically 5-30 CPU hours per track), very precise especially for small structures.  \end{itemize}
 			\end{itemize}
-			\item Batches of 9702 tracks with different initial parameters simulated on MetaCentrum
+			\item Batches of 9702 tracks with different initial parameters simulated on a grid (MetaCentrum~\cite{meta})
 			\begin{itemize}
-				\item Electron or positron
-				\item 11 different energies (from 3~MeV to 11~MeV)
+				\item Electrons and positrons
+				\item 11 different energies from 3~MeV to 11~MeV
 				\item 21 different angles~$\varphi$ and 21 different angles~$\theta$ (see picture on next slide)
 			\end{itemize}
 		\end{itemize}
@@ -106,11 +112,13 @@
 	
 	\begin{frame}
 		\frametitle{Track simulation}
-		\begin{figure}
-			\centering
-			\includegraphics[width = 0.9 \linewidth]{../images/tpc_micro_simulation.png}
-			\caption{Diagram of the batch simulation parameters, $\theta \in [-17.1^\circ,17.1^\circ]$, $\varphi \in [-16.3^\circ,16.3^\circ]$, $ E_k \in [3,13] $~MeV.}
-		\end{figure}
+		\begin{minipage}[t][\textheight]{0.93\textwidth}
+			\begin{figure}
+				\centering
+				\includegraphics[height= 0.65 \textheight]{../images/tpc_micro_simulation.png}
+				\caption{Diagram of the batch simulation parameters, $\theta$~and~$\phi$ are spherical coordinates with respect to~$z$: $\theta\in[-17.1^\circ,17.1^\circ]$, $\varphi~\in~[-16.3^\circ,16.3^\circ]$, $ E_k \in [3,13] $~MeV.}
+			\end{figure}
+		\end{minipage}
 	\end{frame}
 	
 	\begin{frame}
@@ -119,19 +127,19 @@
 			\column{0.33\textwidth}
 			\begin{figure}
 				\centering
-				\includegraphics[width = 0.95 \linewidth]{../images/track1.png}
+				\includegraphics[width = 0.95 \linewidth]{../images/drift_yz.png}
 				\caption{Diffusion front view}
 			\end{figure}
 			\column{0.33\textwidth}
 			\begin{figure}
 				\centering
-				\includegraphics[width = 0.95 \linewidth]{../images/track2.png}
+				\includegraphics[width = 0.95 \linewidth]{../images/drift_xz.png}
 				\caption{Electron drift}
 			\end{figure}
 			\column{0.33\textwidth}
 			\begin{figure}
 				\centering
-				\includegraphics[width = 0.95 \linewidth]{../images/track3.png}
+				\includegraphics[width = 0.95 \linewidth]{../images/drift_xy.png}
 				\caption{Diffusion top view}
 			\end{figure}
 		\end{columns}
@@ -140,9 +148,9 @@
 	\begin{frame}
 		\frametitle{Ionization electrons map simulation}
 		\begin{itemize}
-			\item In the experimental setup TPC only detects secondary ionization electrons (after multiplication on triple GEM)
+			\item In the experimental setup the OFTPC detects secondary ionization electrons (after multiplication on triple GEM)
 			\item These electrons drift at a~constant velocity towards the readout plane
-			\item We can use a~simulation of evenly spaced electrons for the reconstruction (time consuming -- run on MetaCentrum)
+			\item We can use a~simulation of evenly spaced electrons for the reconstruction
 			\begin{itemize}
 				\item Current spacing 5~mm, 100 electrons simulated in each location with 0.1~eV energy in a~random direction
 			\end{itemize}
@@ -220,8 +228,8 @@
 		\frametitle{Energy reconstruction}
 		\begin{itemize}
 			\item Prefit with circle with smoothly attached lines
-			\item One parameter (kinetic energy) fit with 4\textsuperscript{th} order Runge-Kutta fit
-			\item In both steps known initial position and direction of the particle assumed
+			\item Kinetic energy fit with 4\textsuperscript{th} order Runge-Kutta fit
+			\item Known initial position and direction of the particle assumed
 			\item Currently cca 0.3~CPU seconds per track
 		\end{itemize}
 		\begin{figure}
@@ -256,20 +264,27 @@
 	\begin{frame}
 		\frametitle{Summary}
 		\begin{itemize}
-			\item Several batches of tracks have been simulated for testing purposes
-			\item The map of secondary electron positions and drift times has been generated
-			\item The map has been tested by preliminary track reconstruction
-			\item Testing of the energy reconstruction has begun, first attempts of determining the resolution of our detector were made
+			\item Several batches of tracks have been simulated for testing purposes.
+			\begin{itemize}
+				\item $\theta\in[-17.1^\circ,17.1^\circ]$, $\varphi~\in~[-16.3^\circ,16.3^\circ]$, $ E_k \in [3,13] $~MeV
+			\end{itemize}
+			\item The map of secondary electron positions and drift times has been generated.
+			\item The map has been tested by preliminary track reconstruction.
+			\item First results suggest that:
+			\begin{itemize}
+				\item Best possible resolution $\frac{E_\text{rec}-E}{E} \approx 3.5\%$, positrons have worse resolution.
+				\item OFTPC works well on a simulation level.
+			\end{itemize}
 		\end{itemize}
 	\end{frame}
 	\begin{frame}
-		\frametitle{Future}
+		\frametitle{Future Steps}
 		\begin{itemize}
 			\item Account for parasitic tracks caused by high energy secondary electrons
 			\item Account for GEM in simulation, charge distribution between pads
 			\item Optimize Runge-Kutta integration fit with likelihood approach (instead of least squares) if needed
 			\item Write a faster simulation method for secondary electrons using the map
-			\item Fix the systematic error of reconstruction discovered using the simulated tracks
+			\item Fix the observed systematic error of reconstruction
 		\end{itemize}
 	\end{frame}
 	\begin{frame}
@@ -283,8 +298,6 @@
 			\item Residues on first attempts of track reconstruction?
 			\item Change energy reconstruction figure!
 			\item More energy reconstruction resolution figures.
-			\item ATOMKI slide
-			\item OFTPC slide (permanent magnets vs solenoid, parallel field, curving --> need higher resolution,readout electronics positioning (limited budget))
 		\end{itemize}
 	\end{frame}
 	

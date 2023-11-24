@@ -99,7 +99,8 @@
       "csignal": "cpp",
       "scoped_allocator": "cpp",
       "shared_mutex": "cpp",
-      "typeindex": "cpp"
+      "typeindex": "cpp",
+      "plot_drift.C": "cpp"
     },
     "C_Cpp.default.includePath": [
       "/home/vavrik/work/X17/include",
