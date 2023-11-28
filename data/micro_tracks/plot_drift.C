@@ -28,13 +28,13 @@ void TrackStyle(TGraph* g)
 
 void plot_drift()
 {
-    TFile* input = new TFile("random_02/tracks1.root");
-    TTree* tracks = (TTree*)input->Get("tracks");
+    TFile* input = new TFile("grid_01/tracks_full1000.root");
+    TTree* tracks = (TTree*)input->Get("tracks_full");
 
     X17::TrackMicro* track = nullptr;
-    tracks->SetBranchAddress("track",&track);
+    tracks->SetBranchAddress("track_full",&track);
 
-    tracks->GetEntry(0);
+    tracks->GetEntry(4);
     std::sort(track->points.begin(),track->points.end(),compareTimes);
 
     TMultiGraph* mg_lines_xy = new TMultiGraph("mg_lines_xy","Driftlines");

@@ -23,16 +23,17 @@
 	\end{frame}
 }
 
-\title[OFTPC track simulation \& reconstruction]{Simulation and reconstruction of charged particle trajectories in a time projection chamber with orthogonal fields (OFTPC)}
-%\subtitle{Subtitle}
+\title[OFTPC track simulation \& reconstruction]{Simulation and Reconstruction of Charged Particle Trajectories in a Time Projection Chamber with Orthogonal Fields}
+\subtitle{RD51 Collaboration Meeting}
 \author[M.~Vavřík]{\foreignlanguage{czech}{Martin Vavřík}\vspace{0.5cm}\\martin.vavrik@cvut.cz\\IEAP CTU PRAGUE\\}
 \logo{\includegraphics[width=0.08\textwidth]{../images/logo}}
-\date{4\textsuperscript{th} - 8\textsuperscript{th} December, 2023}
+\date{December 6, 2023}
 
 \begin{document}
 	
 	\begin{frame}
 		\titlepage
+		\textcolor{red}{Add grant + MetaCentrum}
 	\end{frame}
 	
 	\begin{frame}
@@ -44,40 +45,58 @@
 	\begin{frame}
 		\frametitle{Motivation: ATOMKI measurements}
 		\begin{itemize}
-			\item Measurement of anomalies in the angular correlation of an~electron-positron pair internally produced in excited $ {}^8\text{Be} $ and $ {}^4\text{He} $
+			\item Measurement of anomalies in the angular correlation of an~electron-positron pair internally produced in excited $ {}^8\text{Be} $ and $ {}^4\text{He} $\newline
+			\begin{columns}
+				\column{0.33 \textwidth}
+					\centering
+					\begin{minipage}[t][4cm]{\textwidth}
+						\centering
+						\includegraphics[width=\textwidth]{../images/atomki_detector.png}
+					\end{minipage}
+					\small{ATOMKI spectrometer.~\cite{atomki_det}}\\ \vspace{0.1cm}
+					\tiny{Beam pipe (black), MWPC, $\Delta$E~det. (red), $E$~scintillators (yellow), light guides (blue)}
+				\column{0.33 \textwidth}
+					\centering
+					\begin{minipage}[t][4cm]{\textwidth}
+						\centering
+						\includegraphics[width=\textwidth]{../images/atomki_be.png}
+					\end{minipage}
+					\footnotesize{$ {}^8\text{Be} $, $e^{+}e^{-}$ pair angular correlation.~\cite{atomki_be}}
+				\column{0.28 \textwidth}
+					\centering
+					\begin{minipage}[t][4cm]{\textwidth}
+						\centering
+						\includegraphics[width=0.7\textwidth]{../images/atomki_he.png}\newline
+					\end{minipage}
+					\footnotesize{$ {}^4\text{He} $, $e^{+}e^{-}$ pair angular correlation.~\cite{atomki_he}}
+			\end{columns}
 		\end{itemize}
 	\end{frame}
 	\begin{frame}
 		\frametitle{OFTPC: Detector Configuration}
 		\begin{itemize}
-			\item Time Projection Chamber with Orthogonal Fields -- electric and magnetic field perpendicular
+			\item Time Projection Chamber with Orthogonal Fields (OFTPC) -- electric and magnetic field perpendicular
 		\end{itemize}
 		\begin{columns}
 			\column{0.47 \textwidth}
-			\begin{figure}
 				\centering
-				\begin{minipage}[t][4.1cm]{\textwidth}
+				\begin{minipage}[t][4.05cm]{\textwidth}
 					\centering
-					\includegraphics[width=0.83\linewidth]{../images/diagram.png}\newline
+					\includegraphics[width=0.82\linewidth]{../images/diagram.png}\newline
 				\end{minipage}
-				\caption{Two out of the six TPC chambers.~\cite{poster}}
-				\label{fig:dia}
-			\end{figure}
+				Two out of the six TPC chambers.~\cite{poster}
 			\column{0.47 \textwidth}
-			\begin{figure}
 				\centering
-				\begin{minipage}[t][4.1cm]{\textwidth}
+				\begin{minipage}[t][4.05cm]{\textwidth}
 					\centering
-					\includegraphics[width=0.73\linewidth]{../images/diagram2.png}\newline
+					\includegraphics[width=0.71\linewidth]{../images/diagram2.png}\newline
 				\end{minipage}
-				\caption{TPC with a triple gas electron multiplier (GEM) readout.~\cite{poster}}
-				\label{fig:dia2}
-			\end{figure}
+				TPC with a triple gas electron multiplier (GEM) readout.~\cite{poster}
 		\end{columns}
 	\end{frame}
 
 	\begin{frame}
-		\frametitle{OFTPC: Reasons and Complications}
+		\frametitle{OFTPC: Reasons for Orthogonal Fields}
 		\begin{itemize}
 			\item No solenoid -- permanent magnets used to generate the field
 			\item Space constraints -- granularity of the TPC readout limited in order to fit one SAMPA/SRS hybrid in each of the six sectors
@@ -85,9 +104,26 @@
 				\item Parallel fields would bend particles parallel to readout, requiring much larger number of pads
 				\item These trajectories would extend to more than one sector, requiring alternative architecture of the detector
 			\end{itemize}
-			\item Inhomogeneous magnetic field (simulated using Maxwell~\textcolor{red}{Add citation!})
-			\item This interferes with the direction of the drift of secondary electrons
-			\item Curvature of the track is not constant in this field (deviation from circle)
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{OFTPC: Complications}
+		Inhomogeneous magnetic field (simulated using Maxwell~\textcolor{red}{Add citation!})
+		\begin{columns}
+			\column{0.5\textwidth}
+				\centering
+				\textcolor{red}{Plot from Maxwell here!}
+			\column{0.5\textwidth}
+				\centering
+				\begin{minipage}[t][4cm]{\textwidth}
+					\centering
+					\includegraphics[width = 0.95 \textwidth]{../images/drift_xz.png}
+				\end{minipage}
+		\end{columns}
+		\begin{itemize}
+			\item The field interferes with the direction of the drift of secondary electrons
+			\item Curvature of the track is not constant in this field (deviation from a~circle)
 		\end{itemize}
 	\end{frame}
 	
@@ -104,62 +140,72 @@
 			\item Batches of 9702 tracks with different initial parameters simulated on a grid (MetaCentrum~\cite{meta})
 			\begin{itemize}
 				\item Electrons and positrons
-				\item 11 different energies from 3~MeV to 11~MeV
-				\item 21 different angles~$\varphi$ and 21 different angles~$\theta$ (see picture on next slide)
+				\item 11 different energies from 3~MeV to 13~MeV (covers range for $ {}^8\text{Be} $)
+				\item 21 different angles~$\varphi$ and 21 different angles~$\theta$ (next slide)
 			\end{itemize}
 		\end{itemize}
 	\end{frame}
 	
 	\begin{frame}
 		\frametitle{Track simulation}
-		\begin{minipage}[t][\textheight]{0.93\textwidth}
-			\begin{figure}
-				\centering
-				\includegraphics[height= 0.65 \textheight]{../images/tpc_micro_simulation.png}
-				\caption{Diagram of the batch simulation parameters, $\theta$~and~$\phi$ are spherical coordinates with respect to~$z$: $\theta\in[-17.1^\circ,17.1^\circ]$, $\varphi~\in~[-16.3^\circ,16.3^\circ]$, $ E_k \in [3,13] $~MeV.}
-			\end{figure}
-		\end{minipage}
+		\centering
+		\large{Spherical angles ($\theta$,$\varphi$) with respect to~$z$}\\
+		\small{$\theta$ taken from the equatorial plane $xy$}
+		\centering
+		\textcolor{white}{aaaaaaaa}\includegraphics[height= 0.61 \textheight]{../images/tpc_micro_simulation.png}\newline
+		\small{Diagram of the batch simulation parameters:\\ $\theta\in[-17.1^\circ,17.1^\circ]$, $\varphi~\in~[-16.3^\circ,16.3^\circ]$, $ E_k \in [3,13] $~MeV.}
 	\end{frame}
 	
 	\begin{frame}
-		\frametitle{Simulated track example (microscopic tracking)}		
+		\frametitle{Simulated track example (microscopic tracking)}
+		\begin{itemize}
+			\item Electron track with kinetic energy 8~MeV, $\theta = 0^\circ$ and $\varphi = 0^\circ$
+			\item Diffusion less than 1.5~mm in both directions
+		\end{itemize}
+		\vspace{0.5cm}
 		\begin{columns}
 			\column{0.33\textwidth}
-			\begin{figure}
 				\centering
 				\includegraphics[width = 0.95 \linewidth]{../images/drift_yz.png}
-				\caption{Diffusion front view}
-			\end{figure}
+				Diffusion front view
 			\column{0.33\textwidth}
-			\begin{figure}
 				\centering
 				\includegraphics[width = 0.95 \linewidth]{../images/drift_xz.png}
-				\caption{Electron drift}
-			\end{figure}
+				Electron drift
 			\column{0.33\textwidth}
-			\begin{figure}
 				\centering
 				\includegraphics[width = 0.95 \linewidth]{../images/drift_xy.png}
-				\caption{Diffusion top view}
-			\end{figure}
+				Diffusion top view
 		\end{columns}
 	\end{frame}
 
 	\begin{frame}
 		\frametitle{Ionization electrons map simulation}
 		\begin{itemize}
-			\item In the experimental setup the OFTPC detects secondary ionization electrons (after multiplication on triple GEM)
-			\item These electrons drift at a~constant velocity towards the readout plane
-			\item We can use a~simulation of evenly spaced electrons for the reconstruction
+			\item We want an~unambiguous map of the drift of secondary electrons for the reconstruction
+			\item We can use a~simulation of evenly spaced electrons
 			\begin{itemize}
 				\item Current spacing 5~mm, 100 electrons simulated in each location with 0.1~eV energy in a~random direction
 			\end{itemize}
 		\end{itemize}
-		\begin{figure}
-			\centering
-			\includegraphics[width = 0.3 \linewidth]{../images/track2.png}
-			\caption{Electron drift}
-		\end{figure}
+		\begin{columns}
+			\column{0.06\textwidth}
+			\column{0.44\textwidth}
+				\centering
+				\begin{minipage}[t][4.2cm]{\textwidth}
+					\centering
+					\includegraphics[width = \textwidth]{../images/drift_xz.png}\\
+				\end{minipage}
+				{Electron drift}
+			\column{0.44\textwidth}
+				\centering
+				\begin{minipage}[t][4.2cm]{\textwidth}
+					\centering
+					\includegraphics[width=0.8\textwidth]{../images/map_lines.png}\\
+				\end{minipage}
+				{Partial simulation of the map \textcolor{red}{Fix labels!!!}}
+			\column{0.06\textwidth}
+		\end{columns}
 	\end{frame}
 
 	\begin{frame}
@@ -171,8 +217,8 @@
 		\end{itemize}
 		\begin{figure}
 			\centering
-			\includegraphics[height=0.4\textheight]{../images/map_lines.png}
-			\caption{Partial simulation of the map}
+			\includegraphics[height=0.4\textheight]{../images/map_lines.png}\\
+			\small{Partial simulation of the map}
 		\end{figure}
 	\end{frame}
 	\begin{frame}
@@ -180,31 +226,34 @@
 		\begin{figure}
 			\centering
 			\includegraphics[width=\textwidth]{../images/map_visualization.png}
-			\caption{2D visualization of the simulated mapping $\mathcal{M}$ and inverse mapping $\mathcal{M}^{-1}$.}
+			\small{2D visualization of the simulated mapping $\mathcal{M}$ and the inverse mapping $\mathcal{M}^{-1}$.}
 		\end{figure}
 	\end{frame}
 	\begin{frame}
 		\frametitle{Ionization electron map simulation}
 		\begin{figure}
 			\centering
-			\includegraphics[height=0.6\textheight]{../images/map_dist.png}
-			\caption{$x$ and $y$ coordinate distortion at different $z$ values (Credit: Hugo Natal da Luz).}
+			\includegraphics[height=0.68\textheight]{../images/map_dist.png}\\
+			\small{$x$ and $y$ coordinate distortion at different $z$ values (denoted by colors).\textcolor{red}{Probably replace with newer gas composition.}}
 		\end{figure}
 	\end{frame}
 	\begin{frame}
 		\frametitle{Ionization electron map simulation}
-		\begin{figure}
-			\centering
-			\includegraphics[height=0.65\textheight]{../images/map_dist2.png}
-			\caption{$x$ and $y$ coordinate distortion for maximal initial distance from readout}
-		\end{figure}
+		\centering
+		\begin{minipage}[c]{0.9\textwidth}
+			\begin{figure}
+				\centering
+				\includegraphics[height=0.7\textheight]{../images/map_dist2_new.png}\\
+				\small{Worst case $x$ and $y$ coordinate distortion for maximal initial distance from readout.}
+			\end{figure}
+		\end{minipage}
 	\end{frame}
 	\begin{frame}
 		\frametitle{Ionization electron map simulation}
 		\begin{figure}
 			\centering
 			\includegraphics[height=0.68\textheight]{../images/pads_dist.png}
-			\caption{Pad voxel boundaries for different times (picture of first attempt).}
+			{Pad voxel boundaries for different times.}
 		\end{figure}
 	\end{frame}
 
@@ -213,13 +262,13 @@
 	\begin{frame}
 		\frametitle{Track reconstruction}
 		\begin{itemize}
-			\item First attempts using only the inverse map (not accounting for readout pads)
-			\item Simple reconstruction with pads and time bins, counting the number of electrons in each bin
+			\item At first using only the inverse map (not accounting for readout pads)
+			\item Later simple reconstruction with pads and time bins, counting the number of electrons in each bin
 		\end{itemize}
 		\begin{figure}
 			\centering
-			\includegraphics[width=0.6\textwidth]{../images/reco_track.png}
-			\caption{Original and reconstructed interaction points on the simulated track}
+			\includegraphics[width=0.6\textwidth]{../images/reco_track.png}\\
+			\small{Original and reconstructed interaction points on the simulated track}
 		\end{figure}
 	\end{frame}
 
@@ -228,18 +277,19 @@
 		\frametitle{Energy reconstruction}
 		\begin{itemize}
 			\item Prefit with circle with smoothly attached lines
-			\item Kinetic energy fit with 4\textsuperscript{th} order Runge-Kutta fit
+			\item Kinetic energy fit using 4\textsuperscript{th} order Runge-Kutta
 			\item Known initial position and direction of the particle assumed
 			\item Currently cca 0.3~CPU seconds per track
 		\end{itemize}
 		\begin{figure}
 			\centering
-			\includegraphics[width=0.5\textwidth]{../images/reco_e.png}
-			\caption{8 MeV simulated electron energy reconstruction from both original and reconstructed interaction points. Results are 8.27 and 7.93 MeV.}
+			\includegraphics[width=0.5\textwidth]{../images/reco_e.png}\\
+			\small{8 MeV simulated electron energy reconstruction from both original and reconstructed interaction points. Results are 8.27 and 7.93 MeV.}
 		\end{figure}		
 	\end{frame}
 	\begin{frame}
 		\frametitle{Energy reconstruction precision}
+		\centering
 		\begin{columns}
 			\column{0.5\textwidth}
 			\centering
@@ -256,7 +306,8 @@
 				\includegraphics[width = 0.95 \linewidth]{../images/c_p_delta_energy.png}
 			\end{figure}
 		\end{columns}
-		\captionof{figure}{Relative reconstruction deviation of the~kinetic energy of electron and positron tracks. These histograms represent the best possible resolution for our detector.}
+		\vspace{0.5cm}
+		\footnotesize{Relative reconstruction deviation of the~kinetic energy of electron and positron tracks. These histograms represent the best possible resolution for our detector.}
 	\end{frame}
 	
 	
@@ -269,7 +320,7 @@
 				\item $\theta\in[-17.1^\circ,17.1^\circ]$, $\varphi~\in~[-16.3^\circ,16.3^\circ]$, $ E_k \in [3,13] $~MeV
 			\end{itemize}
 			\item The map of secondary electron positions and drift times has been generated.
-			\item The map has been tested by preliminary track reconstruction.
+			\item The map has been tested by the track reconstruction.
 			\item First results suggest that:
 			\begin{itemize}
 				\item Best possible resolution $\frac{E_\text{rec}-E}{E} \approx 3.5\%$, positrons have worse resolution.
@@ -281,7 +332,7 @@
 		\frametitle{Future Steps}
 		\begin{itemize}
 			\item Account for parasitic tracks caused by high energy secondary electrons
-			\item Account for GEM in simulation, charge distribution between pads
+			\item Account for GEM in the simulation, charge distribution between pads
 			\item Optimize Runge-Kutta integration fit with likelihood approach (instead of least squares) if needed
 			\item Write a faster simulation method for secondary electrons using the map
 			\item Fix the observed systematic error of reconstruction
@@ -290,11 +341,8 @@
 	\begin{frame}
 		\frametitle{Notes (what else to mention)}
 		\begin{itemize}
-			\item Magnetic field simulation.
-			\item Better simulated track example pictures?
 			\item Extra slide with the whole process summary?
 			\item Better description than pad voxels.
-			\item Better description of interpolation?
 			\item Residues on first attempts of track reconstruction?
 			\item Change energy reconstruction figure!
 			\item More energy reconstruction resolution figures.
