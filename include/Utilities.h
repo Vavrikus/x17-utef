@@ -5,6 +5,7 @@
 #include <vector>
 
 // ROOT dependencies
+#include "TH1F.h"
 #include "TRandom3.h"
 
 /// @brief Find the minimum value among the given parameters.
@@ -58,3 +59,9 @@ int sign(double x);
 /// @param start The first index of the filename.
 /// @param end The last index of the filename.
 void AddFilesToTChain(TChain* chain, std::string prefix, std::string suffix, int start, int end);
+
+/// @brief Uses the histogram maximum and linear interpolation to approximate FWHM.
+/// @param histogram The histogram to be used.
+/// @param draw Should the result get drawn as a line?
+/// @return The FWHM approximation of the histogram.
+double GetFWHM(TH1F* histogram, bool draw);

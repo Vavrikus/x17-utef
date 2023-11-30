@@ -6,6 +6,7 @@
 
 // ROOT dependencies
 #include "TChain.h"
+#include "TLine.h"
 
 // X17 dependencies
 #include "Utilities.h"
@@ -58,4 +59,29 @@ void AddFilesToTChain(TChain* chain, std::string prefix, std::string suffix, int
         } 
         else std::cerr << "Warning: File " << filename << " does not exist. Skipping." << std::endl;
     }
+}
+
+double GetFWHM(TH1F* h, bool draw)
+{
+    double max = h->GetMaximum();
+    int left_bin   = h->FindFirstBinAbove(max/2.0);
+    int right_bin  = h->FindLastBinAbove(max/2.0);
+
+    double left_slope  = (h->GetBinContent(left_bin)    - h->GetBinContent(left_bin-1)) / h->GetBinWidth(1);
+    double right_slope = (h->GetBinContent(right_bin+1) - h->GetBinContent(right_bin))  / h->GetBinWidth(1);
+
+    double left_delta  =  (h->GetBinContent(left_bin)  - (max/2)) / left_slope;
+    double right_delta = -(h->GetBinContent(right_bin) - (max/2)) / right_slope;
+
+    double left  = h->GetBinCenter(left_bin)  - left_delta;
+    double right = h->GetBinCenter(right_bin) + right_delta;
+
+    if(draw)
+    {
+        TLine* l = new TLine(left,max/2,right,max/2);
+        l->SetLineColor(kRed);
+        l->Draw();
+    }
+
+    return right - left;
 }

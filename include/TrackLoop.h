@@ -39,18 +39,18 @@ namespace X17
     class TrackLoop
     {
     public:
-        Field<MapPoint>* map;        // The ionization electron drift map.
-        Field<Vector>* magfield;     // The magnetic field simulated data.
+        Field<MapPoint>* map;            // The ionization electron drift map.
+        Field<Vector>* magfield;         // The magnetic field simulated data.
 
-        TTree* curr_micro_tree;      // Current tree with microscopic simulation result.
-        MicroPoint curr_micro;       // Current microscopic simulation point.
-        RecoPoint curr_reco;         // Current reconstructed point.
+        TTree* curr_micro_tree;          // Current tree with microscopic simulation result.
+        MicroPoint curr_micro;           // Current microscopic simulation point.
+        RecoPoint curr_reco;             // Current reconstructed point.
 
-        TrackRK* curr_rk;            // Current Runge-Kutta simulated track.
-        RKPoint curr_rkpoint;        // Current point on the current Runge-Kutta track.
+        TrackRK* curr_rk;                // Current Runge-Kutta simulated track.
+        RKPoint curr_rkpoint;            // Current point on the current Runge-Kutta track.
 
-        TrackMicro* curr_microtrack; // Current microscopically simulated track.
-        int curr_track_index;        // Index of the current track in the file(s).
+        TrackMicro* curr_microtrack = 0; // Current microscopically simulated track.
+        int curr_track_index;            // Index of the current track in the file(s).
 
         /// @brief Enumeration of the type of the loop currently running.
         enum LoopType { NONE, SINGLE, MULTI, RK };

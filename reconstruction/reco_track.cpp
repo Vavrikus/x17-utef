@@ -19,6 +19,9 @@
 
 int reco_track()
 {
+    // Which files to choose
+    bool allTracks = false;
+
     // Loading the magnetic field data.
     X17::Field<X17::Vector>* magfield = X17::LoadField("../../data/elmag/VecB2.txt",{-20,-30,-30},{20,30,30},0.5);
 
@@ -26,72 +29,49 @@ int reco_track()
     TFile* map_input = new TFile("../../data/ion_map/sample_2.0/map.root");
     X17::Field<X17::MapPoint>* map = (X17::Field<X17::MapPoint>*)map_input->Get("map");
 
-    // Loading file with one microscopic track.
-    std::string single_track_folder = "../../data/single_track/newest_7030/";
-    TFile* input = new TFile((single_track_folder + "electrons.root").c_str());
-    TTree* single_track = (TTree*)input->Get("electrons");
-
-    std::cout << "Loading track with " << single_track->GetEntries() << " entries.\n";
-
-    // Loading file with Runge-Kutta tracks.
-    TFile* input2 = new TFile("../../data/rk_tracks/rk_tracks.root");
-    TTree* rk_tracks = (TTree*)input2->Get("rk_tracks");
-
-    // Loading file with microscopic tracks. (To be replaced with TChain and multiple files later.)
-    // std::string micro_tracks_folder = "../../data/micro_tracks/grid_00/";
-    // TFile* input3 = new TFile((micro_tracks_folder + "tracks_small59.root").c_str());
-    // TTree* micro_tracks = (TTree*)input3->Get("tracks_small");
-
-    // Loading all files with the microscopic tracks.
-    std::string micro_tracks_folder = "../../data/micro_tracks/new_tracks/";
+    // Loading file(s) with microscopic tracks.
+    std::string micro_tracks_folder;
     TChain* micro_tracks = new TChain("tracks_small");
-    AddFilesToTChain(micro_tracks,micro_tracks_folder + "tracks_small",".root",1,2000);
-
-    // TrackLoop for single microscopic track.
-    TrackLoop* single_loop = new TrackLoop(map,magfield);
     
-    single_loop->AddTask(new DriftTimeTask());
-    single_loop->AddTask(new XZPlotTask());
-    single_loop->AddTask(new XYPlotTask());
-    single_loop->AddTask(new GraphResTask());
-    single_loop->AddTask(new HistResTask());
+    if (allTracks)
+    {
+        micro_tracks_folder = "../../data/micro_tracks/new_tracks/";
+        AddFilesToTChain(micro_tracks,micro_tracks_folder + "tracks_small",".root",1,2000);
+    }
+    else
+    {
+        micro_tracks_folder = "../../data/micro_tracks/grid_01/";
+        micro_tracks->Add((micro_tracks_folder + "tracks_small1000.root").c_str());
+    }
 
-    RecoPadsTask* t = new RecoPadsTask();
-    single_loop->AddTask(t);
-    single_loop->AddTask(new CircleAndRKFitTask(t));
-
-
-    // TrackLoop for Runge-Kutta simulated tracks.
-    TrackLoop* rk_loop = new TrackLoop(map,magfield);
-    rk_loop->AddTask(new CircleFitEnergyTask());
-    // rk_loop->AddTask(new PlotSelectionTask());
-
+    std::cout << "Processing " << micro_tracks->GetEntries() << " tracks.\n";
 
     // TrackLoop for multiple microscopic tracks.
     TrackLoop* multi_loop = new TrackLoop(map,magfield);
-    multi_loop->make_track_plots = false;
+    multi_loop->make_track_plots = !allTracks;
 
-    // multi_loop->AddTask(new DriftTimeTask());
-    // multi_loop->AddTask(new XZPlotTask());
-    // multi_loop->AddTask(new XYPlotTask());
-    // multi_loop->AddTask(new GraphResTask());
-    // multi_loop->AddTask(new HistResTask());
+    if (!allTracks)
+    {
+        // multi_loop->AddTask(new DriftTimeTask());
+        multi_loop->AddTask(new XZPlotTask());
+        multi_loop->AddTask(new XYPlotTask());
+        multi_loop->AddTask(new GraphResTask());
+        multi_loop->AddTask(new HistResTask());
+    }
 
-    RecoPadsTask* t2 = new RecoPadsTask();
+    RecoPadsTask* t2 = new RecoPadsTask(-1.6);
     multi_loop->AddTask(t2);
-    // multi_loop->AddTask(new CircleAndRKFitTask(t2));
-    multi_loop->AddTask(new FitAndSaveTask(t2));
+    if (allTracks) multi_loop->AddTask(new FitAndSaveTask(t2));
+    else multi_loop->AddTask(new CircleAndRKFitTask(t2));
 
     gErrorIgnoreLevel = 6001;
 
-    // Processing.
-    // TFile out_file((single_track_folder + "track_plots.root").c_str(),"RECREATE","Tracks from microscopic simulation");
-    // single_loop->ProcessSingle(single_track);
-    // out_file.Close();
-    // rk_loop->ProcessRK(rk_tracks);
+    TFile* out_file = nullptr;
+    if (allTracks) out_file = new TFile((micro_tracks_folder + "reco_tracks.root").c_str(),"RECREATE","Tracks from microscopic simulation");
+    else out_file = new TFile((micro_tracks_folder + "track_plots1000.root").c_str(),"RECREATE","Tracks from microscopic simulation");
 
-    TFile out_file((micro_tracks_folder + "reco_tracks.root").c_str(),"RECREATE","Tracks from microscopic simulation");
     multi_loop->ProcessMulti(micro_tracks);
+    out_file->Close();
 
     return 0;
 }
@@ -100,3 +80,38 @@ int main(int argc, char const *argv[])
 {
     return reco_track();
 }
+
+// Loading file with one microscopic track.
+    // std::string single_track_folder = "../../data/single_track/newest_7030/";
+    // TFile* input = new TFile((single_track_folder + "electrons.root").c_str());
+    // TTree* single_track = (TTree*)input->Get("electrons");
+    // std::cout << "Loading track with " << single_track->GetEntries() << " entries.\n";
+
+// Loading file with Runge-Kutta tracks.
+    // TFile* input2 = new TFile("../../data/rk_tracks/rk_tracks.root");
+    // TTree* rk_tracks = (TTree*)input2->Get("rk_tracks");
+
+ // TrackLoop for single microscopic track.
+    // TrackLoop* single_loop = new TrackLoop(map,magfield);
+    
+    // single_loop->AddTask(new DriftTimeTask());
+    // single_loop->AddTask(new XZPlotTask());
+    // single_loop->AddTask(new XYPlotTask());
+    // single_loop->AddTask(new GraphResTask());
+    // single_loop->AddTask(new HistResTask());
+
+    // RecoPadsTask* t = new RecoPadsTask();
+    // single_loop->AddTask(t);
+    // single_loop->AddTask(new CircleAndRKFitTask(t));
+
+
+// TrackLoop for Runge-Kutta simulated tracks.
+    // TrackLoop* rk_loop = new TrackLoop(map,magfield);
+    // rk_loop->AddTask(new CircleFitEnergyTask());
+    // rk_loop->AddTask(new PlotSelectionTask());
+
+// Processing.
+    // TFile out_file((single_track_folder + "track_plots.root").c_str(),"RECREATE","Tracks from microscopic simulation");
+    // single_loop->ProcessSingle(single_track);
+    // out_file.Close();
+    // rk_loop->ProcessRK(rk_tracks);

@@ -5,10 +5,12 @@
 
 // ROOT dependencies
 #include "TCanvas.h"
+#include "TF1.h"
 #include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TH3F.h"
+#include "TLatex.h"
 #include "TMath.h"
 #include "TPaletteAxis.h"
 #include "TStyle.h"
@@ -19,11 +21,12 @@
 
 // X17 dependencies
 #include "Track.h"
+#include "Utilities.h"
 #include "X17Utilities.h"
 
 int main(int argc, char const *argv[])
 {
-    std::string data_folder = "../../data/micro_tracks/new_tracks/";
+    std::string data_folder = "../../data/micro_tracks/grid_01/";
 
     // Loading file with track information.
     TFile* input = new TFile((data_folder + "reco_tracks.root").c_str());
@@ -48,10 +51,10 @@ int main(int argc, char const *argv[])
     double E_min = 3;                                                                               // THe minimal simulated energy [MeV].
 
     // Reconstruction ranges.
-    double res_min = -50;
+    double res_min = -20;
     double res_max = -res_min;
-    double res_bins = 201;
-    double res_bins_small = 101;
+    double res_bins = 81;
+    double res_bins_small = 51;
 
     // Adjusting boundaries for the extra bin.
     phi_max   = phi_min   + (phi_max   - phi_min)   * angle_bins  / (angle_bins  - 1);
@@ -67,14 +70,14 @@ int main(int argc, char const *argv[])
     theta_max -= theta_shift;
 
     // Histogram titles.
-    const char* h_all_title                = "Energy resolution (#DeltaE/E);Phi [deg];Theta [deg];Simulated energy [MeV]";
-    const char* h_theta_phi_title          = "Energy resolution (#DeltaE/E);Phi [deg];Theta [deg];#DeltaE/E [\%]";
-    const char* h_theta_energy_title       = "Energy resolution (#DeltaE/E);Theta [deg];Simulated energy [MeV];#DeltaE/E [\%]";
-    const char* h_phi_energy_title         = "Energy resolution (#DeltaE/E);Phi [deg];Simulated energy [MeV];#DeltaE/E [\%]";
-    const char* h_deltaenergy_energy_title = "Energy resolution dependence on energy;Simulated energy [MeV];#DeltaE/E [\%]";
-    const char* h_deltaenergy_phi_title    = "Energy resolution dependence on energy;Phi [deg];#DeltaE/E [\%]";
-    const char* h_deltaenergy_theta_title  = "Energy resolution dependence on energy;Theta [deg];#DeltaE/E [\%]";
-    const char* h_delta_energy_title       = "Energy resolution of Runge-Kutta reconstruction (with pads);#DeltaE/E [\%];#NoE";
+    const char* h_all_title                = "Energy resolution (#frac{E_{rec}-E}{E});Phi [deg];Theta [deg];Simulated energy [MeV]";
+    const char* h_theta_phi_title          = "Energy resolution (#frac{E_{rec}-E}{E});Phi [deg];Theta [deg];#frac{E_{rec}-E}{E} [\%]";
+    const char* h_theta_energy_title       = "Energy resolution (#frac{E_{rec}-E}{E});Theta [deg];Simulated energy [MeV];#frac{E_{rec}-E}{E} [\%]";
+    const char* h_phi_energy_title         = "Energy resolution (#frac{E_{rec}-E}{E});Phi [deg];Simulated energy [MeV];#frac{E_{rec}-E}{E} [\%]";
+    const char* h_deltaenergy_energy_title = "Energy resolution dependence on energy;Simulated energy [MeV];#frac{E_{rec}-E}{E} [\%]";
+    const char* h_deltaenergy_phi_title    = "Energy resolution dependence on phi;Phi [deg];#frac{E_{rec}-E}{E} [\%]";
+    const char* h_deltaenergy_theta_title  = "Energy resolution dependence on theta;Theta [deg];#frac{E_{rec}-E}{E} [\%]";
+    const char* h_delta_energy_title       = "Energy resolution of Runge-Kutta reconstruction (with pads);#frac{E_{rec}-E}{E} [\%];# of events";
 
     // Histogram initializations.
     TH3F* he_all                = new TH3F("he_all",h_all_title,angle_bins,phi_min,phi_max,angle_bins,theta_min,theta_max,energy_bins,E_min,E_max);
@@ -255,84 +258,126 @@ int main(int argc, char const *argv[])
     TCanvas* c_e_theta_phi = new TCanvas("c_e_theta_phi","");
     gStyle->SetPalette(kLightTemperature);
     he_theta_phi->SetStats(0);
-    he_theta_phi->Draw("lego2z");
+    he_theta_phi->Draw("colz");
     he_theta_phi->SetContour(ncont,contours);
     c_e_theta_phi->Write();
 
     TCanvas* c_p_theta_phi = new TCanvas("c_p_theta_phi","");
     gStyle->SetPalette(kLightTemperature);
     hp_theta_phi->SetStats(0);
-    hp_theta_phi->Draw("lego2z");
+    hp_theta_phi->Draw("colz");
     hp_theta_phi->SetContour(ncont,contours);
     c_p_theta_phi->Write();
 
     TCanvas* c_e_theta_energy = new TCanvas("c_e_theta_energy","");
     gStyle->SetPalette(kLightTemperature);
     he_theta_energy->SetStats(0);
-    he_theta_energy->Draw("lego2z");
+    he_theta_energy->Draw("colz");
     he_theta_energy->SetContour(ncont,contours);
     c_e_theta_energy->Write();
 
     TCanvas* c_p_theta_energy = new TCanvas("c_p_theta_energy","");
     gStyle->SetPalette(kLightTemperature);
     hp_theta_energy->SetStats(0);
-    hp_theta_energy->Draw("lego2z");
+    hp_theta_energy->Draw("colz");
     hp_theta_energy->SetContour(ncont,contours);
     c_p_theta_energy->Write();
 
     TCanvas* c_e_phi_energy = new TCanvas("c_e_phi_energy","");
     gStyle->SetPalette(kLightTemperature);
     he_phi_energy->SetStats(0);
-    he_phi_energy->Draw("lego2z");
+    he_phi_energy->Draw("colz");
     he_phi_energy->SetContour(ncont,contours);
     c_e_phi_energy->Write();
 
     TCanvas* c_p_phi_energy = new TCanvas("c_p_phi_energy","");
     gStyle->SetPalette(kLightTemperature);
     hp_phi_energy->SetStats(0);
-    hp_phi_energy->Draw("lego2z");
+    hp_phi_energy->Draw("colz");
     hp_phi_energy->SetContour(ncont,contours);
     c_p_phi_energy->Write();
 
     TCanvas* c_e_theta_phi_abs = new TCanvas("c_e_theta_phi_abs","");
     he_theta_phi_abs->SetStats(0);
-    he_theta_phi_abs->Draw("lego2z");
+    he_theta_phi_abs->Draw("colz");
     c_e_theta_phi_abs->Write();
 
     TCanvas* c_p_theta_phi_abs = new TCanvas("c_p_theta_phi_abs","");
     hp_theta_phi_abs->SetStats(0);
-    hp_theta_phi_abs->Draw("lego2z");
+    hp_theta_phi_abs->Draw("colz");
     c_p_theta_phi_abs->Write();
 
     TCanvas* c_e_theta_energy_abs = new TCanvas("c_e_theta_energy_abs","");
     he_theta_energy_abs->SetStats(0);
-    he_theta_energy_abs->Draw("lego2z");
+    he_theta_energy_abs->Draw("colz");
     c_e_theta_energy_abs->Write();
 
     TCanvas* c_p_theta_energy_abs = new TCanvas("c_p_theta_energy_abs","");
     hp_theta_energy_abs->SetStats(0);
-    hp_theta_energy_abs->Draw("lego2z");
+    hp_theta_energy_abs->Draw("colz");
     c_p_theta_energy_abs->Write();
 
     TCanvas* c_e_phi_energy_abs = new TCanvas("c_e_phi_energy_abs","");
     he_phi_energy_abs->SetStats(0);
-    he_phi_energy_abs->Draw("lego2z");
+    he_phi_energy_abs->Draw("colz");
     c_e_phi_energy_abs->Write();
 
     TCanvas* c_p_phi_energy_abs = new TCanvas("c_p_phi_energy_abs","");
     hp_phi_energy_abs->SetStats(0);
-    hp_phi_energy_abs->Draw("lego2z");
+    hp_phi_energy_abs->Draw("colz");
     c_p_phi_energy_abs->Write();
 
     he_deltaenergy_energy->Write();
     he_deltaenergy_phi->Write();
     he_deltaenergy_theta->Write();
-    he_delta_energy->Write();
 
     hp_deltaenergy_energy->Write();
     hp_deltaenergy_phi->Write();
     hp_deltaenergy_theta->Write();
-    hp_delta_energy->Write();
+
+    TCanvas* c_e_delta_energy = new TCanvas("c_e_delta_energy","");
+    he_delta_energy->SetStats(0);
+    he_delta_energy->Draw();
+
+    double fwhm = GetFWHM(he_delta_energy,true);
+    double mean = he_delta_energy->GetMean();
+    double stdev = he_delta_energy->GetStdDev();
+    double skewness = he_delta_energy->GetSkewness();
+    double kurtosis = he_delta_energy->GetKurtosis();
+
+    // Add text labels with information
+    TLatex* label = new TLatex();
+    label->SetNDC();
+    label->SetTextSize(0.035);
+
+    label->DrawLatex(0.75, 0.85, Form("Mean: %.2f %%", mean));
+    label->DrawLatex(0.75, 0.80, Form("FWHM: %.2f %%", fwhm));
+    label->DrawLatex(0.75, 0.75, Form("RMS: %.2f %%", stdev));
+    // label->DrawLatex(0.75, 0.75, Form("Skewness: %.2f", skewness));
+    // label->DrawLatex(0.75, 0.70, Form("Kurtosis: %.2f", kurtosis));
+    c_e_delta_energy->Write();
+    
+    TCanvas* c_p_delta_energy = new TCanvas("c_p_delta_energy","");
+    hp_delta_energy->SetStats(0);
+    hp_delta_energy->Draw();
+
+    fwhm = GetFWHM(hp_delta_energy,true);
+    mean = hp_delta_energy->GetMean();
+    stdev = hp_delta_energy->GetStdDev();
+    skewness = hp_delta_energy->GetSkewness();
+    kurtosis = hp_delta_energy->GetKurtosis();
+
+    // Add text labels with information
+    TLatex* label2 = new TLatex();
+    label2->SetNDC();
+    label2->SetTextSize(0.035);
+
+    label2->DrawLatex(0.75, 0.85, Form("Mean: %.2f %%", mean));
+    label2->DrawLatex(0.75, 0.80, Form("FWHM: %.2f %%", fwhm));
+    label2->DrawLatex(0.75, 0.75, Form("RMS: %.2f %%", stdev));
+    // label2->DrawLatex(0.75, 0.75, Form("Skewness: %.2f", skewness));
+    // label2->DrawLatex(0.75, 0.70, Form("Kurtosis: %.2f", kurtosis));
+    c_p_delta_energy->Write();
 
     return 0;
 }

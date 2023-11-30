@@ -175,25 +175,41 @@ int make_map()
         outfile->Close();
 
         // Drawing the distortion of the pads.
-        // TFile* mapfile = new TFile("../../../data/ion_map/map.root");
-        // X17::Field<X17::MapPoint>* map2 = (X17::Field<X17::MapPoint>*)mapfile->Get("map");
-        // TCanvas* c_pads = new TCanvas("c_pads", "Pads distortion for different times.");
-        // c_pads->Divide(4,4);
+        TFile* mapfile = new TFile("../../../data/ion_map/sample_2.0/map.root");
+        X17::Field<X17::MapPoint>* map2 = (X17::Field<X17::MapPoint>*)mapfile->Get("map");
+        TCanvas* c_pads = new TCanvas("c_pads", "Pads distortion for different times.");
+        c_pads->Divide(4,4);
 
-        // for (int i = 0; i < 16; i++)
-        // {
-        //     using namespace X17::constants;
+        for (int i = 0; i < 16; i++)
+        {
+            using namespace X17::constants;
             
-        //     c_pads->cd(i+1);
-        //     TGraph* gr = new TGraph();
-        //     gr->AddPoint(-yhigh,xmin);
-        //     gr->AddPoint(yhigh,xmax);
-        //     gr->Draw("AP");
+            c_pads->cd(i+1);
+            TGraph* gr = new TGraph();
+            gr->AddPoint(-yhigh,xmin);
+            gr->AddPoint(yhigh,xmax);
 
-        //     X17::DefaultLayout& pads = X17::DefaultLayout::GetDefaultLayout();
-        //     pads.DrawPadsDistortion((i + 1) * 5000 / 16, c_pads, map2);
-        //     // X17::DrawTrapezoid();
-        // }
+            std::string gr_title = "Pads for t = " + std::to_string(i+1) + " #mus";
+            gr->SetTitle(gr_title.c_str());
+            // gr->GetHistogram()->SetTitleSize(1);
+            gr->GetXaxis()->SetLabelSize(0.05);
+            gr->GetYaxis()->SetLabelSize(0.05);
+            gr->GetXaxis()->SetTitleSize(0.07);
+            gr->GetYaxis()->SetTitleSize(0.07);
+            gr->GetXaxis()->SetTitleOffset(0.6);
+            gr->GetYaxis()->SetTitleOffset(0.6);
+            gr->GetXaxis()->SetTitle("x [cm]");
+            gr->GetYaxis()->SetTitle("y [cm]");
+            gr->Draw("AP");
+
+            X17::DefaultLayout& pads = X17::DefaultLayout::GetDefaultLayout();
+            pads.DrawPadsDistortion((i + 1) * 16000 / 16, c_pads, map2);
+            // X17::DrawTrapezoid();
+        }
+
+        TFile* pad_file = new TFile("../../../data/ion_map/sample_2.0/pad_map.root","RECREATE");
+        c_pads->Write();
+        pad_file->Close();
     }
 
     return 0;

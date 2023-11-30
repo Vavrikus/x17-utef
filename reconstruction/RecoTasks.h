@@ -93,8 +93,8 @@ class XZPlotTask : public RecoTask
         xz->Draw("p same");
 
         TLegend* leg_xz = new TLegend(0.129,0.786,0.360,0.887);
-        leg_xz->AddEntry(xz,"original");
-        leg_xz->AddEntry(xz_reco,"reconstructed");
+        leg_xz->AddEntry(xz,"ionization vertices","p");
+        leg_xz->AddEntry(xz_reco,"reconstructed","p");
         leg_xz->Draw("same");
 
         // Fitting both tracks with circles.
@@ -151,8 +151,8 @@ class XYPlotTask : public RecoTask
         xy->Draw("p same");
 
         TLegend* leg_xy = new TLegend(0.129,0.786,0.360,0.887);
-        leg_xy->AddEntry(xy,"original");
-        leg_xy->AddEntry(xy_reco,"reconstructed");
+        leg_xy->AddEntry(xy,"ionization vertices","p");
+        leg_xy->AddEntry(xy_reco,"reconstructed","p");
         leg_xy->Draw("same");
 
         c->Write();
@@ -322,7 +322,7 @@ class RecoPadsTask : public RecoTask
             c_reco = new TCanvas(c_reco_name.c_str(),"Electron track reconstruction with pads and time bins");
 
             // A histogram for scalling of the axes.
-            TH3F* scale = new TH3F("scale","Electron track reconstruction;x [cm]; y [cm];z [cm]",1,xmin,xmax,1,-yhigh,yhigh,1,height,-height);
+            TH3F* scale = new TH3F("scale","Electron track reconstruction;x [cm]; y [cm];z [cm]",1,xmin,xmax,1,-2,2,1,height,0.1);
             scale->Draw("");
             gStyle->SetOptStat(0);
             scale->GetXaxis()->SetTitleOffset(1.5);
@@ -465,7 +465,7 @@ class CircleAndRKFitTask : public RecoTask
             TGraph* g_en = cfit3d->GetEnergyGraph(*magfield);
             g_cfit3d->SetLineColor(kGreen);
             g_cfit3d->SetLineWidth(2);
-            g_cfit3d->Draw("LINE same");
+            // g_cfit3d->Draw("LINE same");
 
 
             TGraph2D* g_cfit3d_reco = cfit3d_reco->GetGraph(0.1,0);
@@ -481,9 +481,9 @@ class CircleAndRKFitTask : public RecoTask
             g_rkfit->Draw("LINE same");
 
             TLegend* leg_xyz = new TLegend(0.741,0.742,0.956,0.931);
-            leg_xyz->AddEntry(reco_task->g_xyz,"original trajectory");
-            leg_xyz->AddEntry(g_cfit3d,"original trajectory fit by circle");
-            leg_xyz->AddEntry(reco_task->g_xyz_reco,"reconstructed trajectory (with pads)");
+            leg_xyz->AddEntry(reco_task->g_xyz,"original trajectory","p");
+            // leg_xyz->AddEntry(g_cfit3d,"original trajectory fit by circle");
+            leg_xyz->AddEntry(reco_task->g_xyz_reco,"reconstructed trajectory (with pads)","p");
             leg_xyz->AddEntry(g_cfit3d_reco,"reconstructed trajectory fit by circle");
             leg_xyz->AddEntry(g_rkfit,"reconstructed trajectory fit by Runge-Kutta");
             leg_xyz->Draw("same");

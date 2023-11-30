@@ -82,16 +82,16 @@
 				\centering
 				\begin{minipage}[t][4.05cm]{\textwidth}
 					\centering
-					\includegraphics[width=0.82\linewidth]{../images/diagram.png}\newline
+					\textcolor{white}{a\,\,}\includegraphics[width=0.82\linewidth]{../images/diagram.png}\newline
 				\end{minipage}
-				Two out of the six TPC chambers.~\cite{poster}
+				Two out of the six OFTPC chambers.~\cite{poster}
 			\column{0.47 \textwidth}
 				\centering
 				\begin{minipage}[t][4.05cm]{\textwidth}
 					\centering
 					\includegraphics[width=0.71\linewidth]{../images/diagram2.png}\newline
 				\end{minipage}
-				TPC with a triple gas electron multiplier (GEM) readout.~\cite{poster}
+				OFTPC with a triple gas electron multiplier (GEM) readout.~\cite{poster}
 		\end{columns}
 	\end{frame}
 
@@ -99,11 +99,15 @@
 		\frametitle{OFTPC: Reasons for Orthogonal Fields}
 		\begin{itemize}
 			\item No solenoid -- permanent magnets used to generate the field
+			\begin{itemize}
+				\item Parallel fields difficult to create with permanent magnets
+			\end{itemize}
 			\item Space constraints -- granularity of the TPC readout limited in order to fit one SAMPA/SRS hybrid in each of the six sectors
 			\begin{itemize}
 				\item Parallel fields would bend particles parallel to readout, requiring much larger number of pads
 				\item These trajectories would extend to more than one sector, requiring alternative architecture of the detector
 			\end{itemize}
+			\item We expect a similar resolution for significantly lower cost
 		\end{itemize}
 	\end{frame}
 	
@@ -113,7 +117,11 @@
 		\begin{columns}
 			\column{0.5\textwidth}
 				\centering
-				\textcolor{red}{Plot from Maxwell here!}
+				\begin{minipage}[t][4cm]{\textwidth}
+					\centering
+					\vspace{0.4cm}
+					\includegraphics[width = 0.95 \textwidth]{../images/maxwell_zoom.png}
+				\end{minipage}
 			\column{0.5\textwidth}
 				\centering
 				\begin{minipage}[t][4cm]{\textwidth}
@@ -153,7 +161,7 @@
 		\small{$\theta$ taken from the equatorial plane $xy$}
 		\centering
 		\textcolor{white}{aaaaaaaa}\includegraphics[height= 0.61 \textheight]{../images/tpc_micro_simulation.png}\newline
-		\small{Diagram of the batch simulation parameters:\\ $\theta\in[-17.1^\circ,17.1^\circ]$, $\varphi~\in~[-16.3^\circ,16.3^\circ]$, $ E_k \in [3,13] $~MeV.}
+		\small{Diagram of the batch simulation parameters:\\ $\theta\in[-17.1^\circ,17.1^\circ]$, $\varphi~\in~[-16.3^\circ,16.3^\circ]$, $ E_\text{kin.} \in [3,13] $~MeV.}
 	\end{frame}
 	
 	\begin{frame}
@@ -201,9 +209,9 @@
 				\centering
 				\begin{minipage}[t][4.2cm]{\textwidth}
 					\centering
-					\includegraphics[width=0.8\textwidth]{../images/map_lines.png}\\
+					\includegraphics[width=0.7\textwidth]{../images/map_lines_flipped.png}\\
 				\end{minipage}
-				{Partial simulation of the map \textcolor{red}{Fix labels!!!}}
+				{Partial simulation of the map}
 			\column{0.06\textwidth}
 		\end{columns}
 	\end{frame}
@@ -217,7 +225,7 @@
 		\end{itemize}
 		\begin{figure}
 			\centering
-			\includegraphics[height=0.4\textheight]{../images/map_lines.png}\\
+			\includegraphics[height=0.4\textheight]{../images/map_lines_flipped.png}\\
 			\small{Partial simulation of the map}
 		\end{figure}
 	\end{frame}
@@ -225,7 +233,7 @@
 		\frametitle{Ionization electron map simulation}
 		\begin{figure}
 			\centering
-			\includegraphics[width=\textwidth]{../images/map_visualization.png}
+			\includegraphics[width=\textwidth]{../images/map_visualization_big.png}
 			\small{2D visualization of the simulated mapping $\mathcal{M}$ and the inverse mapping $\mathcal{M}^{-1}$.}
 		\end{figure}
 	\end{frame}
@@ -234,7 +242,7 @@
 		\begin{figure}
 			\centering
 			\includegraphics[height=0.68\textheight]{../images/map_dist.png}\\
-			\small{$x$ and $y$ coordinate distortion at different $z$ values (denoted by colors).\textcolor{red}{Probably replace with newer gas composition.}}
+			\small{$x$ and $y$ coordinate distortion at different $z$ values (denoted by colors).}
 		\end{figure}
 	\end{frame}
 	\begin{frame}
@@ -252,7 +260,7 @@
 		\frametitle{Ionization electron map simulation}
 		\begin{figure}
 			\centering
-			\includegraphics[height=0.68\textheight]{../images/pads_dist.png}
+			\includegraphics[height=0.68\textheight]{../images/pads_distortion.png}\\
 			{Pad voxel boundaries for different times.}
 		\end{figure}
 	\end{frame}
@@ -265,11 +273,22 @@
 			\item At first using only the inverse map (not accounting for readout pads)
 			\item Later simple reconstruction with pads and time bins, counting the number of electrons in each bin
 		\end{itemize}
-		\begin{figure}
-			\centering
-			\includegraphics[width=0.6\textwidth]{../images/reco_track.png}\\
-			\small{Original and reconstructed interaction points on the simulated track}
-		\end{figure}
+		\begin{columns}
+			\column{0.5\textwidth}
+				\centering
+				\begin{minipage}[t][4.5cm]{\textwidth}
+					\centering
+					\includegraphics[width=\textwidth]{../images/reco_track_new.png}\\
+				\end{minipage}
+				\small{Original and reconstructed interaction points on the simulated track}
+			\column{0.5\textwidth}
+				\centering
+				\begin{minipage}[t][4.5cm]{\textwidth}
+					\centering
+					\includegraphics[width=\textwidth]{../images/reco_track_pads.png}\\
+				\end{minipage}
+				\small{Reconstruction with pads}
+		\end{columns}
 	\end{frame}
 
 	\section{Energy reconstruction}
@@ -281,11 +300,20 @@
 			\item Known initial position and direction of the particle assumed
 			\item Currently cca 0.3~CPU seconds per track
 		\end{itemize}
-		\begin{figure}
+		\begin{columns}
+			\column{0.5\textwidth}
+				\centering
+				\includegraphics[width=\textwidth]{../images/reco_track_pads2.png}\\
+			\column{0.5\textwidth}
+				\centering
+				\includegraphics[width=\textwidth]{../images/reco_track_pads3.png}\\
+		\end{columns}
+		\vspace{0.5cm}
+		\centering
+		\begin{minipage}{0.8\textwidth}
 			\centering
-			\includegraphics[width=0.5\textwidth]{../images/reco_e.png}\\
-			\small{8 MeV simulated electron energy reconstruction from both original and reconstructed interaction points. Results are 8.27 and 7.93 MeV.}
-		\end{figure}		
+			\small{Energy reconstruction of 8~MeV electron track with both circle fit (8.36~MeV) and Runge-Kutta fit (8.072~MeV)}
+		\end{minipage}
 	\end{frame}
 	\begin{frame}
 		\frametitle{Energy reconstruction precision}
@@ -307,7 +335,73 @@
 			\end{figure}
 		\end{columns}
 		\vspace{0.5cm}
-		\footnotesize{Relative reconstruction deviation of the~kinetic energy of electron and positron tracks. These histograms represent the best possible resolution for our detector.}
+		\footnotesize{Relative reconstruction deviation of the~kinetic energy of electron and positron tracks (cca 5000 of each simulated).}
+	\end{frame}
+	\begin{frame}
+		\frametitle{Energy reconstruction precision}
+		\centering
+		\begin{columns}
+			\column{0.5\textwidth}
+			\centering
+			\Large \textbf{Electrons}
+			\begin{figure}
+				\centering
+				\includegraphics[width = 0.95 \linewidth]{../images/h_e_deltaenergy_energy.png}
+			\end{figure}
+			\column{0.5\textwidth}
+			\centering
+			\Large \textbf{Positrons}
+			\begin{figure}
+				\centering
+				\includegraphics[width = 0.95 \linewidth]{../images/h_p_deltaenergy_energy.png}
+			\end{figure}
+		\end{columns}
+		\vspace{0.5cm}
+		\footnotesize{Relative reconstruction deviation of the~kinetic energy of electron and positron tracks (cca 5000 of each simulated).}
+	\end{frame}
+	\begin{frame}
+		\frametitle{Energy reconstruction precision}
+		\centering
+		\begin{columns}
+			\column{0.5\textwidth}
+			\centering
+			\Large \textbf{Electrons}
+			\begin{figure}
+				\centering
+				\includegraphics[width = 0.95 \linewidth]{../images/h_e_deltaenergy_phi.png}
+			\end{figure}
+			\column{0.5\textwidth}
+			\centering
+			\Large \textbf{Positrons}
+			\begin{figure}
+				\centering
+				\includegraphics[width = 0.95 \linewidth]{../images/h_p_deltaenergy_phi.png}
+			\end{figure}
+		\end{columns}
+		\vspace{0.5cm}
+		\footnotesize{Relative reconstruction deviation of the~kinetic energy of electron and positron tracks (cca 5000 of each simulated).}
+	\end{frame}
+	\begin{frame}
+		\frametitle{Energy reconstruction precision}
+		\centering
+		\begin{columns}
+			\column{0.5\textwidth}
+			\centering
+			\Large \textbf{Electrons}
+			\begin{figure}
+				\centering
+				\includegraphics[width = 0.95 \linewidth]{../images/h_e_deltaenergy_theta.png}
+			\end{figure}
+			\column{0.5\textwidth}
+			\centering
+			\Large \textbf{Positrons}
+			\begin{figure}
+				\centering
+				\includegraphics[width = 0.95 \linewidth]{../images/h_p_deltaenergy_theta.png}
+			\end{figure}
+		\end{columns}
+		\vspace{0.5cm}
+		\footnotesize{Relative reconstruction deviation of the~kinetic energy of electron and positron tracks (cca 5000 of each simulated).}
 	\end{frame}
 	
 	
@@ -323,7 +417,7 @@
 			\item The map has been tested by the track reconstruction.
 			\item First results suggest that:
 			\begin{itemize}
-				\item Best possible resolution $\frac{E_\text{rec}-E}{E} \approx 3.5\%$, positrons have worse resolution.
+				\item Current energy resolution (FWHM) is 3.2~\% for electrons and 4.8~\% for positrons.
 				\item OFTPC works well on a simulation level.
 			\end{itemize}
 		\end{itemize}
@@ -336,16 +430,6 @@
 			\item Optimize Runge-Kutta integration fit with likelihood approach (instead of least squares) if needed
 			\item Write a faster simulation method for secondary electrons using the map
 			\item Fix the observed systematic error of reconstruction
-		\end{itemize}
-	\end{frame}
-	\begin{frame}
-		\frametitle{Notes (what else to mention)}
-		\begin{itemize}
-			\item Extra slide with the whole process summary?
-			\item Better description than pad voxels.
-			\item Residues on first attempts of track reconstruction?
-			\item Change energy reconstruction figure!
-			\item More energy reconstruction resolution figures.
 		\end{itemize}
 	\end{frame}
 	
@@ -364,6 +448,14 @@
 		%\printbibliography
 		\bibliography{../references}
 		\bibliographystyle{unsrt}
+	\end{frame}
+	\begin{frame}[noframenumbering]
+	\frametitle{Notes (what else to mention)}
+		\begin{itemize}
+			\item Extra slide with the whole process summary?
+			\item Better description than pad voxels.
+			\item Residues on first attempts of track reconstruction?
+		\end{itemize}
 	\end{frame}
 	
 \end{document}
