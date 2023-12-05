@@ -327,13 +327,61 @@ int main(int argc, char const *argv[])
     hp_phi_energy_abs->Draw("colz");
     c_p_phi_energy_abs->Write();
 
-    he_deltaenergy_energy->Write();
-    he_deltaenergy_phi->Write();
-    he_deltaenergy_theta->Write();
+    TCanvas* c_e_deltaenergy_energy = new TCanvas("c_e_deltaenergy_energy","");
+    he_deltaenergy_energy->SetStats(0);
+    he_deltaenergy_energy->SetMaximum(100);
+    he_deltaenergy_energy->Draw("colz");
+    TLine* y0_line = new TLine(he_deltaenergy_energy->GetXaxis()->GetXmin(),0,he_deltaenergy_energy->GetXaxis()->GetXmax(),0);
+    y0_line->SetLineWidth(4);
+    y0_line->Draw("same");
+    c_e_deltaenergy_energy->Write();
 
-    hp_deltaenergy_energy->Write();
-    hp_deltaenergy_phi->Write();
-    hp_deltaenergy_theta->Write();
+    TCanvas* c_e_deltaenergy_phi = new TCanvas("c_e_deltaenergy_phi","");
+    he_deltaenergy_phi->SetStats(0);
+    he_deltaenergy_phi->SetMaximum(85);
+    he_deltaenergy_phi->Draw("colz");
+    y0_line = new TLine(he_deltaenergy_phi->GetXaxis()->GetXmin(),0,he_deltaenergy_phi->GetXaxis()->GetXmax(),0);
+    y0_line->SetLineWidth(4);
+    y0_line->Draw("same");
+    c_e_deltaenergy_phi->Write();
+
+    TCanvas* c_e_deltaenergy_theta = new TCanvas("c_e_deltaenergy_theta","");
+    he_deltaenergy_theta->SetStats(0);
+    he_deltaenergy_theta->SetMaximum(60);
+    he_deltaenergy_theta->Draw("colz");
+    y0_line = new TLine(he_deltaenergy_theta->GetXaxis()->GetXmin(),0,he_deltaenergy_theta->GetXaxis()->GetXmax(),0);
+    y0_line->SetLineWidth(4);
+    y0_line->Draw("same");
+    c_e_deltaenergy_theta->Write();
+
+
+    TCanvas* c_p_deltaenergy_energy = new TCanvas("c_p_deltaenergy_energy","");
+    hp_deltaenergy_energy->SetStats(0);
+    hp_deltaenergy_energy->SetMaximum(100);
+    hp_deltaenergy_energy->Draw("colz");
+    y0_line = new TLine(hp_deltaenergy_energy->GetXaxis()->GetXmin(),0,hp_deltaenergy_energy->GetXaxis()->GetXmax(),0);
+    y0_line->SetLineWidth(4);
+    y0_line->Draw("same");
+    c_p_deltaenergy_energy->Write();
+
+    TCanvas* c_p_deltaenergy_phi = new TCanvas("c_p_deltaenergy_phi","");
+    hp_deltaenergy_phi->SetStats(0);
+    hp_deltaenergy_phi->SetMaximum(85);
+    hp_deltaenergy_phi->Draw("colz");
+    y0_line = new TLine(hp_deltaenergy_phi->GetXaxis()->GetXmin(),0,hp_deltaenergy_phi->GetXaxis()->GetXmax(),0);
+    y0_line->SetLineWidth(4);
+    y0_line->Draw("same");
+    c_p_deltaenergy_phi->Write();
+
+    TCanvas* c_p_deltaenergy_theta = new TCanvas("c_p_deltaenergy_theta","");
+    hp_deltaenergy_theta->SetStats(0);
+    hp_deltaenergy_theta->SetMaximum(60);
+    hp_deltaenergy_theta->Draw("colz");
+    y0_line = new TLine(hp_deltaenergy_theta->GetXaxis()->GetXmin(),0,hp_deltaenergy_theta->GetXaxis()->GetXmax(),0);
+    y0_line->SetLineWidth(4);
+    y0_line->Draw("same");
+    c_p_deltaenergy_theta->Write();
+
 
     TCanvas* c_e_delta_energy = new TCanvas("c_e_delta_energy","");
     he_delta_energy->SetStats(0);

@@ -33,7 +33,8 @@
 	
 	\begin{frame}
 		\titlepage
-		\textcolor{red}{Add grant + MetaCentrum}
+		\flushleft\scriptsize{Funding: GAČR GA21-21801S\\}
+		\tiny{Computational resources were provided by the e-INFRA CZ project (ID:90254),\\ supported by the Ministry of Education, Youth and Sports of the Czech Republic.}
 	\end{frame}
 	
 	\begin{frame}
@@ -43,7 +44,7 @@
 	
 	\section{Motivation}
 	\begin{frame}
-		\frametitle{Motivation: ATOMKI measurements}
+		\frametitle{Motivation: ATOMKI Measurements}
 		\begin{itemize}
 			\item Measurement of anomalies in the angular correlation of an~electron-positron pair internally produced in excited $ {}^8\text{Be} $ and $ {}^4\text{He} $\newline
 			\begin{columns}
@@ -75,7 +76,7 @@
 	\begin{frame}
 		\frametitle{OFTPC: Detector Configuration}
 		\begin{itemize}
-			\item Time Projection Chamber with Orthogonal Fields (OFTPC) -- electric and magnetic field perpendicular
+			\item Time Projection Chamber with Orthogonal Fields (OFTPC) -- electric and magnetic field perpendicular (gas mixture Ar/CO$_2$~--~70/30)
 		\end{itemize}
 		\begin{columns}
 			\column{0.47 \textwidth}
@@ -107,13 +108,13 @@
 				\item Parallel fields would bend particles parallel to readout, requiring much larger number of pads
 				\item These trajectories would extend to more than one sector, requiring alternative architecture of the detector
 			\end{itemize}
-			\item We expect a similar resolution for significantly lower cost
+			\item We will show a similar resolution for significantly lower cost
 		\end{itemize}
 	\end{frame}
 	
 	\begin{frame}
 		\frametitle{OFTPC: Complications}
-		Inhomogeneous magnetic field (simulated using Maxwell~\textcolor{red}{Add citation!})
+		Inhomogeneous magnetic field (simulated using Maxwell~\cite{maxwell})
 		\begin{columns}
 			\column{0.5\textwidth}
 				\centering
@@ -135,9 +136,9 @@
 		\end{itemize}
 	\end{frame}
 	
-	\section{Track simulation}
+	\section{Track Simulation}
 	\begin{frame}
-		\frametitle{Track simulation}
+		\frametitle{Track Simulation}
 		\begin{itemize}
 			\item Garfield++ used for track simulation
 			\begin{itemize}
@@ -155,7 +156,7 @@
 	\end{frame}
 	
 	\begin{frame}
-		\frametitle{Track simulation}
+		\frametitle{Track Simulation}
 		\centering
 		\large{Spherical angles ($\theta$,$\varphi$) with respect to~$z$}\\
 		\small{$\theta$ taken from the equatorial plane $xy$}
@@ -165,7 +166,7 @@
 	\end{frame}
 	
 	\begin{frame}
-		\frametitle{Simulated track example (microscopic tracking)}
+		\frametitle{Simulated Track Example (microscopic tracking)}
 		\begin{itemize}
 			\item Electron track with kinetic energy 8~MeV, $\theta = 0^\circ$ and $\varphi = 0^\circ$
 			\item Diffusion less than 1.5~mm in both directions
@@ -188,7 +189,7 @@
 	\end{frame}
 
 	\begin{frame}
-		\frametitle{Ionization electrons map simulation}
+		\frametitle{Ionization Electrons Map Simulation}
 		\begin{itemize}
 			\item We want an~unambiguous map of the drift of secondary electrons for the reconstruction
 			\item We can use a~simulation of evenly spaced electrons
@@ -217,7 +218,7 @@
 	\end{frame}
 
 	\begin{frame}
-		\frametitle{Ionization electron map simulation}
+		\frametitle{Ionization Electron Map Simulation}
 		\begin{itemize}
 			\item As a result we get an approximation of a mapping from initial coordinates of the electrons $(x,y,z)$ to the readout coordinates $(x',y',t)$
 			\item By interpolating we can get the inverse map
@@ -230,7 +231,7 @@
 		\end{figure}
 	\end{frame}
 	\begin{frame}
-		\frametitle{Ionization electron map simulation}
+		\frametitle{Ionization Electron Map Simulation}
 		\begin{figure}
 			\centering
 			\includegraphics[width=\textwidth]{../images/map_visualization_big.png}
@@ -238,7 +239,7 @@
 		\end{figure}
 	\end{frame}
 	\begin{frame}
-		\frametitle{Ionization electron map simulation}
+		\frametitle{Ionization Electron Map Simulation}
 		\begin{figure}
 			\centering
 			\includegraphics[height=0.68\textheight]{../images/map_dist.png}\\
@@ -246,7 +247,7 @@
 		\end{figure}
 	\end{frame}
 	\begin{frame}
-		\frametitle{Ionization electron map simulation}
+		\frametitle{Ionization Electron Map Simulation}
 		\centering
 		\begin{minipage}[c]{0.9\textwidth}
 			\begin{figure}
@@ -257,7 +258,7 @@
 		\end{minipage}
 	\end{frame}
 	\begin{frame}
-		\frametitle{Ionization electron map simulation}
+		\frametitle{Ionization Electron Map Simulation}
 		\begin{figure}
 			\centering
 			\includegraphics[height=0.68\textheight]{../images/pads_distortion.png}\\
@@ -266,9 +267,9 @@
 	\end{frame}
 
 
-	\section{Track reconstruction}
+	\section{Track Reconstruction}
 	\begin{frame}
-		\frametitle{Track reconstruction}
+		\frametitle{Track Reconstruction}
 		\begin{itemize}
 			\item At first using only the inverse map (not accounting for readout pads)
 			\item Later simple reconstruction with pads and time bins, counting the number of electrons in each bin
@@ -291,9 +292,9 @@
 		\end{columns}
 	\end{frame}
 
-	\section{Energy reconstruction}
+	\section{Energy Reconstruction}
 	\begin{frame}
-		\frametitle{Energy reconstruction}
+		\frametitle{Energy Reconstruction}
 		\begin{itemize}
 			\item Prefit with circle with smoothly attached lines
 			\item Kinetic energy fit using 4\textsuperscript{th} order Runge-Kutta
@@ -316,7 +317,7 @@
 		\end{minipage}
 	\end{frame}
 	\begin{frame}
-		\frametitle{Energy reconstruction precision}
+		\frametitle{Energy Reconstruction Precision}
 		\centering
 		\begin{columns}
 			\column{0.5\textwidth}
@@ -338,7 +339,7 @@
 		\footnotesize{Relative reconstruction deviation of the~kinetic energy of electron and positron tracks (cca 5000 of each simulated).}
 	\end{frame}
 	\begin{frame}
-		\frametitle{Energy reconstruction precision}
+		\frametitle{Energy Reconstruction Precision}
 		\centering
 		\begin{columns}
 			\column{0.5\textwidth}
@@ -360,7 +361,7 @@
 		\footnotesize{Relative reconstruction deviation of the~kinetic energy of electron and positron tracks (cca 5000 of each simulated).}
 	\end{frame}
 	\begin{frame}
-		\frametitle{Energy reconstruction precision}
+		\frametitle{Energy Reconstruction Precision}
 		\centering
 		\begin{columns}
 			\column{0.5\textwidth}
@@ -382,7 +383,7 @@
 		\footnotesize{Relative reconstruction deviation of the~kinetic energy of electron and positron tracks (cca 5000 of each simulated).}
 	\end{frame}
 	\begin{frame}
-		\frametitle{Energy reconstruction precision}
+		\frametitle{Energy Reconstruction Precision}
 		\centering
 		\begin{columns}
 			\column{0.5\textwidth}
@@ -419,6 +420,7 @@
 			\begin{itemize}
 				\item Current energy resolution (FWHM) is 3.2~\% for electrons and 4.8~\% for positrons.
 				\item OFTPC works well on a simulation level.
+				\item Some of the systematic errors can be corrected.
 			\end{itemize}
 		\end{itemize}
 	\end{frame}
@@ -429,7 +431,8 @@
 			\item Account for GEM in the simulation, charge distribution between pads
 			\item Optimize Runge-Kutta integration fit with likelihood approach (instead of least squares) if needed
 			\item Write a faster simulation method for secondary electrons using the map
-			\item Fix the observed systematic error of reconstruction
+			\item Fix the observed systematic errors of reconstruction
+			\item Test different geometries
 		\end{itemize}
 	\end{frame}
 	
@@ -450,12 +453,36 @@
 		\bibliographystyle{unsrt}
 	\end{frame}
 	\begin{frame}[noframenumbering]
-	\frametitle{Notes (what else to mention)}
-		\begin{itemize}
-			\item Extra slide with the whole process summary?
-			\item Better description than pad voxels.
-			\item Residues on first attempts of track reconstruction?
-		\end{itemize}
+		\frametitle{Reconstruction Testing Summary}
+		\begin{enumerate}
+			\item Ionization electron map simulation of secondary electrons in the entire volume of the OFTPC
+			\item Track(s) simulated using HEED and microscopic tracking
+			\item Counting the number of secondaries in each pad and time bin of the readout
+			\item Using the map to reconstruct the position of centers of pads for given centers of time bins
+			\item Fitting of the reconstructed points with circle and lines fit using least squares weighted by the number of secondaries in each point
+			\item Using the magnetic field in the middle of the track to get first energy estimate
+			\item Using the 4\textsuperscript{th} order Runge-Kutta fit with least squares to refine the energy estimate
+		\end{enumerate}
+	\end{frame}
+	\begin{frame}[noframenumbering]
+		\frametitle{Ionization Electron Map Reconstruction Residuals}
+		\centering
+		\includegraphics[width=0.92\textwidth]{../images/res_graphs.png}
+	\end{frame}
+	\begin{frame}[noframenumbering]
+		\frametitle{Ionization Electron Map Reconstruction Residuals}
+		\centering
+		\includegraphics[width=0.92\textwidth]{../images/res_hists.png}
+	\end{frame}
+	\begin{frame}[noframenumbering]
+		\frametitle{Track Simulation -- TPC Window}
+		\centering
+		\includegraphics[width=0.6\textwidth]{../images/tpc_window_sim.png}
+	\end{frame}
+	\begin{frame}[noframenumbering]
+		\frametitle{Phi Systematic Error and Pad Geometry}
+		\centering
+		\includegraphics[width=0.85\textwidth]{../images/phi_systematic_error.png}
 	\end{frame}
 	
 \end{document}

@@ -191,19 +191,19 @@ class GraphResTask : public RecoTask
         c->Divide(2,2);
         
         c->cd(1);
-        gx_res->SetTitle("X residuals;x [cm];Δx [cm]");
+        gx_res->SetTitle("X residuals;x [cm];#Deltax [cm]");
         gx_res->SetMarkerStyle(2);
         gx_res->SetMarkerSize(0.4);
         gx_res->Draw("ap");
         
         c->cd(2);
-        gy_res->SetTitle("Y residuals;x [cm];Δy [cm]");
+        gy_res->SetTitle("Y residuals;x [cm];#Deltay [cm]");
         gy_res->SetMarkerStyle(2);
         gy_res->SetMarkerSize(0.4);
         gy_res->Draw("ap");
         
         c->cd(3);
-        gz_res->SetTitle("Z residuals;x [cm];Δz [cm]");
+        gz_res->SetTitle("Z residuals;x [cm];#Deltaz [cm]");
         gz_res->SetMarkerStyle(2);
         gz_res->SetMarkerSize(0.4);
         gz_res->Draw("ap");
@@ -225,10 +225,10 @@ class HistResTask : public RecoTask
 
     void PreElectronLoop() override
     {
-        hx_res = new TH1F("hx_res","X residuals",25,-0.5,0.5);
-        hy_res = new TH1F("hy_res","Y residuals",25,-0.5,0.5);
-        hz_res = new TH1F("hz_res","Z residuals",25,-0.5,0.5);
-        hr_res = new TH1F("hr_res","Residuals",25,0,1);
+        hx_res = new TH1F("hx_res","X residuals;x deviation [cm];# of electrons",25,-0.2,0.2);
+        hy_res = new TH1F("hy_res","Y residuals;y deviation [cm];# of electrons",25,-0.2,0.2);
+        hz_res = new TH1F("hz_res","Z residuals;z deviation [cm];# of electrons",25,-0.2,0.2);
+        hr_res = new TH1F("hr_res","Residuals;Deviation [cm];# of electrons",25,0,0.25);
     }
 
     void ElectronLoop() override
