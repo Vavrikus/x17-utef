@@ -322,7 +322,7 @@ class RecoPadsTask : public RecoTask
             c_reco = new TCanvas(c_reco_name.c_str(),"Electron track reconstruction with pads and time bins");
 
             // A histogram for scalling of the axes.
-            TH3F* scale = new TH3F("scale","Electron track reconstruction;x [cm]; y [cm];z [cm]",1,xmin,xmax,1,-2,2,1,height,0.1);
+            TH3F* scale = new TH3F("scale","Electron track reconstruction;x [cm]; y [cm];z [cm]",1,xmin,xmax,1,-2,2,1,height,-height);
             scale->Draw("");
             gStyle->SetOptStat(0);
             scale->GetXaxis()->SetTitleOffset(1.5);

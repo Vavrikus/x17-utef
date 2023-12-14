@@ -1,0 +1,4 @@
+/var/spool/pbs/mom_priv/jobs/18722593.meta-pbs.metacentrum.cz.SC: line 57: 797237 Killed                  ./micro_tracks $PAR1 $PAR2 $PAR3 $PAR4 $PAR5 &> tracks$PAR2.out
+Calculation ended up erroneously (with a code 0) !!
+cp: cannot stat 'tracks_small1.root': No such file or directory
+Result file copying failed (with a code 1) !!
