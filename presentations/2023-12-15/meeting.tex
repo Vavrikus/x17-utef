@@ -1,0 +1,167 @@
+\documentclass{beamer}
+\usetheme{Madrid}
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+
+\usepackage[main=english,czech]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{url}
+\usepackage{caption}
+
+\captionsetup[figure]{font=footnotesize}
+
+%\usepackage{biblatex}
+%\addbibresource{references.bib}
+
+\AtBeginSection[]
+{
+	\begin{frame}<beamer>[noframenumbering]
+		\frametitle{Outline}
+		\tableofcontents[currentsection]
+	\end{frame}
+}
+
+\title[Runge-Kutta Algorithm Energy Resolution]{Energy Resolution of Runge-Kutta Reconstruction of Padded Microscopically Simulated Tracks}
+\subtitle{Second Iteration, More Data}
+\author[M.~Vavřík]{\foreignlanguage{czech}{Martin Vavřík}\vspace{0.5cm}\\martin.vavrik@cvut.cz\\IEAP CTU PRAGUE\\}
+\logo{\includegraphics[width=0.08\textwidth]{../images/logo}}
+\date{December 15, 2023}
+
+\begin{document}
+	
+	\begin{frame}
+		\titlepage
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Outline}
+		\tableofcontents
+	\end{frame}
+	
+	\section{Grid-like track simulation}
+	\begin{frame}
+		\frametitle{Grid-like track simulation}
+		\begin{itemize}
+			\item We use Garfield++ for track simulation
+			\begin{itemize}
+				\item Primary relativistic particle simulated using HEED program~\cite{heed}
+				\item Secondary ionization electrons simulated using microscopic tracking (uses equation of motion)
+			\end{itemize}
+			\item Microscopic tracks were simulated on MetaCentrum to test the Runge-Kutta padded reconstruction
+			\begin{itemize}
+				\item 2000 + 9702 jobs, each 20-160 hours runtime, 20~GB RAM allocated
+				\item 5 sets of 9702 tracks were simulated (electron vs positron, 21~theta angles, 21~phi angles, 11~energies 3-13~MeV)
+				\item Reconstruction lasts around 0.3 seconds per track
+			\end{itemize}
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Simulation ranges}
+		\centering
+		\large{Spherical angles ($\theta$,$\varphi$) with respect to~$z$}\\
+		\small{$\theta$ taken from the equatorial plane $xy$}
+		\centering
+		\textcolor{white}{aaaaaaaa}\includegraphics[height= 0.61 \textheight]{../images/tpc_micro_simulation.png}\newline
+		\small{Diagram of the batch simulation parameters:\\ $\theta\in[-17.1^\circ,17.1^\circ]$, $\varphi~\in~[-16.3^\circ,16.3^\circ]$, $ E_\text{kin.} \in [3,13] $~MeV.}
+	\end{frame}
+	
+	\section{Direction independent resolution}
+	
+	\begin{frame}
+		\frametitle{Energy resolution for all tracks}
+		\begin{columns}
+			\column{0.5\textwidth}
+			\centering
+			\Large \textbf{Electrons}
+			\begin{figure}
+				\centering
+				\includegraphics[width = 0.95 \linewidth]{../images/e_delta_energy_all.png}
+			\end{figure}
+			\column{0.5\textwidth}
+			\centering
+			\Large \textbf{Positrons}
+			\begin{figure}
+				\centering
+				\includegraphics[width = 0.95 \linewidth]{../images/p_delta_energy_all.png}
+			\end{figure}
+		\end{columns}
+	\end{frame}
+	\begin{frame}
+		\frametitle{Energy resolution dependence on simulated energy}
+		\begin{columns}
+			\column{0.5\textwidth}
+			\centering
+			\Large \textbf{Electrons}
+			\begin{figure}
+				\centering
+				\includegraphics[width = 0.95 \linewidth]{../images/e_deltaenergy_energy_all.png}
+			\end{figure}
+			\column{0.5\textwidth}
+			\centering
+			\Large \textbf{Positrons}
+			\begin{figure}
+				\centering
+				\includegraphics[width = 0.95 \linewidth]{../images/p_deltaenergy_energy_all.png}
+			\end{figure}
+		\end{columns}
+	\end{frame}
+	
+	\section{Direction dependent resolution}
+	
+	\begin{frame}
+		\frametitle{Energy resolution dependence on phi}
+		\begin{columns}
+			\column{0.5\textwidth}
+			\centering
+			\Large \textbf{Electrons}
+			\begin{figure}
+				\centering
+				\includegraphics[width = 0.95 \linewidth]{../images/e_deltaenergy_phi_all.png}
+			\end{figure}
+			\column{0.5\textwidth}
+			\centering
+			\Large \textbf{Positrons}
+			\begin{figure}
+				\centering
+				\includegraphics[width = 0.95 \linewidth]{../images/p_deltaenergy_phi_all.png}
+			\end{figure}
+		\end{columns}
+	\end{frame}
+	\begin{frame}
+		\frametitle{Energy resolution dependence on theta}
+		\begin{columns}
+			\column{0.5\textwidth}
+			\centering
+			\Large \textbf{Electrons}
+			\begin{figure}
+				\centering
+				\includegraphics[width = 0.95 \linewidth]{../images/e_deltaenergy_theta_all.png}
+			\end{figure}
+			\column{0.5\textwidth}
+			\centering
+			\Large \textbf{Positrons}
+			\begin{figure}
+				\centering
+				\includegraphics[width = 0.95 \linewidth]{../images/p_deltaenergy_theta_all.png}
+			\end{figure}
+		\end{columns}
+	\end{frame}
+	
+	{
+		%\usebackgroundtemplate{\includegraphics[width=\paperwidth,height=\paperheight]{../images/DSC_5602.jpg}}%
+		\begin{frame}[noframenumbering]{}
+			\begin{center}
+				\Huge Thank you for your attention.
+			\end{center}
+		\end{frame}
+	}
+	
+	%\section{References}
+	\begin{frame}[allowframebreaks,noframenumbering]
+		\frametitle{References}
+		%\printbibliography
+		\bibliography{../references}
+		\bibliographystyle{unsrt}
+	\end{frame}
+	
+\end{document}

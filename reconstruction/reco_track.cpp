@@ -20,7 +20,7 @@
 int reco_track()
 {
     // Which files to choose
-    bool allTracks = false;
+    bool allTracks = true;
 
     // Loading the magnetic field data.
     X17::Field<X17::Vector>* magfield = X17::LoadField("../../data/elmag/VecB2.txt",{-20,-30,-30},{20,30,30},0.5);
@@ -35,8 +35,10 @@ int reco_track()
     
     if (allTracks)
     {
-        micro_tracks_folder = "../../data/micro_tracks/new_tracks/";
+        micro_tracks_folder = "../../data/micro_tracks/grid_01/";
         AddFilesToTChain(micro_tracks,micro_tracks_folder + "tracks_small",".root",1,2000);
+        micro_tracks_folder = "../../data/micro_tracks/grid_02/";
+        AddFilesToTChain(micro_tracks,micro_tracks_folder + "tracks_small",".root",1,9702);
     }
     else
     {
@@ -67,7 +69,7 @@ int reco_track()
     gErrorIgnoreLevel = 6001;
 
     TFile* out_file = nullptr;
-    if (allTracks) out_file = new TFile((micro_tracks_folder + "reco_tracks.root").c_str(),"RECREATE","Tracks from microscopic simulation");
+    if (allTracks) out_file = new TFile((micro_tracks_folder + "../reco_tracks.root").c_str(),"RECREATE","Tracks from microscopic simulation");
     else out_file = new TFile((micro_tracks_folder + "track_plots1000.root").c_str(),"RECREATE","Tracks from microscopic simulation");
 
     multi_loop->ProcessMulti(micro_tracks);
