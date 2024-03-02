@@ -1,7 +1,7 @@
 \chapter{Track Simulation}
 	In order to develop and test the~reconstruction algorithm, electron and positron tracks are simulated inside our detector with different initial parameters. Three approaches are used to simulate tracks for different purposes.
 	
-	The \textbf{Microscopic Simulation} uses the~Garfield++ toolkit~\cite{Garfield++}. Within this toolkit, the~\ac{HEED} program~\cite{HEED} is used to simulate the~primary particle and class \textit{AvalancheMicroscopic} to simulate the~drift of secondary electrons created by ionization in the gas. This is the most precise and time-consuming simulation used, our current goal is to be able to successfully reconstruct its results and determine our best-case energy resolution.
+	The \textbf{Microscopic Simulation} uses the~Garfield++ toolkit~\cite{Garfield++}. Within this toolkit, the~\ac{HEED} program~\cite{HEED} is used to simulate the~primary particle and the~class \textit{AvalancheMicroscopic} to simulate the~drift of secondary electrons created by ionization in the gas. This is the most precise and time-consuming simulation used, our current goal is to be able to successfully reconstruct its results and determine our best-case energy resolution.
 	
 	The \textbf{Runge-Kutta Simulation} uses the 4th order Runge-Kutta numerical integration (\textcolor{red}{add citation for Runge-Kutta}) to simulate the~trajectory of the~primary particle in the~electromagnetic field inside the~detector. It is relatively fast since it does not simulate the secondary particles. It is used as a~part of our reconstruction algorithm as well as for testing of some parts of the reconstruction.
 	
@@ -12,7 +12,16 @@
 	\textcolor{red}{Single track in positive x direction or initial parameters randomization. Importance of gas composition, used gas compositions.}
 	
 	\section{Microscopic Simulation}
-		\textcolor{red}{Primary track simulated in HEED. Ionization electron drift simulated with AvalancheMicroscopic in Garfield.}
+	\label{sec:microsim}
+		The~microscopic simulation is the~most detailed simulation used in this work. We use the Garfield++ toolkit~\cite{Garfield++} for this purpose. 
+		
+		The electron transport properties are simulated using the~program Magboltz~(\textcolor{red}{Add citation.}). Two different gas mixtures were used, 90\%~Ar~+~10\%~CO$_2$ and 70\%~Ar~+~30\%~CO$_2$. The second mixture is planned to be used in our detector. The temperature is set to 20~$^\circ$C, the pressure is atmospheric.
+		
+		The primary track is simulated using the program~\ac{HEED}~\cite{HEED}, which is an implementation of the photo-absorption ionization model. From this program, we get the parameters of ionizing collisions. \ac{HEED} can also be used to simulate the transport of delta electrons, we do not account for these in the current simulation but plan to include them in future. The  photons created in the atomic relaxation cascade are also not simulated.
+		
+		Finally, we use the~microscopic tracking provided by the~class \textit{AvalancheMicroscopic} to simulate the~drift of the~ionization electrons. Each electron is followed from collision to collision (using the collision rates calculated by Magboltz) using the equation of motion.
+		
+		\textcolor{red}{First simulated track in the z direction. Figures.}
 		
 		\begin{figure}
 			\centering

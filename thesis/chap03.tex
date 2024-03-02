@@ -11,7 +11,23 @@
 	\textcolor{red}{Reconstruction of one track simulated with microscopic tracking in Garfield++.}
 	
 	\section{First Attempts}
-		\textcolor{red}{Using the same method as in standard TPC (calculating $z$ from the drift time). Gas composition 90/10.}
+		As the~first step of the~work, we decided to try to reconstruct an~electron track with a~special set of initial parameters. The~origin of the~particle is given by the~origin of our coordinate system. The initial direction is given by the~positive $x$~axis. This means the~magnetic field of our detector is perpendicular to the~momentum of our particle at all times and we can reduce the problem to two dimensional space. We use a~track simulated using the~microscopic simulation (see section~\ref{sec:microsim}) with a~kinetic energy of 8~MeV. The gas composition used in this simulation is 90\%~Ar~+~10\%~CO$_2$.
+		
+		In this first approach to the~reconstruction of the~track, we decided to use the~common method used in a~standard \ac{TPC}. This will allow us to explore the significance of the~atypical behavior in our \ac{OFTPC}. At the~same time, we consider the~readout to be continuous to further simplify the~problem. In this approximation we reconstruct the~initial position of each ionization electron.
+		
+		The~reconstruction is then defined by the~following relations between the~coordinates of the~detector space and the~readout space (see section~\ref{sec:coor}):
+			\begin{eqnarray}
+				x = x',\\
+				y = y',\\
+				z = v_d t,
+			\end{eqnarray}
+		where $v_d$ is the~drift velocity of electrons in the~given gas mixture. On a~phenomenological level, this velocity can be considered a~function of the~electric field~$\bm{E}$ and the~magnetic field~$\bm{B}$:
+			\begin{equation}
+				v_d = v_d(\bm{E},\bm{B}).
+			\end{equation}
+		\textcolor{red}{Taken from Garfield user manual.} The~Garfield++ toolkit uses this fact to accelerate their drift simulation with non-microscopic approaches. Since we assume uniform electric field in our detector and we want to neglect the~effect of our unusual magnetic field, we consider the~drift velocity to be constant in this scenario. We then approximate this velocity by fitting the dependence $z(t)$ taken from the~simulated ionization electrons.\textcolor{red}{This is in one of the provisional figures. Also this description is not completely accurate, in reality we fit t1:8-y0 with a1*x+a0 and then invert this and use 8-y0 = b1*t1+b0 (old coordinates), b1=1/a1 functions as the drift velocity. Maybe also define this 8-z variable as an alternative to z in the section~\ref{sec:coor} and then use it when correcting this.}
+		
+		\textcolor{red}{Later, in a commit after this, I plot some residues (provisional figure) which could be useful but for some reason they are residuals from a spline fit of the track?! Probably redo this without the spline fit, just explore the difference in individual points.}
 		
 		\begin{figure}
 			\centering
@@ -54,9 +70,6 @@
 		
 		\subsection{Gradient Descent Search}
 			\textcolor{red}{Gradient descent search of a point in the original space that gets mapped to the given point of the readout space (trilinear interpolation).}
-			
-			\subsubsection{Trilinear Interpolation}
-			\textcolor{red}{\newline Explanation of trilinear interpolation.}
 		
 		\subsection{Interpolating in the Inverse Grid}
 			\textcolor{red}{Interpolating between known points in the readout space. Gaussian elimination, multivariate polynomial.}
