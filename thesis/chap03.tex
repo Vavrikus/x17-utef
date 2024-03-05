@@ -11,6 +11,7 @@
 	\textcolor{red}{Reconstruction of one track simulated with microscopic tracking in Garfield++.}
 	
 	\section{First Attempts}
+	\label{sec:trackfirst}
 		As the~first step of the~work, we decided to try to reconstruct an~electron track with a~special set of initial parameters. The~origin of the~particle is given by the~origin of our coordinate system. The initial direction is given by the~positive $x$~axis. This means the~magnetic field of our detector is perpendicular to the~momentum of our particle at all times and we can reduce the problem to two dimensional space. We use a~track simulated using the~microscopic simulation (see section~\ref{sec:microsim}) with a~kinetic energy of 8~MeV. The gas composition used in this simulation is 90\%~Ar~+~10\%~CO$_2$.
 		
 		In this first approach to the~reconstruction of the~track, we decided to use the~common method used in a~standard \ac{TPC}. This will allow us to explore the significance of the~atypical behavior in our \ac{OFTPC}. At the~same time, we consider the~readout to be continuous to further simplify the~problem. In this approximation we reconstruct the~initial position of each ionization electron.
@@ -69,6 +70,7 @@
 		\end{figure}
 		
 		\subsection{Gradient Descent Search}
+			\label{sec:grad}
 			\textcolor{red}{Gradient descent search of a point in the original space that gets mapped to the given point of the readout space (trilinear interpolation).}
 		
 		\subsection{Interpolating in the Inverse Grid}

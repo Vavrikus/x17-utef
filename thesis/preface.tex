@@ -21,7 +21,26 @@
 		\textcolor{red}{Magnetic field simulations in Maxwell. Some figures. When working with magnetic field outside the regular grid trilinear interpolation is used.}
 		
 			\subsubsection{Trilinear Interpolation}
-			\textcolor{red}{Explanation of trilinear interpolation. Borrow picture from Wikipedia.}
+				Trilinear interpolation is a~generalization of linear interpolation in 3D. It can be used to interpolate a~function whose values are known on a~regular grid. We use this simple method for magnetic field, later it is also used in section~\ref{sec:grad} to interpolate the Ionization Electron Map. In both cases, we use a~cubic grid.
+				
+				Let us consider a~cube (a~cell of our regular grid) with an~edge of length~$a$ containing the point $C = (x,y,z)$ where we want to interpolate a~function $f\!\!:~\!\!\mathbb{R}^3\,\to\,X$. We know the~values of this function on the~vertices of this cube $C_{ijk} = (x_0+ia,y_0+ja,z_0+ka)$, where $i,j,k \in \{0,1\}$. We also define the~points $C_{ij} = (x,y_0+ia,z_0+ja)$ and $C_i=(x,y,z_0+ia)$. Then the interpolated value $\widehat{f}(C)$ can be calculated as follows:
+				\begin{equation}
+					x_d = \frac{x-x_0}{a},~y_d = \frac{y-y_0}{a},~z_d = \frac{z-z_0}{a},
+				\end{equation}
+				\begin{alignat}{3}
+					\widehat{f}(C_{ij}) &= (1-x_d)f(C_{0ij}) \,&+&\,x_d f(C_{1ij}),\\
+					\widehat{f}(C_{i}) &= (1-y_d)\widehat{f}(C_{0i}) &+&\,y_d \widehat{f}(C_{1i}),\\
+					\widehat{f}(C) &= (1-z_d)\widehat{f}(C_0) &+&\,z_d \widehat{f}(C_1).
+				\end{alignat}
+				
+				\begin{figure}
+					\centering
+					\includegraphics[width=0.5\textwidth]{trilinear.png}
+					\label{fig:trilin}
+					\caption{Visualization of trilinear interpolation.}
+				\end{figure}
+				
+				\textcolor{red}{Maybe a citation here, although I am not sure it is necessary since it could be considered common knowledge.}
 		
 		\subsection{Coordinate System}
 		\label{sec:coor}
