@@ -53,7 +53,15 @@
 	
 	\section{Ionization Electron Map}
 	\label{sec:map}
-		\textcolor{red}{Explanation of the map. Simulated on MetaCentrum, workload distribution between multiple jobs. More electrons at one location to get statistics. Two methods of reconstruction using this map. Comparison of 90/10 and 70/30 maps.}
+		For a~trajectory inside an~\ac{OFTPC}, the~drift of the~secondary (ionization) electrons is significantly affected by its magnetic field. We need to take this into account for accurate reconstruction. In the~first approximation, we assume a~continuous read out (i.e. we neglect pads). We can then reconstruct the~original position of each ionization electron using its readout coordinates. For this purpose, we use the~ionization electron map.
+		
+		The~ionization electron map is a~mapping between the~detector space and the~readout space. It tells us what readout coordinates $(x',y',t)$ we can expect on average for an~ionization electron created in the~detector coordinates $(x,y,z)$. To get an~approximation of this mapping, we can simulate the~drift of ionization electrons created on a~regular grid inside the~volume of our \ac{OFTPC}. It is also useful to simulate multiple (100 in our case) electrons originating in the same position so we can get a~better approximation of the~average drift. In order to get accurate results, we use the~microscopic simulation of these electrons described in the~section~\ref{sec:microsim}.
+		
+		Finally, we need to invert the~map to get the~original detector coordinates $(x,y,z)$ for given readout coordinates $(x',y',t)$. \textcolor{red}{Two ways of inverting.}
+		
+		The~simulation of the~map is a~computationally heavy task. For this reason, we use a~grid MetaCentrum \textcolor{red}{(citation)} to parallelize it. At first, this was done by splitting the~simulated electrons evenly between the~individual jobs. This was used in the~first simulation with only one electron per vertex in the~regular grid with the~spacing of one centimeter. \textcolor{red}{Could insert a table here describing all 4 simulations of the map (gas composition, spacing, etc.).}
+		
+		\textcolor{red}{Explanation of the map, pictures. Simulated on MetaCentrum, workload distribution between multiple jobs. More electrons at one location to get statistics. Two methods of reconstruction using this map. Comparison of 90/10 and 70/30 maps.}
 		
 		\begin{figure}
 			\centering
