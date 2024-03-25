@@ -59,7 +59,24 @@
 		
 		Finally, we need to invert the~map to get the~original detector coordinates $(x,y,z)$ for given readout coordinates $(x',y',t)$. \textcolor{red}{Two ways of inverting.}
 		
-		The~simulation of the~map is a~computationally heavy task. For this reason, we use a~grid MetaCentrum \textcolor{red}{(citation)} to parallelize it. At first, this was done by splitting the~simulated electrons evenly between the~individual jobs. This was used in the~first simulation with only one electron per vertex in the~regular grid with the~spacing of one centimeter. \textcolor{red}{Could insert a table here describing all 4 simulations of the map (gas composition, spacing, etc.).}
+		The~simulation of the~map is a~computationally heavy task. For this reason, we use a~grid MetaCentrum \textcolor{red}{(citation)} to parallelize it. At first, this was done by splitting the~simulated electrons evenly between the~individual jobs. This was used in the~first simulation with only one electron per vertex in the~regular grid with the~spacing of one centimeter. 
+		
+		Later a~better approach was used accounting for different lengths of the~trajectory of individual electrons. If we index the~electrons in the~order of increasing coordinates $y,x,z$ (\textcolor{red}{picture?}), we can express the~number~$n_l$ of full XY~layers (electrons with the~same $z$~coordinate) of electrons with index less than or equal to $i$
+			\begin{equation}
+				n_l(i) = \left\lfloor\frac{i}{n_{xy}}\right\rfloor,
+			\end{equation}
+		where $n_{xy}$ is the~number of electrons in each XY~layer calculated simply by counting the~electrons that satisfy boundary conditions for $x$~and~$y$. \textcolor{red}{These conditions should be mentioned above, sector condition + maximal $x$ value.} The~number of electrons remaining in the~top layer is then
+			\begin{equation}
+				n_r(i) = i\!\!\!\!\mod n_{xy}.
+			\end{equation}
+		Finally, we can calculate the sum of the~drift gaps of electrons up to index~$i$
+			\begin{equation}
+				d_\text{sum} = (z_\text{max}-z_\text{min})n_{xy}n_l-\frac{n_l(n_l-1)}{2}n_{xy}l+n_r(z_\text{max}-z_\text{min}-n_l l).
+			\end{equation}
+		We then use the~binary search algorithm to look for the~highest value of $i$ that gives us smaller value of this sum than the~fraction $\frac{\text{job id}}{\text{max job id}}$ of the total sum. This way we obtain the~minimal and the~maximal index of electrons simulated in the~given job.
+		\textcolor{red}{The spacing $l$ should be probably defined above + picture of the simulating grid (1 layer). zmin zmax also}
+		
+		\textcolor{red}{Could insert a table here describing all 4 simulations of the map (gas composition, spacing, etc.). Simulation inside one sector (at first double angle). Extra space on sensor. Edge cases not taken into account (TPC wall). Using qsub (not sure if important).}
 		
 		\textcolor{red}{Explanation of the map, pictures. Simulated on MetaCentrum, workload distribution between multiple jobs. More electrons at one location to get statistics. Two methods of reconstruction using this map. Comparison of 90/10 and 70/30 maps.}
 		
