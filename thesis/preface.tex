@@ -1,5 +1,5 @@
 \chapwithtoc{Introduction}
-	\ac{TPC} is a~type of gaseous detector that detects charged particle trajectories by measuring the~position and drift time of ions created in the~gas; details are provided in section~\ref{sec:tpc}. The~energy of such particles can be determined thanks to the~curvature of their trajectory in the~magnetic field.
+	\ac{TPC} is a~type of gaseous detector that detects charged particle trajectories by measuring the~position and drift time of ions created in the~gas; details are provided in Section~\ref{sec:tpc}. The~energy of such particles can be determined thanks to the~curvature of their trajectory in the~magnetic field.
 	
 	The~goal of this thesis is to develop an~algorithm for the~reconstruction of charged particle trajectories and energy in an~atypic \ac{TPC} (with orthogonal electric and magnetic fields, i.e., \ac{OFTPC}) used in the~X17 project at the~\ac{IEAPCTU}. Furthermore, we present the~results of testing this algorithm with different samples of simulated data. In the~future, we also plan to test this algorithm by measuring real particles with a~known energy distribution. In order to achieve this, we use the~Garfield++ toolkit~\cite{Garfield++} in combination with the~ROOT~framework~\cite{ROOT}. Some of our more demanding simulations are run on MetaCentrum.
 	
@@ -21,30 +21,43 @@
 		\textcolor{red}{Magnetic field simulations in Maxwell. Some figures. When working with the~magnetic field outside the~regular grid, we use trilinear interpolation.}
 		
 			\subsubsection{Trilinear Interpolation}
-				Trilinear interpolation is a~generalization of linear interpolation in 3D. It can be used to interpolate a~function whose values are known on a~regular grid. We use this simple method for interpolating the~magnetic field, and it is also used in section~\ref{sec:grad} to interpolate the~Ionization Electron Map. In both cases, we use a~cubic grid.
+			\label{sec:trilin}
+				Trilinear interpolation is a~generalization of linear interpolation in 3D. It can be used to interpolate a~function whose values are known on a~regular grid. We use this simple method for interpolating the~magnetic field, and it is also used in Section~\ref{sec:grad} to interpolate the~Ionization Electron Map. In both cases, we use a~cubic grid.
 				
-				Let us consider a~cube (a~cell of our regular grid) with an~edge of length~$a$ containing the~point $C = (x,y,z)$ where we want to interpolate a~function $f\!\!:~\!\!\mathbb{R}^3\,\to\,X$ (\textcolor{red}{it should be better explained what $X$ is}). We know the~values of this function on the~vertices of this cube $C_{ijk} = (x_0+ia,y_0+ja,z_0+ka)$, where $i,j,k \in \{0,1\}$. We also define the~points $C_{ij} = (x,y_0+ia,z_0+ja)$ and $C_i=(x,y,z_0+ia)$. Then the~interpolated value $\widehat{f}(C)$ can be calculated as follows:
-				\begin{equation}
-					x_d = \frac{x-x_0}{a},~y_d = \frac{y-y_0}{a},~z_d = \frac{z-z_0}{a},
-				\end{equation}
-				\begin{alignat}{3}
-					\widehat{f}(C_{ij}) &= (1-x_d)f(C_{0ij}) \,&+&\,x_d f(C_{1ij}),\\
-					\widehat{f}(C_{i}) &= (1-y_d)\widehat{f}(C_{0i}) &+&\,y_d \widehat{f}(C_{1i}),\\
-					\widehat{f}(C) &= (1-z_d)\widehat{f}(C_0) &+&\,z_d \widehat{f}(C_1).
-				\end{alignat}
+				Let us consider a~cube (a~cell of our regular grid) with an~edge of length~$a$ containing the~point $C = (x,y,z)$ where we want to interpolate a~function $f\!\!:~\!\!\mathbb{R}^3\,\to\,X$ (\textcolor{red}{it should be better explained what $X$ is}). We know the~values of this function on the~vertices of this cube $C_{ijk} = (x_0+ia,y_0+ja,z_0+ka)$, where $i,j,k \in \{0,1\}$. We also define the~points $C_{ij} = (x,y_0+ia,z_0+ja)$ and $C_i=(x,y,z_0+ia)$. Then the~interpolated value $\widehat{f}(C)$ can be calculated as a~composition of three linear interpolations:
+					\begin{equation}
+						x_d = \frac{x-x_0}{a},~y_d = \frac{y-y_0}{a},~z_d = \frac{z-z_0}{a},
+					\end{equation}
+					\begin{alignat}{3}
+						\widehat{f}(C_{ij}) &= (1-x_d)f(C_{0ij}) \,&+&\,x_d f(C_{1ij}),\\
+						\widehat{f}(C_{i}) &= (1-y_d)\widehat{f}(C_{0i}) &+&\,y_d \widehat{f}(C_{1i}),\\
+						\widehat{f}(C) &= (1-z_d)\widehat{f}(C_0) &+&\,z_d \widehat{f}(C_1).
+					\end{alignat}
+				We can also write
+					\begin{eqnarray}
+						\widehat{f}(C) = \sum_{i,j,k \in \{0,1\}} t_x^i t_y^j t_z^k f(C_{ijk}),\\
+						t_a \stackrel{\text{def}}{=} \begin{pmatrix}t_a^0\\ t_a^1\end{pmatrix} = \begin{pmatrix}1-a_d\\ a_d\end{pmatrix},\quad a \in \{x,y,z\},
+					\end{eqnarray}
+				or as a~polynomial:
+					\begin{equation}
+						\widehat{f}(C) = \sum_{a,b,c \in \{0,1\}}\sum^{a}_{i=0}\sum^{b}_{j=0}\sum^{c}_{k=0} (-1)^{(a-i)+(b-j)+(c-k)} f(C_{ijk}) x_d^a y_d^b z_d^c.
+					\end{equation}
+					%\begin{equation}
+					%	\widehat{f}(C) = (1-x_d) (1-y_d) (1-z_d) f(C_{000}) + (1-x_d) (1-y_d) z_d f(C_{001}) + (1-x_d) y_d (1-z_d) f(C_{010}) + (1-x_d) y_d z_d f(C_{011}) + x_d (1-y_d) (1-z_d) f(C_{100}) + x_d (1-y_d) z_d f(C_{101}) + x_d y_d (1-z_d) f(C_{110}) + x_d y_d z_d f(C_{111})
+					%\end{equation}
 				
-				\begin{figure}
-					\centering
-					\includegraphics[width=0.5\textwidth]{trilinear.png}
-					\label{fig:trilin}
-					\caption{Visualization of trilinear interpolation. \textcolor{red}{Image drawn in GeoGebra and inspired by a~similar image on Wikipedia (looks a~bit worse) -- is credit necessary?}}
-				\end{figure}
+					\begin{figure}
+						\centering
+						\includegraphics[width=0.5\textwidth]{trilinear.png}
+						\label{fig:trilin}
+						\caption{Visualization of trilinear interpolation. \textcolor{red}{Image drawn in GeoGebra and inspired by a~similar image on Wikipedia (looks a~bit worse) -- is credit necessary?}}
+					\end{figure}
 				
-				\textcolor{red}{Maybe a~citation here, although I am not sure it is necessary since it could be considered common knowledge.}
+				\textcolor{red}{Maybe a~citation here, although I am not sure it is necessary since it could be considered common knowledge. Maybe $x_0$, etc. should be explicitly described.}
 		
 		\subsection{Coordinate System}
 		\label{sec:coor}
-		\textcolor{red}{Description of the~coordinate system used in this thesis (+ figure). Introduce the~detector/readout space.}
+		\textcolor{red}{Description of the~coordinate system used in this thesis (+ figure). Introduce the~detector space $\mathcal{D}$, the~readout space $\mathcal{R}$ and the~pad space $\mathcal{P}$.}
 	
 	\begin{figure}
 		\centering

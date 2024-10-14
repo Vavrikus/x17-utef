@@ -1,22 +1,22 @@
 \chapter{Track Reconstruction}
 \label{sec:track}
-	The~first stage of our reconstruction algorithm is the~reconstruction of the~track of the~primary particle (either an~electron or a~positron). The~results of this step are then used to determine the~energy of the~particle (see section~\ref{sec:energy}).
+	The~first stage of our reconstruction algorithm is the~reconstruction of the~track of the~primary particle (either an~electron or a~positron). The~results of this step are then used to determine the~energy of the~particle (see Section~\ref{sec:energy}).
 	
 	\textbf{First Attempts} at a~track reconstruction were made using the~standard approach. Here, we assume that the~readout coordinates ($x'$,~$y'$,~$t$) are known exactly, neglecting the~pads and time bins. In a~standard \ac{TPC} (with parallel fields), we only need to reconstruct the~$z$~coordinate from drift time using the~known drift velocity.
 	
 	Reconstruction using the~\textbf{Ionization Electron Map} (from now on referred to as \emph{the~map}) uses a~simulation of the~drift of secondary (ionization) electrons within the~detector volume. This simulation can then be used to interpolate the~initial position of the~secondary electrons. First attempts neglect the~pads.
 	
-	The~\textbf{Discrete Reconstruction} uses the~map; instead of reconstructing the~exact position of each electron, we reconstruct the~center of each hit pad with the~time corresponding to the~midpoint of the~time bin. The~number of electrons in each \ac{TPC}~bin (consisting of the~pad and the~time bin) is counted and used as a~charge in the~energy reconstruction.
+	We used the~map for reconstruction in two different ways. The~first one uses gradient descent search along with trilinear interpolation (see Section~\ref{sec:trilin}) in the~map. The~second method uses interpolation in the~irregular inverse grid with a~linear polynomial.
 	
-	\textcolor{red}{Reconstruction of one track simulated with microscopic tracking in Garfield++.}
+	The~\textbf{Discrete Reconstruction} uses the~map; instead of reconstructing the~exact position of each electron, we reconstruct the~center of each hit pad with the~time corresponding to the~midpoint of the~time bin. The~number of electrons in each \ac{TPC}~bin (consisting of the~pad and the~time bin) is counted and used as a~charge in the~energy reconstruction.
 	
 	\section{First Attempts}
 	\label{sec:trackfirst}
-		As the~first step, we decided to try to reconstruct an~electron track with a~special set of initial parameters. The~origin of the~particle is given by the~origin of our coordinate system. The~initial direction is given by the~positive $x$~axis. This means the~magnetic field of our detector is perpendicular to the~momentum of our particle at all times, and we can reduce the~problem to two-dimensional space. We use a~track simulated using the~microscopic simulation (see section~\ref{sec:microsim}) with a~kinetic energy of 8~MeV. The~gas composition used in this simulation is 90\%~Ar~+~10\%~CO$_2$.
+		As the~first step, we decided to try to reconstruct an~electron track with a~special set of initial parameters. The~origin of the~particle is given by the~origin of our coordinate system. The~initial direction is given by the~positive $x$~axis. This means the~magnetic field of our detector is perpendicular to the~momentum of our particle at all times, and we can reduce the~problem to two-dimensional space. We use a~track simulated using the~microscopic simulation (see Section~\ref{sec:microsim}) with a~kinetic energy of 8~MeV. The~gas composition used in this simulation is 90\%~Ar~+~10\%~CO$_2$.
 		
 		In this first approach to the~reconstruction of the~track, we decided to use the~common method used in a~standard \ac{TPC}. This will allow us to explore the~significance of the~atypical behavior in our \ac{OFTPC}. Additionally, we assume the~readout is continuous to further simplify the~problem. In this approximation, we reconstruct the~initial position of each ionization electron.
 		
-		The~reconstruction is then defined by the~following relations between the~coordinates of the~detector space and the~readout space (see section~\ref{sec:coor}):
+		The~reconstruction is then defined by the~following relations between the~coordinates of the~detector space and the~readout space (see Section~\ref{sec:coor}):
 			\begin{eqnarray}
 				x = x',\\
 				y = y',\\
@@ -26,7 +26,7 @@
 			\begin{equation}
 				v_d = v_d(\bm{E},\bm{B}).
 			\end{equation}
-		\textcolor{red}{Taken from Garfield user manual.} The~Garfield++ toolkit uses this fact to accelerate their drift simulation with non-microscopic approaches. Since we assume a~uniform electric field in our detector and we want to neglect the~effect of our unusual magnetic field, we consider the~drift velocity to be constant in this scenario. We then approximate this velocity by fitting the~dependence $z(t)$ taken from the~simulated ionization electrons. \textcolor{red}{This is in one of the~provisional figures. Also, this description is not completely accurate; in reality, we fit t1:8-y0 with a1*x+a0 and then invert this and use 8-y0 = b1*t1+b0 (old coordinates); b1=1/a1 functions as the~drift velocity. Maybe also define this 8-z variable as an~alternative to z in the~section~\ref{sec:coor} and then use it when correcting this.}
+		\textcolor{red}{Taken from Garfield user manual.} The~Garfield++ toolkit uses this fact to accelerate their drift simulation with non-microscopic approaches. Since we assume a~uniform electric field in our detector and we want to neglect the~effect of our unusual magnetic field, we consider the~drift velocity to be constant in this scenario. We then approximate this velocity by fitting the~dependence $z(t)$ taken from the~simulated ionization electrons. \textcolor{red}{This is in one of the~provisional figures. Also, this description is not completely accurate; in reality, we fit t1:8-y0 with a1*x+a0 and then invert this and use 8-y0 = b1*t1+b0 (old coordinates); b1=1/a1 functions as the~drift velocity. Maybe also define this 8-z variable as an~alternative to z in Section~\ref{sec:coor} and then use it when correcting this.}
 		
 		\textcolor{red}{Later, in a~commit after this, I plotted some residues (provisional figure), which could be useful, but for some reason they are residuals from a~spline fit of the~track?! Probably redo this without the~spline fit; just explore the~difference in individual points.}
 		
@@ -55,7 +55,11 @@
 	\label{sec:map}
 		Inside an~\ac{OFTPC}, the~drift of the~secondary (ionization) electrons is significantly affected by its magnetic field. We need to take this into account for accurate reconstruction. In the~first approximation, we assume a~continuous readout (i.e., we neglect pads). We can then reconstruct the~original position of each ionization electron using its readout coordinates. For this purpose, we use the~ionization electron map.
 		
-		The~ionization electron map is a~mapping between the~detector space and the~readout space. It tells us what readout coordinates $(x',y',t)$ we can expect on average for an~ionization electron created in the~detector coordinates $(x,y,z)$. To get an~approximation of this mapping, we can simulate the~drift of ionization electrons generated on a~regular grid inside the~volume of our \ac{OFTPC}. It is also useful to simulate multiple (100 in our case) electrons originating in the~same position so we can get a~better approximation of the~average drift and its variance. In order to get accurate results, we use the~microscopic simulation of these electrons described in the~section~\ref{sec:microsim}.
+		The~ionization electron map is a~mapping from the~detector space to the~readout space. It tells us what readout coordinates $(x',y',t)$ we can expect on average for an~ionization electron created in the~detector coordinates $(x,y,z)$. \textcolor{red}{More precisely it is a~mapping to the~distributions on the~readout space; we can simplify this as only the means $\overbar{\mathcal{M}}$ and the covariance matrices $\mathcal{M}_\text{cov}$, assuming Gaussian distribution.}
+			\begin{equation}
+				\mathcal{M}: \mathcal{D} \longrightarrow \mathcal{R},\; (x,y,z) \longmapsto (x',y',t).
+			\end{equation}
+		To get an~approximation of this mapping, we simulate the~drift of ionization electrons generated on a~regular grid inside the~volume of our \ac{OFTPC} (\textcolor{red}{actually, we don't take the~detector walls into account and simulate even outside of the~\ac{OFTPC}}). It is also useful to simulate multiple (100 in our case) electrons originating from the~same position so we can get a~better approximation of the~average drift and its variance. In order to get accurate results, we use the~microscopic simulation of these electrons described in Section~\ref{sec:microsim}. When evaluating the~map inside the~grid, we use trilinear interpolation (see Section~\ref{sec:trilin}). From now on, we will denote this interpolated simulation with the~same symbol $\mathcal{M}$.
 		
 		Finally, we need to invert the~map to get the~original detector coordinates $(x,y,z)$ for the~given readout coordinates $(x',y',t)$. \textcolor{red}{Two ways of inverting.}
 		
@@ -75,6 +79,10 @@
 			\end{equation}
 		We then use a~binary search algorithm to find the~maximum index $i$ such that the value of this sum is less than the~fraction $\frac{\text{job id}}{\text{max job id}}$ of the~total sum. This way we obtain the~minimal and the~maximal index of electrons simulated in the~given job.
 		\textcolor{red}{The~spacing $l$ should be probably defined above + picture of the~simulating grid (1 layer). zmin zmax also}
+		
+		\textcolor{red}{After the~simulation of the~map, we calculate the~mean readout coordinates assuming Gaussian distribution (i.e., we use averages). We also calculate standard deviations in a~later commit, should be upgraded to the~covariance matrix. We never actually plotted the~distributions we get when simulating the~same electron multiple times, so we don't know if our assumptions are accurate (could also run some statistical test to see how well the~Gaussian distribution fits).}
+		
+		\textcolor{red}{The~map is then stored in a~\textit{Field}, a~custom class template, could expand on that. Maybe earlier, since the~same template is used for the~magnetic field.}
 		
 		\textcolor{red}{Could insert a~table here describing all 4 simulations of the~map (gas composition, spacing, etc.). Simulation inside one sector (at first double angle). Extra space on the~sensor. Edge cases not taken into account (TPC wall). Using qsub (not sure if important).}
 		
@@ -97,9 +105,34 @@
 		\subsection{Gradient Descent Search}
 			\label{sec:grad}
 			\textcolor{red}{Gradient descent search of a~point in the~original space that gets mapped to the~given point of the~readout space (trilinear interpolation).}
+			
+			The~first implemented method of reconstruction uses a~gradient descent search to find an~approximation of the~point in detector space with given mean readout coordinates. Gradient descent is an~iterative minimization algorithm for multivariate functions. Let $R\in\mathcal{R}$ be a~point in the~readout space; we want to find a~point $D = (x,y,z) \in\mathcal{D}$ in the~detector space such that 
+				\begin{equation}
+					\overbar{\mathcal{M}}(D) = R = (x'_R,y'_R,t_R).
+				\end{equation}
+			We define a~function~$f_R$ in the~readout space as a~modified distance in this space:
+				\begin{equation}
+					f_R(x',y',t) = \sqrt{(x'-x'_R)^2+(y'-y'_R)^2+v_d^2(t-t_R)^2},
+				\end{equation}
+			where $v_d$ is an~approximation of the~drift velocity in the~\ac{TPC}, obtained from the~reconstruction in Section~\ref{sec:trackfirst} (\textcolor{red}{there will be an image with the~linear fit there}). We make the~initial guess (\textcolor{red}{actually in the~original code we just take $z=0$}):
+				\begin{equation}
+					D_0 = (x'_R,y'_R,v_dt).
+				\end{equation}
+			Assuming we have the $n$-th estimate $D_n$, we calculate an~approximation of the~$i$-th component of the~gradient of $f_R\circ\mathcal{M}$:
+				\begin{equation}
+					\nabla(f_R\circ\mathcal{M})^i \approx \frac{f_R(\mathcal{M}(D_n+s\cdot e^i))-f_R(\mathcal{M}(D_n-s\cdot e^i))}{2s},
+				\end{equation}
+			where $s$ is a~number and $e^i\in\mathcal{D}$ is the~$i$-th coordinate vector. The~number $s$ should be sufficiently small; initially, we set it as a~fraction of the~map's grid spacing $s = \frac{l}{10}$. During the~minimization, we check that $f_R(\mathcal{M}(D_n))<10s$ at all times. \textcolor{red}{When using trilinear interpolation, it would be more efficient to calculate the~gradient explicitly ($\pm$ same result). This could be implemented inside the~\textit{Field} template class.} The~next estimate can be calculated as follows:
+				\begin{equation}
+					D_{n+1} = D_n - \gamma \nabla(f_R\circ\mathcal{M})(D_n),
+				\end{equation}
+			where $\gamma\in\mathbb{R}^+$ is the~damping coefficient. It should be set to a~small enough value to ensure convergence, but large enough for sufficient converging speed. The~minimization stops either when the error $f_R(\mathcal{M}(D_n))$ drops below a~specified value or when the~number of iterations exceeds 1000 (in this case, a~message is printed into the~console).
+			The parameters of this method could be further optimized (e.g., a~better choice of $\gamma$, \textcolor{red}{gradient computation}); instead, we later decided to use the~interpolation in the~inverse grid described in the~next section.
+			
+			\textcolor{red}{Measure reconstruction duration and compare it with the~inverse grid interpolation? Also compare the~result? Not sure if this has to be cited.}
 		
 		\subsection{Interpolating in the~Inverse Grid}
-			\textcolor{red}{Interpolating between known points in the~readout space. Gaussian elimination, multivariate polynomial.}
+			\textcolor{red}{Interpolating between known points in the~readout space. Gaussian elimination, multivariate polynomial. Benefits compared to the~gradient descent search method (one-time computation for the~whole map is easy to achieve if needed).}
 			
 			\begin{figure}
 				\centering
@@ -109,4 +142,6 @@
 			\end{figure}
 		
 	\section{Discrete Reconstruction}
-		\textcolor{red}{Reconstruction with pads and time bins. Maybe testing different pads.}
+		\textcolor{red}{Reconstruction with pads and time bins. Maybe testing different pads. Mapping the~center of the pad (along with the~midpoint of the~time bin) isn't necessarily the~best approach since it might not correspond to the~average parameters of an~electron with these readout parameters (insignificant?).}
+		
+		\textcolor{red}{It is also possible to make this a~subsection of the~map, making the previous subsections parts of a~new subsection 'Map Inversion'.}

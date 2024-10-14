@@ -1,12 +1,12 @@
 \chapter{Energy Reconstruction}
 \label{sec:energy}
-	The~second stage of our reconstruction algorithm is the~reconstruction of the~particle's energy using its reconstructed track (see section~\ref{sec:track}). We can achieve this by fitting the~track and extracting the~needed parameters of the~trajectory. We have tested three ways of reconstructing the~energy. Fitting is done using the~MINUIT algorithm implemented in ROOT~\cite{ROOT}. \textcolor{red}{Maybe cite some CERN article directly on MINUIT?}
+	The~second stage of our reconstruction algorithm is the~reconstruction of the~particle's energy using its reconstructed track (see Section~\ref{sec:track}). We can achieve this by fitting the~track and extracting the~needed parameters of the~trajectory. We have tested three ways of reconstructing the~energy. Fitting is done using the~MINUIT algorithm implemented in ROOT~\cite{ROOT}. \textcolor{red}{Maybe cite some CERN article directly on MINUIT?}
 	
 	The~\textbf{Cubic Spline Fit} is a~rejected attempt at the~reconstruction of energy. It uses smoothly connected piecewise cubic polynomials between uniformly spaced nodes. Energy can then be computed using the~fit parameters by computing the~radius of curvature in different points of the~fitted curve using the~known magnitude of the~magnetic field perpendicular to the~trajectory. This approach was rejected because tuning the~fit to have a~reasonably stable radius of curvature is unpractical.
 	
 	The~\textbf{Circle and Lines Fit} was chosen as an~alternative since this corresponds to the~shape of a~trajectory of a~charged particle crossing a~finite volume with a~homogeneous magnetic field. The~energy of the~particle can be estimated using the~fitted radius and the~magnitude of the~perpendicular magnetic field in the~middle of the~\ac{TPC}.
 	
-	The~\textbf{Runge-Kutta Fit} uses the~4th order Runge-Kutta numerical integration described in section~\ref{sec:rks}. Initial parameters of the~track (including the~particle's energy) are optimized so that the~integrated trajectory fits to the~reconstructed one. This fit can also be performed as a~single parameter (i.e., energy) fit if we can get the~initial position and orientation of the~particle on the~entrance to the~\ac{TPC} from previous detectors (\ac{Tpx3} and \ac{MWPC}, see section~\ref{sec:IEAP}).
+	The~\textbf{Runge-Kutta Fit} uses the~4th order Runge-Kutta numerical integration described in Section~\ref{sec:rks}. Initial parameters of the~track (including the~particle's energy) are optimized so that the~integrated trajectory fits to the~reconstructed one. This fit can also be performed as a~single parameter (i.e., energy) fit if we can get the~initial position and orientation of the~particle on the~entrance to the~\ac{TPC} from previous detectors (\ac{Tpx3} and \ac{MWPC}, see Section~\ref{sec:IEAP}).
 	
 	\begin{figure}
 		\centering
@@ -17,7 +17,7 @@
 	
 	\section{Cubic Spline Fit}
 	\label{sec:cspline}
-		The~first attempt to get an~early estimate of the~kinetic energy of the~particle uses a~cubic spline fit. This approach was later rejected in favor of the~circle and lines fit described in section~\ref{sec:clines}. We use an~electron track starting in the~origin of our coordinate system with an~initial direction in the~positive $x$~axis. The~track is simulated microscopically (see section~\ref{sec:microsim}) with a~kinetic energy of 8~MeV in a~gas mixture 90\%~Ar~+~10\%~CO$_2$ (the~same track was used in section~\ref{sec:trackfirst}).
+		The~first attempt to get an~early estimate of the~kinetic energy of the~particle uses a~cubic spline fit. This approach was later rejected in favor of the~circle and lines fit described in Section~\ref{sec:clines}. We use an~electron track starting in the~origin of our coordinate system with an~initial direction in the~positive $x$~axis. The~track is simulated microscopically (see Section~\ref{sec:microsim}) with a~kinetic energy of 8~MeV in a~gas mixture 90\%~Ar~+~10\%~CO$_2$ (the~same track was used in Section~\ref{sec:trackfirst}).
 				
 		In order to calculate the~spline, we use the~class \textit{TSpline3} from ROOT. This allows us to evaluate the~spline using the~coordinates $(x_n,z_n)$ of each node and the~derivatives $d_1,d_2$ in the~first and the~last node. We can fit these parameters of a~fixed amount of nodes to the~simulated trajectory. We use the~IMPROVE algorithm provided by the~\textit{TMinuit} class in ROOT. This algorithm attempts to find a~better local minimum after converging.
 		
@@ -59,7 +59,7 @@
 		Since our field is not homogeneous, it is not entirely clear what value of magnetic field should be used along with the~fitted radius (using equations~\ref{eq:ekin1} and~\ref{eq:ekin2}) to get the~best estimate for the~kinetic energy. Since we only use this method to get a~first rough estimate that we later refine, an~optimal solution of this problem is not required. Instead, we tested two options: taking the~value of the~field in the~middle of the~fitted circular arc and taking the~average field along it. \textcolor{red}{We haven't really tried to plot this for multiple tracks, but these estimates are saved somewhere and could be plotted.}
 		
 		\subsection{Two-dimensional fit}
-			In the~2D case, the~fitted function used for the~electron track (which bends down, so we need to use the~upper part of the~circle) described in section~\ref{sec:cspline} looks like this: \textcolor{red}{Maybe describe this track that we used at the~beginning somewhere earlier (section microscopic simulations \textrightarrow~Testing track?) so that it is easier to refer to it in multiple sections. It is not part of the~early GitHub commits, so maybe it won't be possible to create exact replicas of the~images, but they should be at least very similar.}
+			In the~2D case, the~fitted function used for the~electron track (which bends down, so we need to use the~upper part of the~circle) described in Section~\ref{sec:cspline} looks like this: \textcolor{red}{Maybe describe this track that we used at the~beginning somewhere earlier (section microscopic simulations \textrightarrow~Testing track?) so that it is easier to refer to it in multiple sections. It is not part of the~early GitHub commits, so maybe it won't be possible to create exact replicas of the~images, but they should be at least very similar.}
 				\begin{equation}
 					\label{eq:clines2d}
 					z(x) = \begin{cases}
