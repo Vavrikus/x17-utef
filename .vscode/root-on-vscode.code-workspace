@@ -3,21 +3,6 @@
     {
       "name": "X17",
       "path": ".."
-    },
-    {
-      "name": "include",
-      "path": "../../source/root/root_install/include"
-    },
-    {
-      "name": "Garfield",
-      "path": "../../source/garfield/Include/Garfield"
-    },
-    {
-      "name": "Source",
-      "path": "../../source/garfield/Source"
-    },
-    {
-      "path": "../../source/root/root_src"
     }
   ],
   "settings": {

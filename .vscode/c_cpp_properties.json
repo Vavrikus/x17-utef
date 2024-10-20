@@ -3,9 +3,11 @@
         {
             "name": "Linux",
             "includePath": [
-                "/home/vavrik/work/X17/include",
+                "${workspaceFolder}/include",
                 "/home/vavrik/work/source/root/root_install/include",
-                "/home/vavrik/work/source/garfield/Include"
+                "/home/vavrik/work/source/garfield/Include",
+                "/home/vavrik/work/source/root/root_src",
+                "/home/vavrik/work/source/garfield/Source"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
