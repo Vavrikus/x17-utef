@@ -19,7 +19,7 @@ namespace X17
             return elements[0];
         }
         #endif
-        return elements[row*N+column];
+        return elements[row * N + column];
     }
 
     template <int M, int N>

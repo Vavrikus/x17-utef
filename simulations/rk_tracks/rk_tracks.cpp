@@ -48,7 +48,6 @@ int rk_tracks()
 
         X17::GetRandomTrackParams(rand,electron,origin,orientation,kin_en);
 
-
         // The actual track simulation.
         X17::RK4<8>* track = GetTrackRK(*magfield,electron,step,kin_en,origin,orientation);
         track->Integrate();
