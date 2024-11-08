@@ -64,7 +64,7 @@
         "request": "launch",
         "program": "${workspaceFolder}/build/simulations/single_track/make_track",
         "args": [],
-        "cwd": "${workspaceFolder}/build//simulations/single_track/",
+        "cwd": "${workspaceFolder}/build/simulations/single_track/",
         "environment": [],
         "externalConsole": false,
         "MIMode": "gdb",

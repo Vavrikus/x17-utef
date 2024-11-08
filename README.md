@@ -45,7 +45,7 @@ Microscopic tracks can be simulated on MetaCentrum:
 The project uses the following folder structure:
 - **The project folder**
     - **.vscode**
-        - *root-on-vscode.code-workspace* -- useful setup for using ROOT and Garfield++ in Visual Studio Code with Intellisense and debuging tool (some paths may need adjusting)
+        - *root-on-vscode.code-workspace* and *launch.json* -- useful setup for using ROOT and Garfield++ in Visual Studio Code with Intellisense and debuging tool (include paths need to be adjusted)
     - **tests/magnetic_field_plot**
         - *bfield.C* -- old script for displaying the magnetic field using Garfield++
     - **data**
@@ -55,28 +55,35 @@ The project uses the following folder structure:
             - Contains files with ionization electron data and compiled map in the file *map.root*
         - **micro_tracks**
             - Contains files with microscopic track simulations (many tracks)
+            - *plot_drift.C* -- ROOT script for driftline plots used in the RD51 presentation
         - **single_track**
             - Contains files with single simulated track for different settings
     - **include**
         - Contains headers for the project with doxygen comments (and .inl files with definitions of templated functions)
     - **presentations**
-        - Contains presentation from 07-03-2023 seminar and from 28-04-2023 meeting (tex and pdf files)
+        - Contains presentation from meetings and seminars (tex and pdf files)
     - **reconstruction**
         - *reco_track.cpp* -- script for track reconstruction
+        - *reco_plots.cpp* -- script for plots of the reconstruction (comparison of simulated and reconstructed energy)
     - **remote**
-        - *sync.sh* -- Syncing with MetaCentrum (needs adjustments)
+        - Useful scripts for MetaCentrum (uses absolute paths, needs to be adjusted)
+        - *sync.sh* -- Syncing with MetaCentrum
         - *clear_data.sh* -- Clearing the data directories on MetaCentrum
-        - *fetch_data.sh* -- Syncing data simulated on MetaCentrum (needs adjustments)
+        - *fetch_data.sh* -- Syncing data simulated on MetaCentrum
         - *remote_compile.sh* -- Compiling scripts on MetaCentrum
     - **schematics**
-        - *circle_lines.ggb* -- GeoGebra file with circle fit geometry
+        - *circle_fit2d.ggb* -- GeoGebra file with 2D circle fit geometry
+        - *circle_lines.ggb* -- GeoGebra file with 3D circle fit geometry
         - *GEMReadout_CenteredConector.kicad_pcb* -- KiCad file with the readout PCB
-        - *tpc_layout.ggb* -- GeoGebra file with a top-down view of the TPCs
+        - *map_visualization.ggb* -- Simple visualization of the map and its inverse
+        - *phi_systematic_error.ggb* -- Visualization of the phi of the maxima and minima of systematic error in reconstructed energy (pads shown)
+        - *tpc_layout.ggb* -- GeoGebra file with a top-down view of the TPCs (area of the first map simulation and of the magnetic field simulation shown)
+        - *tpc_micro_simulation* -- Visualization of the 3D layout of the microscopic track simulation
     - **simulations**
         - **ion_map**
             - *ion_electrons.cpp* -- script for ionization electrons simulation (creates input for *make_map.cpp*)
             - *make_map.cpp* -- script for creating the map of ionization electron drift
-            - *ion_multi.sh*, *ion_single.sh* -- scripts for handling the map simulation on MetaCentrum (see above)
+            - *ion_multi.sh*, *ion_single.sh* -- scripts handling the map simulation on MetaCentrum (see above)
         - **rk_tracks**
             - *rk_tracks.cpp* -- script for quick Runge-Kutta track simulation, generates rk_tracks.root file (currently 100,000 tracks)
         - **single_track**
@@ -84,5 +91,8 @@ The project uses the following folder structure:
             - *make_track.cpp* -- script for single track simulation
         - **micro_tracks**
             - *micro_tracks.cpp* -- script for random or grid-like simulation of multiple microscopic tracks
+            - *track_multi.sh*, *track_single.sh* -- scripts handling the simulation on MetaCentrum
     - **source**
         - Contains all .cpp files common to the reconstruction and simulation scripts.
+    - **thesis**
+        - Contains the Latex and pdf files of my bachelor's thesis
