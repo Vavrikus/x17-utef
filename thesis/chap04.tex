@@ -30,6 +30,7 @@
 				r(x) = \frac{\left(1+z'^2(x)\right)^\frac{3}{2}}{z''(x)} = \frac{\left(1+\left(b+2c\Delta x+3d(\Delta x)^2\right)^2\right)^\frac{3}{2}}{2c+6d\Delta x}.
 			\end{equation}
 		Based on the~geometry of the~detector, we can assume the~magnetic field \linebreak$\bm{B}(x,0,z) = (0,B(x,z),0)$ for a~track in the~XZ~plane. Since the~electron is relativistic, the~effect of the~electric field on its trajectory is negligible. The~Lorentz force $F_L$ is then always perpendicular to the~momentum of the~electron and is therefore equal to the~centripetal force $F_c$:
+			\begin{linenomath}
 			\begin{align}
 				F_L &= F_c,\\
 				e\bm{v}\times\bm{B} &= \frac{\gamma m_e v^2}{r},\\
@@ -37,6 +38,7 @@
 				\sqrt{1-\beta^2} &= \frac{E_{0e} \beta}{ecBr},\\
 				\beta^2(x) &= \frac{1}{1+\left(\frac{E_{0e}}{ecB(x,z(x))r(x)}\right)^2} \label{eq:ekin1}
 			\end{align}
+			\end{linenomath}
 		where $e$~is the~elementary charge, $c$~is the~speed of light in vacuum, $m_e$~is the~rest mass of electron, $E_{0e} = m_e c^2$ is the~corresponding energy, $\gamma$~is the~Lorentz factor, $\bm{v}$~is the~velocity of the~electron, and $\beta = \frac{v}{c}$. We can then finally get our estimate of the~kinetic energy for a~given point on the~trajectory as follows:
 			\begin{equation}
 				\label{eq:ekin2}
@@ -88,11 +90,13 @@
 					\begin{pmatrix} x_0\\ z_0 \end{pmatrix} = \begin{pmatrix} \frac{x_1+x_2}{2}\\ \frac{z_1+z_2}{2} \end{pmatrix} + t \begin{pmatrix} \frac{z_2-z_1}{2}\\ \frac{x_1-x_2}{2} \end{pmatrix}.
 				\end{equation}
 			At the~same time, the~center has to be in a~distance of $r$ from the~nodes:
+				\begin{linenomath}
 				\begin{gather}
 					(x_1-x_0)^2 + (z_1-z_0)^2 = r^2,\\
 					\left(\frac{x_1-x_2}{2}+\frac{z_1-z_2}{2}t\right)^2 + \left(\frac{z_1-z_2}{2}+\frac{x_2-x_1}{2}t\right)^2 = r^2,\\
 					\left(\left(\frac{x_2-x_1}{2}\right)^2+\left(\frac{z_2-z_1}{2}\right)^2\right)t^2+\left(\frac{x_2-x_1}{2}\right)^2+\left(\frac{z_2-z_1}{2}\right)^2-r^2=0.
 				\end{gather}
+				\end{linenomath}
 			Since our electron track bends towards negative $z$ and $x_2 > x_1$, we only care about the~solution with $t>0$
 				\begin{equation}
 					t = \sqrt{\frac{r^2}{\left(\frac{x_2-x_1}{2}\right)^2+\left(\frac{z_2-z_1}{2}\right)^2}-1},

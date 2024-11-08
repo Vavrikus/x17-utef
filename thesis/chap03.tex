@@ -30,21 +30,21 @@
 		
 		\textcolor{red}{Later, in a~commit after this, I plotted some residues (provisional figure), which could be useful, but for some reason they are residuals from a~spline fit of the~track?! Probably redo this without the~spline fit; just explore the~difference in individual points.}
 		
-		\begin{figure}
+		\begin{figure}[H]
 			\centering
 			\includegraphics[width=0.5\textwidth]{9010_zt.png}
 			\caption{Dependence of the~drift time on the~$z$~coordinate in 90~\%~argon and 10~\%~CO$_2$ atmosphere, fitted with a~linear function. The~fitted function gives us the~average drift velocity in the~gas and can be used for rough reconstruction in our \ac{TPC}. \textcolor{red}{Swap for better image with axis labels, etc. Maybe write the~fitted equation.}}
 			\label{fig:9010zt}
 		\end{figure}
 		
-		\begin{figure}
+		\begin{figure}[H]
 			\centering
 			\includegraphics[width=0.5\textwidth]{9010_xz.png}
 			\caption{First attempt at a~track reconstruction using only the~drift velocity. This approach works well in a~standard \ac{TPC} (\textcolor{red}{ideally cite some source?}). 90~\%~argon and 10~\%~CO$_2$ atmosphere. \textcolor{red}{Swap for better image, correct coordinates.}}
 			\label{fig:9010xz}
 		\end{figure}
 		
-		\begin{figure}
+		\begin{figure}[H]
 			\centering
 			\includegraphics[width=0.5\textwidth]{9010_res.png}
 			\caption{First attempt at a~track reconstruction using only the~drift velocity, residues. \textcolor{red}{Swap for better image, correct coordinates. What's causing the~shift? Explain details.}}
@@ -59,9 +59,16 @@
 			\begin{equation}
 				\mathcal{M}: \mathcal{D} \longrightarrow \mathcal{R},\; (x,y,z) \longmapsto (x',y',t).
 			\end{equation}
-		To get an~approximation of this mapping, we simulate the~drift of ionization electrons generated on a~regular grid inside the~volume of our \ac{OFTPC} (\textcolor{red}{actually, we don't take the~detector walls into account and simulate even outside of the~\ac{OFTPC}}). It is also useful to simulate multiple (100 in our case) electrons originating from the~same position so we can get a~better approximation of the~average drift and its variance. In order to get accurate results, we use the~microscopic simulation of these electrons described in Section~\ref{sec:microsim}. When evaluating the~map inside the~grid, we use trilinear interpolation (see Section~\ref{sec:trilin}). From now on, we will denote this interpolated simulation with the~same symbol $\mathcal{M}$.
+		To get an~approximation of this mapping, we simulate the~drift of ionization electrons generated on a~regular grid inside the~volume of our \ac{OFTPC} (\textcolor{red}{actually, we do not take the~detector walls into account and simulate even outside of the~\ac{OFTPC}}). It is also useful to simulate multiple (100 in our case) electrons originating from the~same position so we can get a~better approximation of the~average drift and its variance. In order to get accurate results, we use the~microscopic simulation of these electrons described in Section~\ref{sec:microsim}. When evaluating the~map inside the~grid, we use trilinear interpolation (see Section~\ref{sec:trilin}). From now on, we will denote this interpolated simulation with the~same symbol $\mathcal{M}$.
 		
-		Finally, we need to invert the~map to get the~original detector coordinates $(x,y,z)$ for the~given readout coordinates $(x',y',t)$. \textcolor{red}{Two ways of inverting.}
+		Finally, we need to invert the~map to get the~original detector coordinates $(x,y,z)$ for the~given readout coordinates $(x',y',t)$. In our case, we can reasonably assume that the mapping $\overbar{\mathcal{M}}$ is one-to-one (as seen in the simulations). We implemented two methods for this purpose: the gradient descent search (Section~\ref{sec:grad}) and interpolation in the~inverse grid (Section~\ref{sec:interpol}).
+		
+		\textcolor{red}{If we wanted to further improve this, taking into account the whole map $\mathcal{M}$, we could make an 'inverse map' from $\mathcal{R}$ to distributions on $\mathcal{D}$. We could probably achieve this by taking the~normalized probability density of an~electron with initial coordinates $(x,y,z)$ having readout coordinates $(x',y',t)$. If we fix $(x',y',t)$, we get an~unnormalized probability density $f(x,y,z) = \mathcal{M}_{(x,y,z)}(x',y',t)$ (assuming that all initial coordinates are a~priori equally likely). This could potentially improve the~discrete reconstruction if we take the~mean value of this probability density across the pad and time bin}
+			\begin{equation}
+				\color{red}
+				f_\text{pad, bin}(x,y,z) = \frac{1}{A_\text{pad} \Delta t_\text{bin}} \int_\text{pad, bin} \mathcal{M}_{(x,y,z)}(x',y',t) \text{d}x'\text{d}y'\text{d}t
+			\end{equation}
+		\textcolor{red}{and using it for a~likelihood fit instead of using least squares. This still assumes that all initial coordinates are equally likely which is clearly not the~case for a~primary particle track. In the future, we could even use the~fast track simulation with the~map (should be possible to make around 1000 tracks per minute per core with current settings), create a~big set of tracks with reasonable parameters and use these to get an~approximation of the probability distribution of the~detector response. Some approximations would be necessary when interpreting the~data to decrease the~degrees of freedom of this distribution (we would have to pick a set of parameters and assume that some of them are independent). This could give us an~idea about the~best achievable resolution (how significantly will the~detector response differ for a~given change in energy). If the~difference is significant, we could try to further improve the~likelihood fit.}
 		
 		The~simulation of the~map is a~computationally heavy task. For this reason, we use a~grid MetaCentrum \textcolor{red}{(citation)} to parallelize it. At first, this was done by evenly distributing the~simulated electrons across the~individual jobs. This was used in the~first simulation with only one electron per vertex in the~regular grid with the~spacing of one centimeter. 
 		
@@ -80,7 +87,7 @@
 		We then use a~binary search algorithm to find the~maximum index $i$ such that the value of this sum is less than the~fraction $\frac{\text{job id}}{\text{max job id}}$ of the~total sum. This way we obtain the~minimal and the~maximal index of electrons simulated in the~given job.
 		\textcolor{red}{The~spacing $l$ should be probably defined above + picture of the~simulating grid (1 layer). zmin zmax also}
 		
-		\textcolor{red}{After the~simulation of the~map, we calculate the~mean readout coordinates assuming Gaussian distribution (i.e., we use averages). We also calculate standard deviations in a~later commit, should be upgraded to the~covariance matrix. We never actually plotted the~distributions we get when simulating the~same electron multiple times, so we don't know if our assumptions are accurate (could also run some statistical test to see how well the~Gaussian distribution fits).}
+		\textcolor{red}{After the~simulation of the~map, we calculate the~mean readout coordinates assuming Gaussian distribution (i.e., we use averages). We also calculate standard deviations in a~later commit, should be upgraded to the~covariance matrix. We never actually plotted the~distributions we get when simulating the~same electron multiple times, so we do not know if our assumptions are accurate (could also run some statistical test to see how well the~Gaussian distribution fits).}
 		
 		\textcolor{red}{The~map is then stored in a~\textit{Field}, a~custom class template, could expand on that. Maybe earlier, since the~same template is used for the~magnetic field.}
 		
@@ -95,16 +102,19 @@
 			\item \textcolor{red}{XT plot ($y = 0$) showing (small) distortion in drift times}
 		\end{itemize}
 		
-		\textcolor{red}{Explanation of the~map, pictures. Simulated on MetaCentrum, workload distribution between multiple jobs. More electrons at one location to get statistics. There are two methods of reconstruction using this map. Comparison of 90/10 and 70/30 maps.}
+		\textcolor{red}{More images:}
+		\begin{itemize}
+			\item \textcolor{red}{Residuals of the~continuous readout reconstruction.}
+		\end{itemize}		
 		
-		\begin{figure}
+		\begin{figure}[H]
 			\centering
 			\includegraphics[width=0.5\textwidth]{map_9010_gen.png}
 			\caption{Example of map generation. \textcolor{red}{Swap for better image, correct coordinates.}}
 			\label{fig:map9010gen}
 		\end{figure}
 		
-		\begin{figure}
+		\begin{figure}[H]
 			\centering
 			\includegraphics[width=0.5\textwidth]{9010_reco.png}
 			\caption{Example reconstruction with the~map. \textcolor{red}{Swap for better image, correct coordinates.}}
@@ -112,9 +122,7 @@
 		\end{figure}
 		
 		\subsection{Gradient Descent Search}
-			\label{sec:grad}
-			\textcolor{red}{Gradient descent search of a~point in the~original space that gets mapped to the~given point of the~readout space (trilinear interpolation).}
-			
+		\label{sec:grad}			
 			The~first implemented method of reconstruction uses a~gradient descent search to find an~approximation of the~point in detector space with given mean readout coordinates. Gradient descent is an~iterative minimization algorithm for multivariate functions. Let $R\in\mathcal{R}$ be a~point in the~readout space; we want to find a~point $D = (x,y,z) \in\mathcal{D}$ in the~detector space such that 
 				\begin{equation}
 					\overbar{\mathcal{M}}(D) = R = (x'_R,y'_R,t_R).
@@ -127,23 +135,56 @@
 				\begin{equation}
 					D_0 = (x'_R,y'_R,v_dt).
 				\end{equation}
-			Assuming we have the $n$-th estimate $D_n$, we calculate an~approximation of the~$i$-th component of the~gradient of $f_R\circ\mathcal{M}$:
+			Assuming we have the $n$-th estimate $D_n$, we calculate an~approximation of the~$i$-th component of the~gradient of $f_R\circ\overbar{\mathcal{M}}$:
 				\begin{equation}
-					\nabla(f_R\circ\mathcal{M})^i \approx \frac{f_R(\mathcal{M}(D_n+s\cdot e^i))-f_R(\mathcal{M}(D_n-s\cdot e^i))}{2s},
+					\nabla(f_R\circ\overbar{\mathcal{M}})^i \approx \frac{f_R(\overbar{\mathcal{M}}(D_n+s\cdot e^i))-f_R(\overbar{\mathcal{M}}(D_n-s\cdot e^i))}{2s},
 				\end{equation}
-			where $s$ is a~number and $e^i\in\mathcal{D}$ is the~$i$-th coordinate vector. The~number $s$ should be sufficiently small; initially, we set it as a~fraction of the~map's grid spacing $s = \frac{l}{10}$. During the~minimization, we check that $f_R(\mathcal{M}(D_n))<10s$ at all times. \textcolor{red}{When using trilinear interpolation, it would be more efficient to calculate the~gradient explicitly ($\pm$ same result). This could be implemented inside the~\textit{Field} template class.} The~next estimate can be calculated as follows:
+			where $s$ is a~number and $e^i\in\mathcal{D}$ is the~$i$-th coordinate vector. The~number $s$ should be sufficiently small; initially, we set it as a~fraction of the~map's grid spacing $s = \frac{l}{10}$. During the~minimization, we check that $f_R(\overbar{\mathcal{M}}(D_n))<10s$ at all times. \textcolor{red}{When using trilinear interpolation, it would be more efficient to calculate the~gradient explicitly ($\pm$ same result). This could be implemented inside the~\textit{Field} template class.} The~next estimate can be calculated as follows:
 				\begin{equation}
-					D_{n+1} = D_n - \gamma \nabla(f_R\circ\mathcal{M})(D_n),
+					D_{n+1} = D_n - \gamma \nabla(f_R\circ\overbar{\mathcal{M}})(D_n),
 				\end{equation}
-			where $\gamma\in\mathbb{R}^+$ is the~damping coefficient. It should be set to a~small enough value to ensure convergence, but large enough for sufficient converging speed. The~minimization stops either when the error $f_R(\mathcal{M}(D_n))$ drops below a~specified value or when the~number of iterations exceeds 1000 (in this case, a~message is printed into the~console).
+			where $\gamma\in\mathbb{R}^+$ is the~damping coefficient. It should be set to a~small enough value to ensure convergence, but large enough for sufficient converging speed. The~minimization stops either when the error $f_R(\overbar{\mathcal{M}}(D_n))$ drops below a~specified value or when the~number of iterations exceeds 1000 (in this case, a~message is printed into the~console).
 			The parameters of this method could be further optimized (e.g., a~better choice of $\gamma$, \textcolor{red}{gradient computation}); instead, we later decided to use the~interpolation in the~inverse grid described in the~next section.
 			
 			\textcolor{red}{Measure reconstruction duration and compare it with the~inverse grid interpolation? Also compare the~result? Not sure if this has to be cited.}
 		
-		\subsection{Interpolating in the~Inverse Grid}
+		\subsection{Interpolation in the~Inverse Grid}
+		\label{sec:interpol}
 			\textcolor{red}{Interpolating between known points in the~readout space. Gaussian elimination, multivariate polynomial. Benefits compared to the~gradient descent search method (one-time computation for the~whole map is easy to achieve if needed).}
 			
-			\begin{figure}
+			The~currently used reconstruction method is the~interpolation in the~inverse grid. Rather than attempting to invert the~trilinearly interpolated map as in the~previous section, we take advantage of the~fact that the~map $\overbar{\mathcal{M}}$ is one-to-one. Since we have simulated values of this map on a~regular grid in the~detector space $\mathcal{D}$, we also know the~inverse map $\overbar{\mathcal{M}}^{-1}$ on the~irregular inverse grid in the~readout space $\mathcal{R}$. To get an~approximation of the~inverse map in the~entire readout space, we can use interpolation.
+			
+			Since the~inverse grid is irregular, we cannot use trilinear interpolation. Since the~simulated map is dense enough to give us a~good approximation considering the~size of our pads, we can use a~similar approach (more complicated and computationally heavy alternative would be the~natural neighbor interpolation). As shown in the~equation~\ref{eq:trilinpoly} in Section~\ref{sec:trilin}, trilinear interpolation can be expressed as a~polynomial:
+				\begin{equation}
+					\widehat{f}(x,y,z) = axyz + bxy + cxz + dyz + ex + fy + gz + h,
+				\end{equation}
+			where $a,b,c,d,e,f,g,h$ are coefficients determined uniquely by the~values of the~function on the~vertices of the~interpolation cube. We can generalize this for a~function known on an~irregular grid. If we know the~value of a~function in any eight points, we can take a~system of eight linear equations
+				\begin{equation}
+					\begin{pmatrix}
+						x_1 y_1 z_1 & x_1 y_1 & x_1 z_1 & y_1 z_1 & x_1 & y_1 & z_1 & 1\\
+						\vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots\\
+						x_8 y_8 z_8 & x_8 y_8 & x_8 z_8 & y_8 z_8 & x_8 & y_8 & z_8 & 1
+					\end{pmatrix}
+					\begin{pmatrix}
+						a\\
+						\vdots\\
+						h
+					\end{pmatrix}
+					=
+					\begin{pmatrix}
+						f(x_1,y_1,z_1)\\
+						\vdots\\
+						f(x_8,y_8,z_8)
+					\end{pmatrix},
+				\end{equation}
+			which gives us a~unique solution for the~coefficients for most values of $(x_n, y_n, z_n)$ and $f(x_n,y_n,z_n)$, where $n\in\{1,\ldots,8\}$.
+			
+			Using this approach introduces a~small problem: finding the~correct pseudocell (i.e., the image of eight vertices forming a~cubic cell in the~regular grid) in the~inverse grid. The~eight irregularly spaced vertices of this pseudocell do not define a~unique solid body, so there is no straightforward way to divide $\mathcal{R}$ into pseudocells using only these vertices.
+			
+			\textcolor{red}{We are currently ignoring this problem and performing binary search along $x$, $y$, $z$ (in this order). It shouldn't matter too much because the~70/30 map doesn't cause such a big distortion and was even accidentally extrapolated for all $z$ different from the central plane.}
+			\textcolor{red}{Interpolation should be generally faster than the~gradient descent since we don't need to iterate. We also don't need to optimize it to improve performance, if it's too slow we can even calculate the~coefficients for the~entire map before reconstruction.}
+			
+			\begin{figure}[H]
 				\centering
 				\includegraphics[width=0.8\textwidth]{interpol.png}
 				\caption{Selection of the~points for interpolation. \textcolor{red}{Create better images; use the~explanation interpolation vs. extrapolation strange property. Solution~2 probably does not make much sense.}}
