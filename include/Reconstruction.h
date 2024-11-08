@@ -21,10 +21,10 @@ namespace X17
     /// @param map A reference to the Field of MapPoint values.
     /// @param indices An array of 6 integers representing the indices of the MapPoint values to use for interpolation.
     ///                The array should contain indices for {xmin, xmax, ymin, ymax, zmin, zmax}.
-    /// @return A 2D vector containing the interpolation coefficients for each of the x, y, and t coordinates of the MapPoint values.
-    ///         The first index of the vector selects the x (0), y (1), z (2), or t(3) coordinate,
+    /// @return A 2D array containing the interpolation coefficients for each of the x, y, and t coordinates of the MapPoint values.
+    ///         The first index of the array selects the x (0), y (1), z (2), or t(3) coordinate,
     ///         while the second index selects the polynomial coefficient.
-    std::vector<std::vector<double>> GetInterpolCoef(const Field<MapPoint>& map, const int (&indices)[6]);
+    std::array<std::array<double,8>,3> GetInterpolCoef(const Field<MapPoint>& map, const int (&indices)[6]);
 
     /// @brief Finds the indices of the elements closest to a given value in a 3D map along a given variable.
     /// @param map The 3D map to search through.

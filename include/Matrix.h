@@ -56,8 +56,8 @@ namespace X17
 
         /// @brief Returns a vector representing the specified column of the matrix.
         /// @param c The index of the column to retrieve.
-        /// @return A vector representing the specified column of the matrix, or an empty vector if the index is out of bounds.
-        std::vector<double> GetColumn(int c) const;
+        /// @return An array representing the specified column of the matrix, or an empty vector if the index is out of bounds.
+        std::array<double,M> GetColumn(int c) const;
 
         /// @brief Prints the matrix to the console.
         void Print() const;

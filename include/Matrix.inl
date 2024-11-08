@@ -36,12 +36,12 @@ namespace X17
     }
 
     template <int M, int N>
-    std::vector<double> Matrix<M,N>::GetColumn(int c) const
+    std::array<double,M> Matrix<M,N>::GetColumn(int c) const
     {
         // Check if the column index is valid.
         if(c >= 0 && c < N)
         {
-            std::vector<double> column(M);
+            std::array<double,M> column;
 
             for (int r = 0; r < M; r++) column[r] = this->at(r, c);
             return column;
@@ -49,7 +49,7 @@ namespace X17
         else
         {
             std::cerr << "ERROR: Invalid matrix column index.\n";
-            return std::vector<double>();
+            return std::array<double,M>();
         }
     }
 

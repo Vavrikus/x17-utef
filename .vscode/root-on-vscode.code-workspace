@@ -7,6 +7,7 @@
   ],
   "settings": {
     "files.associations": {
+      "*.shader": "glsl",
       "iostream": "cpp",
       "cmath": "cpp",
       "ostream": "cpp",
@@ -85,7 +86,8 @@
       "scoped_allocator": "cpp",
       "shared_mutex": "cpp",
       "typeindex": "cpp",
-      "plot_drift.C": "cpp"
+      "plot_drift.C": "cpp",
+      "optional": "cpp"
     },
     "C_Cpp.default.includePath": [
       "/home/vavrik/work/X17/include",
