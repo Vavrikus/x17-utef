@@ -1,20 +1,17 @@
 \chapter{Track Simulation}
-	In order to develop and test the~reconstruction algorithm, electron and positron tracks are simulated inside our detector with different initial parameters. Three approaches are used to simulate tracks for different purposes.
+	In order to develop and test the~reconstruction algorithm, electron and positron tracks are simulated inside the~first sector $\mathcal{D}_1$ of our detector (see Section~\ref{sec:coor}) with different initial parameters. Two approaches are currently used to simulate tracks, each of them for different purpose.
 	
-	The~\textbf{Microscopic Simulation} uses the~Garfield++ toolkit~\cite{Garfield++}. Within this toolkit, the~\ac{HEED} program~\cite{HEED} is used to simulate the~primary particle and the~class \textit{AvalancheMicroscopic} to simulate the~drift of secondary electrons created by ionization in the~gas. This is the~most precise and time-consuming simulation used; our current goal is to be able to successfully reconstruct its results and determine our best-case energy resolution.
+	The~\textbf{Microscopic Simulation} uses the~\garfieldpp toolkit~\cite{Garfield++}. Within this toolkit, the~\ac{HEED} program~\cite{HEED} is used to simulate the~primary particle and the~class \textit{AvalancheMicroscopic} to simulate the~drift of secondary electrons created by ionization in the~gas. This is the~most precise and time-consuming simulation used; our current goal is to be able to successfully reconstruct its results and determine our best-case energy resolution.
 	
 	The~\textbf{Runge-Kutta Simulation} uses the~4th order Runge-Kutta numerical integration (\textcolor{red}{add citation for Runge-Kutta}) to simulate the~trajectory of the~primary particle in the~electromagnetic field inside the~detector. It is relatively fast since it does not simulate the~secondary particles. It is used as part of our reconstruction algorithm and for testing some parts of the~reconstruction.
 	
-	The~\textbf{Fast Simulation with Ionization Electron Map} is planned for the~future. It will use the~\ac{HEED} program~\cite{HEED} to simulate the~primary particle and the~Ionization Electron Map (see Section~\ref{sec:map}) to simulate the~drift of secondary electrons. It should be significantly faster than the~Microscopic Simulation but offer comparable precision since it will rely on an already simulated drift map.
+	All of these simulations require the~knowledge of the~electromagnetic field inside the~detector. A~uniform electric field of 400~V$\cdot$cm$^{-1}$ is assumed. The~magnetic field was simulated in Maxwell (see Section~\ref{sec:mag}). \textcolor{red}{add citation}
 	
-	All of these simulations require the~knowledge of the~electromagnetic field inside the~detector. A~uniform electric field of 400~V$\cdot$cm$^{-1}$ is assumed. The~magnetic field was simulated in Maxwell (\textcolor{red}{add citation? details? own subsection with figures? more details in Section~\ref{sec:IEAP}?}).
-	
-	\textcolor{red}{Could also mention mention Monte Carlo (requires gas file generation) and Runge Kutta simulation implemented in Garfield, why we don't use them.}
 	\textcolor{red}{Single track in positive x direction or initial parameter randomization. Importance of gas composition, used gas compositions.}
 	
 	\section{Microscopic Simulation}
 	\label{sec:microsim}
-		The~microscopic simulation, the~most detailed simulation used in this work, is performed using the~Garfield++ toolkit~\cite{Garfield++} for this purpose. 
+		The~microscopic simulation, the~most detailed simulation used in this work, is performed using the~Garfield++ toolkit~\cite{Garfield++}.
 		
 		The~electron transport properties are simulated using the~program Magboltz~(\textcolor{red}{Add citation.}). Two different gas mixtures were used: 90\%~Ar~+~10\%~CO$_2$ and 70\%~Ar~+~30\%~CO$_2$. The~second mixture will be used in our detector. The~temperature is set to 20~$^\circ$C, the~pressure is atmospheric.
 		
@@ -22,7 +19,9 @@
 		
 		Finally, we use the~microscopic tracking provided by the~class \textit{AvalancheMicroscopic} to simulate the~drift of the~ionization electrons. Each electron is followed from collision to collision using the~equation of motion and the~collision rates calculated by Magboltz.
 		
-		\textcolor{red}{First simulated track in the~$z$ direction. Figures.}
+		\textcolor{red}{First simulated track in the~$z$ direction should be described in detail here (own subsection?). Figures.}
+		
+		\textcolor{red}{Add more detailed and better description of HEED, and microscopic tracking (each their own subsection?). Could also mention Monte Carlo (requires gas file generation) and Runge-Kutta simulation implemented in Garfield, why we don't use them (another subsection? rename the~section to \garfieldpp simulation and mention all relevant parts?).}
 		
 		\begin{figure}[H]
 			\centering
@@ -42,7 +41,4 @@
 	
 	\section{Runge-Kutta Simulation}
 	\label{sec:rks}
-		\textcolor{red}{Trajectory simulation with 4th order Runge-Kutta. Relativistic equation that is numerically integrated by the~algorithm.}
-	
-	\section{Future?: Fast Simulation with the~Ionization Electron Map}
-		\textcolor{red}{Primary track simulated in HEED. Readout parameters by interpolating the~map. Diffusion from the~map for randomization.}
+		\textcolor{red}{Trajectory simulation with 4th order Runge-Kutta. Relativistic equation that is numerically integrated by the~algorithm.}	
