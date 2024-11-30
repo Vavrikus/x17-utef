@@ -25,7 +25,7 @@
 			\begin{equation}
 				z(x) = z_n + b \Delta x+c(\Delta x)^2+d(\Delta x)^3,
 			\end{equation}
-		where $\Delta x = x-x_n$ and $b,c,d$ are coefficients. Using this equation, we derive the~radius of curvature as:
+		where $\Delta x = x-x_n$ and $b,c,d$ are coefficients. Using this equation, we derive the~radius of curvature\footnote{For the~general formula see \url{https://en.wikipedia.org/wiki/Curvature\#Graph_of_a_function}} as:
 			\begin{equation}
 				r(x) = \frac{\left(1+z'^2(x)\right)^\frac{3}{2}}{z''(x)} = \frac{\left(1+\left(b+2c\Delta x+3d(\Delta x)^2\right)^2\right)^\frac{3}{2}}{2c+6d\Delta x}.
 			\end{equation}
@@ -33,7 +33,7 @@
 			\begin{linenomath}
 			\begin{align}
 				\bm{F_L} &= \bm{F_c},\\
-				||e\bm{v}\times\bm{B}|| &= \frac{\gamma m_e v^2}{r},\\
+				\norm{e\bm{v}\times\bm{B}} &= \frac{\gamma m_e v^2}{r},\\
 				e c\beta B &= \frac{E_{0e} \beta^2}{r\sqrt{1-\beta^2}},\\
 				\sqrt{1-\beta^2} &= \frac{E_{0e} \beta}{ecBr},
 			\end{align}
@@ -95,6 +95,7 @@
 				\begin{linenomath}
 				\begin{gather}
 					(x_1-x_0)^2 + (z_1-z_0)^2 = r^2,\\
+					\left(\frac{x_1-x_2}{2}+\frac{z_1-z_2}{2}t\right)^2 + \left(\frac{z_1-z_2}{2}+\frac{x_2-x_1}{2}t\right)^2 = r^2,\\
 					\left(\left(\frac{x_2-x_1}{2}\right)^2+\left(\frac{z_2-z_1}{2}\right)^2\right)t^2+\left(\frac{x_2-x_1}{2}\right)^2+\left(\frac{z_2-z_1}{2}\right)^2-r^2=0.
 				\end{gather}
 				\end{linenomath}

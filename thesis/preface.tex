@@ -1,14 +1,65 @@
 \chapwithtoc{Motivation}
 	A~\ac{TPC} is a~type of gaseous detector that detects charged particle trajectories by measuring the~positions and drift time of ions created in the~gas; details are provided in Section~\ref{sec:tpc}. The~energy of these particles can be inferred from the~curvature of their trajectory in the~magnetic field.
 	
-	The~goal of this thesis is to develop an~algorithm for the~reconstruction of charged particle trajectories and energy in an~atypic \ac{TPC} with orthogonal electric and magnetic fields, hereafter referred to as the \ac{OFTPC}, used in the~X17 project at the~\ac{IEAPCTU}. Furthermore, we present the~results of testing this algorithm with different samples of simulated data. We use the~\garfieldpp toolkit~\cite{Garfield++} for simulations in combination with the~ROOT~framework~\cite{ROOT} for data analysis and visualization. Some of our more demanding simulations are run on the~MetaCentrum grid.
+	The~goal of this thesis is to develop an~algorithm for the~reconstruction of charged particle trajectories and energy in an~atypic \ac{TPC} with orthogonal electric and magnetic fields, hereafter referred to as the \ac{OFTPC}, used in the~X17 project at the~\ac{IEAPCTU}. Furthermore, we present the~results of testing this algorithm with different samples of simulated data. (We use the~\garfieldpp toolkit~\cite{Garfield++} for simulations in combination with the~ROOT~framework~\cite{ROOT} for data analysis and visualization. Some of our more demanding simulations are run on the~MetaCentrum grid~\cite{metacentrum}.)
 	
-	The~X17 project in \ac{IEAPCTU} aims to reproduce measurements of anomalous behavior in the~angular correlation distribution of pairs produced by the~\ac{IPF} mechanism during the~decay of certain excited nuclei (\iso{Be}{8},~\iso{C}{12},~and~\iso{He}{4}) observed by the~ATOMKI group in Hungary. \textcolor{red}{I would leave this here as a short summary before I explain it in more detail in the sections below.}
+	The~X17 project in \ac{IEAPCTU} aims to reproduce measurements of anomalous behavior in the~angular correlation distribution of pairs produced by the~\ac{IPC} mechanism~\cite{IPC} during the~decay of certain excited nuclei (\iso{Be}{8}, \iso{C}{12}, and~\iso{He}{4}) observed by a~team at ATOMKI in Hungary. \textcolor{red}{I would leave this here as a short summary before I explain it in more detail in the sections below.}
 	
-	\textcolor{red}{Add citations: MetaCentrum, X17 project, VdG, ATOMKI papers. Maybe also TPC, IPF, etc.}
+	\textcolor{red}{Add citations: X17 project, VdG. Maybe also TPC, etc.}
 	
-	\section{ATOMKI Measurements}
-	\textcolor{red}{Short summary of results of measurements in ATOMKI.}
+	\section{ATOMKI Anomaly}
+	\label{sec:ATOMKI}
+		\subsection{ATOMKI Measurements}
+			In 2015 a~group at ATOMKI led by Attila Krasznahorkay observed an anomalous~\acl{IPC} in~\iso{Be}{8} while attempting to find a~new light neutral boson~\cite{atomki_be}. They used the~\iso{Li}{7}$(p,\gamma)$\iso{Be}{8} reaction at the~$E_p = 1030$~keV proton capture resonance to prepare the~18.15~MeV excited state ($J^\pi = 1^{+}$, $T=0$). This state decays predominantly through M1~transitions to the~ground state ($J^\pi = 0^{+}$, $T=0$) and to the~3.03~MeV state ($J^\pi = 2^{+}$, $T=0$)~\cite{resonances}.
+			
+			The~angular correlation of the~$e^+ e^-$ pairs created internally in these transitions were measured and compared to the~simulation; results from a~narrow $E_\text{sum}=18$~MeV region are shown in Figure~\ref{fig:atomki_be}. The~simulation includes boson decay pairs for different boson masses. The~disparity parameter~$y$ is defined as
+				\begin{equation}
+					y = \frac{E_{e^-}-E_{e^+}}{E_{e^-}+E_{e^+}},
+				\end{equation}
+			where $E_{e^-}$ and $E_{e^+}$ are the~kinetic energies of the~electron and positron.
+			
+			Their experimental setup was later upgraded (\textcolor{red}{details?}) and used for new measurements. In 2022 the~\iso{Be}{8} anomaly was also measured using the~$E_p = 441$~keV resonance to produce the~17.64~MeV excited state ($J^\pi = 1^{+}$, $T=1$) which again decays primarily to the~ground state and the~3.03~MeV state~\cite{resonances}. The~anomaly was also measured for $E_p = 650$ and 800~keV where E1~transitions from the~direct proton capture dominate~\cite{atomki_be2}. The~results for $e^+e^-$ with ${E_\text{sum}\in[13.5,20]}$~MeV are shown in Figure~\ref{fig:atomki_be2}.
+			
+			The~newer setup was also used in 2021 to study the~\iso{H}{3}$(p,e^+ e^-)$\iso{He}{4} reaction at $E_p = 510$, 610 and 900~keV~\cite{atomki_he2}, inducing direct and resonant capture populating the~overlapping first 20.21~MeV ($J^\pi = 0^+$) and second 21.01~MeV ($J^\pi = 0^-$) excited states~\cite{resonances2}. The~comparison of simulated and measured $e^+e^-$ pair angular correlations in the~${E_\text{sum}\in[18,22]}$~MeV region is shown in Figure~\ref{fig:atomki_he}.
+			
+			In 2022, another anomaly was measured in the~\iso{B}{11}($p,e^+e^-$)\iso{C}{12} process~\cite{atomki_c}. The~$E_p = 1388$~keV resonance was used to populate the~17.23~MeV excited state ($J^\pi = 1^-$, $T = 1$) with a~large width $\Gamma = 1.15$~MeV~\cite{resonances3}. This state decays mainly through E1~transitions to the~ground state $J^\pi = 0^+$ and to the~4.44~MeV state $J^\pi = 2^+$. To compensate for energy losses in the~target, five energies in the~range $E_p = 1.5\text{--}2.5$~MeV were used. The~experimental angular correlation for the~17.23~MeV transition to the~ground state is shown in Figure~\ref{fig:atomki_c}.
+			
+				\begin{figure}[h]
+					\centering
+					\begin{subfigure}[t]{0.48\textwidth}
+						\centering
+						\includegraphics[width=\textwidth]{atomki_be.png}
+						\caption{Experimental $e^+e^-$ pair correlations measured in the~\iso{Li}{7}$(p,e^+e^-)$\iso{Be}{8} reaction with $|y| \leq 0.5$ (closed circles) and $|y| \geq 0.5$ (open circles)~\cite{atomki_be}.}
+						\label{fig:atomki_be}
+					\end{subfigure}
+					\hfill
+					\begin{subfigure}[t]{0.42\textwidth}
+						\centering
+						\includegraphics[width=\textwidth]{atomki_be2.png}
+						\caption{Experimental $e^+e^-$ pair correlations measured in the~\iso{Li}{7}$(p,e^+e^-)$\iso{Be}{8} reaction with the~improved setup for different proton beam energies~\cite{atomki_be2}.}
+						\label{fig:atomki_be2}
+					\end{subfigure}
+					\begin{subfigure}[t]{0.45\textwidth}
+						\centering
+						\includegraphics[width=\textwidth]{atomki_he.png}
+						\caption{Experimental $e^+e^-$ pair correlations measured in the~\iso{H}{3}$(p,e^+e^-)$\iso{He}{4} reaction with $|y| \leq 0.3$ for different proton beam energies~\cite{atomki_he2}.}
+						\label{fig:atomki_he}
+					\end{subfigure}
+					\hfill
+					\begin{subfigure}[t]{0.45\textwidth}
+						\centering
+						\includegraphics[width=\textwidth]{atomki_c.png}
+						\caption{Experimental $e^+e^-$ pair correlations measured in the~\iso{B}{11}$(p,e^+e^-)$\iso{C}{12} reaction for different proton beam energies~\cite{atomki_c}.}
+						\label{fig:atomki_c}
+					\end{subfigure}
+					\caption{The~ATOMKI anomalous \ac{IPC} measured for different reactions.}
+					\label{fig:atomki}
+				\end{figure}
+		
+		\subsection{Possible Explanations}
+		
+		\subsection{Other Experiments}
+			
 	
 	\section{X17 Project at IEAP CTU}
 	\label{sec:IEAP}

@@ -63,7 +63,7 @@
 		
 		Finally, we need to invert the~map to get the~original detector coordinates $(x,y,z)$ for the~given readout coordinates $(x',y',t)$. In our case, we can reasonably assume that the mapping $\overbar{\mathcal{M}}$ is one-to-one (as seen in the simulations). We implemented two methods for this purpose: the gradient descent search (Section~\ref{sec:grad}) and interpolation on the~inverse grid (Section~\ref{sec:interpol}).
 		
-		The~simulation of the~map is a~computationally heavy task. For this reason, we use the~MetaCentrum grid \textcolor{red}{(citation)} to parallelize needed calculations. At first, this was done by evenly distributing the~simulated electrons across the~individual jobs in a~simulation with only one electron per vertex in the~regular grid with a~spacing of one centimeter. 
+		The~simulation of the~map is a~computationally heavy task. For this reason, we use the~MetaCentrum grid~\cite{metacentrum} to parallelize needed calculations. At first, this was done by evenly distributing the~simulated electrons across the~individual jobs in a~simulation with only one electron per vertex in the~regular grid with a~spacing of one centimeter. 
 		
 		Later, a~more efficient approach was implemented, accounting for the~varying lengths of the~drift of individual electrons. If we index the~electrons in the~order of increasing coordinates $y,x,z$ (\textcolor{red}{picture?}), we can express the~number~$n_l$ of full XY~layers (i.e., electrons with the~same $z$~coordinate) of electrons with index less than or equal to $i$
 			\begin{equation}
