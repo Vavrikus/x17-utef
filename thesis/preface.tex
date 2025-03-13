@@ -21,6 +21,7 @@
 			The~angular correlation of the~$e^+ e^-$ pairs created internally in these transitions were measured and compared to the~simulation; results from a~narrow $E_\text{sum}=18$~MeV region are shown in Figure~\ref{fig:atomki_be}. The~simulation includes boson decay pairs for different boson masses. The~disparity parameter~$y$ is defined as
 				\begin{equation}
 					y = \frac{E_{e^-}-E_{e^+}}{E_{e^-}+E_{e^+}},
+					\label{eq:dispar}
 				\end{equation}
 			where $E_{e^-}$ and $E_{e^+}$ are the~kinetic energies of the~electron and positron.
 			
@@ -30,7 +31,7 @@
 			
 			In 2022, another anomaly was measured in the~\iso{B}{11}($p,e^+e^-$)\iso{C}{12} process~\cite{atomki_c}. The~$E_p = 1388$~keV resonance was used to populate the~17.23~MeV excited state ($J^\pi = 1^-$, $T = 1$) with a~large width $\Gamma = 1.15$~MeV~\cite{resonances3}. This state decays mainly through E1~transitions to the~ground state $J^\pi = 0^+$ and to the~4.44~MeV state $J^\pi = 2^+$. To compensate for energy losses in the~target, five energies in the~range $E_p = 1.5\text{--}2.5$~MeV were used. The~experimental angular correlation for the~17.23~MeV transition to the~ground state is shown in Figure~\ref{fig:atomki_c}.
 			
-				\begin{figure}[h]
+				\begin{figure}
 					\centering
 					\begin{subfigure}[t]{0.48\textwidth}
 						\centering
@@ -70,7 +71,7 @@
 			\subsubsection{Two-arm $e^+e^-$ spectrometer in Hanoi}
 				The anomaly in \iso{Be}{8} has been observed with $>4\sigma$ confidence by a team at the Hanoi University of Sciences for $E_p = 1225$~keV~\cite{hanoi}. They built a two\nobreakdash-arm spectrometer in collaboration with ATOMKI and calibrated it using the 17.6~MeV M1 transition. The results are shown in Figure~\ref{fig:hanoi}.
 				
-				\begin{figure}[h]
+				\begin{figure}
 					\centering
 					\includegraphics[width=0.75\textwidth]{hanoi.png}
 					\caption{Results from the Hanoi spectrometer -- angular $e^+e^-$ pair correlations measured in the~\iso{Li}{7}$(p,e^+e^-)$\iso{Be}{8} reaction at $E_p = 1225$~keV~\cite{hanoi}.}
@@ -81,18 +82,24 @@
 				At the Joint Institute for Nuclear Research in Dubna, signal in the form of enhanced structures in the $\gamma\gamma$ spectra at $\sim 17$ and $\sim 38$~MeV invariant masses for $p+\mathrm{C}$, $d+\mathrm{C}$ and $d+\mathrm{Cu}$ reactions at momenta 5.5, 2.75, and 3.83~GeV per nucleon~\cite{dubna}. Monte Carlo simulations support the conclusion that the signals are a~consequence of a~decay of unknown particles X17 and E38.
 				
 			\subsubsection{The MEG II (Muon Electron Gamma) experiment}
-				Experiments using the~\iso{Li}{7}$(p,e^+e^-)$\iso{Be}{8} reaction were carried out at the~Paul Scherrer Institute with the MEG II superconducting solenoid spectrometer~\cite{megii}. Analysis of the data with $E_p = 1080$~keV exciting both of the resonances (beam fully stopping in the target) found no significant evidence supporting the~X17 hypothesis. An upper bound (at 90\% confidence) on the X17\nobreakdash-to\nobreakdash-$\gamma$ branching ratio was set at $1.2\cdot10^{-5}$ for the 18.15~MeV state (larger than the ratio $5.8\cdot10^{-6}$ obtained by ATOMKI in 2016).
+				Experiments using the~\iso{Li}{7}$(p,e^+e^-)$\iso{Be}{8} reaction were carried out at the~Paul Scherrer Institute with the MEG II superconducting solenoid spectrometer~\cite{megii}. Analysis of the data with $E_p = 1080$~keV exciting both of the resonances (beam fully stopping in the target) found no significant evidence supporting the~X17 hypothesis, results are shown in Figure~\ref{fig:megii}. An upper bound (at 90\% confidence) on the X17\nobreakdash-to\nobreakdash-$\gamma$ branching ratio was set at $1.2\cdot10^{-5}$ for the 18.15~MeV state (larger than the ratio $5.8\cdot10^{-6}$ obtained by ATOMKI in 2016). \textcolor{red}{Could add their 90\% C.L bounds figure also.}
+				
+				\begin{figure}
+					\centering
+					\includegraphics[width=0.9\textwidth]{megii.png}
+					\caption{Results from the~MEG II experiments -- angular correlation of $e^+e^-$ pairs with $E_\text{sum} \in [16,20]$~MeV measured in the~\iso{Li}{7}$(p,e^+e^-)$\iso{Be}{8} reaction with proton beam energies 500 and 1080~keV. The~500~keV dataset is fitted with Monte Carlo of both the~\ac{IPC} deexcitation and the~\ac{EPC} produced by gammas~\cite{megii}.}
+					\label{fig:megii}
+				\end{figure}
 			
 	
 	\section{X17 Project at IEAP CTU}
 	\label{sec:IEAP}
-		\textcolor{red}{Short summary of our goals, maybe mention the~grant.}
-		\textcolor{red}{\begin{itemize}
-				\item \iso{Li}{7} or \iso{T}{3} target, proton beam energies to be used to excite above mentioned states, energy range (detector should be able $> 4$ MeV)
-				\item three layers (TPX3, MWPC, TPC)
-				\item multiple scattering problem (TPX3 in vacuum tube, carbon tube with thinned aluminum or Kapton windows, MWPC for exit point + triggering/coincidence)
-				\item TPC -- energy, particle recognition (energy loss per unit distance), \textbf{more details in the next chapter}
-				\item CAD drawing (with coordinate system defined in the next chapter, more figures will be there probably)
-				\item TPX3 details: short description, maybe a mention of the tests
-				\item couple of MWPC details could be above, TPC details in the next chapter
-		\end{itemize}}
+		The aim of the X17 project at the Van der Graaff facility of the~\acl{IEAPCTU} is to repeat the original ATOMKI experiments with \iso{Li}{7} and \iso{H}{3} targets using an independent $e^+e^-$ spectrometer. In order to effectively measure the anomaly, we need to reconstruct both the~energy and the~angular correlation of the $e^+e^-$ pairs. The spectrometer will use three layers of detectors to achieve this -- \acf{Tpx3} silicon pixel detector and \acf{MWPC} layers for the~angle reconstruction and a~\acf{TPC} layer for the~energy reconstruction. \textcolor{red}{Spectrometer CAD drawing (coordinates here or next chapter?). Cite some VdG paper, mention grant? Using \url{https://cernbox.cern.ch/pdf-viewer/public/rf0oU1nqVLN3acZ/LuzH_submitted.pdf}.}
+		
+		The energy of $e^+e^-$ pair produced in the reaction is given by the energy available $E_\text{r}$ in the reaction and can be distributed between them arbitrarily. Nonetheless in the~decay of the~hypothetical X17 particle, electron and positron should have similar energy and we can therefore use a~disparity cut $|y| \leq 0.5$ for the disparity parameter (defined in Equation~\ref{eq:dispar}). Interesting events should rarely have a~particle with an~energy below $E_\text{r}/4$ (roughly 4~MeV). Electrons with such low energies are scattered significantly by even a~thin layer of relatively light material, for this reason the \ac{Tpx3} layer will be inside of the vacuum tube and the tube will have a thinned aluminum segment or Kapton\texttrademark\ windows.
+		
+		\ac{Tpx3} can measure (in each $55\times55~\mathrm{\mu m}$ pixel) \ac{ToA} with 1.6~ns precision and \ac{ToT} which reflects the deposited energy. This potentially allows 3D~tracking if we increase the~chip thickness at the~cost of increased scattering. The layer can reconstruct the~reaction vertex and the~angular correlation with high precision.
+		
+		The layer of \ac{MWPC}s with sensitive area $40\times38$~mm$^2$ will be outside of the~beam pipe. It will provide an extra point on the particle trajectory which can help with the estimation of the~reaction vertex and improve the~\ac{TPC} performance by providing its entry point.
+		
+		The \ac{TPC}s, which are a subject of this theses, are in a~magnetic field of permanent magnets positioned between them and provide 3D track reconstruction and subsequent momentum and particle identification (its charge, or even type based on its stopping power). They avoid radiative losses thanks to the small interaction with the~incident particle. For the~readout, triple \ac{GEM} will be used. The magnetic field layout in our \ac{TPC}s is atypical -- orthogonal to the~electric field inside the~chamber, this is why we call them \acf{OFTPC}. Further details about our \ac{OFTPC}s are provided in section~\ref{sec:oftpc}.
