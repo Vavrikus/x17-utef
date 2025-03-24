@@ -117,7 +117,7 @@ namespace X17
         return -1;        
     }
 
-    void DefaultLayout::DrawPads(bool nogaps, TCanvas* c) const
+    void DefaultLayout::DrawPads(bool nogaps, bool inverted, TCanvas* c) const
     {
         using namespace constants;
 
@@ -130,29 +130,38 @@ namespace X17
             double x1,y1,x2,y2;
             GetPadCorners(i,x1,y1,x2,y2,nogaps);
 
-            pad_lines.push_back(new TLine(x1,y1,x1,y2)); // Left line.
-            pad_lines.push_back(new TLine(x2,y1,x2,y2)); // Right line.
-            pad_lines.push_back(new TLine(x1,y1,x2,y1)); // Bottom line.
-            pad_lines.push_back(new TLine(x1,y2,x2,y2)); // Top line.
+            TText* pad_number;
 
-            // double xc,yc;
-            // GetPadCenter(i,xc,yc);
-            // pad_lines.push_back(new TLine(x1,y1,xc,yc));
-            // pad_lines.push_back(new TLine(x1,y2,xc,yc));
-            // pad_lines.push_back(new TLine(x2,y1,xc,yc));
-            // pad_lines.push_back(new TLine(x2,y2,xc,yc));
+            if (inverted)
+            {
+                pad_lines.push_back(new TLine(y1, x1, y2, x1)); // Left line.
+                pad_lines.push_back(new TLine(y1, x2, y2, x2)); // Right line.
+                pad_lines.push_back(new TLine(y1, x1, y1, x2)); // Bottom line.
+                pad_lines.push_back(new TLine(y2, x1, y2, x2)); // Top line.
 
-            TText* pad_number = new TText((x1+x2)/2,(y1+y2)/2,std::to_string(i).c_str());
+                pad_number = new TText((y1 + y2) / 2, (x1 + x2) / 2, std::to_string(i).c_str());
+            } 
+            
+            else 
+            {
+                pad_lines.push_back(new TLine(x1, y1, x1, y2)); // Left line.
+                pad_lines.push_back(new TLine(x2, y1, x2, y2)); // Right line.
+                pad_lines.push_back(new TLine(x1, y1, x2, y1)); // Bottom line.
+                pad_lines.push_back(new TLine(x1, y2, x2, y2)); // Top line.
+
+                pad_number = new TText((x1 + x2) / 2, (y1 + y2) / 2, std::to_string(i).c_str());
+            }
+            
             pad_number->SetTextAlign(22);
             pad_number->SetTextSize(0.035);
             pad_numbers.push_back(pad_number);
         }
         
-        c->Range(xmin-1,-yhigh-1,xmax+1,yhigh+1);
+        // c->Range(xmin-1,-yhigh-1,xmax+1,yhigh+1);
         for(auto l : pad_lines)   l->Draw("AL");
         for(auto t : pad_numbers) t->Draw("same");
 
-        DrawTrapezoid(false);
+        DrawTrapezoid(inverted);
     }
 
     void DefaultLayout::DrawPads3D(const double height) const

@@ -52,7 +52,7 @@ namespace X17
 
         /// @brief Test function for drawing of the pads with their channel numbers.
         /// @param nogaps If true, the gaps are evenly divided between neighbouring pads.
-        virtual void DrawPads(bool nogaps = false, TCanvas* c = nullptr) const = 0;
+        virtual void DrawPads(bool nogaps = false, bool inverted = false, TCanvas* c = nullptr) const = 0;
 
         /// @brief Function for drawing of the pads in 3D with certain height.
         /// @param height Specifies how high should the pads be drawn.
@@ -122,7 +122,7 @@ namespace X17
 
         /// @brief Test function for drawing of the pads with their channel numbers.
         /// @param nogaps If true, the gaps are evenly divided between neighbouring pads.
-        void DrawPads(bool nogaps = false, TCanvas* c = nullptr) const override;
+        void DrawPads(bool nogaps = false, bool inverted = false, TCanvas* c = nullptr) const override;
 
         /// @brief Function for drawing of the pads in 3D with certain height.
         /// @param height Specifies how high should the pads be drawn.

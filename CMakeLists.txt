@@ -51,7 +51,15 @@ set(PROJECT_BUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build)
 file(MAKE_DIRECTORY ${PROJECT_BUILD_DIR})
 
 # Create a list of subdirectories
-set(SUBDIRECTORIES reconstruction simulations/ion_map simulations/single_track simulations/rk_tracks simulations/micro_tracks)
+set(SUBDIRECTORIES
+    reconstruction
+    simulations/ion_map
+    simulations/single_track
+    simulations/rk_tracks
+    simulations/micro_tracks
+    tests/magnetic_field_plot
+    tests/thesis_plots
+)
 
 # Iterate over each subdirectory
 foreach(subdirectory ${SUBDIRECTORIES})
@@ -59,68 +67,29 @@ foreach(subdirectory ${SUBDIRECTORIES})
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/${subdirectory})
 endforeach()
 
-# Specify the desired folders where you want to create the link to the ROOT dictionary
-set(LINK_TARGET_FOLDER "${PROJECT_BUILD_DIR}/reconstruction")
-set(LINK_TARGET_FOLDER2 "${PROJECT_BUILD_DIR}/simulations/rk_tracks")
-set(LINK_TARGET_FOLDER3 "${PROJECT_BUILD_DIR}/simulations/single_track")
-set(LINK_TARGET_FOLDER4 "${PROJECT_BUILD_DIR}/simulations/ion_map")
-set(LINK_TARGET_FOLDER5 "${PROJECT_BUILD_DIR}/simulations/micro_tracks")
-
-# Create a symbolic link to the PCM file in the desired folder
-execute_process(
-    COMMAND ${CMAKE_COMMAND} -E create_symlink
-            "${PROJECT_BUILD_DIR}/libX17_source_lib_rdict.pcm"
-            "${LINK_TARGET_FOLDER}/libX17_source_lib_rdict.pcm"
-    RESULT_VARIABLE LINK_RESULT
-)
-execute_process(
-    COMMAND ${CMAKE_COMMAND} -E create_symlink
-            "${PROJECT_BUILD_DIR}/libX17_source_lib_rdict.pcm"
-            "${LINK_TARGET_FOLDER2}/libX17_source_lib_rdict.pcm"
-    RESULT_VARIABLE LINK_RESULT2
-)
-execute_process(
-    COMMAND ${CMAKE_COMMAND} -E create_symlink
-            "${PROJECT_BUILD_DIR}/libX17_source_lib_rdict.pcm"
-            "${LINK_TARGET_FOLDER3}/libX17_source_lib_rdict.pcm"
-    RESULT_VARIABLE LINK_RESULT3
-)
-execute_process(
-    COMMAND ${CMAKE_COMMAND} -E create_symlink
-            "${PROJECT_BUILD_DIR}/libX17_source_lib_rdict.pcm"
-            "${LINK_TARGET_FOLDER4}/libX17_source_lib_rdict.pcm"
-    RESULT_VARIABLE LINK_RESULT4
-)
-execute_process(
-    COMMAND ${CMAKE_COMMAND} -E create_symlink
-            "${PROJECT_BUILD_DIR}/libX17_source_lib_rdict.pcm"
-            "${LINK_TARGET_FOLDER5}/libX17_source_lib_rdict.pcm"
-    RESULT_VARIABLE LINK_RESULT5
+# List of target folders for ROOT dictionary link
+set(LINK_TARGET_FOLDERS
+    "${PROJECT_BUILD_DIR}/reconstruction"
+    "${PROJECT_BUILD_DIR}/simulations/rk_tracks"
+    "${PROJECT_BUILD_DIR}/simulations/single_track"
+    "${PROJECT_BUILD_DIR}/simulations/ion_map"
+    "${PROJECT_BUILD_DIR}/simulations/micro_tracks"
+    "${PROJECT_BUILD_DIR}/tests/magnetic_field_plot"
 )
 
-# Check if the link creation was successful
-if(LINK_RESULT EQUAL 0)
-    message(STATUS "Symbolic link to libX17_source_lib_rdict.pcm created successfully for reconstruction.")
-else()
-    message(WARNING "Failed to create symbolic to libX17_source_lib_rdict.pcm link for reconstruction.")
-endif()
-if(LINK_RESULT2 EQUAL 0)
-    message(STATUS "Symbolic link to libX17_source_lib_rdict.pcm created successfully for rk_tracks.")
-else()
-    message(WARNING "Failed to create symbolic to libX17_source_lib_rdict.pcm link for rk_tracks.")
-endif()
-if(LINK_RESULT3 EQUAL 0)
-    message(STATUS "Symbolic link to libX17_source_lib_rdict.pcm created successfully for single_track.")
-else()
-    message(WARNING "Failed to create symbolic to libX17_source_lib_rdict.pcm link for single_track.")
-endif()
-if(LINK_RESULT4 EQUAL 0)
-    message(STATUS "Symbolic link to libX17_source_lib_rdict.pcm created successfully for ion_map.")
-else()
-    message(WARNING "Failed to create symbolic to libX17_source_lib_rdict.pcm link for ion_map.")
-endif()
-if(LINK_RESULT4 EQUAL 0)
-    message(STATUS "Symbolic link to libX17_source_lib_rdict.pcm created successfully for micro_tracks.")
-else()
-    message(WARNING "Failed to create symbolic to libX17_source_lib_rdict.pcm link for micro_tracks.")
-endif()
+# Path to the source PCM file
+set(PCM_SOURCE "${PROJECT_BUILD_DIR}/libX17_source_lib_rdict.pcm")
+
+# Loop through each target folder
+foreach(target_folder ${LINK_TARGET_FOLDERS})
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E create_symlink "${PCM_SOURCE}" "${target_folder}/libX17_source_lib_rdict.pcm"
+        RESULT_VARIABLE LINK_RESULT
+    )
+    
+    if(LINK_RESULT EQUAL 0)
+        message(STATUS "Symbolic link to libX17_source_lib_rdict.pcm created successfully for ${target_folder}.")
+    else()
+        message(WARNING "Failed to create symbolic link to libX17_source_lib_rdict.pcm for ${target_folder}.")
+    endif()
+endforeach()
