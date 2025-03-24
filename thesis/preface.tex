@@ -1,4 +1,8 @@
 \chapwithtoc{Motivation}
+\setcounter{equation}{0}
+\setcounter{figure}{0}
+\renewcommand{\theequation}{\thechapter.\arabic{equation}}
+\renewcommand{\thefigure}{\thechapter.\arabic{figure}}
 	A~\ac{TPC} is a~type of gaseous detector that detects charged particle trajectories by measuring the~positions and drift time of ions created in the~gas; details are provided in Section~\ref{sec:tpc}. The~energy of these particles can be inferred from the~curvature of their trajectory in the~magnetic field.
 	
 	The~goal of this thesis is to develop an~algorithm for the~reconstruction of charged particle trajectories and energy in an~atypic \ac{TPC} with orthogonal electric and magnetic fields, hereafter referred to as the \ac{OFTPC}, used in the~X17 project at the~\ac{IEAPCTU}. Furthermore, we present the~results of testing this algorithm with different samples of simulated data. (We use the~\garfieldpp toolkit~\cite{Garfield++} for simulations in combination with the~ROOT~framework~\cite{ROOT} for data analysis and visualization. Some of our more demanding simulations are run on the~MetaCentrum grid~\cite{metacentrum}.)
@@ -93,7 +97,14 @@
 	
 	\section{X17 Project at IEAP CTU}
 	\label{sec:IEAP}
-		The aim of the X17 project at the Van der Graaff facility of the~\acl{IEAPCTU} is to repeat the original ATOMKI experiments with \iso{Li}{7} and \iso{H}{3} targets using an independent $e^+e^-$ spectrometer. In order to effectively measure the anomaly, we need to reconstruct both the~energy and the~angular correlation of the $e^+e^-$ pairs. The spectrometer will use three layers of detectors to achieve this -- \acf{Tpx3} silicon pixel detector and \acf{MWPC} layers for the~angle reconstruction and a~\acf{TPC} layer for the~energy reconstruction. \textcolor{red}{Spectrometer CAD drawing (coordinates here or next chapter?). Cite some VdG paper, mention grant? Using \url{https://cernbox.cern.ch/pdf-viewer/public/rf0oU1nqVLN3acZ/LuzH_submitted.pdf}.}
+		The aim of the X17 project at the Van der Graaff facility of the~\acl{IEAPCTU} is to repeat the original ATOMKI experiments with \iso{Li}{7} and \iso{H}{3} targets using an independent $e^+e^-$ spectrometer. In order to effectively measure the anomaly, we need to reconstruct both the~energy and the~angular correlation of the $e^+e^-$ pairs. The spectrometer will use three layers of detectors to achieve this -- \acf{Tpx3} silicon pixel detector and \acf{MWPC} layers for the~angle reconstruction and a~\acf{TPC} layer for the~energy reconstruction. The~schematics of the~prepared detector is in Figure~\ref{fig:ieap} \textcolor{red}{Spectrometer CAD drawing (coordinates here or next chapter?). Cite some VdG paper, mention grant? Using \url{https://cernbox.cern.ch/pdf-viewer/public/rf0oU1nqVLN3acZ/LuzH_submitted.pdf}.}
+			
+			\begin{figure}
+				\centering
+				\includegraphics[width=\textwidth]{ieap_x17.png}
+				\caption{Schematics of the~detector at the Van der Graaff facility at~\ac{IEAPCTU}.}
+				\label{fig:ieap}
+			\end{figure}
 		
 		The energy of $e^+e^-$ pair produced in the reaction is given by the energy available $E_\text{r}$ in the reaction and can be distributed between them arbitrarily. Nonetheless in the~decay of the~hypothetical X17 particle, electron and positron should have similar energy and we can therefore use a~disparity cut $|y| \leq 0.5$ for the disparity parameter (defined in Equation~\ref{eq:dispar}). Interesting events should rarely have a~particle with an~energy below $E_\text{r}/4$ (roughly 4~MeV). Electrons with such low energies are scattered significantly by even a~thin layer of relatively light material, for this reason the \ac{Tpx3} layer will be inside of the vacuum tube and the tube will have a thinned aluminum segment or Kapton\texttrademark\ windows.
 		
