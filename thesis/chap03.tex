@@ -59,7 +59,7 @@
 			\begin{equation}
 				\mathcal{M}: \mathcal{D} \longrightarrow \mathcal{R},\; (x,y,z) \longmapsto (x',y',t).
 			\end{equation}
-		To get an~approximation of this mapping, we simulate the~drift of ionization electrons generated on a~regular grid inside the~volume of our \ac{OFTPC} \footnote{we do not take the~detector walls into account and simulate even outside of the~\ac{OFTPC} which lets us interpolate even close to the~walls}. It is also useful to simulate multiple (100 in our case) electrons originating from the~same position so we can get a~better information about the~average drift and its variance. In order to get more accurate results, we use the~microscopic simulation of these electrons described in Section~\ref{sec:microsim}. When evaluating the~map inside the~grid, we use trilinear interpolation (see Section~\ref{sec:trilin}). From now on, we will denote this interpolated simulation with the~same symbol $\mathcal{M}$.
+		To get an~approximation of this mapping, we simulate the~drift of ionization electrons generated on a~regular grid inside the~volume of our \ac{OFTPC}\footnote{we do not take the~detector walls into account and simulate even outside of the~\ac{OFTPC} which lets us interpolate even close to the~walls}. It is also useful to simulate multiple (100 in our case) electrons originating from the~same position so we can get a~better information about the~average drift and its variance. In order to get more accurate results, we use the~microscopic simulation of these electrons described in Section~\ref{sec:microsim}. When evaluating the~map inside the~grid, we use trilinear interpolation (see Section~\ref{sec:trilin}). From now on, we will denote this interpolated simulation with the~same symbol $\mathcal{M}$.
 		
 		Finally, we need to invert the~map to get the~original detector coordinates $(x,y,z)$ for the~given readout coordinates $(x',y',t)$. In our case, we can reasonably assume that the mapping $\overbar{\mathcal{M}}$ is one-to-one (as seen in the simulations). We implemented two methods for this purpose: the gradient descent search (Section~\ref{sec:grad}) and interpolation on the~inverse grid (Section~\ref{sec:interpol}).
 		
@@ -188,3 +188,15 @@
 		\textcolor{red}{Reconstruction with pads and time bins. Maybe testing different pads. Mapping the~center of the pad (along with the~midpoint of the~time bin) isn't necessarily the~best approach since it might not correspond to the~average parameters of an~electron with these readout parameters (insignificant?).}
 		
 		\textcolor{red}{It is also possible to make this a~subsection of the~map, making the previous subsections parts of a~new subsection 'Map Inversion'.}
+		
+		In order to get a~more realistic representation of a~track measured in our \ac{TPC}, we need to take the~discretization of the~position and time data into account. The~readout of our \ac{TPC} will consist of 128~pads, their layout is shown in Figure~\ref{fig:padlayout}. Time will be read out with $t_\text{int} = 100$~ns intervals.
+		
+		As a first approximation, we can neglect the~multiplication in our triple\nobreakdash-\ac{GEM} and assume ideal charge readout. We start the~time at the~beginning of the~electron/positron simulation \textcolor{red}{(could easily randomize this time a bit and see what it does to the~reconstruction)}. We can then map the~readout coordinates $(x',y',t)\in\mathcal{R}$ of each ionization electron to the pad coordinates~$(n_\text{pad},n_t) \in \mathcal{P}$ (using the~parameters described in Section~\ref{sec:coor}):
+			\begin{gather}
+				n_\text{pad} = n\colon (x',y') \in \left[x_{1,n}-\frac{g}{2},x_{2,n}+\frac{g}{2}\right)\times\left[y_{1,n}-\frac{g}{2},y_{2,n}+\frac{g}{2}\right), \\
+				n_t = \left\lceil \frac{t}{t_\text{int}}\right\rceil.
+			\end{gather}
+		This way assign the closest pad to each readout position within the~\ac{TPC} volume (\textcolor{red}{some positions near the wall are not handled}). \textcolor{red}{Makes sense since the~pads attract the electrons, the inhomogeneity of electric field is neglected.} The number of electrons in each pad (i.e., collected charge) is then counted and serves as a~weight for the~energy reconstruction. The~reconstructed track consists of points for each $(n,n_t)\in\mathcal{P}$, we get these by reconstructing the~position of a~hypothetical electron with the~readout coordinates of the~pad/time bin center:
+			\begin{equation}
+				\mathcal{D} \ni (x,y,z) = \overbar{\mathcal{M}}\left(x_{c,n},y_{c,n},\left(n_t-\frac{1}{2}\right)t_\text{int}\right).
+			\end{equation}

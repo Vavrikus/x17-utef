@@ -127,9 +127,13 @@
 				The~readout space $\mathcal{R}$ represents the~drift time and final positions of ionization electrons as measured by an~ideal continuous readout. We describe it using coordinates $(x',y',t)$, where $x'$ and $y'$ correspond to the~detector coordinates at the readout plane ($z = 8$~cm). \textcolor{red}{Currently not entirely sure how to put this into a~figure since only $x'$ and $y'$ correspond to the~detector coordinates, it will make more sense when visualizing the~map. The drift time~$t$ is approximately proportional to~$d_r$.}
 			
 			\subsubsection{Pad Space}
-				The~pad space $\mathcal{P}$ represents the~time bin and pad number of ionization electrons as measured by an~ideal discrete readout. \textcolor{red}{It is not really a~subspace of $\mathcal{R}$ but there is a mapping from $\mathcal{R}$ to $\mathcal{P}$. It is a discretization of a~part of $\mathcal{R}$, the mapping can be adjusted depending on the~simulation. If we assume uniform electric field there will be gaps, we don't use gaps in the reconstruction since the~electrons should be pulled towards the~pads.}
+				The~pad space $\mathcal{P}$ represents the~time bin and pad number of ionization electrons as measured by an~ideal discrete readout:
+					\begin{equation}
+						\mathcal{P} = \{(n_\text{pad},n_t)\in\mathbb{N}^2 \mid n_\text{pad}\leq128\}.
+					\end{equation}
+				\textcolor{red}{Technically both values can be zero as defined in the~code (max channel 127). It is not really a~subspace of $\mathcal{R}$ but there is a mapping from $\mathcal{R}$ to $\mathcal{P}$. It is a discretization of a~part of $\mathcal{R}$, the mapping can be adjusted depending on the~simulation. If we assume uniform electric field there will be gaps, we don't use gaps in the reconstruction since the~electrons should be pulled towards the~pads.}
 				
-				The~readout of the~\ac{OFTPC} will consist (\textcolor{red}{is the design final?}) of 128~rectangular pads arranged in a~staggered pattern. Parameters of the~pad layout are shown in Figure~\ref{fig:padlayout}.
+			The~readout of the~\ac{OFTPC} will consist (\textcolor{red}{is the design final?}) of 128~rectangular pads arranged in a~staggered pattern. Parameters of the~pad layout are shown in Figure~\ref{fig:padlayout}. The bottom left corner of $n$\nobreakdash-th pad has coordinates $(x_{1,n},y_{1,n})$, the~ top right $(x_{2,n},y_{2,n})$ and its center has coordinates $(x_{c,n},y_{c,n})$. The gap between neighboring pads is $g=0.08$~cm. Time will be read out with 100~ns intervals (\textcolor{red}{details?}). \textcolor{red}{Could also describe pad-related functions.}
 			
 				\begin{figure}[H]
 					\centering
@@ -140,7 +144,7 @@
 		
 		\subsection{Magnetic Field Simulation}
 		\label{sec:mag}
-			The~magnetic field inside our detector is produced by six permanent magnets. It was simulated using Ansys Maxwell (\textcolor{red}{citation?}) which gives us values on a~regular grid. Visualization of the~magnetic field is shown in Figure~\ref{fig:mag}. Whenever we need to work with values outside this grid, we use trilinear interpolation described in Section~\ref{sec:trilin} below.
+			The~magnetic field inside our detector is produced by six permanent magnets. It was simulated using Ansys Maxwell (\textcolor{red}{citation?}) which gives us values on a~regular grid. Visualization of the~magnetic field is shown in Figure~\ref{fig:mag}. Whenever we need to work with values outside this grid, we use trilinear interpolation described below.
 			
 			\begin{figure}
 				\centering
