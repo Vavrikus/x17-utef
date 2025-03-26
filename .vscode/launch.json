@@ -113,6 +113,25 @@
             "ignoreFailures": true
           }
         ]
+      },
+
+      {
+        "name": "(gdb) Launch bfield",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/build/tests/magnetic_field_plot/bfield",
+        "args": [],
+        "cwd": "${workspaceFolder}/build/tests/magnetic_field_plot/",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          }
+        ]
       }
     ]
   }

@@ -132,5 +132,22 @@ int main(int argc, char *argv[])
 
 	h_field->GetZaxis()->SetTitleOffset(1.5);
 
+	// TCanvas *c3 = new TCanvas("c3", "Field along z=0.45 in xz plane", 800, 800);
+	// c3->SetLeftMargin(0.12);
+	// c3->SetRightMargin(0.05);
+
+	// TH1F* h_field_xz = new TH1F("h_field_xz", ";x [cm];B [T]", 1000, 0, xmax);
+	// h_field_xz->SetStats(0);
+
+	// for(int i = 0; i < 1000; i++)
+	// {
+	// 	double x = h_field_xz->GetBinCenter(i);
+	// 	X17::Vector b = magfield->GetField(x,0,0.45);
+	// 	std::cout << "x = " << x << " b.y = " << b.y << std::endl;
+	// 	h_field_xz->SetBinContent(i,b.y);
+	// }
+
+	// h_field_xz->Draw();
+
 	app.Run(true);
 }

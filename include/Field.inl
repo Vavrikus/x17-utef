@@ -1,6 +1,7 @@
 // C++ dependencies
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 #include <stdexcept>
 #include <string>
 
@@ -58,9 +59,9 @@ namespace X17
         _GetPointIndices(x, y, z, xi, yi, zi);
 
         // Determine the grid coordinates of given point.
-        int x_grid = m_xmin + m_step_size * xi;
-        int y_grid = m_ymin + m_step_size * yi;
-        int z_grid = m_zmin + m_step_size * zi;
+        double x_grid = m_xmin + m_step_size * xi;
+        double y_grid = m_ymin + m_step_size * yi;
+        double z_grid = m_zmin + m_step_size * zi;
 
         // Determine the indices of the eight surrounding points.
         int xi2, yi2, zi2;
@@ -69,14 +70,14 @@ namespace X17
         if(z - z_grid < 0) zi2 = zi - 1; else zi2 = zi + 1;
 
         // Make sure the indices are in bounds.
-        std::clamp(xi2, 0, m_num_x_cells - 1);
-        std::clamp(yi2, 0, m_num_y_cells - 1);
-        std::clamp(zi2, 0, m_num_z_cells - 1);
+        xi2 = std::clamp(xi2, 0, m_num_x_cells - 1);
+        yi2 = std::clamp(yi2, 0, m_num_y_cells - 1);
+        zi2 = std::clamp(zi2, 0, m_num_z_cells - 1);
 
         // Compute the trilinear interpolation coefficients.
-        double dx = abs((x - x_grid) / m_step_size);
-        double dy = abs((y - y_grid) / m_step_size);
-        double dz = abs((z - z_grid) / m_step_size);
+        double dx = std::abs((x - x_grid) / m_step_size);
+        double dy = std::abs((y - y_grid) / m_step_size);
+        double dz = std::abs((z - z_grid) / m_step_size);
 
         // Get references to the eight surrounding points.
         const T& c000 = this->at(xi,  yi,  zi);
