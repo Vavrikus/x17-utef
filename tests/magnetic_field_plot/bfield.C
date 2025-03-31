@@ -76,6 +76,8 @@ int main(int argc, char *argv[])
 	frame->Draw("colz");
 
 	X17::DrawTrapezoid(false);
+	X17::DrawTube();
+	X17::DrawFirstSectorMagnets(false);
 
 	for (double x = 0; x <= xmax; x += spacing) {
 		for (double y = -ymax; y <= ymax; y += spacing) {

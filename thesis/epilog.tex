@@ -2,31 +2,33 @@
 	\textcolor{red}{Here or at the~end of each section. Something about the~future of this work?}
 	
 	\section*{Notes}
-		\textcolor{red}{General notes about the~thesis:}
-		\begin{itemize}[topsep=4pt,itemsep=2pt]
-			\item \textcolor{red}{Check that all of the~classes and other code are marked the~same way in the~text. I used italics somewhere, could use different font for this instead.}
-			\item \textcolor{red}{Check unbreakable space in front of articles. Remove excessive article usage with proper nouns.}
-			\item \textcolor{red}{Currently using margins for single-sided printing (bigger on the left side).}
-			\item \textcolor{red}{Check that present tense is used}
-			\item \textcolor{red}{American English quotation marks (") instead of British English (').}
-			\item \textcolor{red}{Some of the overfull hbox warnings might change if duplex printing is used (they generate black rectangles on the~edge of the page), leaving them be for now}
-			\item \textcolor{red}{Check nobreakdash usage}
-			\item \textcolor{red}{Check capitalized references (e.g., Figure, Section, Equation)}
-			\item \textcolor{red}{Check \textbackslash(...\textbackslash) math mode instead of \$...\$. (actually unlike \textbackslash[...\textbackslash] math mode, there is apparently no real benefit to this clumsy syntax)}
-			\item \textcolor{red}{Use siunitx package to ensure correct formatting.}
-			\item \textcolor{red}{Check other stuff that's written in the MFF UK template. Apparently it has since been updated and there are some differences (check for them).}
-			\item \textcolor{red}{Check correct subscripts in equation (italics vs no italics)}\\
-			\item \textcolor{red}{Consistent bold marking of points/vectors}
-		\end{itemize}
-		\textcolor{red}{Random notes:}
-		\begin{itemize}[topsep=4pt,itemsep=2pt]
-			\item \textcolor{red}{Terminology consistency -- ionization/primary/secondary electrons}
-			\item \textcolor{red}{Consistent \ac{TPC} vs \ac{OFTPC} acronym usage in the text or individual chapters.}
-			\item \textcolor{red}{Only electrons that start and end in the~sector closer than 0.5~cm are used for reconstruction (newest version).}
-			\item \textcolor{red}{Attachment, Penning transfer and secondary ionization not considered in the~microscopic simulation.}
-			\item \textcolor{red}{Suspicious artifacts of trilinear interpolation in Figure~\ref{fig:mag}.}
-		\end{itemize}
-		
+		\textcolor{red}{General notes about the~thesis:
+			\begin{itemize}[topsep=4pt,itemsep=2pt]
+				\item Check that all of the~classes and other code are marked the~same way in the~text. I used italics somewhere, could use different font for this instead.
+				\item Check unbreakable space in front of articles. Remove excessive article usage with proper nouns.
+				\item Currently using margins for single-sided printing (bigger on the left side).
+				\item Check that present tense is used
+				\item Active vs passive voice usage
+				\item American English quotation marks (") instead of British English (').
+				\item Some of the overfull hbox warnings might change if duplex printing is used (they generate black rectangles on the~edge of the page), leaving them be for now
+				\item Check nobreakdash usage (is it always necessary)
+				\item Check capitalized references (e.g., Figure, Section, Equation)
+				\item Check \textbackslash(...\textbackslash) math mode instead of \$...\$. (actually unlike \textbackslash[...\textbackslash] math mode, there is apparently no real benefit to this clumsy syntax)
+				\item Use siunitx package to ensure correct formatting.
+				\item Check other stuff that's written in the MFF UK template. Apparently it has since been updated and there are some differences (check for them).
+				\item Check correct subscripts in equation (italics vs no italics)
+				\item Consistent bold marking of points/vectors
+				\item Correct footnotes (capital letters, etc.).
+			\end{itemize}
+			Random notes:
+			\begin{itemize}[topsep=4pt,itemsep=2pt]
+				\item Terminology consistency -- ionization/primary/secondary electrons
+				\item Consistent \ac{TPC} vs \ac{OFTPC} acronym usage in the text or individual chapters.
+				\item Only electrons that start and end in the~sector closer than 0.5~cm are used for reconstruction (newest version).
+				\item Attachment, Penning transfer and secondary ionization not considered in the~microscopic simulation.
+				\item Suspicious artifacts of trilinear interpolation in Figure~\ref{fig:mag}. \textbf{Fixed -- integers instead of doubles in the implementation, influenced reconstruction SIGNIFICANTLY (but not simulation).}
+			\end{itemize}
+		}
 	\section*{Future}
 		\textcolor{red}{Things planned for the future:}
 		\begin{itemize}[topsep=4pt,itemsep=2pt]

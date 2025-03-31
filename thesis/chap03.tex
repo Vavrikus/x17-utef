@@ -189,14 +189,14 @@
 		
 		\textcolor{red}{It is also possible to make this a~subsection of the~map, making the previous subsections parts of a~new subsection 'Map Inversion'.}
 		
-		In order to get a~more realistic representation of a~track measured in our \ac{TPC}, we need to take the~discretization of the~position and time data into account. The~readout of our \ac{TPC} will consist of 128~pads, their layout is shown in Figure~\ref{fig:padlayout}. Time will be read out with $t_\text{int} = 100$~ns intervals.
+		In order to get a~more realistic representation of a~track measured in the~\ac{OFTPC}, we need to take the~discretization of the~position and time data into account. The~readout of the~\ac{OFTPC} will consist of 128~pads, their layout is shown in Figure~\ref{fig:padlayout}. Time will be read out with $t_\text{int} = 100$~ns intervals.
 		
-		As a first approximation, we can neglect the~multiplication in our triple\nobreakdash-\ac{GEM} and assume ideal charge readout. We start the~time at the~beginning of the~electron/positron simulation \textcolor{red}{(could easily randomize this time a bit and see what it does to the~reconstruction)}. We can then map the~readout coordinates $(x',y',t)\in\mathcal{R}$ of each ionization electron to the pad coordinates~$(n_\text{pad},n_t) \in \mathcal{P}$ (using the~parameters described in Section~\ref{sec:coor}):
+		As a first approximation, we can neglect the~multiplication in the~triple\nobreakdash-\ac{GEM} and assume an~ideal charge readout. The~time is started at the~beginning of the~electron/positron simulation \textcolor{red}{(randomize this time a bit and see what it does to the~reconstruction)}. The~readout coordinates ${(x',y',t)\in\mathcal{R}}$ of each ionization electron can be mapped to the pad coordinates~$(n_\text{pad},n_t) \in \mathcal{P}$ (using the~parameters described in Section~\ref{sec:coor}):
 			\begin{gather}
 				n_\text{pad} = n\colon (x',y') \in \left[x_{1,n}-\frac{g}{2},x_{2,n}+\frac{g}{2}\right)\times\left[y_{1,n}-\frac{g}{2},y_{2,n}+\frac{g}{2}\right), \\
 				n_t = \left\lceil \frac{t}{t_\text{int}}\right\rceil.
 			\end{gather}
-		This way assign the closest pad to each readout position within the~\ac{TPC} volume (\textcolor{red}{some positions near the wall are not handled}). \textcolor{red}{Makes sense since the~pads attract the electrons, the inhomogeneity of electric field is neglected.} The number of electrons in each pad (i.e., collected charge) is then counted and serves as a~weight for the~energy reconstruction. The~reconstructed track consists of points for each $(n,n_t)\in\mathcal{P}$, we get these by reconstructing the~position of a~hypothetical electron with the~readout coordinates of the~pad/time bin center:
+		This way the closest pad is assigned to each readout position within the~\ac{OFTPC} volume\footnote{Some positions near the wall are not handled and some pads extend beyond the~\ac{OFTPC} volume.}. \textcolor{red}{Makes sense since the~pads attract the electrons, the inhomogeneity of electric field is neglected.} The number of electrons in each pad (i.e., collected charge) is then counted and serves as a~weight for the~energy reconstruction. The~reconstructed track consists of points for each $(n,n_t)\in\mathcal{P}$, we get these by reconstructing the~position of a~hypothetical electron with the~readout coordinates of the~pad/time bin center:
 			\begin{equation}
 				\mathcal{D} \ni (x,y,z) = \overbar{\mathcal{M}}\left(x_{c,n},y_{c,n},\left(n_t-\frac{1}{2}\right)t_\text{int}\right).
 			\end{equation}

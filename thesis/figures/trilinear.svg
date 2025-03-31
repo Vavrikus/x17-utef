@@ -1,0 +1,162 @@
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%" viewBox="-105 -80 210 280">
+ <title>Trilinear interpolation visualisation</title>
+ <desc>A geometric visualisation of trilinear interpolation by CMG Lee. The product of the value at the desired point and the entire volume is equal to the sum of the products of the value at each corner and the partial volume diagonaly opposite the corner.</desc>
+ <defs>
+  <circle id="point" cx="0" cy="0" r="3" stroke="#000000"/>
+  <path id="lx" d="M -35,-10 h 130"/>
+  <path id="ly" d="M -30,-15 v 90"/>
+  <path id="lz" d="M -26.5,-6.5 l -67,-67"/>
+  <g id="l" stroke="#999999">
+   <use xlink:href="#lx"/>
+   <use xlink:href="#lx" transform="translate(0,80)"/>
+   <use xlink:href="#lx" transform="translate(-60,-60)"/>
+   <use xlink:href="#lx" transform="translate(-60,20)"/>
+   <use xlink:href="#ly"/>
+   <use xlink:href="#ly" transform="translate(120,0)"/>
+   <use xlink:href="#ly" transform="translate(-60,-60)"/>
+   <use xlink:href="#ly" transform="translate(60,-60)"/>
+   <use xlink:href="#lz"/>
+   <use xlink:href="#lz" transform="translate(120,0)"/>
+   <use xlink:href="#lz" transform="translate(0,80)"/>
+   <use xlink:href="#lz" transform="translate(120,80)"/>
+  </g>
+  <rect id="z0" x="-30" y="-10" width="80" height="60"/>
+  <rect id="z1" x="50"  y="-10" width="40" height="60"/>
+  <rect id="z2" x="-30" y="50"  width="80" height="20"/>
+  <rect id="z3" x="50"  y="50"  width="40" height="20"/>
+  <path id="x0" d="M -80,-60 v 60 l 50,50   v -60 z"/>
+  <path id="x1" d="M -80,0   v 20 l 50,50   v -20 z"/>
+  <path id="x2" d="M -90,-70 v 60 l 10,10   v -60 z"/>
+  <path id="x3" d="M -90,-10 v 20 l 10,10   v -20 z"/>
+  <path id="y0" d="M -30,-10 h 80 l -50,-50 h -80 z"/>
+  <path id="y1" d="M -80,-60 h 80 l -10,-10 h -80 z"/>
+  <path id="y2" d="M 50,-10  h 40 l -50,-50 h -40 z"/>
+  <path id="y3" d="M 0,-60   h 40 l -10,-10 h -40 z"/>
+  <g id="c0" fill="#cccccc" fill-opacity="0.5">
+   <use xlink:href="#l"/>
+   <use xlink:href="#x0" fill="#000000"/>
+   <use xlink:href="#y0" fill="#ffffff"/>
+   <use xlink:href="#z0" fill="#666666"/>
+   <use xlink:href="#x0"/>
+   <use xlink:href="#y0"/>
+   <use xlink:href="#z0"/>
+  </g>
+  <g id="c1" fill="#cc9900" fill-opacity="0.5">
+   <use xlink:href="#l"/>
+   <use xlink:href="#x0" transform="translate(80,0)" fill="#000000"/>
+   <use xlink:href="#y2"                             fill="#ffffff"/>
+   <use xlink:href="#z1"                             fill="#666666"/>
+   <use xlink:href="#x0" transform="translate(80,0)"/>
+   <use xlink:href="#y2"/>
+   <use xlink:href="#z1"/>
+  </g>
+  <g id="c2" fill="#0099cc" fill-opacity="0.5">
+   <use xlink:href="#l"/>
+   <use xlink:href="#x1"                             fill="#000000"/>
+   <use xlink:href="#y0" transform="translate(0,60)" fill="#ffffff"/>
+   <use xlink:href="#z2"                             fill="#666666"/>
+   <use xlink:href="#x1"/>
+   <use xlink:href="#y0" transform="translate(0,60)"/>
+   <use xlink:href="#z2"/>
+  </g>
+  <g id="c3" fill="#009900" fill-opacity="0.5">
+   <use xlink:href="#l"/>
+   <use xlink:href="#x1" transform="translate(80,0)" fill="#000000"/>
+   <use xlink:href="#y2" transform="translate(0,60)" fill="#ffffff"/>
+   <use xlink:href="#z3"                             fill="#666666"/>
+   <use xlink:href="#x1" transform="translate(80,0)"/>
+   <use xlink:href="#y2" transform="translate(0,60)"/>
+   <use xlink:href="#z3"/>
+  </g>
+  <g id="c4" fill="#cc0000" fill-opacity="0.5">
+   <use xlink:href="#l"/>
+   <use xlink:href="#x2"                                fill="#000000"/>
+   <use xlink:href="#y1"                                fill="#ffffff"/>
+   <use xlink:href="#z0" transform="translate(-50,-50)" fill="#666666"/>
+   <use xlink:href="#x2"/>
+   <use xlink:href="#y1"/>
+   <use xlink:href="#z0" transform="translate(-50,-50)"/>
+  </g>
+  <g id="c5" fill="#cc00ff" fill-opacity="0.5">
+   <use xlink:href="#l"/>
+   <use xlink:href="#x2" transform="translate(80,0)"    fill="#000000"/>
+   <use xlink:href="#y3"                                fill="#ffffff"/>
+   <use xlink:href="#z1" transform="translate(-50,-50)" fill="#666666"/>
+   <use xlink:href="#x2" transform="translate(80,0)"/>
+   <use xlink:href="#y3"/>
+   <use xlink:href="#z1" transform="translate(-50,-50)"/>
+  </g>
+  <g id="c6" fill="#0000ff" fill-opacity="0.5">
+   <use xlink:href="#l"/>
+   <use xlink:href="#x3"                                fill="#000000"/>
+   <use xlink:href="#y1" transform="translate(0,60)"    fill="#ffffff"/>
+   <use xlink:href="#z2" transform="translate(-50,-50)" fill="#666666"/>
+   <use xlink:href="#x3"/>
+   <use xlink:href="#y1" transform="translate(0,60)"/>
+   <use xlink:href="#z2" transform="translate(-50,-50)"/>
+  </g>
+  <g id="c7" fill="#000000" fill-opacity="0.5">
+   <use xlink:href="#l"/>
+   <use xlink:href="#x3" transform="translate(80,0)"    fill="#000000"/>
+   <use xlink:href="#y3" transform="translate(0,60)"    fill="#ffffff"/>
+   <use xlink:href="#z3" transform="translate(-50,-50)" fill="#666666"/>
+   <use xlink:href="#x3" transform="translate(80,0)"/>
+   <use xlink:href="#y3" transform="translate(0,60)"/>
+   <use xlink:href="#z3" transform="translate(-50,-50)"/>
+  </g>
+  <g id="c">
+   <use xlink:href="#c7"/>
+   <use xlink:href="#c6"/>
+   <use xlink:href="#c5"/>
+   <use xlink:href="#c4"/>
+   <use xlink:href="#c3"/>
+   <use xlink:href="#c2"/>
+   <use xlink:href="#c1"/>
+   <use xlink:href="#c0"/>
+  </g>
+ </defs>
+ <g font-family="sans-serif" font-size="12" text-anchor="middle" stroke="none" fill="none">
+  <g transform="scale(-1,1)">
+   <use xlink:href="#c"/>
+   <g>
+    <use xlink:href="#point"                                fill="#000000"/>
+    <use xlink:href="#point" transform="translate(30,  10)" fill="#cccccc"/>
+    <use xlink:href="#point" transform="translate(-90, 10)" fill="#cc9900"/>
+    <use xlink:href="#point" transform="translate(30, -70)" fill="#0099ff"/>
+    <use xlink:href="#point" transform="translate(-90,-70)" fill="#009900"/>
+    <use xlink:href="#point" transform="translate(90,  70)" fill="#cc0000"/>
+    <use xlink:href="#point" transform="translate(-30, 70)" fill="#9900ff"/>
+    <use xlink:href="#point" transform="translate(90, -10)" fill="#0000ff"/>
+    <use xlink:href="#point" transform="translate(-30,-10)" fill="#666666"/>
+   </g>
+  </g>
+  <g transform="translate(-100,103)">
+   <use xlink:href="#point" transform="translate(0,   0)" fill="#000000"/>
+   <use xlink:href="#point" transform="translate(70,  0)" fill="#cccccc"/>
+   <use xlink:href="#point" transform="translate(140, 0)" fill="#cc9900"/>
+   <use xlink:href="#point" transform="translate(0,  40)" fill="#0099ff"/>
+   <use xlink:href="#point" transform="translate(70, 40)" fill="#009900"/>
+   <use xlink:href="#point" transform="translate(140,40)" fill="#cc0000"/>
+   <use xlink:href="#point" transform="translate(0,  80)" fill="#9900ff"/>
+   <use xlink:href="#point" transform="translate(70, 80)" fill="#0000ff"/>
+   <use xlink:href="#point" transform="translate(140,80)" fill="#666666"/>
+  </g>
+  <g transform="translate(-70,100)">
+   <use xlink:href="#c"  transform="scale(-0.25,0.25)"/>
+   <use xlink:href="#c0" transform="translate(70,  0) scale(-0.25,0.25)"/>
+   <use xlink:href="#c1" transform="translate(140, 0) scale(-0.25,0.25)"/>
+   <use xlink:href="#c2" transform="translate(0,  40) scale(-0.25,0.25)"/>
+   <use xlink:href="#c3" transform="translate(70, 40) scale(-0.25,0.25)"/>
+   <use xlink:href="#c4" transform="translate(140,40) scale(-0.25,0.25)"/>
+   <use xlink:href="#c5" transform="translate(0,  80) scale(-0.25,0.25)"/>
+   <use xlink:href="#c6" transform="translate(70, 80) scale(-0.25,0.25)"/>
+   <use xlink:href="#c7" transform="translate(140,80) scale(-0.25,0.25)"/>
+  </g>
+  <g transform="translate(-40,107)" fill="#000000">
+   <text x="0"  y="0"><tspan>=</tspan><tspan x="70">+</tspan><tspan x="139">+</tspan></text>
+   <text x="0" y="40"><tspan>+</tspan><tspan x="70">+</tspan><tspan x="139">+</tspan></text>
+   <text x="0" y="80"><tspan>+</tspan><tspan x="70">+</tspan></text>
+  </g>
+ </g>
+</svg>
