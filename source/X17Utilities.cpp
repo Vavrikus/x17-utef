@@ -124,7 +124,6 @@ namespace X17
         TEllipse* circle = new TEllipse(0, 0, tube_radius, tube_radius);
         circle->SetFillStyle(0); // Set fill style to transparent
         circle->Draw("same");
-
     }
     void DrawFirstSectorMagnets(bool yxformat)
     {

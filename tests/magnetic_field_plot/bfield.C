@@ -75,6 +75,13 @@ int main(int argc, char *argv[])
 	frame->SetMaximum(255.0/750.0);
 	frame->Draw("colz");
 
+	// Create a TRANSPARENT SUBPAD to enforce clipping to the DATA REGION
+	TPad *subpad = new TPad("subpad", "", 0.12, 0.1, 1 - 0.15, 1 - 0.1);
+	subpad->SetFillStyle(0);   // Make subpad transparent
+	subpad->Draw();
+	subpad->cd();
+	subpad->Range(-padding, -ymax-padding, xmax+padding, ymax+padding);
+
 	X17::DrawTrapezoid(false);
 	X17::DrawTube();
 	X17::DrawFirstSectorMagnets(false);
@@ -117,8 +124,10 @@ int main(int argc, char *argv[])
 	}
 
 	gStyle->SetNumberContours(255);
+	h_field->GetZaxis()->SetTitleOffset(1.5);
 	h_field->Draw("colz");
 
+	// TPC boundaries
 	TLine *line = new TLine(X17::constants::xmax, X17::constants::zmax, X17::constants::xmax, -X17::constants::zmax);
 	line->SetLineWidth(2);
 	line->Draw();
@@ -132,7 +141,10 @@ int main(int argc, char *argv[])
 	line->SetLineWidth(2);
 	line->Draw();
 
-	h_field->GetZaxis()->SetTitleOffset(1.5);
+	// Vacuum tube
+	line = new TLine(X17::constants::tube_radius, -zmax, X17::constants::tube_radius, zmax);
+	line->SetLineWidth(2);
+	line->Draw();
 
 	// TCanvas *c3 = new TCanvas("c3", "Field along z=0.45 in xz plane", 800, 800);
 	// c3->SetLeftMargin(0.12);
