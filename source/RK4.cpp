@@ -66,7 +66,7 @@ namespace X17
 
         Matrix<4,4> EMtensor = GetEMtensor(magfield,position);
         Matrix<4,1> out1 = (charge/m0)*EMtensor*fourvelocity;
-        output =  Matrix<8,1>({
+        output = Matrix<8,1>({
             params.at(4,0),
             params.at(5,0),
             params.at(6,0),

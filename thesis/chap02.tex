@@ -41,4 +41,46 @@
 	
 	\section{Runge-Kutta Simulation}
 	\label{sec:rks}
-		\textcolor{red}{Trajectory simulation with 4th order Runge-Kutta. Relativistic equation that is numerically integrated by the~algorithm.}	
+		The~Runge-Kutta simulation in this work uses the~\ac{RK4} method to numerically integrate the~equation of motion of a~relativistic charged particle in an~electromagnetic field. Given a~system of first order differential equations with an initial condition
+			\begin{equation}
+				\derivative{\mathbf{y}}{t}(t) = \mathbf{f}(t,\mathbf{y}(t)) \qquad \mathbf{y}(t_0) = \mathbf{y}_0,
+			\end{equation}
+		we iteratively compute the estimate $\mathbf{y}_n = \mathbf{y}(t_n) = \mathbf{y}(t_0+nh)$ as follows (\textcolor{red}{citation? common knowledge?}):
+			\begin{align}
+				\mathbf{k}_1 &= \mathbf{f}(t_n,\mathbf{y}_n),\\
+				\mathbf{k}_2 &= \mathbf{f}\left(t_n+\frac{h}{2},\, \mathbf{y}_n+\frac{h\mathbf{k}_1}{2}\right),\\
+				\mathbf{k}_3 &= \mathbf{f}\left(t_n+\frac{h}{2},\, \mathbf{y}_n+\frac{h\mathbf{k}_2}{2}\right),\\
+				\mathbf{k}_4 &= \mathbf{f}(t_n+h,\, \mathbf{y}_n+h\mathbf{k}_3),
+			\end{align}
+			\begin{equation}
+				\mathbf{y}_{n+1} = \mathbf{y}_n + \frac{1}{6}(\mathbf{k}_1+2\mathbf{k}_2+2\mathbf{k}_3+\mathbf{k}_4).
+			\end{equation}
+		\textcolor{red}{Alternate forms (infinitely many) possible, accuracy vs computational cost. Runge-Kutta-Fehlberg with adaptive step size also possible, can potentially save some computation time especially in rapidly changing field (so maybe not in this case).}
+		
+		In our case, we want to integrate the~equation of motion, given by the~relativistic Lorentz force:
+			\begin{equation}
+				F^\mu_L = m\derivative{u^\mu}{\tau} = q F^{\mu\nu}u_{\nu},
+			\end{equation}
+		where the~Einstein summation convention is used, $m$~is the mass of the~particle, $q$~is its charge, $u^\mu$~is its four-velocity, $\tau$~is the~proper time (i.e., time in the~particle's frame of reference) and $F^{\mu\nu}$~is the~electromagnetic tensor for given coordinates~$x^\mu$ (in our case, it is considered to be time-independent). Given the electric $\mathbf{E} = (E_x,E_y,E_z)$ and the~magnetic field $\mathbf{B} = (B_x,B_y,B_z)$ and using the~metric signature $(+,-,-,-)$, the~equation expands to
+			\begin{equation}
+				\renewcommand{\arraystretch}{1.2}
+				\derivative{}{\tau} \begin{pmatrix}\gamma c\\ \gamma v_x\\ \gamma v_y\\ \gamma v_z\end{pmatrix} = \frac{q}{m} 
+				\begin{pmatrix}
+					0             & -\frac{E_x}{c} & -\frac{E_y}{c} & -\frac{E_z}{c} \\
+					\frac{E_x}{c} &  0             & -B_z           &  B_y           \\
+					\frac{E_y}{c} &  B_z           &  0             & -B_x           \\
+					\frac{E_z}{c} & -B_y           &  B_x           &  0
+				\end{pmatrix}
+				\begin{pmatrix}\gamma c\\ \gamma v_x\\ \gamma v_y\\ \gamma v_z\end{pmatrix},
+				\renewcommand{\arraystretch}{1}
+			\end{equation}
+		where $c$ is the~speed of light in vacuum, $\mathbf{v} = (v_x,v_y,v_z)$ is the~particle's velocity and $\gamma = \left(1-\frac{v^2}{c^2}\right)^{-\frac{1}{2}}$ is the~Lorentz factor \textcolor{red}{(wrong magnetic field sign in the implementation???)}. Together with the~equation
+			\begin{equation}
+				u^\mu = \begin{pmatrix}\gamma c\\ \gamma v_x\\ \gamma v_y\\ \gamma v_z\end{pmatrix} = \derivative{}{\tau} \begin{pmatrix} ct\\ x\\ y\\ z\end{pmatrix},
+			\end{equation}
+		we get a~system of eight first order differential equations for~$x^\mu$ and~$u^\mu$, which we can integrate using the~Runge-Kutta method described above. As a~result of this integration, we get the~position~$\mathbf{x}(\tau_n)$, the~velocity~$\mathbf{v}(\tau_n)$ and the~detector time~$t(\tau_n)$ for every proper time $\tau_n = n \tau_\text{step}$. \textcolor{red}{Integrating using the proper time means, that the step size in $t$ gets larger by the~gamma factor $\derivative{t}{\tau} = \gamma$ (maybe change it and integrate the~detector time).} As initial conditions, we use the~origin of the~track $(x_0,y_0,z_0)$, the~initial velocity direction vector $\mathbf{n}$ and the~kinetic energy $E_\text{kin}$, we then compute $\gamma$ and $\norm{\mathbf{v}}$:
+			\begin{align}
+				\gamma &= 1 + \frac{E_\text{kin}}{E_0},\\
+				\norm{\mathbf{v}} &= c\sqrt{1-\gamma^{-2}}.
+			\end{align}
+		\textcolor{red}{Example of RK simulation -- first testing track, randomized sample of 100000 tracks.}
