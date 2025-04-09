@@ -21,8 +21,7 @@ namespace X17
     {
         using namespace constants;
 
-        Vector n_orient = orientation;
-        n_orient.Normalize();
+        orientation.Normalize();
 
         Vector start = origin / m2cm;
 
@@ -35,9 +34,9 @@ namespace X17
             start.y,
             start.z,
             gamma*c,
-            gamma*velocity*n_orient.x,
-            gamma*velocity*n_orient.y,
-            gamma*velocity*n_orient.z
+            gamma*velocity*orientation.x,
+            gamma*velocity*orientation.y,
+            gamma*velocity*orientation.z
         });
     }
 
