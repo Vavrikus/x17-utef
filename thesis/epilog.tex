@@ -19,7 +19,11 @@
 				\item Check correct subscripts in equation (italics vs no italics)
 				\item Consistent bold marking of points/vectors
 				\item Correct footnotes (capital letters, etc.).
-				\item Might have to mention GeoGebra as per the non-commercial license agreement (Made with GeoGebra®)
+				\item Might have to mention GeoGebra as per the non-commercial license agreement (Made with GeoGebra®) -- maybe put it into acknowledgments next to the MetaCentrum credit? And list all of the figures where GeoGebra was used?
+				\item Maybe make some section outside of References specifically for literature? (such as the old CERN TPC review, ATOMKI review is currently not mentioned, not sure if some Wikipedia articles should get a mention or how do these things work)
+				\item Consistent use of bm vs mathbf
+				\item Consistent use of $\overbar{\mathcal{M}}$ instead of $\mathcal{M}$ when talking about the map of the means (so most of the time)
+				\item Proper equation numbering when deriving a relation
 			\end{itemize}
 			Random notes:
 			\begin{itemize}[topsep=4pt,itemsep=2pt]
@@ -28,6 +32,9 @@
 				\item Only electrons that start and end in the~sector closer than 0.5~cm are used for reconstruction (newest version).
 				\item Attachment, Penning transfer and secondary ionization not considered in the~microscopic simulation.
 				\item Suspicious artifacts of trilinear interpolation in Figure~\ref{fig:mag}. \textbf{Fixed -- integers instead of doubles in the implementation, influenced reconstruction SIGNIFICANTLY (but not simulation).}
+				\item Profiling of the reconstruction!!!! Find out what's taking the most time (probably Runge-Kutta integration which the fit calls a lot). Could gradually decrease the step size to refine the fit instead of making it small right away (arbitrarily small -- the effect of this was never tested). This could take some time to do properly (find a profiler or make profiling macros).
+				\item Slow drift velocity good for $z$ reconstruction, too low leads to recombination
+				\item Could add link to the GitHub repository
 			\end{itemize}
 		}
 	\section*{Future}
@@ -37,7 +44,8 @@
 			\item \textcolor{red}{The~\textbf{Fast Simulation with Ionization Electron Map} is planned for the~future. It will use the~\ac{HEED} program~\cite{HEED} to simulate the~primary particle and the~Ionization Electron Map (see Section~\ref{sec:map}) to simulate the~drift of secondary electrons. It should be significantly faster than the~Microscopic Simulation but offer comparable precision since it will rely on an already simulated drift map. (Primary track simulated in HEED. Readout parameters by interpolating the map.	Diffusion from the map for randomization.)}
 			\item \textcolor{red}{Account for GEM, delta electrons, ...}
 			\item \textcolor{red}{Likelihood approach instead of least squares (if it improves the~reconstruction significantly), we should at least use a~better method than taking the~center of the~TPC bin.}
-			\item \textcolor{red}{More detailed electric field simulation (if needed, GEM will have more complex field)}
+			\item \textcolor{red}{More detailed electric field simulation (if needed, GEM will have more complex field, some irregularities in the field should be considered)}
+			\item Account for the triggering in MWPC/TPX3 (particle travels from TPX3 to MWPC basically immediately -- fraction of a~nanosecond so there should be no significant difference)
 		\end{itemize}
 		
 		\subsection*{Likelihood - inverse map}

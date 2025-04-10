@@ -1,8 +1,8 @@
 \chapter{Energy Reconstruction}
 \label{sec:energy}
-	The~second stage is the~reconstruction of the~particle's energy using a~fit of its reconstructed track (see Section~\ref{sec:track}). We have tested three ways of reconstructing the~energy. Fitting is done using the~MINUIT algorithm implemented in ROOT~\cite{ROOT}. \textcolor{red}{Cite some CERN article directly on MINUIT, can add a~section.}
+	The~second stage is the~reconstruction of the~particle's energy using a~fit of its reconstructed track (see Section~\ref{sec:track}). We have tested three ways of reconstructing the~energy. Fitting is done using the~MINUIT algorithm implemented in ROOT~\cite{ROOT}. \textcolor{red}{Cite some CERN article directly on MINUIT, can add a~section. Or is it done using MIGRAD? The circle and RK4 probably was.}
 	
-	The~\textbf{Cubic Spline Fit} is a~tested and later rejected method of energy reconstruction. It uses smoothly connected piecewise cubic polynomials between uniformly spaced nodes. Energy is calculated using the~fit parameters by computing the~radius of curvature in different points of the~fitted curve using the~known magnitude of the~magnetic field perpendicular to the~trajectory. We rejected this method because tuning of the~fit to have a~reasonably stable radius of curvature turned out to be unpractical.
+	The~\textbf{Cubic Spline Fit} was a~tested and later rejected method of energy reconstruction. It uses smoothly connected piecewise cubic polynomials between uniformly spaced nodes. The reconstructed energy is calculated using the~fit parameters by computing the~radius of curvature in different points of the~fitted curve using the~known magnitude of the~magnetic field perpendicular to the~trajectory. We rejected this method because the~tuning of the~fit turned out to be unpractical compared to the~other used methods. \textcolor{red}{Reconstructs energy at every position (even though the~actual energy doesn't change much) and it might be slower but no profiling has been done yet. Of course, it wasn't tested on the newer track reconstruction methods at all.}
 	
 	The~\textbf{Circle and Lines Fit} was chosen as an~alternative since this corresponds to the~shape of a~trajectory of a~charged particle crossing a~finite volume with a~homogeneous magnetic field. The~energy of the~particle can be estimated using the~fitted radius and the~magnitude of the~perpendicular magnetic field in the~middle of the~\ac{TPC}.
 	
@@ -17,36 +17,34 @@
 	
 	\section{Cubic Spline Fit}
 	\label{sec:cspline}
-		The~first attempt to get an~early estimate of the~kinetic energy of the~particle uses a~cubic spline fit. We use an~electron track starting in the~origin of our coordinate system with an~initial direction in the~positive $x$~axis. The~ example track is simulated microscopically (see Section~\ref{sec:microsim}) with a~kinetic energy of 8~MeV in a~gas mixture 90\%~Ar~+~10\%~CO$_2$ (the~same track was used in Section~\ref{sec:trackfirst}). \textcolor{red}{This track should probably be described in the~simulation chapter.}
+		The~first attempt to get an~estimate of the~kinetic energy of the~particle uses a~cubic spline fit. We use an~electron track starting in the~origin of our coordinate system with an~initial direction in the~positive $x$~axis. The~ example track is simulated microscopically (see Section~\ref{sec:microsim}) with a~kinetic energy of 8~MeV in a~gas mixture 90\%~Ar~+~10\%~CO$_2$ (the~same track was used in Section~\ref{sec:trackfirst}). \textcolor{red}{This track should probably be described in the~simulation chapter.}
 				
-		In order to calculate the~spline, we use the~class \textit{TSpline3} from ROOT. This allows us to evaluate the~spline using the~coordinates $(x_n,z_n)$ of each node and the~derivatives $d_1,d_2$ in the~first and the~last node. We can fit these parameters of a~fixed amount of nodes to the~simulated trajectory. We use the~IMPROVE algorithm provided by the~\textit{TMinuit} class in ROOT. This algorithm attempts to find a~better local minimum after converging.
+		In order to calculate the~spline, we use the~class \textit{TSpline3} from ROOT. This allows us to evaluate the~spline using the~coordinates $(x_n,z_n)$ of each node and the~derivatives $d_1,d_2$ in the~first and the~last node. We can fit these parameters of a~fixed amount of nodes to the~simulated trajectory. We use the~IMPROVE algorithm provided by the~\textit{TMinuit} class in ROOT (\textcolor{orange}{there are some guidelines for fonts in MFF UK template (Czech version) that I will eventually apply (see notes in the conclusion)}). This algorithm attempts to find a~better local minimum after converging (\textcolor{orange}{could reformulate a~bit, taken word for word from some manual}).
 		
-		After the~fit, we want to get an~energy estimate. In order to calculate it, we need the~radius of curvature, which we get from the~fitted spline at every point of the~trajectory. The~part of the~spline corresponding to a~given node is defined as
+		After the~fit converges, we calculate an~energy estimate using the~radius of curvature, which we can extract from the~fitted spline equation at every point of the~trajectory. The~part of the~spline corresponding to a~given node is defined as
 			\begin{equation}
 				z(x) = z_n + b \Delta x+c(\Delta x)^2+d(\Delta x)^3,
 			\end{equation}
-		where $\Delta x = x-x_n$ and $b,c,d$ are coefficients. Using this equation, we derive the~radius of curvature\footnote{For the~general formula see \url{https://en.wikipedia.org/wiki/Curvature\#Graph_of_a_function}} as:
+		where $\Delta x = x-x_n$ and $b,c,d$ are coefficients. Using this equation, we derive the~radius of curvature\footnote{For the~general formula see \url{https://en.wikipedia.org/wiki/Curvature\#Graph_of_a_function}.} as:
 			\begin{equation}
 				r(x) = \frac{\left(1+z'^2(x)\right)^\frac{3}{2}}{z''(x)} = \frac{\left(1+\left(b+2c\Delta x+3d(\Delta x)^2\right)^2\right)^\frac{3}{2}}{2c+6d\Delta x}.
 			\end{equation}
-		Based on the~geometry of the~detector, we can assume the~magnetic field \linebreak$\bm{B}(x,0,z) = (0,B(x,z),0)$ for a~track in the~XZ~plane. Since the~electron is relativistic, the~effect of the~electric field on its trajectory is negligible. The~Lorentz force $F_L$ is then always perpendicular to the~momentum of the~electron and acts as a~centripetal force $F_c$:
-			\begin{linenomath}
-			\begin{align}
-				\bm{F_L} &= \bm{F_c},\\
-				\norm{e\bm{v}\times\bm{B}} &= \frac{\gamma m_e v^2}{r},\\
-				e c\beta B &= \frac{E_{0e} \beta^2}{r\sqrt{1-\beta^2}},\\
-				\sqrt{1-\beta^2} &= \frac{E_{0e} \beta}{ecBr},
-			\end{align}
-			\end{linenomath}
-			\begin{equation}
+		Based on the~geometry of our~detector, we assume that the~magnetic field satisfies $\bm{B}(x,0,z) = (0,B(x,z),0)$ for a~track in the~XZ~plane. Since the~electron is relativistic, the~effect of the~electric field on its trajectory is negligible. The~Lorentz force $F_L$ is then always perpendicular to the~momentum of the~electron and acts as a~centripetal force $F_c$ (\textcolor{orange}{not quite sure how to handle this then?}):
+			\begin{gather}
+				\begin{aligned}
+					\bm{F_L} &= \bm{F_c},\\
+					\norm{e\bm{v}\times\bm{B}} &= \frac{\gamma m_e v^2}{r},\\
+					e c\beta B &= \frac{E_{0e} \beta^2}{r\sqrt{1-\beta^2}},\\
+					\sqrt{1-\beta^2} &= \frac{E_{0e} \beta}{ecBr},
+				\end{aligned}\\
 				\beta^2(x) = \left[1+\left(\frac{E_{0e}}{ecB(x,z(x))r(x)}\right)^2\right]^{-1}, \label{eq:ekin1}
-			\end{equation}
-		where $e$~is the~elementary charge, $c$~is the~speed of light in vacuum, $m_e$~is the~rest mass of electron, $E_{0e} = m_e c^2$ is the~corresponding energy, $\gamma$~is the~Lorentz factor, $\bm{v}$~is the~velocity of the~electron, and $\beta = \frac{v}{c}$. We can then finally get our estimate of the~kinetic energy for a~given point on the~trajectory as follows:
+			\end{gather}
+		where $e$~is the~elementary charge, $c$~is the~speed of light in vacuum, $m_e$~is the~rest mass of electron, $E_{0e} = m_e c^2$ is its rest energy, $\gamma$~is the~Lorentz factor, $\bm{v}$~is the~velocity of the~electron, and $\beta = \frac{v}{c}$. The~kinetic energy for a~given point on the~trajectory is then given as
 			\begin{equation}
 				\label{eq:ekin2}
 				E_\text{kin}(x) = \left(\frac{1}{\sqrt{1-\beta^2(x)}}-1\right)E_{0e}.
 			\end{equation}
-		We can then average these estimates at multiple points to get one final estimate. This method was later rejected in favor of the~circle and lines fit described in Section~\ref{sec:clines}.
+		We can then average these estimates at multiple points (\textcolor{red}{possibly using some weights to account for the~change in accuracy}, this wasn't optimized and we just ended with the graph) to get a~single value. This method was later rejected in favor of the~circle and lines fit \textcolor{orange}{the name was already established at the~beginning of the chapter} described in the~next section.
 		\textcolor{red}{Add some figures.}
 		
 		\begin{figure}
@@ -58,12 +56,12 @@
 	
 	\section{Circle and Lines Fit}
 	\label{sec:clines}
-		Another way to estimate the~particle's kinetic energy is to~fit its trajectory with a~circular arc with lines attached smoothly. This shape of trajectory corresponds to a~movement of a~charged particle through a~homogeneous magnetic field perpendicular to the~particle's momentum and limited to a~certain volume. In general, the~shape of such a~trajectory in a~non-perpendicularly oriented field is a~spiral. In our case, this component is negligible since the~field is approximately toroidal and the~particle motion is nearly perpendicular to it. At first, we tested a~2D version of this fit, then we adapted it to 3D.
+		Another way to estimate the~particle's kinetic energy is to~fit its (\textcolor{orange}{??}) trajectory with a~circular arc with lines attached smoothly. This shape of trajectory corresponds to a~movement of a~charged particle through a~homogeneous magnetic field perpendicular to the~particle's momentum and limited to a~certain volume. In general, the~shape of such a~trajectory with a~non-perpendicularly oriented momentum is a~spiral. In our case, the~magnetic field is approximately toroidal and the~particle motion is nearly perpendicular to it (\textcolor{red}{verify, could add some magnetic field plots in different vertical planes; shouldn't have a big effect on the reconstructed radius anyway}). At first, we tested a~2D version of this fit, then we adapted it to 3D.
 		
-		Our field is not homogeneous, it is therefore not entirely clear what value of magnetic field should be used along with the~fitted radius (using equations~\ref{eq:ekin1} and~\ref{eq:ekin2}) to get the~best estimate for the~kinetic energy. Since we only use this method as the~first iteration of the~particle's energy that we later refine, an~optimal solution of this problem is not required. Instead, we tested two options: taking the~value of the~field in the~middle of the~fitted circular arc and taking the~average field along it. \textcolor{red}{We haven't really tried to plot this for multiple tracks, but these estimates are saved somewhere and could be plotted.}
+		The~field in our detector is not homogeneous, it is therefore not entirely clear what value of magnetic field should be used along with the~fitted radius (using equations~\ref{eq:ekin1} and~\ref{eq:ekin2}) to get the~best estimate for the~kinetic energy. Since we only use this method as the~first iteration of the~particle's energy that we later refine, an~optimal solution of this problem is not required. Instead, we tested two options: taking the~value of the~field in the~middle of the~fitted circular arc (\textcolor{red}{or is it in the middle $x$ of the OFTPC?}) and taking the~average field along it. \textcolor{red}{We haven't really tried to plot this for multiple tracks, but these estimates are saved somewhere and could be plotted.}
 		
 		\subsection{Two-dimensional fit}
-			In the~2D case, the~fitted function used for the~electron track\footnote{Electron tracks bend towards negative~$z$, we need to use the~upper part of the~circle} described in Section~\ref{sec:cspline} is defined as follows: \textcolor{red}{Maybe describe this track that we used at the~beginning somewhere earlier (section microscopic simulations \textrightarrow~Testing track?) so that it is easier to refer to it in multiple sections. It is not part of the~early GitHub commits, so maybe it won't be possible to create exact replicas of the~images, but they should be at least very similar.}
+			In the~2D case, the~fitted function used for the~electron track\footnote{Electron tracks bend towards negative~$z$, we need to use the~upper part of the~circle} described in Section~\ref{sec:cspline} (\textcolor{red}{or in microsim? one specific track at the time, technically this function doesn't work for a curvature that gets outside of the semicircle}) is defined as follows: \textcolor{red}{Maybe describe this track that we used at the~beginning somewhere earlier (section microscopic simulations \textrightarrow~Testing track?) so that it is easier to refer to it in multiple sections. It is not part of the~early GitHub commits, so maybe it won't be possible to create exact replicas of the~images, but they should be at least very similar.}
 				\begin{equation}
 					\label{eq:clines2d}
 					z(x) = \begin{cases}
@@ -72,17 +70,17 @@
 								a_2x+b_2 & x>x_2
 						   \end{cases},
 				\end{equation}
-			where $a_{1,2}$ and $b_{1,2}$ are the~parameters of the~lines, $(x_0,z_0)$ is the~center of the~circle, $r$ is its radius, and $(x_{1,2},z_{1,2})$ are the~coordinates of the~function's nodes. That means we have 9~parameters ($z_{1,2}$ are not used in the~function) along with 2~continuity conditions and 2~smoothness conditions. For the~fit, we use the~coordinates of the~nodes and the~radius of the~circle, which gives us 5~independent parameters (only the~radius has to be larger than half of the~distance between nodes). The~continuity conditions (combined with the~relations for $z_{1,2}$) are as follows:
+			where $a_{1,2}$ and $b_{1,2}$ are the~parameters of the~lines, $(x_0,z_0)$ is the~center of the~circle, $r$ is its radius, and $(x_{1,2},z_{1,2})$ are the~coordinates of the~function's nodes. That means we have 9~parameters ($z_{1,2}$ are not used in the~function) along with 2~continuity conditions and 2~smoothness conditions (\textcolor{orange}{9~parameters of the described function, 5~of them independent after taking the conditions into account}). For the~fit, we use the~coordinates of the~nodes and the~radius of the~circle, which gives us 5~independent parameters (only the~radius has to be larger than half of the~distance between nodes). The~continuity conditions (combined with the~relations for $z_{1,2}$) are
 				\begin{equation}
 					\label{eq:ccont}
-					z_{1,2} = a_{1,2}x_{1,2}+b_{1,2} = z_0-\sqrt{r^2-(x_{1,2}-x_0)^2}.
+					z_{1,2} = a_{1,2}x_{1,2}+b_{1,2} = z_0-\sqrt{r^2-(x_{1,2}-x_0)^2},
 				\end{equation}
-			The~smoothness conditions are as follows:
+			the~smoothness conditions are
 				\begin{equation}
 					\label{eq:a12}
 					a_{1,2} = \frac{x_0-x_{1,2}}{\sqrt{r^2-(x_{1,2}-x_0)^2}}.
 				\end{equation}
-			Equation~\ref{eq:ccont} gives us the~values of $b_{1,2}$
+			Together with the Equation~\ref{eq:ccont} we get the~values of $b_{1,2}$
 				\begin{equation}
 					\label{eq:b12}
 					b_{1,2} = z_{1,2} - a_{1,2} x_{1,2}.
@@ -92,34 +90,32 @@
 					\begin{pmatrix} x_0\\ z_0 \end{pmatrix} = \begin{pmatrix} \frac{x_1+x_2}{2}\\ \frac{z_1+z_2}{2} \end{pmatrix} + t \begin{pmatrix} \frac{z_2-z_1}{2}\\ \frac{x_1-x_2}{2} \end{pmatrix}.
 				\end{equation}
 			At the~same time, the~center has to be in a~distance of $r$ from the~nodes:
-				\begin{linenomath}
 				\begin{gather}
-					(x_1-x_0)^2 + (z_1-z_0)^2 = r^2,\\
-					\left(\frac{x_1-x_2}{2}+\frac{z_1-z_2}{2}t\right)^2 + \left(\frac{z_1-z_2}{2}+\frac{x_2-x_1}{2}t\right)^2 = r^2,\\
+					(x_1-x_0)^2 + (z_1-z_0)^2 = r^2,\notag\\
+					\left(\frac{x_1-x_2}{2}+\frac{z_1-z_2}{2}t\right)^2 + \left(\frac{z_1-z_2}{2}+\frac{x_2-x_1}{2}t\right)^2 = r^2,\notag\\
 					\left(\left(\frac{x_2-x_1}{2}\right)^2+\left(\frac{z_2-z_1}{2}\right)^2\right)t^2+\left(\frac{x_2-x_1}{2}\right)^2+\left(\frac{z_2-z_1}{2}\right)^2-r^2=0.
 				\end{gather}
-				\end{linenomath}
 			Since our electron track bends towards negative $z$ and $x_2 > x_1$, we only care about the~solution with $t>0$
-				\begin{equation}
-					t = \sqrt{\frac{r^2}{\left(\frac{x_2-x_1}{2}\right)^2+\left(\frac{z_2-z_1}{2}\right)^2}-1},
-				\end{equation}
-				\begin{align}
-					x_0 = \frac{x_1+x_2}{2} + \frac{z_2-z_1}{2} \sqrt{\frac{r^2}{\left(\frac{x_2-x_1}{2}\right)^2+\left(\frac{z_2-z_1}{2}\right)^2}-1},\label{eq:x0}\\
-					z_0 = \frac{z_1+z_2}{2} - \frac{x_2-x_1}{2} \sqrt{\frac{r^2}{\left(\frac{x_2-x_1}{2}\right)^2+\left(\frac{z_2-z_1}{2}\right)^2}-1}.\label{eq:z0}
-				\end{align}
-			The~function defined in Equation~\ref{eq:clines2d} along with equations~\ref{eq:a12}, \ref{eq:b12}, \ref{eq:x0} and~\ref{eq:z0} derived using the~continuity and smoothness conditions (combined with the~relations for $z_{1,2}$) fully define our fitted function with parameters $r,x_{1,2},z_{1,2}$. \textcolor{red}{Some pictures of the~fit on the~tested track. Results of the~fit. Again, the~actual fit uses 8-z. Use GeoGebra schematics to generate a~picture of 2D geometry.}
+				\begin{gather}
+					t = \sqrt{\frac{r^2}{\left(\frac{x_2-x_1}{2}\right)^2+\left(\frac{z_2-z_1}{2}\right)^2}-1},\\
+					\begin{aligned}
+						x_0 = \frac{x_1+x_2}{2} + \frac{z_2-z_1}{2} \sqrt{\frac{r^2}{\left(\frac{x_2-x_1}{2}\right)^2+\left(\frac{z_2-z_1}{2}\right)^2}-1},\label{eq:xz0}\\
+						z_0 = \frac{z_1+z_2}{2} - \frac{x_2-x_1}{2} \sqrt{\frac{r^2}{\left(\frac{x_2-x_1}{2}\right)^2+\left(\frac{z_2-z_1}{2}\right)^2}-1}.
+					\end{aligned}
+				\end{gather}
+			The~function defined in Equation~\ref{eq:clines2d} along with equations~\ref{eq:a12}, \ref{eq:b12}, and \ref{eq:xz0} derived using the~continuity and smoothness conditions (combined with the~relations for $z_{1,2}$) fully define our fitted function with parameters $r,x_{1,2},z_{1,2}$. \textcolor{red}{Some pictures of the~fit on the~tested track. Results of the~fit. Again, the~actual fit uses 8-z. Use GeoGebra schematics to generate a~picture of 2D geometry.}
 			
 			\begin{figure}
 				\centering
 				\includegraphics[width=0.8\textwidth]{9010_circle2D.png}
-				\caption{First attempt at a~track reconstruction using only the~drift velocity. Circle and Lines Fit in 2D. \textcolor{red}{Swap for better image, correct coordinates.}}
+				\caption{First attempt at a~track reconstruction using only the~drift velocity. Circle and Lines Fit in 2D. \textcolor{red}{Swap for better image, correct coordinates.} \textcolor{orange}{Bias should be described in the previous chapter, not here.}}
 				\label{fig:9010circle2D}
 			\end{figure}
 		
 		\subsection{Three-dimensional fit}
 			\textcolor{red}{Explain the geometry and least square method used for the~3D fit. Tested on a~Runge-Kutta sample, and with microscopic tracks + map simulation.}
 			
-			In three dimensions, the~shape of a~trajectory of a~charged particle in a~uniform magnetic field is a~cylindrical helix. since we assume that the field is approximately perpendicular to the~particle's momentum at all times, we will further approximate the~trajectory with a~circular arc (with lines attached smoothly).
+			In three dimensions, the~shape of a~trajectory of a~charged particle in a~uniform magnetic field is a~cylindrical helix. Nevertheless, since we assume that the field is approximately perpendicular to the~particle's momentum at all times, we will further approximate the~trajectory with a~circular arc (with lines attached smoothly).
 			
 			We assume that the~initial position $\mathbf{X}_0 = (x_0,y_0,z_0)$ and direction $\theta,\varphi$ (\textcolor{red}{spherical angles as in Section~\ref{sec:coor}}) are known, since this information will be provided by \ac{Tpx3} and \ac{MWPC} layers. \textcolor{red}{We could further refine it at the~end of the current algorithm with some kind of global fit (all detector layers).} The fit then has four free parameters (\textcolor{red}{figure}):
 				\begin{itemize}[nosep]
@@ -140,7 +136,7 @@
 				\begin{equation}
 					\mathbf{X}_1 = \mathbf{X}_\text{L1}(l) = \mathbf{X}_0 + l\mathbf{v}.
 				\end{equation}
-			The vector $\mathbf{n}\perp\mathbf{c}_1$ that lies in the~plane of curvature and points from $\mathbf{X}_1$ to the~center of curvature can be calculated using a composition of rotations. First, we rotate $\mathbf{v}$ to point in the~$\mathbf{\hat{x}}$ direction, the normal for $\alpha = 0$ than points in the $-\mathbf{\hat{z}}$ direction, we apply the $\alpha$ rotation and reverse the rotations into the~$\mathbf{\hat{x}}$ direction:
+			The vector $\mathbf{c}_1$ that lies in the~plane of curvature and points from $\mathbf{X}_1$ to the~center of curvature can be calculated using a composition of rotations. First, we rotate $\mathbf{v}$ to point in the~$\mathbf{\hat{x}}$ direction, the normal for $\alpha = 0$ than points in the $-\mathbf{\hat{z}}$ direction, we apply the $\alpha$ rotation and reverse the rotations into the~$\mathbf{\hat{x}}$ direction: \textcolor{orange}{(parameters are explained in the bullet points above)}
 				\begin{equation}
 					\begin{aligned}
 						\mathbf{c}_1 &= R_z(\varphi)R_y(-\theta)R_x(\alpha)R_y\left(\frac{\pi}{2}\right)R_y(\theta)R_z(-\varphi)\mathbf{v},\\
@@ -172,7 +168,7 @@
 							\end{pmatrix}.
 					\end{aligned}
 				\end{equation}
-			\textcolor{red}{Seems like in this part of the~code $\theta$ is actually taken from the~pole.} Similarly by rotating $\mathbf{\hat{y}}$, we can get the~normal vector $\mathbf{n}=\mathbf{v}\cross\mathbf{c}_1$ perpendicular to the~plane of the~trajectory:
+			\textcolor{orange}{Signs should be correct because right-handed rotation around $y$ rotates $z$ into $x$ and this one is the opposite.} \textcolor{red}{Seems like in this part of the~code $\theta$ is actually taken from the~pole. Instead of the~equator plane.} Similarly by rotating $\mathbf{\hat{y}}$, we can get the~normal vector $\mathbf{n}=\mathbf{v}\cross\mathbf{c}_1$ perpendicular to the~plane of the~trajectory:
 				\begin{equation}
 					\mathbf{n} = R_z(\varphi)R_y(-\theta)R_x(\alpha)\mathbf{\hat{y}}=
 									\begin{pmatrix}
@@ -181,11 +177,11 @@
 										\sin\alpha\cos\theta
 									\end{pmatrix}.
 				\end{equation}
-			This allows us to express the coordinates of the~center of the~circular arc:
+			This allows us to express the coordinates of the~center $\mathbf{C}$ of the~circular arc:
 				\begin{equation}
 					\mathbf{C} = \mathbf{X}_1+r\mathbf{c}_1.
 				\end{equation}
-			We can then get the parametrization and the endpoint of the~circular arc using Rodrigues' rotation formula:
+			We can then get the parametrization and the endpoint of the~circular arc using Rodrigues' rotation formula: (\textcolor{orange}{all parameters explained in the bullet points above})
 				\begin{gather}
 					\begin{aligned}
 						\mathbf{c}_2 &= \mathbf{c}_1\cos\phi_\text{max} + (\mathbf{n}\cross\mathbf{c}_1)\sin\phi_\text{max} + \mathbf{n}(\mathbf{n}\cdot\mathbf{c}_1)(1-\cos\phi_\text{max}),\\
@@ -208,7 +204,7 @@
 						d_{P1} &= \norm{\mathbf{P}-\mathbf{X}_\text{L1}(t_P)}.
 					\end{aligned}
 				\end{equation}
-			If the parameter value is outside of its bounds defined above, we take the boundary value instead. The distance to the~second line is computed likewise. For the~circular arc, we find the closest point by projecting the~center connecting line onto the~arc plane:
+			If the parameter value is outside of its bounds defined above, we take the boundary value instead. The distance to the~second line is computed likewise. For the~circular arc (\textcolor{orange}{specific circular arc in the fit}), we find the closest point (\textcolor{orange}{on the arc}) by projecting the~center connecting line onto the~arc plane:
 				\begin{gather}
 					\mathbf{X}_{PC} = \mathbf{X}_C + r\frac{(\mathbf{P-\mathbf{X}_C})-(\mathbf{n}\cdot(\mathbf{P-\mathbf{X}_C}))\mathbf{n}}{\norm{(\mathbf{P-\mathbf{X}_C})-(\mathbf{n}\cdot(\mathbf{P-\mathbf{X}_C}))\mathbf{n}}},\\
 					d_{PC} = \norm{\mathbf{P}-\mathbf{X}_{PC}}

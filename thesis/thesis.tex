@@ -25,9 +25,6 @@
 % \setlength\headheight{0mm}
 % \let\openright=\cleardoublepage
 
-%% Generate PDF/A-2u
-\usepackage[a-2u]{pdfx}
-
 %% Character encoding: usually latin2, cp1250 or utf8:
 \usepackage[utf8]{inputenc}
 
@@ -42,7 +39,6 @@
 %\usepackage{bbding}           % various symbols (squares, asterisks, scissors, ...)
 \usepackage{bm}                % boldface symbols (\bm)
 \usepackage{graphicx}          % embedding of pictures
-\usepackage{hyperref}          % references to sections
 \usepackage{fancyvrb}          % improved verbatim environment
 \usepackage{natbib}            % citation style AUTHOR (YEAR), or AUTHOR [NUMBER]
 \usepackage[nottoc]{tocbibind} % makes sure that bibliography and the lists
@@ -62,6 +58,9 @@
 \usepackage{subcaption}
 \captionsetup[subfigure]{font=footnotesize}
 \usepackage{enumitem}
+
+\usepackage[a-2u]{pdfx} % Generate PDF/A-2u
+\usepackage{hyperref}   % references to sections
 
 %%% Basic information on the thesis
 
