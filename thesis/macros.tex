@@ -98,3 +98,40 @@
 \begingroup\lccode`~=`=
 \lowercase{\endgroup\def~}{\mathequals\discretionary{}{\the\textfont0=}{}}
 \AtBeginDocument{\mathcode`=="8000 }
+
+
+%%% Detailed settings of bibliography
+	\ifx\citet\undefined\else
+	
+	% Maximum number of authors of a single work. If exceeded, "et al." is used.
+	\ExecuteBibliographyOptions{maxnames=2}
+	% The same setting specific to citations using \citet{...}
+	\ExecuteBibliographyOptions{maxcitenames=2}
+	% The same settings specific to the list of literature
+	%\ExecuteBibliographyOptions{maxbibnames=2}
+	
+	% Shortening first names of authors: "E. A. Poe" instead of "Edgar Allan Poe"
+	%\ExecuteBibliographyOptions{giveninits}
+	% The same without dots ("EA Poe")
+	%\ExecuteBibliographyOptions{terseinits}
+	
+	% If your bibliography entries are hard to break into lines, try this mode:
+	%\ExecuteBibliographyOptions{block=ragged}
+	
+	% Possibly reverse the names of the authors with the non-ISO styles:
+	%\DeclareNameAlias{default}{family-given}
+	
+	% Use caps-and-small-caps for family names in ISO 690 style.
+	\let\familynameformat=\textsc
+	
+	% We want to separate multiple authors in citations by commas
+	% (while we use semicolons in the bibliography as per the ISO standard)
+	\DeclareDelimFormat[textcite]{multinamedelim}{\addcomma\space}
+	\DeclareDelimFormat[textcite]{finalnamedelim}{\space and~}
+	
+	\fi
+	
+%%% Journal Abbreviations (jabbrv package) -- extra custom definitions (following ISO 4)
+\DefineJournalPartialAbbreviation{Instrument}{Instrum}
+\DefineJournalAbbreviation{Polonica}{Pol}
+\DefineJournalPartialAbbreviation{Spectrometer}{Spectrom}

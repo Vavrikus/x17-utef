@@ -6,7 +6,7 @@
 	
 	The~\textbf{Circle and Lines Fit} was chosen as an~alternative since this corresponds to the~shape of a~trajectory of a~charged particle crossing a~finite volume with a~homogeneous magnetic field. The~energy of the~particle can be estimated using the~fitted radius and the~magnitude of the~perpendicular magnetic field in the~middle of the~\ac{TPC}.
 	
-	The~\textbf{Runge-Kutta Fit} uses the~4th order Runge-Kutta numerical integration described in Section~\ref{sec:rks}. Initial parameters of the~track (including the~particle's energy) are optimized so that the~integrated trajectory fits to the~reconstructed one. This fit can also be performed as a~single parameter (i.e., energy) fit if we get the~initial position and orientation of the~particle on the~entrance to the~\ac{TPC} from previous detectors (\ac{Tpx3} and \ac{MWPC}, see Section~\ref{sec:IEAP}).
+	The~\textbf{Runge-Kutta Fit} uses the~4th order Runge-Kutta numerical integration described in Section~\ref{sec:rks}. Initial parameters of the~track (including the~particle's energy) are optimized so that the~integrated trajectory fits to the~reconstructed one. This fit can also be performed as a~single parameter (i.e., energy) fit if we get the~initial position and orientation of the~particle on the~entrance to the~\ac{TPC} from previous detectors (\ac{TPX3} and \ac{MWPC}, see Section~\ref{sec:IEAP}).
 	
 	\begin{figure}
 		\centering
@@ -117,7 +117,7 @@
 			
 			In three dimensions, the~shape of a~trajectory of a~charged particle in a~uniform magnetic field is a~cylindrical helix. Nevertheless, since we assume that the field is approximately perpendicular to the~particle's momentum at all times, we will further approximate the~trajectory with a~circular arc (with lines attached smoothly).
 			
-			We assume that the~initial position $\mathbf{X}_0 = (x_0,y_0,z_0)$ and direction $\theta,\varphi$ (\textcolor{red}{spherical angles as in Section~\ref{sec:coor}}) are known, since this information will be provided by \ac{Tpx3} and \ac{MWPC} layers. \textcolor{red}{We could further refine it at the~end of the current algorithm with some kind of global fit (all detector layers).} The fit then has four free parameters (\textcolor{red}{figure}):
+			We assume that the~initial position $\mathbf{X}_0 = (x_0,y_0,z_0)$ and direction $\theta,\varphi$ (\textcolor{red}{spherical angles as in Section~\ref{sec:coor}}) are known, since this information will be provided by \ac{TPX3} and \ac{MWPC} layers. \textcolor{red}{We could further refine it at the~end of the current algorithm with some kind of global fit (all detector layers).} The fit then has four free parameters (\textcolor{red}{figure}):
 				\begin{itemize}[nosep]
 					\item the length of the first line $l$ (as measured from the initial position),
 					\item the radius of the circular arc $r$,

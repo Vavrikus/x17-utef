@@ -40,8 +40,8 @@
 \usepackage{bm}                % boldface symbols (\bm)
 \usepackage{graphicx}          % embedding of pictures
 \usepackage{fancyvrb}          % improved verbatim environment
-\usepackage{natbib}            % citation style AUTHOR (YEAR), or AUTHOR [NUMBER]
-\usepackage[nottoc]{tocbibind} % makes sure that bibliography and the lists
+%\usepackage{natbib}            % citation style AUTHOR (YEAR), or AUTHOR [NUMBER]
+%\usepackage[nottoc]{tocbibind} % makes sure that bibliography and the lists
                                % of figures/tables are included in the table
                                % of contents
                                
@@ -58,6 +58,32 @@
 \usepackage{subcaption}
 \captionsetup[subfigure]{font=footnotesize}
 \usepackage{enumitem}
+\usepackage[warnundef]{jabbrv}
+
+% Set up formatting of bibliography (references to literature)
+% Details can be adjusted in macros.tex.
+%
+% BEWARE: Different fields of research and different university departments
+% have their own customs regarding bibliography. Consult the bibliography
+% format with your supervisor.
+%
+% The basic format according to the ISO 690 standard with numbered references
+\usepackage[natbib,style=iso-numeric,sorting=none]{biblatex}
+% ISO 690 with alphanumeric references (abbreviations of authors' names)
+%\usepackage[natbib,style=iso-alphabetic]{biblatex}
+% ISO 690 with references Author (year)
+%\usepackage[natbib,style=iso-authoryear]{biblatex}
+%
+% Some fields of research prefer a simple format with numbered references
+% (sorting=none tells that bibliography should be listed in citation order)
+%\usepackage[natbib,style=numeric,sorting=none]{biblatex}
+% Numbered references, but [1,2,3,4,5] is compressed to [1-5]
+%\usepackage[natbib,style=numeric-comp,sorting=none]{biblatex}
+% A simple format with alphanumeric references:
+%\usepackage[natbib,style=alphabetic]{biblatex}
+
+% Load the file with bibliography entries
+\addbibresource{bibliography.bib}
 
 \usepackage[a-2u]{pdfx} % Generate PDF/A-2u
 \usepackage{hyperref}   % references to sections
