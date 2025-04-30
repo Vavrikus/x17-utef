@@ -7,7 +7,7 @@ namespace X17
     RK4<N>::RK4(double start, double step, VecFn equation, VectorN initial, EndFn end_condition)
         : m_param(start), m_step(step), m_dif_eq(equation), m_end_fn(end_condition), m_current(initial)
     {
-        results.push_back(m_current);
+        m_results.push_back(m_current);
     }
 
     template<int N>
@@ -28,7 +28,7 @@ namespace X17
             VectorN diff = (1.0/6.0) * (k1 + 2*k2 + 2*k3 + k4);
             m_current += diff;
             m_param   += m_step;
-            results.push_back(m_current);
+            m_results.push_back(m_current);
         }
     }
 } // namespace X17

@@ -123,4 +123,13 @@ namespace X17
     /// @param point The point to compute the distance from.
     /// @return The squared distance between the line and the point.
     double LineSqDist(Vector origin, Vector orientation, double max_param, Vector point);
+
+    /// @brief Computes the squared distance between a line and a point in 3D space and returns the closest point on the line.
+    /// @param origin The origin of the line.
+    /// @param orientation The orientation vector of the line.
+    /// @param max_param The maximum allowed parameter of the line.
+    /// @param point The point to compute the distance from.
+    /// @param closest_point Will be set to the closest point on the line to the given point.
+    /// @return The squared distance between the line and the point.
+    double LineSqDistAndCP(Vector origin, Vector orientation, double max_param, Vector point, Vector& closest_point);
 } // namespace X17

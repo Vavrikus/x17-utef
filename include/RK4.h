@@ -30,7 +30,7 @@ namespace X17
         double m_step;     // The step size for the integration.
         EndFn m_end_fn;    // The function object that determines the end condition for the integration.
 
-        std::vector<VectorN> results; // A vector that stores the values of the dependent variable at different points in the integration.
+        std::vector<VectorN> m_results; // A vector that stores the values of the dependent variable at different points in the integration.
         
     public:
         /// @brief Constructs an RK4 object with the specified initial conditions and integration parameters.
@@ -46,11 +46,11 @@ namespace X17
 
         /// @brief Returns the vector of values of the dependent variable at different points in the integration.
         /// @return The vector of values of the dependent variable at different points in the integration.
-        const std::vector<VectorN>& GetResults() const { return results; }
+        const std::vector<VectorN>& GetResults() const { return m_results; }
 
         /// @brief Returns the number of points in the integration.
         /// @return The number of points in the integration.
-        int GetSize() const { return results.size(); }
+        int GetSize() const { return m_results.size(); }
 
         /// @brief Returns the step size used for the integration.
         /// @return The step size used for the integration.
@@ -100,6 +100,42 @@ namespace X17
     /// @param big_volume Should a volume be added in front of the TPC?
     /// @return Pointer to an instance of RK4 class.
     RK4<8>* GetTrackRK(const Field<Vector>& magfield, bool electron, double step, double kin_en, Vector origin, Vector orientation, bool big_volume = false);
+
+    /// @brief Gets a point on the computed trajectory at a specified index.
+    /// @param track Pointer to a simulated RK4 trajectory.
+    /// @param index The index of the desired point on the trajectory.
+    /// @return The RKPoint object representing the position (with time) of the particle at the specified index on the trajectory.
+    RKPoint GetTrackRKPoint(const RK4<8>* track, int index);
+
+    /// @brief Computes the square of the distance between a point and a point on the computed trajectory at a specified index.
+    /// @param track Pointer to a simulated RK4 trajectory.
+    /// @param index The index of the point on the trajectory to compare the distance to.
+    /// @param point The Vector object representing the point to calculate the distance from.
+    /// @return The square of the distance between the specified point and the point on the trajectory at the specified index.
+    double GetTrackRKSqDist(const RK4<8>* track, int index, Vector point);
+
+    /// @brief Computes the scaled derivative of the square of the distance between a point and the point on the computed trajectory with respect to the index.
+    /// @param track Pointer to a simulated RK4 trajectory.
+    /// @param index The index of the point on the trajectory to compute the derivative at.
+    /// @param point The Vector object representing the point to calculate the derivative for.
+    /// @return The derivative of the square of the distance between the specified point and the computed trajectory at the specified index with respect to the index.
+    inline double TrackRKDistDer(const RK4<8>* track, int index, Vector point)
+    {
+        return GetTrackRKSqDist(track, index + 1, point) - GetTrackRKSqDist(track, index, point);
+    }
+
+    /// @brief Calculates the squared distance between the given point and the curve.
+    /// @param track Pointer to a simulated RK4 trajectory.
+    /// @param point The point to calculate the distance to.
+    /// @return The squared distance between the point and the curve.
+    double GetTrackRKSqDist(const RK4<8>* track, Vector point);
+
+    /// @brief Calculates the squared distance between the given point and the curve and returns the closest point on the curve.
+    /// @param track Pointer to a simulated RK4 trajectory.
+    /// @param point The point to calculate the distance to.
+    /// @param closest_point Will be set to the closest point on the curve to the given point.
+    /// @return The squared distance between the point and the curve.
+    double GetTrackRKSqDistAndCP(const RK4<8>* track, Vector point, Vector& closest_point);
 
     /// @brief Returns a TGraph2D object representing the track of a particle obtained from a Runge-Kutta 4th order simulation.
     /// @param rk_track A pointer to a RK4 object containing the simulation results.
@@ -166,31 +202,6 @@ namespace X17
         TGraph2D* GetFitGraph() { return GetGraphRK(m_curr_rk); }
 
     private:
-        /// @brief Gets a point on the computed trajectory at a specified index.
-        /// @param index The index of the desired point on the trajectory.
-        /// @return The RKPoint object representing the position (with time) of the particle at the specified index on the trajectory.
-        RKPoint _GetPoint(int index) const;
-
-        /// @brief Computes the square of the distance between a point and a point on the computed trajectory at a specified index.
-        /// @param index The index of the point on the trajectory to compare the distance to.
-        /// @param point The Vector object representing the point to calculate the distance from.
-        /// @return The square of the distance between the specified point and the point on the trajectory at the specified index.
-        double _SqDist(int index, Vector point) const;
-
-        /// @brief Computes the scaled derivative of the square of the distance between a point and the point on the computed trajectory with respect to the index.
-        /// @param index The index of the point on the trajectory to compute the derivative at.
-        /// @param point The Vector object representing the point to calculate the derivative for.
-        /// @return The derivative of the square of the distance between the specified point and the computed trajectory at the specified index with respect to the index.
-        double _DistDerivative(int index, Vector point) const
-        {
-            return _SqDist(index + 1, point) - _SqDist(index,point);
-        }
-
-        /// @brief Calculates the squared distance between the given point and the curve.
-        /// @param point The point to calculate the distance to.
-        /// @return The squared distance between the point and the curve.
-        double _GetSqDist(Vector point) const;
-
         /// @brief Calculates the sum of squared distances for a set of fit data.
         /// @param npar The number of parameters to fit.
         /// @param gin The gradient of the fit parameters.
@@ -210,6 +221,8 @@ namespace X17
             lastfit->_SumSqDist(npar,gin,sumsq,par,iflag);
         }
     };
+
+    inline RKFit* RKFit::lastfit = nullptr;
 } // namespace X17
 
 // Templated function definitions.

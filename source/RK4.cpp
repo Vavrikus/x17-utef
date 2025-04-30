@@ -108,6 +108,83 @@ namespace X17
         else return new RK4<8>(0,step,f,init,IsOutOfTPC);
     }
 
+    RKPoint GetTrackRKPoint(const RK4<8>* track, int index)
+    {
+        using namespace constants;
+        const auto& rk_pts = track->GetResults();
+        return RKPoint(m2cm * rk_pts[index].at(1,0), m2cm * rk_pts[index].at(2,0), m2cm * rk_pts[index].at(3,0), 1e+9 / c * rk_pts[index].at(0,0));
+    }
+
+    double GetTrackRKSqDist(const RK4<8>* track, int index, Vector point)
+    {
+        RKPoint rk_point = GetTrackRKPoint(track,index);
+        return rk_point.AsVector().SqDist(point);
+    }
+
+    double GetTrackRKSqDist(const RK4<8>* track, Vector point)
+    {
+        int min_index = 0;
+        int max_index = track->GetSize() - 2;
+
+        if (max_index <= min_index) throw std::runtime_error("GetTrackRKSqDist: Runge-Kutta trajectory has less than three points.");
+
+        double min_der = TrackRKDistDer(track, min_index, point);
+        double max_der = TrackRKDistDer(track, max_index, point);
+
+        // Convex function minimum search.
+        while (min_index + 1 != max_index)
+        {
+            int mid_index = (min_index + max_index) / 2;
+            double mid_der = TrackRKDistDer(track, mid_index, point);
+
+            if (mid_der*max_der > 0) {max_der = mid_der; max_index = mid_index;}
+            else                     {min_der = mid_der; min_index = mid_index;}
+        }
+
+        // Minimal distance from two lines.
+        Vector orig    = GetTrackRKPoint(track, max_index).AsVector();
+        Vector orient1 = GetTrackRKPoint(track, max_index + 1).AsVector() - orig;
+        Vector orient2 = GetTrackRKPoint(track, max_index - 1).AsVector() - orig;
+
+        double dist1 = LineSqDist(orig,orient1,orient1.Magnitude(),point);
+        double dist2 = LineSqDist(orig,orient2,orient2.Magnitude(),point);
+
+        return std::min(dist1,dist2);
+    }
+
+    double GetTrackRKSqDistAndCP(const RK4<8>* track, Vector point, Vector& closest_point)
+    {
+        int min_index = 0;
+        int max_index = track->GetSize() - 2;
+
+        if (max_index <= min_index) throw std::runtime_error("GetTrackRKSqDist: Runge-Kutta trajectory has less than three points.");
+
+        double min_der = TrackRKDistDer(track, min_index, point);
+        double max_der = TrackRKDistDer(track, max_index, point);
+
+        // Convex function minimum search.
+        while (min_index + 1 != max_index)
+        {
+            int mid_index = (min_index + max_index) / 2;
+            double mid_der = TrackRKDistDer(track, mid_index, point);
+
+            if (mid_der*max_der > 0) {max_der = mid_der; max_index = mid_index;}
+            else                     {min_der = mid_der; min_index = mid_index;}
+        }
+
+        // Minimal distance from two lines.
+        Vector orig    = GetTrackRKPoint(track, max_index).AsVector();
+        Vector orient1 = GetTrackRKPoint(track, max_index + 1).AsVector() - orig;
+        Vector orient2 = GetTrackRKPoint(track, max_index - 1).AsVector() - orig;
+
+        Vector cp1, cp2;
+        double dist1 = LineSqDistAndCP(orig,orient1,orient1.Magnitude(),point,cp1);
+        double dist2 = LineSqDistAndCP(orig,orient2,orient2.Magnitude(),point,cp2);
+
+        closest_point = dist1 < dist2 ? cp1 : cp2;
+        return dist1 < dist2 ? dist1 : dist2;
+    }
+
     TGraph2D* GetGraphRK(const RK4<8>* rk_track)
     {
         TGraph2D* output = new TGraph2D();
@@ -121,10 +198,6 @@ namespace X17
         }
         return output;
     }
-
-    //// Class RKFit static variables.
-
-    RKFit* RKFit::lastfit = nullptr;
 
     
     
@@ -172,50 +245,6 @@ namespace X17
 
     //// Private methods of the RKFit class.
 
-    RKPoint RKFit::_GetPoint(int index) const
-    {
-        using namespace constants;
-        auto rk_pts = m_curr_rk->GetResults();
-        return RKPoint(m2cm * rk_pts[index].at(1,0), m2cm * rk_pts[index].at(2,0), m2cm * rk_pts[index].at(3,0), 1e+9 / c * rk_pts[index].at(0,0));
-    }
-
-    double RKFit::_SqDist(int index, Vector point) const
-    {
-        RKPoint rk_point = _GetPoint(index);
-        return rk_point.AsVector().SqDist(point);
-    }
-
-    double RKFit::_GetSqDist(Vector point) const
-    {
-        int min_index = 0;
-        int max_index = m_curr_rk->GetSize() - 2;
-
-        if (max_index <= min_index) throw std::runtime_error("RKFit::_GetSqDist: Runge-Kutta trajectory has less than three points.");
-
-        double min_der = _DistDerivative(min_index,point);
-        double max_der = _DistDerivative(max_index,point);
-
-        // Convex function minimum search.
-        while (min_index + 1 != max_index)
-        {
-            int mid_index = (min_index + max_index) / 2;
-            double mid_der = _DistDerivative(mid_index,point);
-
-            if (mid_der*max_der > 0) {max_der = mid_der; max_index = mid_index;}
-            else                     {min_der = mid_der; min_index = mid_index;}
-        }
-
-        // Minimal distance from two lines.
-        Vector orig    = _GetPoint(max_index).AsVector();
-        Vector orient1 = _GetPoint(max_index + 1).AsVector() - orig;
-        Vector orient2 = _GetPoint(max_index - 1).AsVector() - orig;
-
-        double dist1 = LineSqDist(orig,orient1,orient1.Magnitude(),point);
-        double dist2 = LineSqDist(orig,orient2,orient2.Magnitude(),point);
-
-        return std::min(dist1,dist2);
-    }
-
     void RKFit::_SumSqDist(int& npar, double* gin, double& sumsq, double* par, int iflag)
     {
         m_kin_en = par[0];
@@ -225,6 +254,6 @@ namespace X17
         m_curr_rk->Integrate();
         
         sumsq = 0;
-        for (auto p : m_fit_data) sumsq += p.count * _GetSqDist(p.AsVector());
+        for (auto p : m_fit_data) sumsq += p.count * GetTrackRKSqDist(m_curr_rk, p.AsVector());
     }
 } // namespace X17

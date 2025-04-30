@@ -88,13 +88,13 @@ void PlotDriftXZ(X17::TrackMicro track, bool newcoords = false)
         {
             if (newcoords)
             {
-                g1->SetPoint(g1->GetN(),point.start.x(),point.start.z());
+                g1->AddPoint(point.start.x(),point.start.z());
                 driftlines.emplace_back(new TLine(point.start.x(),point.start.z(),point.end.x(),point.end.z()));
             }
 
             else
             {
-                g1->SetPoint(g1->GetN(),point.start.z(),point.start.y());
+                g1->AddPoint(point.start.z(),point.start.y());
                 driftlines.emplace_back(new TLine(point.start.z(),point.start.y(),point.end.z(),point.end.y()));
             }
         }
@@ -148,12 +148,12 @@ void PlotDriftXY(X17::TrackMicro track, std::string filename, bool newcoords = f
     {
         if (newcoords)
         {
-            g2->SetPoint(g2->GetN(),point.start.x(),point.start.y());
+            g2->AddPoint(point.start.x(),point.start.y());
         }
         
         else
         {
-            g2->SetPoint(g2->GetN(),point.start.z(),point.start.x());
+            g2->AddPoint(point.start.z(),point.start.x());
         }
     }
     g2->SetLineWidth(3);
@@ -192,16 +192,92 @@ void PlotDriftYZ(X17::TrackMicro track, std::string filename, bool newcoords = f
     {
         if (newcoords)
         {
-            g3->SetPoint(g3->GetN(),point.start.y(),point.start.z());
+            g3->AddPoint(point.start.y(),point.start.z());
         }
         
         else
         {
-            g3->SetPoint(g3->GetN(),point.start.x(),point.start.y());
+            g3->AddPoint(point.start.x(),point.start.y());
         }
     }
     g3->SetLineWidth(3);
     g3->Draw("L same");
+}
+
+void PlotTrackRK(X17::TrackMicro track, X17::Field<X17::Vector>* magfield)
+{
+    double Ekin = sqrt(64E+12 + X17::constants::E0*X17::constants::E0) - X17::constants::E0;
+        X17::RK4<8>* trackrk = X17::GetTrackRK(*magfield,true,1E-13,Ekin,X17::Vector(0,0,0),X17::Vector(1,0,0),true);
+        trackrk->Integrate();
+        std::vector<X17::RKPoint> rk_points;
+        for (const auto& vec : trackrk->GetResults())
+        {
+            using namespace X17::constants;
+            rk_points.push_back(X17::RKPoint(m2cm * vec.at(1,0), m2cm * vec.at(2,0), m2cm * vec.at(3,0), 1e+9 / c * vec.at(0,0)));
+        }
+
+        TGraph* g_micro = new TGraph();
+        TGraph* g_res = new TGraph();
+        TGraph* g_diff = new TGraph();
+        TGraph* g_diff2 = new TGraph();
+        for (const auto& point : track.points)
+        {
+            X17::Vector start_old = point.start.point;
+            X17::Vector start_new = {start_old.z,start_old.x,start_old.y};
+
+            X17::Vector closest_point;
+            double res2 = X17::GetTrackRKSqDistAndCP(trackrk,start_new,closest_point);
+            g_res->AddPoint(start_new.x,10000*sqrt(res2));
+
+            X17::Vector exaggerated = closest_point + 1000 * (start_new-closest_point);
+            g_micro->AddPoint(exaggerated.x,exaggerated.z);
+
+            X17::Vector diff = start_new - closest_point;
+            g_diff->AddPoint(start_new.x,10000*diff.z);
+            g_diff2->AddPoint(start_new.x,10000*diff.x);
+        }
+
+        TCanvas* c_rk = new TCanvas("c_rk","Drift XZ",g_cwidth,g_cheight);
+        g_micro->SetMarkerStyle(2);
+        g_micro->SetMarkerColor(kRed);
+        g_micro->SetLineColor(kNone);
+        g_micro->GetXaxis()->SetTitle("x [cm]");
+        g_micro->GetYaxis()->SetTitle("z [cm]");
+        g_micro->Draw("AP");
+
+        TGraph* g_rk = new TGraph();
+        for (const auto& point : rk_points)
+            g_rk->AddPoint(point.x(),point.z());
+        g_rk->SetLineColor(kBlue);
+        g_rk->SetLineWidth(2);
+        g_rk->Draw("L same");
+
+        TLegend* l_rk = new TLegend(0.58,0.81,0.93,0.93);
+        l_rk->AddEntry(g_rk,"Runge-Kutta track");
+        l_rk->AddEntry(g_micro,"HEED ion. electrons");
+        l_rk->SetTextSize(0.043);
+        l_rk->Draw();
+
+        TCanvas* c_res = new TCanvas("c_res","Residuals",g_cwidth,g_cheight);
+        g_res->SetMarkerStyle(2);
+        g_res->SetMarkerColor(kRed);
+        g_res->SetLineColor(kNone);
+        g_res->GetXaxis()->SetTitle("x [cm]");
+        g_res->GetYaxis()->SetTitle("residuals [#mum]");
+        g_res->Draw("AP");
+
+        TLegend* l_res = new TLegend(0.54,0.82,0.93,0.93);
+        l_res->AddEntry(g_res,"#splitline{HEED electron}{residuals to RK4 track}","p");
+        l_res->SetTextSize(0.043);
+        l_res->Draw();
+
+        //TCanvas* c_diff = new TCanvas("c_diff","Diff",g_cwidth,g_cheight);
+        // g_diff->SetMarkerStyle(2);
+        // g_diff->SetMarkerColor(kRed);
+        // g_diff->Draw("AP");
+        // g_diff2->SetMarkerStyle(2);
+        // g_diff2->SetMarkerColor(kBlue);
+        // g_diff2->Draw("P same");
 }
 
 int main(int argc, char *argv[])
@@ -215,14 +291,25 @@ int main(int argc, char *argv[])
     X17::Field<X17::Vector>* magfield = X17::LoadField("../../../data/elmag/VecB2.txt",{-20,-30,-30},{20,30,30},0.5);
 
     X17::TrackMicro track1 = LoadTrack("original");
-    PlotDriftXZ(track1);
-    PlotDriftXY(track1,"drift_xy_9010.png");
-    PlotDriftYZ(track1,"drift_yz_9010.png");
+    // PlotDriftXZ(track1);
+    // PlotDriftXY(track1,"drift_xy_9010.png");
+    // PlotDriftYZ(track1,"drift_yz_9010.png");
 
     X17::TrackMicro track2 = LoadTrack("new_7030");
-    PlotDriftXZ(track2,true);
-    PlotDriftXY(track2,"drift_xy_7030.png",true);
-    PlotDriftYZ(track2,"drift_yz_7030.png",true);
+    // PlotDriftXZ(track2,true);
+    // PlotDriftXY(track2,"drift_xy_7030.png",true);
+    // PlotDriftYZ(track2,"drift_yz_7030.png",true);
+
+    gStyle->SetTitleSize(0.06,"XY");
+    gStyle->SetLabelSize(0.06,"XY");
+    gStyle->SetTitleXOffset(0.9);
+    gStyle->SetTitleYOffset(0.9);
+    gStyle->SetPadLeftMargin(0.13);
+    gStyle->SetPadBottomMargin(0.13);
+    gStyle->SetPadRightMargin(0.07);
+    gStyle->SetPadTopMargin(0.07);
+
+    PlotTrackRK(track1, magfield);
 
     // Reconstruct CircleFit3D + RK4
         // std::vector<X17::RecoPoint> reco_points;
@@ -250,7 +337,8 @@ int main(int argc, char *argv[])
         // fit.FitRK();
         // fit.PrintFitParams();
 
-    app.Run(true);
+    app.Run();
 
     return 0;
 }
+
