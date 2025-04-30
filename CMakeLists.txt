@@ -75,6 +75,7 @@ set(LINK_TARGET_FOLDERS
     "${PROJECT_BUILD_DIR}/simulations/ion_map"
     "${PROJECT_BUILD_DIR}/simulations/micro_tracks"
     "${PROJECT_BUILD_DIR}/tests/magnetic_field_plot"
+    "${PROJECT_BUILD_DIR}/tests/thesis_plots"
 )
 
 # Path to the source PCM file

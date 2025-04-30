@@ -27,24 +27,56 @@
 		
 		\red{Add more detailed and better description of HEED, and microscopic tracking (each their own subsection?). Could also mention Monte Carlo (requires gas file generation - Magboltz) and Runge-Kutta simulation implemented in Garfield, why we don't use them (another subsection? rename the~section to \garfieldpp simulation and mention all relevant parts?).}
 		
-		\begin{figure}[H]
-			\centering
-			\includegraphics[width=0.3\textwidth]{7030_xz.png}
-			\includegraphics[width=0.3\textwidth]{7030_yz.png}
-			\includegraphics[width=0.3\textwidth]{7030_xy.png}
-			\caption{Example of a~simulated electron track in 70~\%~argon and 30~\%~CO$_2$ atmosphere (on the~left). \red{Swap for better images, better zoom. Explain drift lines, primary particle.}}
-			\label{fig:7030sim}
-		\end{figure}
-		
-		\begin{figure}[H]
-			\centering
-			\includegraphics[width=0.9\textwidth]{diff_comp.png}
-			\caption{Comparison of diffusion in a~simulated electron track in 70~\%~argon, 30~\%~CO$_2$ atmosphere and in 90~\%~argon, 10~\%~CO$_2$ atmosphere (on the~right). \red{Swap for better image, better zoom. Or put the~same pictures for both comparisons in one subfigure, etc. Describe better.}}
-			\label{fig:diffcomp}
-		\end{figure}
-		
-		\subsection{First testing track}		
-			\red{First simulated track in the~$z$ direction should be described in detail here (own subsection of the microscopic section, together with a~subsection for random/grid batches?). Figures.}
+		\subsection{First testing track}
+		\label{sec:microfirst}
+			The first electron track simulated for testing purposes was chosen to have a~special set of parameters:
+				\begin{itemize}[nosep]
+					\item the starting point of the track is the origin of the coordinate system,
+					\item the initial direction is along the positive $x$-axis,
+					\item the momentum is $8~\text{MeV}/c$ (the kinetic energy is 7.505~MeV).
+				\end{itemize}
+			Such a~track moves in the~XZ plane in the~toroidal magnetic field of the~detector, because the particle's velocity vector is always perpendicular to the~field. At first, we simulated such a~track in 90:10 Ar:CO$_2$ gas mixture, later we added a~simulation in 70:30 Ar:CO$_2$, which we plan to use in our detector. The comparison of both simulations is in Figure~\ref{fig:microfirst}.
+			
+			\begin{figure}
+				\centering
+				\begin{subfigure}[t]{0.48\textwidth}
+					\centering
+					\includegraphics[width=\textwidth]{9010_xz.png}
+					\caption{90:10 Ar:CO$_2$ drift lines XZ projection}
+				\end{subfigure}
+				\hfill
+				\begin{subfigure}[t]{0.48\textwidth}
+					\centering
+					\includegraphics[width=\textwidth]{7030_xz.png}
+					\caption{70:30 Ar:CO$_2$ drift lines XZ projection}
+				\end{subfigure}
+				\hfill
+				\begin{subfigure}[t]{0.48\textwidth}
+					\centering
+					\includegraphics[width=\textwidth]{9010_yz.png}
+					\caption{90:10 Ar:CO$_2$ drift lines YZ projection}
+				\end{subfigure}
+				\hfill
+				\begin{subfigure}[t]{0.48\textwidth}
+					\centering
+					\includegraphics[width=\textwidth]{7030_yz.png}
+					\caption{70:30 Ar:CO$_2$ drift lines YZ projection}
+				\end{subfigure}
+				\hfill
+				\begin{subfigure}[t]{0.48\textwidth}
+					\centering
+					\includegraphics[width=\textwidth]{9010_xy.png}
+					\caption{90:10 Ar:CO$_2$ drift lines XY projection}
+				\end{subfigure}
+				\hfill
+				\begin{subfigure}[t]{0.48\textwidth}
+					\centering
+					\includegraphics[width=\textwidth]{7030_xy.png}
+					\caption{70:30 Ar:CO$_2$ drift lines XY projection}
+				\end{subfigure}
+				\caption{Comparison of drift lines for two different gas mixtures 90:10 and 70:30 Ar:CO$_2$. The electron track is marked in black, the drift lines of the ionization electrons are marked in orange. In this example, we assume a~larger \ac{OFTPC} volume with readout at $z = 8$~cm. \red{Larger labels.}}
+				\label{fig:microfirst}
+			\end{figure}
 			
 		\subsection{Grid-like testing sample}
 		\label{sec:microgrid}
@@ -107,7 +139,7 @@
 			\begin{equation}
 				\derivative{}{\tau} \begin{pmatrix} ct\\ x\\ y\\ z\end{pmatrix} = \begin{pmatrix}\gamma c\\ \gamma v_x\\ \gamma v_y\\ \gamma v_z\end{pmatrix} = u^\mu,
 			\end{equation}
-		we get a~system of eight first order differential equations for~$x^\mu$ and~$u^\mu$, which we can integrate using the~Runge-Kutta method described above. As a~result of this integration, we get the~position~$\mathbf{x}(\tau_n)$, the~velocity~$\mathbf{v}(\tau_n)$ and the~detector time~$t(\tau_n)$ for every proper time $\tau_n = n \tau_\text{step}$. \red{Integrating using the proper time means, that the step size in $t$ gets larger by the~gamma factor $\derivative{t}{\tau} = \gamma$ (maybe change it and integrate the~detector time or adjust the step size accordingly). The only difference is in the~step size (because $t$ gets also calculated as it is among the 8~variables)} As initial conditions, we use the~origin of the~track $(x_0,y_0,z_0)$, the~initial velocity direction vector $\mathbf{n} = (\cos\varphi\cos\theta,\sin\varphi\cos\theta,\sin\theta)$ and the~kinetic energy $E_\text{kin}$  (\orange{initial parameters of \textbf{the~simulation} (fit is in chapter 4)}), we then compute $\gamma$ and $\norm{\mathbf{v}}$:
+		we get a~system of eight first order differential equations for~$x^\mu$ and~$u^\mu$, which we can integrate using the~Runge-Kutta method described above. As a~result of this integration, we get the~position~$\mathbf{x}(\tau_n)$, the~velocity~$\mathbf{v}(\tau_n)$ and the~detector time~$t(\tau_n)$ for every proper time $\tau_n = n \tau_\text{step}$. \red{Integrating using the proper time means that the step size in $t$ gets larger by the~gamma factor $\derivative{t}{\tau} = \gamma$ (maybe change it and integrate the~detector time or adjust the step size accordingly). The only difference is in the~step size (because $t$ gets also calculated as it is among the 8~variables). \textbf{It might be even better to adjust the step size using approximate distance traveled.}} As initial conditions, we use the~origin of the~track $(x_0,y_0,z_0)$, the~initial velocity direction vector $\mathbf{n} = (\cos\varphi\cos\theta,\sin\varphi\cos\theta,\sin\theta)$ and the~kinetic energy $E_\text{kin}$  (\orange{initial parameters of \textbf{the~simulation} (fit is in chapter 4)}), we then compute $\gamma$ and $\norm{\mathbf{v}}$:
 			\begin{align}
 				\gamma &= 1 + \frac{E_\text{kin}}{E_0},\\
 				\norm{\mathbf{v}} &= c\sqrt{1-\gamma^{-2}}.

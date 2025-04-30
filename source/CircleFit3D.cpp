@@ -83,7 +83,7 @@ namespace X17
         while (param < m_length)
         {
             Vector cur_pos = _GetLinePoint(param,true);
-            if(IsInSector(cur_pos,dist)) 
+            if(IsInTPC(cur_pos,dist)) 
                 fit_graph->AddPoint(cur_pos.x,cur_pos.y,cur_pos.z);
             param += step;
         }
@@ -93,7 +93,7 @@ namespace X17
         while (param/m_radius < m_phi_max)
         {
             Vector cur_pos = _GetCirclePoint(param / m_radius);
-            if(IsInSector(cur_pos,dist)) 
+            if(IsInTPC(cur_pos,dist)) 
                 fit_graph->AddPoint(cur_pos.x,cur_pos.y,cur_pos.z);
             param += step;
         }
@@ -103,7 +103,7 @@ namespace X17
         while (param < 20)
         {
             Vector cur_pos = _GetLinePoint(param,false);
-            if(IsInSector(cur_pos,dist)) 
+            if(IsInTPC(cur_pos,dist)) 
                 fit_graph->AddPoint(cur_pos.x,cur_pos.y,cur_pos.z);
             param += step;
         }
@@ -137,7 +137,7 @@ namespace X17
         while (param/m_radius < m_phi_max) 
         {
             Vector cur_point = _GetCirclePoint(param/m_radius);
-            if(IsInSector(cur_point))
+            if(IsInTPC(cur_point))
             {
                 Vector bfield = magfield.GetField(cur_point);
                 double b_proj = m_normal * bfield;
@@ -179,6 +179,8 @@ namespace X17
     {
         m_cos_theta = m_orientation.z;
         m_sin_theta = sqrt(1 - m_cos_theta * m_cos_theta);
+
+        if (m_sin_theta == 0) throw std::runtime_error("CircleFit3D: Orientation vector cannot be parallel to z.");
 
         m_cos_phi = m_orientation.x / m_sin_theta;
         m_sin_phi = m_orientation.y / m_sin_theta;
@@ -276,7 +278,7 @@ namespace X17
         while (param/m_radius < m_phi_max) 
         {
             Vector cur_point = _GetCirclePoint(param/m_radius);
-            if(IsInSector(cur_point))
+            if(IsInTPC(cur_point))
             {
                 bfield += magfield.GetField(cur_point);
                 i++;

@@ -10,6 +10,7 @@
 
 // X17 dependencies
 #include "Matrix.h"
+#include "Points.h"
 
 namespace X17
 {
@@ -77,11 +78,17 @@ namespace X17
     /// @param output Vector containing the final position and four-velocity of the particle.
     void EMMotion(const Field<Vector>& magfield, bool electron, double tau, const Matrix<8,1>& params, Matrix<8,1>& output);
 
-    /// @brief Checks if the particle is out of the sector after it has moved beyond the minimum x position.
+    /// @brief Checks if the particle is out of the first sector TPC after it has moved beyond the minimum x position.
     /// @param tau Proper time elapsed (independent variable) [s].
     /// @param params Vector of position and four-velocity of the particle.
-    /// @return True if the particle is out of the sector after it has moved beyond the minimum x position, false otherwise.
-    bool IsOutOfSector(double tau, const Matrix<8,1>& params);
+    /// @return True if the particle is out of the TPC after it has moved beyond the minimum x position, false otherwise.
+    bool IsOutOfTPC(double tau, const Matrix<8,1>& params);
+
+    /// @brief Checks if the particle is out of the first sector TPC and outside a rectangular volume in front of it (x < xmin).
+    /// @param tau Proper time elapsed (independent variable) [s].
+    /// @param params Vector of position and four-velocity of the particle.
+    /// @return True if the particle is out of the TPC and outside the rectangular volume, false otherwise.
+    bool IsOutOfTPCandRect(double tau, const Matrix<8,1>& params);
 
     /// @brief Returns a pointer to an instance of RK4 class for tracking a charged particle in a magnetic field.
     /// @param magfield Vector field representing the magnetic field.
@@ -90,8 +97,9 @@ namespace X17
     /// @param kin_en Kinetic energy of the particle [eV].
     /// @param origin Coordinates of the origin [cm].
     /// @param orientation Initial direction of motion.
+    /// @param big_volume Should a volume be added in front of the TPC?
     /// @return Pointer to an instance of RK4 class.
-    RK4<8>* GetTrackRK(const Field<Vector>& magfield, bool electron, double step, double kin_en, Vector origin, Vector orientation);
+    RK4<8>* GetTrackRK(const Field<Vector>& magfield, bool electron, double step, double kin_en, Vector origin, Vector orientation, bool big_volume = false);
 
     /// @brief Returns a TGraph2D object representing the track of a particle obtained from a Runge-Kutta 4th order simulation.
     /// @param rk_track A pointer to a RK4 object containing the simulation results.
@@ -109,6 +117,7 @@ namespace X17
         double m_step;             // The step size used in the Runge-Kutta 4th order method.
         Vector m_origin;           // The initial position of the particle.
         Vector m_orientation;      // The initial orientation of the particle.
+        bool m_big_volume;         // A boolean indicating if a volume should be added in front of the TPC.
 
         std::vector<RecoPoint> m_fit_data; // A vector containing the reconstructed points used for fitting.
         RK4<8>* m_curr_rk = nullptr;       // A pointer to the RK4 object used to compute the trajectory of the particle.
@@ -126,7 +135,8 @@ namespace X17
         /// @param origin A Vector object representing the origin.
         /// @param orientation A Vector object representing the orientation.
         /// @param fit_data A vector of RecoPoint objects representing the fit data.
-        RKFit(Field<Vector>* magfield, bool electron, double step, Vector origin, Vector orientation, const std::vector<RecoPoint>& fit_data);
+        /// @param big_volume A boolean value indicating if a volume should be added in front of the TPC.
+        RKFit(Field<Vector>* magfield, bool electron, double step, Vector origin, Vector orientation, const std::vector<RecoPoint>& fit_data, bool big_volume = false);
 
         /// @brief Getter for the kinetic energy.
         /// @return Kinetic energy [eV].

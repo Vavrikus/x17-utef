@@ -31,7 +31,7 @@ namespace X17
         for (int i = 0; i < single_track->GetEntries(); i++)
         {
             single_track->GetEntry(i);
-            if (IsInSector(curr_micro.x1(),curr_micro.y1(),0) && IsInSector(curr_micro.GetInitPos(),-0.01))
+            if (IsInTPC(curr_micro.x1(),curr_micro.y1(),0) && IsInTPC(curr_micro.GetInitPos(),-0.01))
             {
                 n_electrons++;
                 curr_reco = Reconstruct(*map,curr_micro);
@@ -69,7 +69,7 @@ namespace X17
                 curr_micro = p;
 
                 // Use only electrons that started and ended in the sector, endpoint not further than 0.5 cm from readout
-                if (IsInSector(curr_micro.x1(), curr_micro.y1(), 0) && IsInSector(curr_micro.GetInitPos(), -0.01) && curr_micro.z1() > 7.5)
+                if (IsInTPC(curr_micro.x1(), curr_micro.y1(), 0) && IsInTPC(curr_micro.GetInitPos(), -0.01) && curr_micro.z1() > 7.5)
                 {
                     n_electrons++;
                     curr_reco = Reconstruct(*map,curr_micro);

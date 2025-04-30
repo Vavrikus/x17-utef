@@ -77,19 +77,35 @@ namespace X17
         });
     }
 
-    bool IsOutOfSector(double tau, const Matrix<8,1>& params)
+    bool IsOutOfTPC(double tau, const Matrix<8,1>& params)
     {
         using namespace constants;
-        return (!IsInSector(m2cm * params.at(1,0), m2cm * params.at(2,0), m2cm * params.at(3,0),-0.5)); // && (m2cm * params.at(1,0) > xmin);
+        return (!IsInTPC(m2cm * params.at(1,0), m2cm * params.at(2,0), m2cm * params.at(3,0),-0.5)); // && (m2cm * params.at(1,0) > xmin);
     }
 
-    RK4<8>* GetTrackRK(const Field<Vector>& magfield, bool electron, double step, double kin_en, Vector origin, Vector orientation)
+    bool IsOutOfTPCandRect(double tau, const Matrix<8, 1> &params)
+    {
+        using namespace constants;
+
+        double x = m2cm * params.at(1,0);
+        double y = m2cm * params.at(2,0);
+        double z = m2cm * params.at(3,0);
+
+        if (z < zmin || z > zmax) return true;
+        if (std::abs(y) > yhigh || x < 0) return true;
+        if (x > xmin) return (!IsInTPC(x,y,z,-0.5));
+
+        return false;
+    }
+
+    RK4<8>* GetTrackRK(const Field<Vector>& magfield, bool electron, double step, double kin_en, Vector origin, Vector orientation, bool big_volume)
     {
         Matrix<8,1> init = GetInitParams(kin_en,origin,orientation);
         auto f = [&magfield, electron](double t, const Matrix<8, 1>& y, Matrix<8, 1>& dydt) {
             EMMotion(magfield, electron, t, y, dydt);
         };
-        return new RK4<8>(0,step,f,init,IsOutOfSector);
+        if (big_volume) return new RK4<8>(0,step,f,init,IsOutOfTPCandRect);
+        else return new RK4<8>(0,step,f,init,IsOutOfTPC);
     }
 
     TGraph2D* GetGraphRK(const RK4<8>* rk_track)
@@ -101,7 +117,7 @@ namespace X17
         {
             using namespace constants;
             Vector point = {m2cm * r.at(1,0), m2cm * r.at(2,0), m2cm * r.at(3,0)};
-            if (IsInSector(point)) output->AddPoint(point.x,point.y,point.z);
+            if (IsInTPC(point)) output->AddPoint(point.x,point.y,point.z);
         }
         return output;
     }
@@ -116,8 +132,8 @@ namespace X17
     
     //// Public methods of the RKFit class.
 
-    RKFit::RKFit(Field<Vector>* magfield, bool electron, double step, Vector origin, Vector orientation, const std::vector<RecoPoint>& fit_data)
-        : m_magfield(magfield), m_electron(electron), m_step(step), m_origin(origin), m_orientation(orientation), m_fit_data(fit_data)
+    RKFit::RKFit(Field<Vector>* magfield, bool electron, double step, Vector origin, Vector orientation, const std::vector<RecoPoint>& fit_data, bool big_volume)
+        : m_magfield(magfield), m_electron(electron), m_step(step), m_origin(origin), m_orientation(orientation), m_fit_data(fit_data), m_big_volume(big_volume)
     { lastfit = this; }
 
     void RKFit::SetFitter(int parameters, bool print)
@@ -174,6 +190,8 @@ namespace X17
         int min_index = 0;
         int max_index = m_curr_rk->GetSize() - 2;
 
+        if (max_index <= min_index) throw std::runtime_error("RKFit::_GetSqDist: Runge-Kutta trajectory has less than three points.");
+
         double min_der = _DistDerivative(min_index,point);
         double max_der = _DistDerivative(max_index,point);
 
@@ -203,7 +221,7 @@ namespace X17
         m_kin_en = par[0];
         
         if (m_curr_rk != nullptr) delete m_curr_rk;
-        m_curr_rk = GetTrackRK(*m_magfield,m_electron,m_step,m_kin_en,m_origin,m_orientation);
+        m_curr_rk = GetTrackRK(*m_magfield,m_electron,m_step,m_kin_en,m_origin,m_orientation,m_big_volume);
         m_curr_rk->Integrate();
         
         sumsq = 0;

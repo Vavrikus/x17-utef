@@ -1,5 +1,8 @@
 #pragma once
 
+// ROOT dependencies
+#include "TColor.h"
+
 // X17 dependencies
 #include "Field.h"
 #include "Vector.h"
@@ -63,21 +66,21 @@ namespace X17
             constexpr int channels = 128; // Number of pads (channels)
     } // namespace constants
     
-    /// @brief Returns true if given point is in the first sector (containing positive x-axis) of the detector (trapezoidal prism).
+    /// @brief Returns true if given point is in the first sector TPC (containing positive x-axis) of the detector (trapezoidal prism).
     /// @param x The x-coordinate [cm].
     /// @param y The y-coordinate [cm].
     /// @param z The z-coordinate [cm].
     /// @param dist Specifies the minimal distance from within the TPC walls except the bottom anode wall (makes volume smaller).
     /// @return True if in sector, false otherwise.
-    bool IsInSector(double x, double y, double z, double dist = 0);
+    bool IsInTPC(double x, double y, double z, double dist = 0);
 
-    /// @brief True if vector is in the first sector (containing positive x-axis) of the detector (trapezoidal prism).
+    /// @brief True if vector is in the first sector TPC (containing positive x-axis) of the detector (trapezoidal prism).
     /// @param vec The vector representing a point in space (x,y,z) [cm].
     /// @param dist Specifies the minimal distance from within the TPC walls except the bottom anode wall (makes volume smaller).
     /// @return True if in sector, false otherwise.
-    inline bool IsInSector(Vector vec, double dist = 0)
+    inline bool IsInTPC(Vector vec, double dist = 0)
     {
-        return IsInSector(vec.x,vec.y,vec.z,dist);
+        return IsInTPC(vec.x,vec.y,vec.z,dist);
     }
     
     /// @brief Returns minimal and maximal (magnetic) field inside first sector TPC volume.
@@ -104,4 +107,17 @@ namespace X17
     /// @brief Draws the two magnets extending to the first sector.
     /// @param yxformat If true, the y-coordinate is drawn on the x-axis and vice versa.
     void DrawFirstSectorMagnets(bool yxformat = true);
+
+    namespace Color
+    {
+        inline int GOrange()
+        {
+            static const int index = [] {
+                int idx = TColor::GetFreeColorIndex();
+                new TColor(idx, 1, 0.6, 0);
+                return idx;
+            }();
+            return index;
+        }
+    };
 } // namespace X17

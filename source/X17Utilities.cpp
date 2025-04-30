@@ -16,7 +16,7 @@ namespace X17
 {
     //// Useful functions for X17.
 
-    bool IsInSector(double x, double y, double z, double dist)
+    bool IsInTPC(double x, double y, double z, double dist)
     {
         using namespace constants;
 
@@ -44,7 +44,7 @@ namespace X17
             double y = magfield.GetYMin() + magfield.GetStep()*yi;
             double z = magfield.GetZMin() + magfield.GetStep()*zi;
 
-            if (IsInSector(x,y,z,dist))
+            if (IsInTPC(x,y,z,dist))
             {
                 if (v.SqMagnitude() < min_magnitude_sq || min_magnitude_sq == -1) 
                     min_magnitude_sq = v.SqMagnitude();
@@ -73,7 +73,7 @@ namespace X17
             double z = magfield.GetZMin() + magfield.GetStep()*zi;
 
 
-            if (IsInSector(x,y,z,dist))
+            if (IsInTPC(x,y,z,dist))
             {
                 using namespace constants;
 

@@ -17,7 +17,7 @@
 	
 	\section{Cubic Spline Fit}
 	\label{sec:cspline}
-		The~first attempt to get an~estimate of the~kinetic energy of the~particle uses a~cubic spline fit. We use an~electron track starting in the~origin of our coordinate system with an~initial direction in the~positive $x$~axis. The~ example track is simulated microscopically (see Section~\ref{sec:microsim}) with a~kinetic energy of 8~MeV in a~gas mixture 90\%~Ar~+~10\%~CO$_2$ (the~same track was used in Section~\ref{sec:trackfirst}). \red{This track should probably be described in the~simulation chapter.}
+		The~first method for the~estimation of the~kinetic energy of the~particle uses a~cubic spline fit. We use an~electron track simulated using the~microscopic simulation, described in detail in Section~\ref{sec:microfirst}. The track was reconstructed using the~map described in Section~\ref{sec:map}.
 				
 		In order to calculate the~spline, we use the~class \textit{TSpline3} from ROOT. This allows us to evaluate the~spline using the~coordinates $(x_n,z_n)$ of each node and the~derivatives $d_1,d_2$ in the~first and the~last node. We can fit these parameters of a~fixed amount of nodes to the~simulated trajectory. We use the~IMPROVE algorithm provided by the~\textit{TMinuit} class in ROOT (\orange{there are some guidelines for fonts in MFF UK template (Czech version) that I will eventually apply (see notes in the conclusion)}). This algorithm attempts to find a~better local minimum after converging (\orange{could reformulate a~bit, taken word for word from some manual}).
 		
@@ -61,7 +61,7 @@
 		The~field in our detector is not homogeneous, it is therefore not entirely clear what value of magnetic field should be used along with the~fitted radius (using equations~\ref{eq:ekin1} and~\ref{eq:ekin2}) to get the~best estimate for the~kinetic energy. Since we only use this method as the~first iteration of the~particle's energy that we later refine, an~optimal solution of this problem is not required. Instead, we tested two options: taking the~value of the~field in the~middle of the~fitted circular arc (\red{or is it in the middle $x$ of the OFTPC?}) and taking the~average field along it. \red{We haven't really tried to plot this for multiple tracks, but these estimates are saved somewhere and could be plotted.}
 		
 		\subsection{Two-dimensional fit}
-			In the~2D case, the~fitted function used for the~electron track\footnote{Electron tracks bend towards negative~$z$, we need to use the~upper part of the~circle} described in Section~\ref{sec:cspline} (\red{or in microsim? one specific track at the time, technically this function doesn't work for a curvature that gets outside of the semicircle}) is defined as follows: \red{Maybe describe this track that we used at the~beginning somewhere earlier (section microscopic simulations \textrightarrow~Testing track?) so that it is easier to refer to it in multiple sections. It is not part of the~early GitHub commits, so maybe it won't be possible to create exact replicas of the~images, but they should be at least very similar.}
+			In the~2D case, the~fitted function used for the~electron track\footnote{Electron tracks bend towards negative~$z$, we need to use the~upper part of the~circle} described in Section~\ref{sec:microfirst} (\red{one specific track at the time, technically this function doesn't work for a curvature that gets outside of the semicircle}) is defined as follows:
 				\begin{equation}
 					\label{eq:clines2d}
 					z(x) = \begin{cases}
