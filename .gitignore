@@ -12,15 +12,17 @@
 /data/ion_map/new_sample/
 /data/single_track/new_7030/*.pdf
 /data/single_track/new_9010/*.pdf
-/data/single_track/original/
-/data/single_track/originalMC/
-/data/single_track/original_v2/
-/data/single_track/track1/
+/data/single_track/original/*.pdf
+/data/single_track/originalMC/*.pdf
+/data/single_track/original_v2/*.pdf
+/data/single_track/track1/*.pdf
 /data/micro_tracks/random_02/*.root
 /data/micro_tracks/grid_01/tracks_full1000.root
 
-# No tests
-/tests/
+# No unnecessary tests
+/tests/map_jobs
+/tests/old_track
+/tests/thisroot.sh
 
 # No redesign folder
 /redesign/

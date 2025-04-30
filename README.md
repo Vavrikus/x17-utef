@@ -53,11 +53,17 @@ The project uses the following folder structure:
             - Contains files *VecB.txt* and *VecE.txt* with magnetic field simulation (electric field is homogeneous) and files *VecB2.txt* and *VecE2.txt* containing the same data with adjusted coordinates.
         - **ion_map**
             - Contains files with ionization electron data and compiled map in the file *map.root*
+            - *sample_1.0* contains the old map with 90/10 gas composition
+            - *sample_2.0* contains the new map with 70/30 gas composition
         - **micro_tracks**
             - Contains files with microscopic track simulations (many tracks)
             - *plot_drift.C* -- ROOT script for driftline plots used in the RD51 presentation
+            - Currently used tracks are in *grid_01* and *grid_02*
         - **single_track**
             - Contains files with single simulated track for different settings
+            - *original*, *original_v2*, *originalMC*, *track1* are tracks with 8 MeV momentum and use old coordinates
+            - *new_9010*, *new_7030* are tracks with 8 MeV momentum and use new coordinates
+            - *newest_7030* is a track with 10 MeV (?) momentum and uses new coordinates and struct MicroPoint
     - **include**
         - Contains headers for the project with doxygen comments (and .inl files with definitions of templated functions)
     - **presentations**
@@ -95,4 +101,4 @@ The project uses the following folder structure:
     - **source**
         - Contains all .cpp files common to the reconstruction and simulation scripts.
     - **thesis**
-        - Contains the Latex and pdf files of my bachelor's thesis
+        - Contains the Latex and pdf files of my bachelor thesis
