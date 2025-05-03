@@ -1,8 +1,7 @@
 \chapter{Time Projection Chamber}
 \label{sec:tpc}
-	\red{Using (2010 -- a little old) \scriptsize{\url{https://cds.cern.ch/record/1302071/files/CERN-PH-EP-2010-047.pdf}}}
-	
-	A~\acf{TPC} is a~type of gaseous detector that uses the~drift in an~electric field of free charges (electrons and cations, \red{also anions if attachment of electrons to the gas particles is considered}) produced by an~ionizing particle to reconstruct its 3D~trajectory. When placed inside a~magnetic field, the~momentum of the~incident particle can be inferred from the~curvature of its trajectory. Particle identification is also possible using the~ionization energy loss inside the~\ac{TPC} (see Figure~\ref{fig:particleid}). The~detector used 80:20 Ar:CH$_4$ mixture at 8.5~atm pressure.
+	\red{Using (2010 -- a little old) \scriptsize{\url{https://cds.cern.ch/record/1302071/files/CERN-PH-EP-2010-047.pdf}}\\}
+	A~\acf{TPC} is a~type of gaseous detector that uses the~drift in an~electric field of free charges (electrons and cations\red{, also anions if attachment of electrons to the gas particles is considered}) produced by an~ionizing particle to reconstruct its 3D~trajectory. When placed inside a~magnetic field, the~momentum of the~incident particle can be inferred from the~curvature of its trajectory. Particle identification is also possible using the~ionization energy loss inside the~\ac{TPC} (see Figure~\ref{fig:particleid}). The~detector used 80:20 Ar:CH$_4$ mixture at 8.5~atm pressure.
 	
 	\begin{figure}[H]
 		\centering
@@ -20,31 +19,31 @@
 		\label{fig:pep4}
 	\end{figure}
 	
-	When a~charged particle crosses the~volume of a~\ac{TPC}, it loses energy by excitation and ionization of the detector gas (\red{how much -- from dE/dx + density $\rightarrow$ footnote?}). Most ionizing collision produce a~single ionization electron, sometimes a~few secondary electrons are produced close to the~collision vertex. In rare cases, the~ionization electron has energy large enough to create a measurable track, such an~electron is called a~$\delta$\nobreakdash-electron (\orange{terminology, just like bellow -- technically it's a (primary) ionization electron causing other (secondary) ionization}). \red{Penning transfer (collisions, light -- factor 10 for gas gain in Ar/CO2 viz PDG CERN)?}
+	When a~charged particle crosses the~volume of a~\ac{TPC}, it loses energy by excitation and ionization of the detector gas\red{~(how much -- from dE/dx + density $\rightarrow$ footnote?)}. Most ionizing collision produce a~single ionization electron, sometimes a~few secondary electrons are produced close to the~collision vertex. In rare cases, the~ionization electron has energy large enough to create a measurable track, such an~electron is called a~$\delta$\nobreakdash-electron\orange{~(terminology, just like bellow -- technically it's a (primary) ionization electron causing other (secondary) ionization)}.\red{~Penning transfer (collisions, light -- factor 10 for gas gain in Ar/CO2 viz PDG CERN)?}
 	
 	\red{CERES/NA45 -- very inhomogeneous magnetic field}
 	
 	\section{Charge transport in gases}
 		\subsection{Drift}
-			Produced ionization electrons (\orange{terminology -- called ionization electrons in the rest of the thesis, ionoelectrons?}) are accelerated towards the~readout by the~electric field inside the~chamber. At the same time, they lose speed by colliding with the~gas particles, quickly reaching a~constant (for a~given field $\mathbf{E}, \mathbf{B}$) mean drift velocity. The~electrons might be absorbed by electronegative impurities, such as halides and oxygen.
+			Produced ionization electrons\orange{~(terminology -- called ionization electrons in the rest of the thesis, ionoelectrons?)} are accelerated towards the~readout by the~electric field inside the~chamber. At the same time, they lose speed by colliding with the~gas particles, quickly reaching a~constant (for a~given field $\mathbf{E}, \mathbf{B}$) mean drift velocity. The~electrons might be absorbed by electronegative impurities, such as halides and oxygen.
 			
-			In many gases (called "hot", e.g., Ar or CH$_4$), the~drift velocity (\orange{def? the paragraph above not enough?}) is much greater than that of their thermal motion thanks to a~high proportion of elastic collisions. On the other hand, "cold" gases like CO$_2$ have a higher proportion of inelastic collisions (e.g., thanks to the~excitation of rotational and vibrational states) and therefore much lower (\orange{value? magnitude (implied)?}) drift velocity.
+			In many gases (called "hot", e.g., Ar or CH$_4$), the~drift velocity\orange{~(def? the paragraph above not enough?)} is much greater than that of their thermal motion thanks to a~high proportion of elastic collisions. On the other hand, "cold" gases like CO$_2$ have a higher proportion of inelastic collisions (e.g., thanks to the~excitation of rotational and vibrational states) and therefore much lower\orange{~(value? magnitude (implied)?)} drift velocity.
 			
-			The ions produced by the~ionization lose a significant portion of their energy during each collision since their mass is close to the~mass of the~gas particles (\orange{see the source material -- average energy loss during collision $\Delta E = \frac{2m_i M}{(m_i+M)^2}$}, this way it's more accurate). This, together with their large collision cross section, makes their drift velocity much smaller and their energy is close to thermal. Since their momenta aren't randomized to such an~extent during collisions, their diffusion is smaller (\orange{more in the~sense of distribution of positions, could move this to the diffusion subsection}).
+			The ions produced by the~ionization lose a significant portion of their energy during each collision since their mass is close to the~mass of the~gas particles\orange{~(see the source material -- average energy loss during collision $\Delta E = \frac{2m_i M}{(m_i+M)^2}$, this way it's more accurate)}. This, together with their large collision cross section, makes their drift velocity much smaller and their energy is close to thermal. Since their momenta aren't randomized to such an~extent during collisions, their diffusion is smaller\orange{~(more in the~sense of distribution of positions, could move this to the diffusion subsection)}.
 			
 			The drift is also influenced by the~magnetic field. Langevin derived a~good approximation for the~drift velocity vector:
 				\begin{equation}
 					\label{eq:drift}
 					\mathbf{v}_\text{d} = \left(\frac{\mathbf{E}}{\norm{\mathbf{E}}} + \omega\tau\frac{\mathbf{E}\times\mathbf{B}}{\norm{\mathbf{E}}\norm{\mathbf{B}}} + \omega^2\tau^2\frac{\mathbf{E}\cdot\mathbf{B}}{\norm{\mathbf{E}}\norm{\mathbf{B}}}\cdot \frac{\mathbf{B}}{\norm{\mathbf{B}}}\right) \frac{q\tau}{m(1+\omega^2\tau^2)}\norm{\mathbf{E}},
 				\end{equation}
-			where $q$ is the~charge of the particle, $m$ is its mass, $\tau$ is the mean time between collisions and $\omega = \frac{q}{m}\norm{\mathbf{B}}$ is the~Larmor frequency. In a~standard \ac{TPC}, $\mathbf{E}$ is nearly parallel to $\mathbf{B}$ and the~influence of the~magnetic field on the~drift is minimal. The~drift of ions is only negligibly influenced by the~magnetic field ($\omega\tau\sim10^{-4}$ is small due to the~low drift velocity \orange{-- better because it takes $\tau$ into account and differs only by E/B ratio}). \red{Lorentz angle for orthogonal fields $\tan\psi = -\omega\tau$ (deviation from electric field) -- mention in the OFTPC section.} Without magnetic field, we can write
+			where $q$ is the~charge of the particle, $m$ is its mass, $\tau$ is the mean time between collisions and $\omega = \frac{q}{m}\norm{\mathbf{B}}$ is the~Larmor frequency. In a~standard \ac{TPC}, $\mathbf{E}$ is nearly parallel to $\mathbf{B}$ and the~influence of the~magnetic field on the~drift is minimal. The~drift of ions is only negligibly influenced by the~magnetic field ($\omega\tau\sim10^{-4}$ is small due to the~low drift velocity\orange{~-- better because it takes $\tau$ into account and differs only by E/B ratio}).\red{~Lorentz angle for orthogonal fields $\tan\psi = -\omega\tau$ (deviation from electric field) -- mention in the OFTPC section.} Without magnetic field, we can write
 				\begin{equation}
 					\mathbf{v}_d = \frac{q\tau}{m} \mathbf{E} = \mu \mathbf{E},
 				\end{equation}
 			where $\mu$ is called charge mobility.
 			
 		\subsection{Diffusion}
-			Due to collisions a~cloud of electrons or ions originating from the~same point will show a~Gaussian density distribution at time $t$ while drifting in the~electric field $\mathbf{E} = (0,0,E_z)$ along the $z$\nobreakdash-coordinate (\orange{coordinates defined by the electric field}):
+			Due to collisions a~cloud of electrons or ions originating from the~same point will show a~Gaussian density distribution at time $t$ while drifting in the~electric field $\mathbf{E} = (0,0,E_z)$ along the $z$\nobreakdash-coordinate\orange{~(coordinates defined by the electric field)}:
 				\begin{equation}
 					\rho(x,y,z,t) = (4\pi Dt)^{-\frac{3}{2}} \exp\left(-\frac{x^2+y^2+(z-v_dt)^2}{4Dt}\right),
 				\end{equation}
@@ -71,10 +70,10 @@
 	
 	\section{Readout}
 		\subsection{Multi-Wire Proportional Chamber}
-			In most \red{(2010 -- almost all)} \ac{TPC}s operated in experiments \acf{MWPC} (\orange{actually wire chamber -- similar}) was used for the~readout. The electrons enter the chamber through a~cathode grid and get accelerated in the~strong electric field towards the~thin anode wires and create a~Townsend avalanche (\red{ref}), multiplying the~signal. \red{Alternating with field wires? That is the difference between MWPC and a drift chamber?} The~trajectory can be reconstructed using signal from each separate wire. Segmented cathode is also often used for the readout of produced cations. \red{Gating grid (reduction of space charge effect, blocking backflow of ions?, closed for electrons B=0, $\Delta V$, static mode (loss of 25\% el.) x opening on trigger)? (gas amplification $>10000$ required for good SNR, 100-200~ns shaping time), figure -- field (acts as a plane from far away and the field only gets strong enough for avalanches)?}
+			In most\red{~(2010 -- almost all)} \ac{TPC}s operated in experiments \acf{MWPC}\orange{~(actually wire chamber -- similar)} was used for the~readout. The electrons enter the chamber through a~cathode grid and get accelerated in the~strong electric field towards the~thin anode wires and create a~Townsend avalanche\red{~(ref)}, multiplying the~signal.\red{~Alternating with field wires? That is the difference between MWPC and a drift chamber?} The~trajectory can be reconstructed using signal from each separate wire. Segmented cathode is also often used for the readout of produced cations.\red{~Gating grid (reduction of space charge effect, blocking backflow of ions?, closed for electrons B=0, $\Delta V$, static mode (loss of 25\% el.) x opening on trigger)? (gas amplification $>10000$ required for good SNR, 100-200~ns shaping time), figure -- field (acts as a plane from far away and the field only gets strong enough for avalanches)?}
 			
 		\subsection{Gas Electron Multiplier}
-			A~\acf{GEM} is a~thin metal-coated polymer sheet with a~high density of small holes (Figure~\ref{fig:gemhole}). The amplification is achieved by applying voltage on the~metal layers, creating a strong electric field inside the~holes and causing avalanches (see Figure~\ref{fig:gemsim}). Double or triple stack of \ac{GEM}s is usually used to create a~sufficient gain. From the last foil, the~electrons drift to a~segmented anode where the~signal is read. The~backflow of cations is reduced compared to \ac{MWPC}. \red{Typical parameters (vs thick GEM?).}
+			A~\acf{GEM} is a~thin metal-coated polymer sheet with a~high density of small holes (Figure~\ref{fig:gemhole}). The amplification is achieved by applying voltage on the~metal layers, creating a strong electric field inside the~holes and causing avalanches (see Figure~\ref{fig:gemsim}). Double or triple stack of \ac{GEM}s is usually used to create a~sufficient gain. From the last foil, the~electrons drift to a~segmented anode where the~signal is read. The~backflow of cations is reduced compared to \ac{MWPC}.\red{~Typical parameters (vs thick GEM?).}
 			\begin{figure}
 				\centering
 				\includegraphics[width=0.5\textwidth]{gem_hole.png}
@@ -89,7 +88,7 @@
 			\end{figure}
 		
 		\subsection{Micromegas}
-			In a~\ac{Micromegas} (\orange{in sources I viewed it is not capitalized}) electrons pass through a~fine mesh (made out of very thin wires) into the~narrow amplification gap where they are multiplied in the~high field and read as signal on the~segmented anode. Very high field (30-80 kV/cm$^2$) is necessary to achieve sufficient gain. Cation backflow is heavily suppressed by the~mesh.
+			In a~\ac{Micromegas}\orange{~(in sources I viewed it is not capitalized)} electrons pass through a~fine mesh (made out of very thin wires) into the~narrow amplification gap where they are multiplied in the~high field and read as signal on the~segmented anode. Very high field (30-80 kV/cm$^2$) is necessary to achieve sufficient gain. Cation backflow is heavily suppressed by the~mesh.
 			
 		\subsection{Parallel Plate Chamber}
 			\red{..., microwell? -- these readouts and Micromegas are not used in our detector, so maybe just mention them at the beginning of the readout section without excessive detail (some subfigures showing how they look without describing each too much)}
@@ -98,7 +97,7 @@
 	
 	\section{Orthogonal Fields TPC at IEAP CTU}
 	\label{sec:oftpc}
-		At \ac{IEAPCTU}, we are going to use six identical atypical \ac{TPC}s with inhomogeneous toroidal magnetic field \textbf{orthogonal} to the~electric field (\orange{details below}), hereafter referred to as \acf{OFTPC}. It has the~shape of isosceles trapezoidal prism 16~centimeters high with triple\nobreakdash-\ac{GEM} readout on one of its bases. Dimensions of the~\ac{OFTPC} are discussed in detail in section~\ref{sec:coor} below. Throughout this thesis, we assume a~uniform electric field along the~$z$~axis with $E_z = -400$~V/cm. \red{Isn't the field affected by the~\ac{MWPC}s?} Measured particles enter the~\ac{OFTPC} through a~window after crossing the~\ac{MWPC}. \red{Gas mixture used in the~detector (70/30) and its effect -- some graph with the mixture. Add a~figure of the~real TPC.}
+		At \ac{IEAPCTU}, we are going to use six identical atypical \ac{TPC}s with inhomogeneous toroidal magnetic field \textbf{orthogonal} to the~electric field\orange{~(details below)}, hereafter referred to as \acf{OFTPC}. It has the~shape of isosceles trapezoidal prism 16~centimeters high with triple\nobreakdash-\ac{GEM} readout on one of its bases. Dimensions of the~\ac{OFTPC} are discussed in detail in section~\ref{sec:coor} below. Throughout this thesis, we assume a~uniform electric field along the~$z$~axis with $E_z = -400$~V/cm.\red{~Isn't the field affected by the~\ac{MWPC}s?} Measured particles enter the~\ac{OFTPC} through a~window after crossing the~\ac{MWPC}.\red{~Gas mixture used in the~detector (70/30) and its effect -- some graph with the mixture. Add a~figure of the~real TPC.}
 		
 		
 		\subsection{Motivation and Associated Challenges}
@@ -109,13 +108,13 @@
 				\end{enumerate}
 			In this thesis, we will show that such a~setup can reach a~similar energy resolution as common cylindrical \ac{TPC}s while reducing the~overall cost.
 			
-			The layout introduces two complications to the~track reconstruction -- the trajectory in inhomogeneous field is not circular and the drift is distorted by the magnetic field as shown in the~Equation~\ref{eq:drift}(in our case $\omega\tau \approx 0.08$ \red{for 0.3~T assuming $\mu\approx0.25$~T$^{-1}$, varies inside the detector}). We will deal with these effects in the upcoming chapters.
+			The layout introduces two complications to the~track reconstruction -- the trajectory in inhomogeneous field is not circular and the drift is distorted by the magnetic field as shown in the~Equation~\ref{eq:drift}(in our case $\omega\tau \approx 0.08$\red{~for 0.3~T assuming $\mu\approx0.25$~T$^{-1}$, varies inside the detector}). We will deal with these effects in the upcoming chapters.
 			
 			The diffusion in such setup is larger since parallel orientation reduces diffusion by curling the~electrons in the $x$\nobreakdash-$y$ direction (see Equation~\ref{eq:difmag}), but for our relatively weak magnetic field and short drift distance, the~difference is negligible.
 	
 		\subsection{Coordinate Systems and Dimensions}
 		\label{sec:coor}
-			In order to describe events in our detector, we use three distinct spaces: the~detector space $\mathcal{D}$, the~readout space $\mathcal{R}$ and the~pad space $\mathcal{P}$ (\orange{different spaces that describe different things and each has their own coordinate system, so maybe rename the section somehow?}). Each space is later used to represent ionization electrons at different stages of the~detection process: their creation in the gas, their final position when hitting the readout plane, and finally their representation in the discrete pad space.
+			In order to describe events in our detector, we use three distinct spaces: the~detector space $\mathcal{D}$, the~readout space $\mathcal{R}$ and the~pad space $\mathcal{P}$\orange{~(different spaces that describe different things and each has their own coordinate system, so maybe rename the section somehow?)}. Each space is later used to represent ionization electrons at different stages of the~detection process: their creation in the gas, their final position when hitting the readout plane, and finally their representation in the discrete pad space.
 		
 			\subsubsection{Detector Space}
 				The~detector space $\mathcal{D}$ represents the~physical space of our detector. We describe it using Cartesian coordinates $(x,y,z)$. The~$z$-axis is the~detector's axis of symmetry, with its negative direction aligned with the~proton beam. The~origin $(0,0,0)$ is located at the~center of the~irradiated target. The~positive $x$\nobreakdash-axis passes through the~center of one the~\ac{OFTPC}s along the~intersection of its two planes of symmetry. The~$y$\nobreakdash-axis is then chosen to maintain a~right-handed coordinate system.
@@ -133,7 +132,7 @@
 							y_\text{max}(x_\text{max}) = -y_\text{min}(x_\text{max}) &=  7.45\;\text{cm},
 						\end{align}
 					\end{linenomath}
-				where $y_\text{max}(x)$ is the~maximal value of the~$y$-coordinate for a~given $x$. The~readout is located at $z = 8$~cm; for some purposes, we also define the distance to the~readout $d_r = 8\;\text{cm}-z$ as an~alternative to the~$z$-coordinate. \orange{Keeping this paragraph as it is because the~\ac{OFTPC} volume is distinct from the~first sector and some parts of this thesis use the~space beyond this volume.} The~\ac{OFTPC} window has width 3.8~cm and height 4.0~cm.
+				where $y_\text{max}(x)$ is the~maximal value of the~$y$-coordinate for a~given $x$. The~readout is located at $z = 8$~cm; for some purposes, we also define the distance to the~readout $d_r = 8\;\text{cm}-z$ as an~alternative to the~$z$-coordinate.\orange{~Keeping this paragraph as it is because the~\ac{OFTPC} volume is distinct from the~first sector and some parts of this thesis use the~space beyond this volume.} The~\ac{OFTPC} window has width 3.8~cm and height 4.0~cm.
 				
 				We also use spherical coordinates $(r,\theta,\varphi)$ with the~elevation angle~$\theta$ measured relative to the~$xy$ plane. Angles~$\theta$ and~$\varphi$ are useful when describing the~direction of $e^+/e^-$~tracks. Their maximal values considered for the~initial direction in simulations are $\theta_\text{max} \approx 17.1^\circ$ and $\varphi_\text{max} \approx 16.3^\circ$ as shown in Figure~\ref{fig:oftpc}.
 				
@@ -156,7 +155,7 @@
 					\end{equation}
 				\red{\textbf{Rewrite to reflect this:} Technically both values can be zero as defined in the~code (max channel 127). It is not really a~subspace of $\mathcal{R}$ but there is a mapping from $\mathcal{R}$ to $\mathcal{P}$. It is a discretization of a~part of $\mathcal{R}$, the mapping can be adjusted depending on the~simulation. If we assume uniform electric field there will be gaps, we don't use gaps in the reconstruction since the~electrons should be pulled towards the~pads.}
 				
-				The~readout of the~\ac{OFTPC} will consist (\red{is the design final?}) of 128~rectangular pads arranged in a~staggered pattern. Parameters of the~pad layout are shown in Figure~\ref{fig:padlayout}. The bottom left corner of $n$\nobreakdash-th pad has coordinates $(x_{1,n},y_{1,n})$, the~ top right $(x_{2,n},y_{2,n})$ and its center has coordinates $(x_{c,n},y_{c,n})$. The gap between neighboring pads is $g=0.08$~cm. Time will be read out in discrete bins of size $t_\text{bin}=100$~ns (\red{details?}). \red{Could also describe pad-related functions.}
+				The~readout of the~\ac{OFTPC} will consist\red{~(is the design final?)} of 128~rectangular pads arranged in a~staggered pattern. Parameters of the~pad layout are shown in Figure~\ref{fig:padlayout}. The bottom left corner of $n$\nobreakdash-th pad has coordinates $(x_{1,n},y_{1,n})$, the~ top right $(x_{2,n},y_{2,n})$ and its center has coordinates $(x_{c,n},y_{c,n})$. The gap between neighboring pads is $g=0.08$~cm. Time will be read out in discrete bins of size $t_\text{bin}=100$~ns\red{~(details?)}.\red{~Could also describe pad-related functions.}
 			
 				\begin{figure}[H]
 					\centering
@@ -167,7 +166,7 @@
 		
 		\subsection{Magnetic Field Simulation}
 		\label{sec:mag}
-			The~magnetic field inside our detector is produced by six permanent magnets. It was simulated using Ansys Maxwell (\red{citation}) which gives us values on a~regular grid. \red{More details, vacuum tube, magnets (homogeneous?, density?).} Visualization of the~magnetic field is shown in Figure~\ref{fig:mag}. Whenever we need to work with values outside this grid, we use trilinear interpolation described below.
+			The~magnetic field inside our detector is produced by six permanent magnets. It was simulated using Ansys Maxwell\red{~(citation)} which gives us values on a~regular grid.\red{~More details, vacuum tube, magnets (homogeneous?, density?).} Visualization of the~magnetic field is shown in Figure~\ref{fig:mag}. Whenever we need to work with values outside this grid, we use trilinear interpolation described below.
 			
 			\begin{figure}
 				\centering
@@ -182,15 +181,15 @@
 					\includegraphics[width=\textwidth]{mag_xz.png}
 					\caption{Field magnitude in the~$xz$ plane.}
 				\end{subfigure}
-				\caption{Magnetic field simulation results. The \ac{OFTPC} volume and the~vacuum tube are marked with black lines, the~magnets are marked with red lines. \red{The coordinates of the magnets from the CAD drawing seem to be 9/10 of the ones from the magnetic simulation (confirm and fix).}}
+				\caption{Magnetic field simulation results. The \ac{OFTPC} volume and the~vacuum tube are marked with black lines, the~magnets are marked with red lines.\red{~The coordinates of the magnets from the CAD drawing seem to be 9/10 of the ones from the magnetic simulation (confirm and fix).}}
 				\label{fig:mag}
 			\end{figure}
 		
 			\subsubsection{Trilinear Interpolation}
 			\label{sec:trilin}
-				Trilinear interpolation is a~3D generalization of linear interpolation\footnote{Linear interpolation in point $x\in(x_1,x_2)$ of a~function $f\colon\mathbb{R}\to\mathbb{R}$ known in points $x_1 < x_2$ is the~convex combination $\widehat{f}(x) = (1-x_d)f(x_1)+x_d f(x_2)$, where $x_d = \frac{x-x_1}{x_2-x_1} \in (0,1)$.}. It can be used to interpolate a~function whose values are known on a~regular grid with rectangular prism cells. We use this simple method for interpolating the~magnetic field, and it is later used in Section~\ref{sec:grad} to interpolate the~Ionization Electron Map, a~key component of our track reconstruction algorithm. In both cases, we use a~regular cubic grid (\red{apparently it is also called a~Cartesian grid}).
+				Trilinear interpolation is a~3D generalization of linear interpolation\footnote{Linear interpolation in point $x\in(x_1,x_2)$ of a~function $f\colon\mathbb{R}\to\mathbb{R}$ known in points $x_1 < x_2$ is the~convex combination $\widehat{f}(x) = (1-x_d)f(x_1)+x_d f(x_2)$, where $x_d = \frac{x-x_1}{x_2-x_1} \in (0,1)$.}. It can be used to interpolate a~function whose values are known on a~regular grid with rectangular prism cells. We use this simple method for interpolating the~magnetic field, and it is later used in Section~\ref{sec:grad} to interpolate the~Ionization Electron Map, a~key component of our track reconstruction algorithm. In both cases, we use a~regular cubic grid\red{~(apparently it is also called a~Cartesian grid)}.
 				
-				Let us consider a~cell of our regular grid (a~cube) with an~edge of length~$a$ containing the~point $\mathbf{C} = (x,y,z)$ where we want to interpolate a~function $f\colon\mathbb{R}^3\to\mathbb{R}$. We know the~values of this function at the~vertices of the~cell $\mathbf{C}_{ijk} = (x_0+ia,y_0+ja,z_0+ka)$, where $\mathbf{C}_{000} = (x_0,y_0,z_0)$ is the~origin of the~cell (\orange{is that clear?}), and $i,j,k \in \{0,1\}$ are indices. We also define the~points $\mathbf{C}_{ij} = (x,y_0+ia,z_0+ja)$ and $\mathbf{C}_i=(x,y,z_0+ia)$. Then the~interpolated value $\widehat{f}(\mathbf{C})$ can be calculated as a~composition of three linear interpolations (see Figure~\ref{fig:trilin}):
+				Let us consider a~cell of our regular grid (a~cube) with an~edge of length~$a$ containing the~point $\mathbf{C} = (x,y,z)$ where we want to interpolate a~function $f\colon\mathbb{R}^3\to\mathbb{R}$. We know the~values of this function at the~vertices of the~cell $\mathbf{C}_{ijk} = (x_0+ia,y_0+ja,z_0+ka)$, where $\mathbf{C}_{000} = (x_0,y_0,z_0)$ is the~origin of the~cell\orange{~(is that clear?)}, and $i,j,k \in \{0,1\}$ are indices. We also define the~points $\mathbf{C}_{ij} = (x,y_0+ia,z_0+ja)$ and $\mathbf{C}_i=(x,y,z_0+ia)$. Then the~interpolated value $\widehat{f}(\mathbf{C})$ can be calculated as a~composition of three linear interpolations (see Figure~\ref{fig:trilin}):
 					\begin{alignat}{3}
 						\label{eq:linterpol}
 						\widehat{f}(\mathbf{C}_{ij}) &= (1-x_d)\,f(\mathbf{C}_{0ij}) \,&+&\,x_d\, f(\mathbf{C}_{1ij}),\\

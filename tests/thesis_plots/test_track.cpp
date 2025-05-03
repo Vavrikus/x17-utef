@@ -5,12 +5,14 @@
 #include "TApplication.h"
 #include "TAxis.h"
 #include "TCanvas.h"
+#include "TF1.h"
 #include "TFile.h"
 #include "TGraph.h"
 #include "TH2F.h"
 #include "TImage.h"
 #include "TLine.h"
 #include "TLegend.h"
+#include "TMultiGraph.h"
 #include "TStyle.h"
 #include "TSystem.h"
 #include "TTree.h"
@@ -57,11 +59,11 @@ X17::TrackMicro ParseOldTrack(TTree* tree, bool newfile)
     return track;    
 }
 
-/// @brief Load track (electron start and endpoints) from a single track file
+/// @brief Load track (electron start and endpoints) from a single track file.
 /// @param folder Name of the folder in the data/single_track directory.
 /// @param newcoords True = x,y,z; False = z,x,y
 /// @param newfile True = doubles; False = X17::MicroPoint
-/// @return The track as a X17::TrackMicro object
+/// @return The track as a X17::TrackMicro object.
 X17::TrackMicro LoadTrack(std::string folder, bool newcoords = false, bool newfile = false)
 {
     std::string track_path = "../../../data/single_track/" + folder + "/electrons.root";
@@ -78,6 +80,9 @@ double g_ymin = -0.3;
 double g_ymax = 0.3;
 double g_zmin = -3;
 double g_zmax = 8;
+
+TGraph* g_g_res1 = nullptr;
+TGraph* g_g_res2 = nullptr;
 
 void PlotDriftXZ(X17::TrackMicro track, bool newcoords = false)
 {
@@ -280,6 +285,142 @@ void PlotTrackRK(X17::TrackMicro track, X17::Field<X17::Vector>* magfield)
         // g_diff2->Draw("P same");
 }
 
+void PlotRASD(X17::TrackMicro track, bool newcoords = false)
+{
+    TGraph* g_drift_noTPC = new TGraph();
+    TGraph* g_drift_TPC = new TGraph();
+    for (const auto& point : track.points)
+    {
+        using namespace X17::constants;
+        double z_end = newcoords ? point.end.z() : point.end.y();
+        if(z_end > 7.5)
+        {
+            double x = newcoords ? point.start.x() : point.start.z();
+            double z = newcoords ? point.start.z() : point.start.y();
+            double t = point.end.t/1000;
+
+            if(x < xmin)
+                g_drift_noTPC->AddPoint(8-z,t);
+            else
+                g_drift_TPC->AddPoint(8-z,t);
+        }
+    }
+    g_drift_noTPC->SetMarkerStyle(2);
+    g_drift_noTPC->SetMarkerColor(kBlue);
+    g_drift_TPC->SetMarkerStyle(2);
+    g_drift_TPC->SetMarkerColor(kRed);
+
+    TF1* f_drift_TPC = new TF1("f_drift_TPC","pol1",7.5,15);
+    g_drift_TPC->Fit(f_drift_TPC,"0");
+    f_drift_TPC->SetLineColor(kBlack);
+    f_drift_TPC->SetLineWidth(2);
+    double a0 = f_drift_TPC->GetParameter(0);
+    double a1 = f_drift_TPC->GetParameter(1);
+    double b0 = -a0/a1; //inverse polynomial param
+    double b1 = 1.0/a1; //inverse polynomial param
+
+    std::cout << "Reconstructed v_d: " << b1 << " cm/us, d_0: " << b0 << " cm\n";
+
+    TCanvas* c_drift = new TCanvas("","Drift",g_cwidth,g_cheight);
+
+    TMultiGraph* mg_drift = new TMultiGraph();
+    mg_drift->Add(g_drift_noTPC,"P");
+    mg_drift->Add(g_drift_TPC,"P");
+    mg_drift->GetXaxis()->SetTitle("distance to readout [cm]");
+    mg_drift->GetYaxis()->SetTitle("t [#mus]");
+    mg_drift->Draw("A");
+    f_drift_TPC->Draw("same");
+
+    TLegend* l_drift = new TLegend(0.17,0.745,0.5,0.91);
+    l_drift->AddEntry(g_drift_noTPC,"outside TPC","p");
+    l_drift->AddEntry(g_drift_TPC,"inside TPC","p");
+    l_drift->AddEntry(f_drift_TPC,"linear fit inside TPC","l");
+    l_drift->SetTextSize(0.043);
+    l_drift->Draw();
+
+    TCanvas* c_rasd = new TCanvas("","RASD",g_cwidth,g_cheight);
+    TGraph* xz_original = new TGraph();
+    TGraph* xz_reconstructed = new TGraph();
+    TGraph* g_res = new TGraph();
+    for (const auto& point : track.points)
+    {
+        using namespace X17::constants;
+        double z_end = newcoords ? point.end.z() : point.end.y();
+        if(z_end > 7.5)
+        {
+            X17::Vector orig,reco;
+
+            if (newcoords)
+            {
+                orig = {point.start.x(), point.start.y(),point.start.z()};
+                reco = {point.end.x(), point.end.y(), 8-(b0+b1*point.end.t/1000)};
+            }
+            else
+            {
+                orig = {point.start.z(), point.start.x(),point.start.y()};
+                reco = {point.end.z(), point.end.x(), 8-(b0+b1*point.end.t/1000)};
+            }
+            xz_original->AddPoint(orig.x,orig.z);
+            xz_reconstructed->AddPoint(reco.x,reco.z);
+            g_res->AddPoint(reco.x,sqrt(reco.SqDist(orig)));//reco.z-orig.z);//reco.x-orig.x);//
+        }
+    }
+    xz_original->SetMarkerStyle(7);
+    xz_original->SetMarkerColor(kRed);
+    xz_reconstructed->SetMarkerStyle(2);
+    xz_reconstructed->SetMarkerColor(kBlack);
+
+    gStyle->SetTitleYOffset(1.05);
+    TMultiGraph* mg_rasd = new TMultiGraph();
+    mg_rasd->Add(xz_original,"P");
+    mg_rasd->Add(xz_reconstructed,"P");
+    mg_rasd->GetXaxis()->SetTitle("x [cm]");
+    mg_rasd->GetYaxis()->SetTitle("z [cm]");
+    mg_rasd->Draw("A");
+
+    TLegend* l_rasd = new TLegend(0.69,0.82,0.93,0.93);
+    l_rasd->AddEntry(xz_original,"simulation","p");
+    l_rasd->AddEntry(xz_reconstructed,"reconstructed","p");
+    l_rasd->SetTextSize(0.043);
+    l_rasd->Draw();
+
+    TCanvas* c_res = new TCanvas("","Residuals",g_cwidth,g_cheight);
+    g_res->SetMarkerStyle(2);
+    g_res->SetMarkerColor(kRed);
+    g_res->GetXaxis()->SetTitle("x [cm]");
+    g_res->GetYaxis()->SetTitle("residual [cm]");
+    g_res->Draw("AP");
+
+    TLegend* l_res = new TLegend(0.17,0.855,0.5,0.91);
+    l_res->AddEntry(g_res,"reconstr. residuals","p");
+    l_res->SetTextSize(0.043);
+    l_res->Draw();
+
+    if (!g_g_res1) g_g_res1 = g_res;
+    else if (!g_g_res2) g_g_res2 = g_res;
+}
+
+void PlotRASDres2()
+{
+    TCanvas* c = new TCanvas("","Residuals comparison",g_cwidth,g_cheight);
+    g_g_res2->SetMarkerColor(kBlue);
+
+    gStyle->SetTitleYOffset(0.9);
+
+    TMultiGraph* mg_res = new TMultiGraph();
+    mg_res->Add(g_g_res1,"p");
+    mg_res->Add(g_g_res2,"p");
+    mg_res->GetXaxis()->SetTitle("x [cm]");
+    mg_res->GetYaxis()->SetTitle("residual [cm]");
+    mg_res->Draw("A");
+
+    TLegend* l_res = new TLegend(0.17,0.775,0.4,0.91);
+    l_res->AddEntry(g_g_res1,"90:10 Ar:CO_{2}","p");
+    l_res->AddEntry(g_g_res2,"70:30 Ar:CO_{2}","p");
+    l_res->SetTextSize(0.043);
+    l_res->Draw();
+}
+
 int main(int argc, char *argv[])
 {
     TApplication app("app", &argc, argv);
@@ -309,7 +450,11 @@ int main(int argc, char *argv[])
     gStyle->SetPadRightMargin(0.07);
     gStyle->SetPadTopMargin(0.07);
 
-    PlotTrackRK(track1, magfield);
+    // PlotTrackRK(track1, magfield);
+
+    PlotRASD(track1);
+    PlotRASD(track2,true);
+    PlotRASDres2();
 
     // Reconstruct CircleFit3D + RK4
         // std::vector<X17::RecoPoint> reco_points;

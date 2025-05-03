@@ -1,7 +1,7 @@
 \chapwithtoc{Conclusion}
 	\red{Here or at the~end of each section. Something about the~future of this work?}
 	
-	\section*{Notes}
+	\red{\section*{Notes}}
 		\red{General notes about the~thesis:
 			\begin{itemize}[topsep=4pt,itemsep=2pt]
 				\item Check that all of the~classes and other code are marked the~same way in the~text. I used italics somewhere, could use different font for this instead.
@@ -24,9 +24,10 @@
 				\item Consistent use of bm vs mathbf
 				\item Consistent use of $\overbar{\mathcal{M}}$ instead of $\mathcal{M}$ when talking about the map of the means (so most of the time)
 				\item Proper equation numbering when deriving a relation
-				\item Hugo should be mentioned somewhere in the title probably?
+				\item Hugo should be mentioned somewhere in the title pages probably?
 				\item Consistent itemize/enumerate style (namely spacing) that looks good (ideally set by some macro? maybe the new MFF UK template will solve this?)
-				\item Consistent gas mixture notation (e.g.  90:10 Ar:CO$_2$).
+				\item Consistent gas mixture notation (e.g., 90:10 Ar:CO$_2$). Maybe mention at the beginning that it is a~molar ratio.
+				\item Labels of figures and tables -- maybe in bold? Abbreviated?
 			\end{itemize}
 		Random notes:
 			\begin{itemize}[topsep=4pt,itemsep=2pt]
@@ -44,20 +45,20 @@
 			\end{itemize}
 		}
 	\section*{Future}
-		\red{Things planned for the future:}
+		\red{Things planned for the future:
 		\begin{itemize}[topsep=4pt,itemsep=2pt]
-			\item \red{Testing the reconstruction algorithm by measuring real particles with a~known energy distribution.}
-			\item \red{The~\textbf{Fast Simulation with Ionization Electron Map} is planned for the~future. It will use the~\ac{HEED} program~\cite{HEED} to simulate the~primary particle and the~Ionization Electron Map (see Section~\ref{sec:map}) to simulate the~drift of secondary electrons. It should be significantly faster than the~Microscopic Simulation but offer comparable precision since it will rely on an already simulated drift map. (Primary track simulated in HEED. Readout parameters by interpolating the map.	Diffusion from the map for randomization.)}
-			\item \red{Account for GEM, delta electrons, ...}
-			\item \red{Likelihood approach instead of least squares (if it improves the~reconstruction significantly), we should at least use a~better method than taking the~center of the~TPC bin.}
-			\item \red{More detailed electric field simulation (if needed, GEM will have more complex field, some irregularities in the field should be considered)}
+			\item Testing the reconstruction algorithm by measuring real particles with a~known energy distribution.
+			\item The~\textbf{Fast Simulation with Ionization Electron Map} is planned for the~future. It will use the~\ac{HEED} program~\cite{HEED} to simulate the~primary particle and the~Ionization Electron Map (see Section~\ref{sec:map}) to simulate the~drift of secondary electrons. It should be significantly faster than the~Microscopic Simulation but offer comparable precision since it will rely on an already simulated drift map. (Primary track simulated in HEED. Readout parameters by interpolating the map.	Diffusion from the map for randomization.)
+			\item Account for GEM, delta electrons, ...
+			\item Likelihood approach instead of least squares (if it improves the~reconstruction significantly), we should at least use a~better method than taking the~center of the~TPC bin.
+			\item More detailed electric field simulation (if needed, GEM will have more complex field, some irregularities in the field should be considered)
 			\item Account for the triggering in MWPC/TPX3 (particle travels from TPX3 to MWPC basically immediately -- fraction of a~nanosecond so there should be no significant difference)
-		\end{itemize}
+		\end{itemize}}
 		
-		\subsection*{Likelihood - inverse map}
-			\red{If we wanted to further improve this procedure, taking into account the whole map $\mathcal{M}$, we could make an "inverse map" from $\mathcal{R}$ to distributions on $\mathcal{D}$. We could achieve this by taking the~normalized probability density of an~electron with initial coordinates $(x,y,z)$ having readout coordinates $(x',y',t)$. If we fix $(x',y',t)$, we get an~unnormalized probability density $f(x,y,z) = \mathcal{M}_{(x,y,z)}(x',y',t)$ (assuming that all initial coordinates are a~priori equally likely). This could potentially improve the~discrete reconstruction if we take the~mean value of this probability density across the pad and time bin}
+		\red{\subsection*{Likelihood - inverse map}}
+			\red{If we wanted to further improve this procedure, taking into account the whole map $\mathcal{M}$, we could make an "inverse map" from $\mathcal{R}$ to distributions on $\mathcal{D}$. We could achieve this by taking the~normalized probability density of an~electron with initial coordinates $(x,y,z)$ having readout coordinates $(x',y',t)$. If we fix $(x',y',t)$, we get an~unnormalized probability density $f(x,y,z) = \mathcal{M}_{(x,y,z)}(x',y',t)$ (assuming that all initial coordinates are a~priori equally likely). This could potentially improve the~discrete reconstruction if we take the~mean value of this probability density across the pad and time bin
 				\begin{equation}
 					\color{red}
 					f_\text{pad, bin}(x,y,z) = \frac{1}{A_\text{pad} \Delta t_\text{bin}} \int_\text{pad, bin} \mathcal{M}_{(x,y,z)}(x',y',t) 	\text{d}x'\text{d}y'\text{d}t
 				\end{equation}
-			\red{and using it for a~likelihood fit instead of using least squares. This still assumes that all initial coordinates are equally likely which is clearly not the~case for a~primary particle track. In the future, we could even use the~fast track simulation with the~map (should be possible to make around 1000 tracks per minute per core with current settings), create a~big set of tracks with reasonable parameters and use these to get an~approximation of the probability distribution of the~detector response. Some approximations would be necessary when interpreting the~data to decrease the~degrees of freedom of this distribution (we would have to pick a set of parameters and assume that some of them are independent). This could give us an~idea about the~best achievable resolution (how significantly will the~detector response differ for a~given change in energy). If the~difference is significant, we could try to further improve the~likelihood fit.}
+			and using it for a~likelihood fit instead of using least squares. This still assumes that all initial coordinates are equally likely which is clearly not the~case for a~primary particle track. In the future, we could even use the~fast track simulation with the~map (should be possible to make around 1000 tracks per minute per core with current settings), create a~big set of tracks with reasonable parameters and use these to get an~approximation of the probability distribution of the~detector response. Some approximations would be necessary when interpreting the~data to decrease the~degrees of freedom of this distribution (we would have to pick a set of parameters and assume that some of them are independent). This could give us an~idea about the~best achievable resolution (how significantly will the~detector response differ for a~given change in energy). If the~difference is significant, we could try to further improve the~likelihood fit.}
