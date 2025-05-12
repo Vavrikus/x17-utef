@@ -7,6 +7,7 @@
 // ROOT dependencies
 #include "TChain.h"
 #include "TLine.h"
+#include "TMath.h"
 
 // X17 dependencies
 #include "Utilities.h"
@@ -84,4 +85,9 @@ double GetFWHM(TH1F* h, bool draw)
     }
 
     return right - left;
+}
+
+double StdevBiasFactor(int N)
+{
+    return TMath::Sqrt(2.0/(N-1))*TMath::Gamma(0.5*N)/TMath::Gamma(0.5*(N-1));
 }

@@ -10,7 +10,7 @@ namespace X17
     //// Public methods.
 
     template <int M, int N>    
-    inline const double& Matrix<M,N>::at(int row, int column) const
+    const double& Matrix<M,N>::at(int row, int column) const
     {
         #ifdef DEBUG
         if (row < 0 || row >= M || column < 0 || column >= N)
@@ -23,7 +23,7 @@ namespace X17
     }
 
     template <int M, int N>
-    inline double& Matrix<M,N>::at(int row, int column)
+    double& Matrix<M,N>::at(int row, int column)
     {
         #ifdef DEBUG
         if (row < 0 || row >= M || column < 0 || column >= N)
@@ -133,7 +133,18 @@ namespace X17
     }
 
     template <int M, int N>
-    Matrix<M,N> operator*(double d, const Matrix<M,N>& A)
+    Matrix<M, N> operator-(const Matrix<M, N> &A, const Matrix<M, N> &B)
+    {
+        Matrix<M,N> result;
+        for (int i = 0; i < M * N; i++) 
+        {
+            result.elements[i] = A.elements[i] - B.elements[i];
+        }
+        return result;
+    }
+
+    template <int M, int N>
+    Matrix<M, N> operator*(double d, const Matrix<M, N> &A)
     {
         Matrix<M,N> result;
         for (int i = 0; i < M * N; i++)

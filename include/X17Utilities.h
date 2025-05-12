@@ -1,8 +1,5 @@
 #pragma once
 
-// ROOT dependencies
-#include "TColor.h"
-
 // X17 dependencies
 #include "Field.h"
 #include "Vector.h"
@@ -107,17 +104,4 @@ namespace X17
     /// @brief Draws the two magnets extending to the first sector.
     /// @param yxformat If true, the y-coordinate is drawn on the x-axis and vice versa.
     void DrawFirstSectorMagnets(bool yxformat = true);
-
-    namespace Color
-    {
-        inline int GOrange()
-        {
-            static const int index = [] {
-                int idx = TColor::GetFreeColorIndex();
-                new TColor(idx, 1, 0.6, 0);
-                return idx;
-            }();
-            return index;
-        }
-    };
 } // namespace X17

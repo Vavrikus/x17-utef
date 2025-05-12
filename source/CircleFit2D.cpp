@@ -35,20 +35,20 @@ namespace X17
 
         double x_mid = (node2_x - node1_x) / 2;
         double y_mid = (node2_y - node1_y) / 2;
-        double r_mid = sqrt(pow(x_mid,2) + pow(y_mid,2));
+        double r_mid = std::sqrt(pow(x_mid,2) + pow(y_mid,2));
 
-        double r_c = sqrt(pow(radius,2) - pow(r_mid,2));
+        double r_c = std::sqrt(pow(radius,2) - pow(r_mid,2));
         double x0 = node1_x + x_mid - y_mid * r_c / r_mid;
         double y0 = node1_y + y_mid + x_mid * r_c / r_mid;
 
-        double a1 = (node1_x - x0) / sqrt(pow(radius,2) - pow(node1_x - x0,2));
-        double a2 = (node2_x - x0) / sqrt(pow(radius,2) - pow(node2_x - x0,2));
+        double a1 = (node1_x - x0) / std::sqrt(pow(radius,2) - pow(node1_x - x0,2));
+        double a2 = (node2_x - x0) / std::sqrt(pow(radius,2) - pow(node2_x - x0,2));
         double b1 = node1_y - a1 * node1_x;
         double b2 = node2_y - a2 * node2_x;
 
         if (xx < node1_x) return a1 * xx + b1;
         if (xx > node2_x) return a2 * xx + b2;    
-        return y0 - sqrt(pow(radius,2) - pow(xx - x0,2));
+        return y0 - std::sqrt(pow(radius,2) - pow(xx - x0,2));
     }
 
     TF1* FitCircle2(TGraph* graph, double min, double max)
@@ -83,7 +83,7 @@ namespace X17
             
             Vector B      = magfield.GetField(x, 0, 8 - sp_fit->Eval(x));
             double betasq = 1 / (1 + pow((E0 / (c * r * B.x)), 2));
-            double Ekin   = E0 * (1 / sqrt(1 - betasq) - 1);
+            double Ekin   = E0 * (1 / std::sqrt(1 - betasq) - 1);
 
             if (x > 4)
                 energy->AddPoint(x, Ekin / 1e6);
@@ -110,9 +110,9 @@ namespace X17
         }
         
         double betasq = 1 / (1 + pow((E0 / (c * r * B.y)), 2));
-        double Ekin = E0 * (1 / sqrt(1 - betasq) - 1);
+        double Ekin = E0 * (1 / std::sqrt(1 - betasq) - 1);
 
         std::cout << "Kinetic energy: " << Ekin << " eV, By: " << B.y << " T, beta: ";
-        std::cout << sqrt(betasq) << "\n";
+        std::cout << std::sqrt(betasq) << "\n";
     }
 }

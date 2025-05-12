@@ -19,20 +19,6 @@ double find_min(T... args)
     return *std::min_element(values, values + sizeof...(args));
 }
 
-/// @brief Calculates the standard deviation of a vector of double values assuming a Gaussian distribution.
-/// @tparam T Numeric type that has operators += and /. Must be possible to cast it to zero.
-/// @param values The vector of double values.
-/// @param average The average of the vector of double values.
-/// @return The standard deviation of the vector of double values.
-template<typename T>
-T stdev(std::vector<T> values, T average)
-{
-    T sqdev_sum = static_cast<T>(0);
-    for (T d : values) sqdev_sum += (d - average).Square();
-
-    return (sqdev_sum / values.size()).SquareRoot();
-}
-
 /// @brief Returns random number between given minimal and maximal value.
 /// @param rand The TRandom3 instance that should be used to generate the number.
 /// @param min The minimal value.
@@ -65,3 +51,36 @@ void AddFilesToTChain(TChain* chain, std::string prefix, std::string suffix, int
 /// @param draw Should the result get drawn as a line?
 /// @return The FWHM approximation of the histogram.
 double GetFWHM(TH1F* histogram, bool draw);
+
+/// @brief Calculates the bias factor for the common normal distribution standard deviation estimator.
+/// @param N Number of samples.
+/// @return The bias factor.
+double StdevBiasFactor(int N);
+
+/// @brief Calculates the average value of a vector.
+/// @tparam T The type of the values in the vector.
+/// @param values The vector of values.
+/// @return The average value of the vector.
+template <typename T>
+T GetAverage(const std::vector<T>& values)
+{
+    T sum = 0;
+    for (T value : values) sum += value;
+    return sum/values.size();
+}
+
+/// @brief Calculates the linearly interpolated quantile of a vector.
+/// @tparam T The type of the values in the vector.
+/// @param values The vector of values.
+/// @param quantile The quantile to calculate.
+/// @param sorted Is the vector sorted?
+/// @return The linearly interpolated quantile of the vector.
+template <typename T>
+T GetQuantile(std::vector<T>& values, double quantile, bool sorted = false)
+{
+    if (!sorted) std::sort(values.begin(),values.end());
+    double index = values.size()*quantile;
+    int floor_index = std::floor(index);
+    double mantissa = index - floor_index;
+    return (1-mantissa)*values[floor_index] + mantissa*values[floor_index+1];
+}

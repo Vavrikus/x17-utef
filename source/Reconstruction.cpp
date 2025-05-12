@@ -224,7 +224,7 @@ namespace X17
     double Offset(MapPoint p, double x1, double y1, double t1)
     {
         constexpr double tfact = 0.00327; // Time is measured at different scale, it needs weight.
-        return sqrt(pow(x1 - p.point.x(), 2) + pow(y1 - p.point.y(), 2) + pow(tfact * (t1 - p.point.t), 2));
+        return std::sqrt(pow(x1 - p.point.x(), 2) + pow(y1 - p.point.y(), 2) + pow(tfact * (t1 - p.point.t), 2));
     }
 
     RecoPoint ReconstructOld(const Field<MapPoint>& map, double x1, double y1, double t1, double max_err)

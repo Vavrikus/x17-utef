@@ -15,6 +15,20 @@ namespace X17
         this->z += v.z;
     }
 
+    void Vector::operator-=(Vector v)
+    {
+        this->x -= v.x;
+        this->y -= v.y;
+        this->z -= v.z;
+    }
+
+    void Vector::operator*=(double d)
+    {
+        x *= d;
+        y *= d;
+        z *= d;
+    }
+
     void Vector::operator/=(double d)
     {
         x /= d;

@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
         if((job.SectorLineDist(x,y,false) > 0) || (job.SectorLineDist(x,y,true) < 0)) continue;
         i_el++;
 
-        // Check if this electron is supposed to be simulated by job with this id.
+        // Check if this electron is supposed to be simulated by this job.
         if (((i_el < job.min_el)||(i_el > job.max_el))) continue;
 
         std::cout << "Progress: " << i_el - job.min_el + 1 << "/" << job.max_el - job.min_el + 1;

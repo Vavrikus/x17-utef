@@ -27,7 +27,7 @@ namespace X17
 
         /// @brief Compute the magnitude of this vector.
         /// @return The magnitude.
-        double Magnitude() const { return sqrt(this->SqMagnitude()); }
+        double Magnitude() const { return std::sqrt(this->SqMagnitude()); }
 
         /// @brief Normalize this vector.
         void Normalize();
@@ -48,6 +48,14 @@ namespace X17
         /// @brief Add another vector to this vector.
         /// @param[in] v The vector to add.
         void operator+=(Vector v);
+
+        /// @brief Subtract another vector to this vector.
+        /// @param[in] v The vector to subtract.
+        void operator-=(Vector v);
+
+        /// @brief Multiply each component of this vector by a scalar.
+        /// @param d The scalar to multiply by.
+        void operator*=(double d);
 
         /// @brief Divide each component of the vector by a scalar.
         /// @param d The scalar to divide by.

@@ -26,7 +26,7 @@ namespace X17
         Vector start = origin / m2cm;
 
         double gamma    = 1 + kin_en / E0;
-        double velocity = c * sqrt(1 - pow(1.0 / gamma,2));
+        double velocity = c * std::sqrt(1 - pow(1.0 / gamma,2));
 
         return Matrix<8,1>({
             0,

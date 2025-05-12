@@ -6,7 +6,9 @@
 #include "TGraph.h"
 #include "TGraphErrors.h"
 #include "TH2F.h"
+#include "TPolyLine3D.h"
 #include "TStyle.h"
+#include "TVectorD.h"
 
 // X17 dependencies
 #include "Field.h"
@@ -309,5 +311,52 @@ public:
     void PostLoop() override
     {
         xz_t1->Write();
+    }
+};
+
+class GraphXYT : public MapTask
+{
+    TGraph2D* g_xyt;
+    TGraph2D* g_endpts;
+    std::vector<TPolyLine3D*> v_lines;
+
+public:
+    GraphXYT(X17::Field<X17::MapPoint>* map, TGraph2D* g_endpts) : MapTask(map), g_endpts(g_endpts) { }
+
+    void PreLoop() override
+    {
+        g_xyt = new TGraph2D();
+    }
+
+    void XYZ_Loop(double x, double y, double z, X17::MapPoint current) override
+    {
+        if (z >= -7.5) return;
+        bool stop = (current.t() != -1) && (z < -7);
+        bool no_z = false;
+
+        g_xyt->AddPoint(current.x(),current.y(),current.t());
+        TMatrixD err_vecs = no_z ? TMatrixD(3,3) : TMatrixD(4,4);
+        TVectorD errs = no_z ? TVectorD(3) : TVectorD(4);
+        current.Diagonal(errs,err_vecs,no_z);
+        
+        for (int i = 0; i < 3; i++)
+        {
+            X17::Vector err_vec = no_z ? X17::Vector(err_vecs(0,i),err_vecs(1,i),err_vecs(2,i)) : X17::Vector(err_vecs(0,i),err_vecs(1,i),err_vecs(3,i));
+            // err_vec.Normalize();
+            err_vec *= StdevBiasFactor(100)*std::sqrt(errs(i));
+            TPolyLine3D* line = new TPolyLine3D(2);
+            line->SetPoint(0,current.x()-err_vec.x,current.y()-err_vec.y,current.t()-err_vec.z);
+            line->SetPoint(1,current.x()+err_vec.x,current.y()+err_vec.y,current.t()+err_vec.z);
+            v_lines.push_back(line);
+        }
+    }
+
+    void PostLoop() override
+    {
+        TCanvas* c_g_xyt = new TCanvas("c_g_xyt","Map of ionization electron drift times");
+        g_xyt->Draw("AP");
+        g_endpts->Draw("P");
+        for(TPolyLine3D* line : v_lines) line->Draw();
+        c_g_xyt->Write();
     }
 };

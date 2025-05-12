@@ -27,20 +27,20 @@ namespace X17
         
 
         // Simulation of the initial track parameters.
-        double phi = RandomMinMax(rand,0,2*M_PI);            // The azimuth of the initial point on the circle target.
-        double r   = sqrt(RandomMinMax(rand,0,r_max*r_max)); // The distance of the initial point from the circle target.
-        double y0  = r*cos(phi);                             // The y-coordinate of the initial point.
-        double z0  = r*sin(phi);                             // The z-coordinate of the initial point.
+        double phi = RandomMinMax(rand,0,2*M_PI);                 // The azimuth of the initial point on the circle target.
+        double r   = std::sqrt(RandomMinMax(rand,0,r_max*r_max)); // The distance of the initial point from the circle target.
+        double y0  = r*cos(phi);                                  // The y-coordinate of the initial point.
+        double z0  = r*sin(phi);                                  // The z-coordinate of the initial point.
 
-        double y1 = RandomMinMax(rand,y1_min,y1_max);        // The y-coordinate of the window point (TPC entry).
-        double z1 = RandomMinMax(rand,z1_min,z1_max);        // The z-coordinate of the window point (TPC entry).
+        double y1 = RandomMinMax(rand,y1_min,y1_max);             // The y-coordinate of the window point (TPC entry).
+        double z1 = RandomMinMax(rand,z1_min,z1_max);             // The z-coordinate of the window point (TPC entry).
 
-        origin = {x1, y1, z1};                               // Setting the initial point (or origin).
-        orient = {x1 - x0, y1 - y0, z1 - z0};                // Setting the initial orientation.
+        origin = {x1, y1, z1};                                    // Setting the initial point (or origin).
+        orient = {x1 - x0, y1 - y0, z1 - z0};                     // Setting the initial orientation.
         orient.Normalize();
 
-        e_kin = RandomMinMax(rand,e_min,e_max);              // The kinetic energy of the particle.
+        e_kin = RandomMinMax(rand,e_min,e_max);                   // The kinetic energy of the particle.
 
-        electron = rand->Rndm() > 0.5;                       // Choosing either electron or positron.
+        electron = rand->Rndm() > 0.5;                            // Choosing either electron or positron.
     }
 } // namespace X17

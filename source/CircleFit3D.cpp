@@ -122,7 +122,7 @@ namespace X17
         double b_proj = m_normal*bfield;
 
         double betasq = 1 / (1 + pow((E0 / (c * (cm2m * m_radius) * b_proj)), 2));
-        double Ekin   = E0 * (1 / sqrt(1 - betasq) - 1);
+        double Ekin   = E0 * (1 / std::sqrt(1 - betasq) - 1);
 
         return Ekin;
     }
@@ -143,7 +143,7 @@ namespace X17
                 double b_proj = m_normal * bfield;
 
                 double betasq = 1 / (1 + pow((E0 / (c * (cm2m * m_radius) * b_proj)), 2));
-                double Ekin   = E0 * (1 / sqrt(1 - betasq) - 1);
+                double Ekin   = E0 * (1 / std::sqrt(1 - betasq) - 1);
                 graph->AddPoint(param,Ekin);
             }
             param += step;
@@ -178,7 +178,7 @@ namespace X17
     void CircleFit3D::_UpdateCurve()
     {
         m_cos_theta = m_orientation.z;
-        m_sin_theta = sqrt(1 - m_cos_theta * m_cos_theta);
+        m_sin_theta = std::sqrt(1 - m_cos_theta * m_cos_theta);
 
         if (m_sin_theta == 0) throw std::runtime_error("CircleFit3D: Orientation vector cannot be parallel to z.");
 

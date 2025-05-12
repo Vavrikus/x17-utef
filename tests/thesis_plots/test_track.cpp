@@ -1,7 +1,9 @@
+// C++ dependencies
 #include <iostream>
 #include <string>
 #include <vector>
 
+// ROOT dependencies
 #include "TApplication.h"
 #include "TAxis.h"
 #include "TCanvas.h"
@@ -19,7 +21,9 @@
 
 #include "../../build/X17_dict.cxx"
 
+// X17 dependencies
 #include "CircleFit3D.h"
+#include "Color.h"
 #include "Field.h"
 #include "RK4.h"
 #include "Track.h"
@@ -211,7 +215,7 @@ void PlotDriftYZ(X17::TrackMicro track, std::string filename, bool newcoords = f
 
 void PlotTrackRK(X17::TrackMicro track, X17::Field<X17::Vector>* magfield)
 {
-    double Ekin = sqrt(64E+12 + X17::constants::E0*X17::constants::E0) - X17::constants::E0;
+    double Ekin = std::sqrt(64E+12 + X17::constants::E0*X17::constants::E0) - X17::constants::E0;
         X17::RK4<8>* trackrk = X17::GetTrackRK(*magfield,true,1E-13,Ekin,X17::Vector(0,0,0),X17::Vector(1,0,0),true);
         trackrk->Integrate();
         std::vector<X17::RKPoint> rk_points;
@@ -232,7 +236,7 @@ void PlotTrackRK(X17::TrackMicro track, X17::Field<X17::Vector>* magfield)
 
             X17::Vector closest_point;
             double res2 = X17::GetTrackRKSqDistAndCP(trackrk,start_new,closest_point);
-            g_res->AddPoint(start_new.x,10000*sqrt(res2));
+            g_res->AddPoint(start_new.x,10000*std::sqrt(res2));
 
             X17::Vector exaggerated = closest_point + 1000 * (start_new-closest_point);
             g_micro->AddPoint(exaggerated.x,exaggerated.z);
@@ -362,7 +366,7 @@ void PlotRASD(X17::TrackMicro track, bool newcoords = false)
             }
             xz_original->AddPoint(orig.x,orig.z);
             xz_reconstructed->AddPoint(reco.x,reco.z);
-            g_res->AddPoint(reco.x,sqrt(reco.SqDist(orig)));//reco.z-orig.z);//reco.x-orig.x);//
+            g_res->AddPoint(reco.x,std::sqrt(reco.SqDist(orig)));//reco.z-orig.z);//reco.x-orig.x);//
         }
     }
     xz_original->SetMarkerStyle(7);

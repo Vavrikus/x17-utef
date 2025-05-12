@@ -180,7 +180,7 @@ class GraphResTask : public RecoTask
         gx_res->AddPoint(micro.x0(), reco.x() - micro.x0());
         gy_res->AddPoint(micro.x0(), reco.y() - micro.y0());
         gz_res->AddPoint(micro.x0(), reco.z() - micro.z0());
-        gr_res->AddPoint(micro.x0(), sqrt(pow((reco.x() - micro.x0()),2) + pow((reco.y() - micro.y0()),2) + pow((reco.z()-micro.z0()),2)));
+        gr_res->AddPoint(micro.x0(), std::sqrt(pow((reco.x() - micro.x0()),2) + pow((reco.y() - micro.y0()),2) + pow((reco.z()-micro.z0()),2)));
     }
 
     void PostElectronLoop() override
@@ -239,7 +239,7 @@ class HistResTask : public RecoTask
         hx_res->Fill(reco.x() - micro.x0());
         hy_res->Fill(reco.y() - micro.y0());
         hz_res->Fill(reco.z() - micro.z0());
-        hr_res->Fill(sqrt(pow((reco.x() - micro.x0()),2) + pow((reco.y() - micro.y0()),2) + pow((reco.z() - micro.z0()),2)));
+        hr_res->Fill(std::sqrt(pow((reco.x() - micro.x0()),2) + pow((reco.y() - micro.y0()),2) + pow((reco.z() - micro.z0()),2)));
     }
 
     void PostElectronLoop() override

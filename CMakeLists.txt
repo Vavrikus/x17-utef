@@ -1,27 +1,29 @@
 # ########################################################################################
-# Use the code in this section for standalone projects
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 project(X17)
 
-# Find the Garfield package
-if(NOT TARGET Garfield::Garfield)
-  find_package(Garfield REQUIRED HINTS "/home/vavrik/work/source/garfield/build/CMake")
-endif()
-# ########################################################################################
+# Set the C++ standard
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Set default build type to Release if not specified
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Release)
 endif()
 
 # Enable debug symbols and disable optimization for Debug build type
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 endif()
 
 # Enable optimization for Release build type
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+endif()
+
+# ---Garfield-----------------------------------------------------------------------------
+if(NOT TARGET Garfield::Garfield)
+  find_package(Garfield REQUIRED HINTS "/home/vavrik/work/source/garfield/build/CMake")
 endif()
 
 # ---Root---------------------------------------------------------------------------------

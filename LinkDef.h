@@ -5,6 +5,7 @@
 namespace X17
 {
     template class X17::Field<X17::MapPoint>;
+    template class X17::Matrix<4,4>;
 
     #ifdef __CLING__
     #pragma link C++ nestedclasses;
@@ -20,5 +21,6 @@ namespace X17
     #pragma link C++ class X17::TrackRK+;
     #pragma link C++ class X17::TrackMicro+;
     #pragma link C++ class X17::TrackInfo+;
+    #pragma link C++ class X17::Matrix<4,4>+;
     #endif
 } // namespace X17

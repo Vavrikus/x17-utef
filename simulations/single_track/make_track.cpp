@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     int nc;
     while (track.GetCluster(xc, yc, zc, tc, nc, ec, extra)) 
     {
-        std::cout << "Distance to origin: " << sqrt(xc*xc+yc*yc+zc*zc) << "  time " << tc << "  number " << k << "\n";
+        std::cout << "Distance to origin: " << std::sqrt(xc*xc+yc*yc+zc*zc) << "  time " << tc << "  number " << k << "\n";
         for (int j = 0; j < nc; ++j) 
         {
             double xe, ye, ze, te, ee, dxe, dye, dze;

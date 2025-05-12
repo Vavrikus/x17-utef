@@ -15,6 +15,14 @@ namespace X17
         /// @brief Default constructor.
         Matrix() = default;
 
+        /// @brief Constructor that initializes the matrix to a diagonal matrix with all elements equal to d.
+        /// @param d The value to fill the diagonal with.
+        Matrix(double d)
+        {
+            for (double& element : elements) element = 0;
+            for (int i = 0; i < std::min(M, N); i++) this->at(i, i) = d;
+        }
+
         /// @brief Constructor that initializes the matrix from an array of size M*N.
         /// @param arr The array of size M*N containing the matrix elements in row-major order.
         Matrix(const double (&arr)[M * N])
@@ -35,6 +43,13 @@ namespace X17
         {
             for (double& element : elements) element *= d;
         }
+        
+        /// Divide each element in the matrix by a scalar.
+        /// @param d The scalar to divide the elements by.
+        void operator/=(double d)
+        {
+            for (double& element : elements) element /= d;
+        }
     
         /// Access the matrix element at the specified row and column.
         /// @param row The row of the element to access, starting from 0.
@@ -43,7 +58,7 @@ namespace X17
         /// If the specified row or column is out of bounds, returns a reference to the first element and prints an error message.
         /// @note If DEBUG is defined, this method checks if the specified row and column are within bounds and prints an error message if not.
         /// If DEBUG is not defined, no bounds checking is performed for efficiency.
-        inline const double& at(int row, int column) const;
+        const double& at(int row, int column) const;
 
         /// Access the matrix element at the specified row and column.
         /// @param row The row of the element to access, starting from 0.
@@ -52,7 +67,7 @@ namespace X17
         /// If the specified row or column is out of bounds, returns a reference to the first element and prints an error message.
         /// @note If DEBUG is defined, this method checks if the specified row and column are within bounds and prints an error message if not.
         /// If DEBUG is not defined, no bounds checking is performed for efficiency.
-        inline double& at(int row, int column);
+        double& at(int row, int column);
 
         /// @brief Returns a vector representing the specified column of the matrix.
         /// @param c The index of the column to retrieve.
@@ -79,6 +94,15 @@ namespace X17
     /// @return The sum of the two matrices.
     template <int M, int N>
     Matrix<M,N> operator+(const Matrix<M,N>& A, const Matrix<M,N>& B);
+
+    /// @brief Subtracts two matrices element-wise and returns the result.
+    /// @tparam M the number of rows in the matrices.
+    /// @tparam N the number of columns in the matrices.
+    /// @param A The first matrix.
+    /// @param B The second matrix.
+    /// @return The difference of the two matrices.
+    template <int M, int N>
+    Matrix<M,N> operator-(const Matrix<M,N>& A, const Matrix<M,N>& B);
 
     /// @brief Multiplies a scalar with a matrix element-wise.
     /// @tparam M The number of rows in the matrix.

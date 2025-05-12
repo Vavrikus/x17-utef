@@ -3,7 +3,7 @@
 namespace X17
 {
     // Tangent of 30 degrees for the sector condition.
-    const double tan30 = sqrt(3)/3;
+    const double tan30 = std::sqrt(3)/3;
 
     // Number of steps to offset on the negative x-axis for the sector condition.
     const double x_offset = 3;
