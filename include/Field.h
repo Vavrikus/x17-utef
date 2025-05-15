@@ -134,6 +134,15 @@ namespace X17
             return &this->at(xi,yi,zi);
         }
 
+        /// @brief Returns a pointer to the field value at the specified coordinates.
+        /// @param position Vector with position of the point to retrieve [cm].
+        /// @return Pointer to the field value at the specified coordinates.
+        /// @throws std::out_of_range if the specified coordinates are out of bounds.
+        T* GetPoint(const Vector& position)
+        {
+            return this->GetPoint(position.x, position.y, position.z);
+        }
+
         /// @brief Sets the value of the field at the specified point.
         /// @param x The x coordinate of the point [cm].
         /// @param y The y coordinate of the point [cm].

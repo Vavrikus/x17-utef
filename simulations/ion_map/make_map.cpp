@@ -45,16 +45,17 @@ TChain* LoadData(int max_id, std::string folder = "../../../data/ion_map/sample_
     return map_data;
 }
 
-TGraph* GetQQconfidenceGraph(double sigma, std::vector<std::vector<double>> sq_mahal_sets, TGraph* g_rand)
+TGraph* GetQQconfidenceGraph(double sigma, std::vector<std::vector<double>> sq_mahal_sets, TGraph* g_rand, bool no_z = true)
 {
     int nsets = sq_mahal_sets.size();
     int rand_size = sq_mahal_sets.back().size();
+    int degrees_of_freedom = no_z ? 3 : 4;
 
     TGraph* g_rand_ci = new TGraph(2*rand_size);
     double confidence = TMath::Erf(sigma/std::sqrt(2));
     for(int i = 0; i < rand_size; i++)
     {
-        double chi2_quantile = TMath::ChisquareQuantile((i+1.0)/(rand_size+1),4);
+        double chi2_quantile = TMath::ChisquareQuantile((i+1.0)/(rand_size+1.0),degrees_of_freedom);
 
         std::vector<double> sq_mahal;
         sq_mahal.reserve(nsets);
@@ -63,8 +64,8 @@ TGraph* GetQQconfidenceGraph(double sigma, std::vector<std::vector<double>> sq_m
             sq_mahal.push_back(sq_mahal_sets[j][i]);
         }
         g_rand->AddPoint(GetQuantile(sq_mahal,0.95),chi2_quantile);
-        g_rand_ci->SetPoint(rand_size-i-1,chi2_quantile,GetQuantile(sq_mahal,confidence,true));
-        g_rand_ci->SetPoint(rand_size+i,chi2_quantile,GetQuantile(sq_mahal,1-confidence,true));
+        g_rand_ci->SetPoint(rand_size-i-1,chi2_quantile,GetQuantile(sq_mahal,0.5+confidence/2,true));
+        g_rand_ci->SetPoint(rand_size+i,chi2_quantile,GetQuantile(sq_mahal,0.5-confidence/2,true));
     }
 
     return g_rand_ci;
@@ -104,8 +105,16 @@ int make_map()
     TRandom3* rand = new TRandom3(0);
     TGraph* g_rand = new TGraph();
     std::vector<std::vector<double>> sq_mahal_sets;
+    std::vector<double> mardiaA;
+    std::vector<double> mardiaB;
+    TH1F* h_mardia = new TH1F("h_mardia","Mardia's multivariate normality test",19,-7.5,7.5);
+    TH1F* h_mardia_rand = new TH1F("h_mardia_rand","Mardia's multivariate normality test",150,-7.5,7.5);
+    TH1F* h_mardia2 = new TH1F("h_mardia2","Mardia's multivariate normality test",38,0,30);
+    TH1F* h_mardia_rand2 = new TH1F("h_mardia_rand2","Mardia's multivariate normality test",300,0,30);
+
     int nsets = 50000;
     sq_mahal_sets.reserve(nsets);
+    bool filled_mardia = false;
 
     // Calculate the averages and standard deviations.
     for (int i = 0; i < map_data_in->GetEntries(); i++)
@@ -138,40 +147,58 @@ int make_map()
 
             if (i != 0) 
             {
-                map.SetPoint(v_prev,X17::MapPoint(p_avg,CovarianceMatrix(p_vec,p_avg)));
+                map.SetPoint(v_prev,X17::MapPoint(p_vec.size(),p_avg,CovarianceMatrix(p_vec,p_avg)));
                 // std::cout << v_prev.x << "\t" << v_prev.y << "\t" << v_prev.z << "\n";
                 g_sim->AddPoint(v_prev.x,v_prev.y,v_prev.z);
                 g_reco->AddPoint(p_avg.x(),p_avg.y(),p_avg.t);
                 
-                if (v_prev == X17::Vector(8,0,-8))//14.5,7,-8))
+                if (!filled_mardia && v_prev == X17::Vector(15,9,-8))//8,3,-8))//14.5,7,-8))//
                 {
-                    FillQQplot(g_qq,p_vec,p_avg);
+                    FillQQplot(g_qq,p_vec);
                     
-                    X17::MapPoint current = map.GetField(v_prev);
-                    TMatrixD eigen_vecs(4,4);
-                    TVectorD eigen_vals(4);
-                    current.Diagonal(eigen_vals,eigen_vecs,false);
+                    X17::MapPoint current = *map.GetPoint(v_prev);
+                    current.Diagonalize(true);
                     
                     for (int n = 0; n < nsets; n++)
                     {
                         std::vector<EndPoint> p_rand;
-                        p_rand.assign(p_vec.size(),p_avg);
-
-                        for (int i = 0; i < 3; i++)
+                        p_rand.reserve(p_vec.size());
+                        
+                        for (int j = 0; j < p_vec.size(); j++)
                         {
-                            X17::EndPoint err_vec(eigen_vecs(0,i),eigen_vecs(1,i),eigen_vecs(2,i),eigen_vecs(3,i));
-                            double err = StdevBiasFactor(100)*std::sqrt(eigen_vals(i));
-
-                            for (EndPoint& point : p_rand)
-                            {
-                                point += rand->Gaus(0,err) * err_vec;
-                            }                        
-                        }
-
+                            X17::EndPoint rand_point = current.GetRandomPoint(rand);
+                            // g_endpts->AddPoint(rand_point.x(),rand_point.y(),rand_point.t);
+                            p_rand.push_back(rand_point);
+                        }                     
+                        
                         // FillQQplot(g_rand,p_rand,p_avg);
-                        sq_mahal_sets.push_back(SqMahalanobis(p_rand,p_avg,CovarianceMatrix(p_rand,p_avg)));
+                        sq_mahal_sets.push_back(SqMahalanobis(p_rand));//CovarianceMatrix(p_rand,p_avg)));//
                         std::sort(sq_mahal_sets.back().begin(),sq_mahal_sets.back().end());
+
+                        double A,B;
+                        MardiaTest(p_rand,A,B);
+                        h_mardia_rand->Fill(B);
+                        h_mardia_rand2->Fill(A);
+                        mardiaA.push_back(A);
+                        mardiaB.push_back(B);
                     }
+                    
+                    filled_mardia = true;
+                    i = 0;
+                    continue;
+                }
+                
+                if (v_prev.z == -8 && filled_mardia)
+                {
+                    std::cout << "X: " << v_prev.x << "\tY: " << v_prev.y << "\n"; 
+                    X17::MapPoint current = *map.GetPoint(v_prev);
+                    current.Diagonalize(true);
+                    double A,B;
+                    MardiaTest(p_vec,A,B);
+                    h_mardia->Fill(B);
+                    h_mardia2->Fill(A);
+
+                    std::cout << "A: " << A << "\tA p-value: " << GetPvalue(mardiaA,A) << "\tB: " << B << "\tB p-value: " << GetPvalue(mardiaB,B) << "\n";
                 }
                 
                 p_vec.clear();
@@ -211,7 +238,7 @@ int make_map()
     TGraph* g_rand_ci = GetQQconfidenceGraph(3.0,sq_mahal_sets,g_rand);
     g_rand_ci->SetFillColor(X17::Color::RGB(255,0,0,15));
     g_rand_ci->SetFillStyle(1001);
-    g_rand_ci->GetXaxis()->SetTitle("#chi^{2}_{4} quantile");
+    g_rand_ci->GetXaxis()->SetTitle("#chi^{2}_{3} quantile");
     g_rand_ci->GetYaxis()->SetTitle("Squared Mahalanobis distance");
     g_rand_ci->SetTitle("");
     g_rand_ci->Draw("AF");
@@ -234,9 +261,30 @@ int make_map()
 
     g_rand_ci->SetLineColor(kRed-4);
     g_rand_ci->Draw("L same");
-    // c_qq->GetListOfPrimitives()->Add();
     c_qq->Write();
-    c_qq->SaveAs("qq.png");
+    // c_qq->SaveAs("qq.png");
+
+    TCanvas* c_mardia = new TCanvas("c_mardia","Mardia test");
+    h_mardia->Scale(1./(h_mardia->Integral("width")));
+    h_mardia->Draw("hist");
+    h_mardia_rand->Scale(1./h_mardia_rand->Integral("width"));    
+    h_mardia_rand->Draw("hist same");
+    TF1* f_gaus = new TF1("gaus", "1/sqrt(2*TMath::Pi()) * exp(-0.5 * x*x)", -5, 5);
+    f_gaus->SetLineColor(kBlue);
+    f_gaus->Draw("same");
+    c_mardia->Write();
+
+    TCanvas* c_mardia2 = new TCanvas("c_mardia2","Mardia test 2");
+    h_mardia2->Scale(1./h_mardia2->Integral("width"));
+    h_mardia2->Draw("hist same");
+    h_mardia_rand2->Scale(1./h_mardia_rand2->Integral("width"));
+    h_mardia_rand2->Draw("hist same");
+    int k = 3*4*5/6; // Degrees of freedom
+    TF1 *chi2_pdf = new TF1("chi2_pdf", "[0] * TMath::Power(x, [1]/2 - 1) * TMath::Exp(-x/2) / (TMath::Gamma([1]/2) * TMath::Power(2, [1]/2))", 0, 30);
+    chi2_pdf->SetParameters(1.0, k); // [0] = normalization, [1] = k (dof)
+    chi2_pdf->SetLineColor(kRed);
+    chi2_pdf->Draw("same");
+    c_mardia2->Write();
 
     // Plotting.
     bool MakePlots = true;
@@ -247,9 +295,9 @@ int make_map()
 
         // Plotting limits for some of the plots.
         double ymin = -10; // Minimal plotted y-coordinate.
-        double ymax = 10;  // Maximal plotted y-coordinate.
-        double xmin = 5;   // Minimal plotted x-coordinate.
-        double xmax = 16;  // Maximal plotted x-coordinate.
+        double ymax =  10; // Maximal plotted y-coordinate.
+        double xmin =   5; // Minimal plotted x-coordinate.
+        double xmax =  16; // Maximal plotted x-coordinate.
         
         std::vector<MapTask*> plot_tasks; // The vector containing all plotting tasks to be plotted.
         // plot_tasks.push_back(new Hist_YX_DX(&map));

@@ -332,18 +332,15 @@ public:
     {
         if (z >= -7.5) return;
         bool stop = (current.t() != -1) && (z < -7);
-        bool no_z = false;
+        bool no_z = true;
 
         g_xyt->AddPoint(current.x(),current.y(),current.t());
-        TMatrixD err_vecs = no_z ? TMatrixD(3,3) : TMatrixD(4,4);
-        TVectorD errs = no_z ? TVectorD(3) : TVectorD(4);
-        current.Diagonal(errs,err_vecs,no_z);
+        current.Diagonalize(no_z);
         
         for (int i = 0; i < 3; i++)
         {
-            X17::Vector err_vec = no_z ? X17::Vector(err_vecs(0,i),err_vecs(1,i),err_vecs(2,i)) : X17::Vector(err_vecs(0,i),err_vecs(1,i),err_vecs(3,i));
-            // err_vec.Normalize();
-            err_vec *= StdevBiasFactor(100)*std::sqrt(errs(i));
+            X17::Vector err_vec = X17::Vector(current.eigen_vecs(0,i),current.eigen_vecs(1,i),current.eigen_vecs(3,i));
+            err_vec *= StdevBiasFactor(current.n)*std::sqrt(current.eigen_vals(i));
             TPolyLine3D* line = new TPolyLine3D(2);
             line->SetPoint(0,current.x()-err_vec.x,current.y()-err_vec.y,current.t()-err_vec.z);
             line->SetPoint(1,current.x()+err_vec.x,current.y()+err_vec.y,current.t()+err_vec.z);

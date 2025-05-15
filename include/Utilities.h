@@ -52,7 +52,7 @@ void AddFilesToTChain(TChain* chain, std::string prefix, std::string suffix, int
 /// @return The FWHM approximation of the histogram.
 double GetFWHM(TH1F* histogram, bool draw);
 
-/// @brief Calculates the bias factor for the common normal distribution standard deviation estimator.
+/// @brief Calculates the bias factor (1/c_4(N)) for the common normal distribution standard deviation estimator.
 /// @param N Number of samples.
 /// @return The bias factor.
 double StdevBiasFactor(int N);
@@ -70,13 +70,11 @@ T GetAverage(const std::vector<T>& values)
 }
 
 /// @brief Calculates the linearly interpolated quantile of a vector.
-/// @tparam T The type of the values in the vector.
 /// @param values The vector of values.
 /// @param quantile The quantile to calculate.
 /// @param sorted Is the vector sorted?
 /// @return The linearly interpolated quantile of the vector.
-template <typename T>
-T GetQuantile(std::vector<T>& values, double quantile, bool sorted = false)
+inline double GetQuantile(std::vector<double>& values, double quantile, bool sorted = false)
 {
     if (!sorted) std::sort(values.begin(),values.end());
     double index = values.size()*quantile;
@@ -84,3 +82,10 @@ T GetQuantile(std::vector<T>& values, double quantile, bool sorted = false)
     double mantissa = index - floor_index;
     return (1-mantissa)*values[floor_index] + mantissa*values[floor_index+1];
 }
+
+/// @brief Calculates the symmetric p-value of a value in a vector.
+/// @param values The vector of values.
+/// @param value The value to calculate the p-value for.
+/// @param sorted Is the vector sorted?
+/// @return The p-value of the value in the vector.
+double GetPvalue(std::vector<double>& values, double value, bool sorted = false);

@@ -89,5 +89,27 @@ double GetFWHM(TH1F* h, bool draw)
 
 double StdevBiasFactor(int N)
 {
-    return TMath::Sqrt(2.0/(N-1))*TMath::Gamma(0.5*N)/TMath::Gamma(0.5*(N-1));
+    return 1.0/(TMath::Sqrt(2.0/(N-1))*TMath::Gamma(0.5*N)/TMath::Gamma(0.5*(N-1)));
+}
+
+double GetPvalue(std::vector<double>& values, double value, bool sorted)
+{
+    if (!sorted) std::sort(values.begin(), values.end());
+    
+    // Handle edge cases
+    if (value < values.front()) return 1.0;  // Extremely low (p ≈ 1)
+    if (value > values.back()) return 1.0;   // Extremely high (p ≈ 1)
+
+    // Fraction of values ≤ input (left tail)
+    double left_p = static_cast<double>(
+        std::lower_bound(values.begin(), values.end(), value) - values.begin()
+    ) / values.size();
+
+    // Fraction of values ≥ input (right tail)
+    double right_p = static_cast<double>(
+        values.end() - std::upper_bound(values.begin(), values.end(), value)
+    ) / values.size();
+
+    // Two-tailed p-value: min(left, right) × 2
+    return 2.0 * std::min(left_p, right_p);
 }

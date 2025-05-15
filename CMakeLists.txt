@@ -61,6 +61,7 @@ set(SUBDIRECTORIES
     simulations/micro_tracks
     tests/magnetic_field_plot
     tests/thesis_plots
+    tests/mardia_test
 )
 
 # Iterate over each subdirectory
