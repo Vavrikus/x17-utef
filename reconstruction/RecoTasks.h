@@ -310,7 +310,7 @@ class RecoPadsTask : public RecoTask
                     double xpad,ypad;
                     DefaultLayout::GetDefaultLayout().GetPadCenter(i+1,xpad,ypad);
 
-                    RecoPoint reco = Reconstruct(*(m_loop->map),EndPoint(xpad,ypad,zmax,time));
+                    RecoPoint reco = Reconstruct(m_loop->map,EndPoint(xpad,ypad,zmax,time));
                     if (m_loop->make_track_plots) g_xyz_reco->AddPoint(reco.x(),reco.y(),reco.z());
                 }
             }        
@@ -434,7 +434,7 @@ class CircleAndRKFitTask : public RecoTask
                     double xpad,ypad;
                     DefaultLayout::GetDefaultLayout().GetPadCenter(i+1,xpad,ypad);
 
-                    RecoPoint reco = Reconstruct(*(m_loop->map),EndPoint(xpad,ypad,zmax,time));
+                    RecoPoint reco = Reconstruct(m_loop->map,EndPoint(xpad,ypad,zmax,time));
                     cfit3d_reco->AddPoint(reco.x(),reco.y(),reco.z(),reco_task->padhits[i][j]);
                     reco_data.emplace_back(reco.x(),reco.y(),reco.z(),reco_task->padhits[i][j]);
                 }
@@ -795,7 +795,7 @@ class FitAndSaveTask : public RecoTask
                     double xpad,ypad;
                     DefaultLayout::GetDefaultLayout().GetPadCenter(i+1,xpad,ypad);
 
-                    RecoPoint reco = Reconstruct(*(m_loop->map),EndPoint(xpad,ypad,zmax,time));
+                    RecoPoint reco = Reconstruct(m_loop->map,EndPoint(xpad,ypad,zmax,time));
                     cfit3d_reco->AddPoint(reco.x(),reco.y(),reco.z(),reco_task->padhits[i][j]);
                     reco_data.emplace_back(reco.x(),reco.y(),reco.z(),reco_task->padhits[i][j]);
                 }

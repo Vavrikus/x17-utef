@@ -34,7 +34,7 @@ namespace X17
             if (IsInTPC(curr_micro.x1(),curr_micro.y1(),0) && IsInTPC(curr_micro.GetInitPos(),-0.01))
             {
                 n_electrons++;
-                curr_reco = Reconstruct(*map,curr_micro);
+                curr_reco = Reconstruct(map,curr_micro);
                 for (RecoTask* t : m_tasks) t->ElectronLoop();
             }
         }
@@ -72,7 +72,7 @@ namespace X17
                 if (IsInTPC(curr_micro.x1(), curr_micro.y1(), 0) && IsInTPC(curr_micro.GetInitPos(), -0.01) && curr_micro.z1() > 7.5)
                 {
                     n_electrons++;
-                    curr_reco = Reconstruct(*map,curr_micro);
+                    curr_reco = Reconstruct(map,curr_micro);
                     for (RecoTask* t : m_tasks) t->ElectronLoop();
                 }
             }

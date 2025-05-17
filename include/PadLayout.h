@@ -60,7 +60,7 @@ namespace X17
 
         /// @brief Draw the pads using the coordinates of the electrons ending up in the corners.
         /// @param time Time to propagate backwards [ns].
-        virtual void DrawPadsDistortion(double time, TCanvas* c = nullptr, Field<MapPoint>* map = nullptr) const = 0;
+        virtual void DrawPadsDistortion(double time, TCanvas* c = nullptr, const Field<MapPoint>* map = nullptr) const = 0;
     };
 
     /// @brief A function for the n-th triangle number calculation.
@@ -130,7 +130,7 @@ namespace X17
 
         /// @brief Draw the pads using the coordinates of the electrons ending up in the corners.
         /// @param time Time to propagate backwards [ns].
-        void DrawPadsDistortion(double time, TCanvas* c = nullptr, Field<MapPoint>* map = nullptr) const override;
+        void DrawPadsDistortion(double time, TCanvas* c = nullptr, const Field<MapPoint>* map = nullptr) const override;
         
     private:
         /// @brief Default constructor.

@@ -35,9 +35,9 @@ public:
     virtual void PostLoop() { }
 
 protected:
-    X17::Field<X17::MapPoint>* map; // A pointer to the ionization electron map.
+    const X17::Field<X17::MapPoint>& map; // A pointer to the ionization electron map.
 
     /// @brief The constructor of MapTask.
     /// @param map A pointer to the ionization electron drift map.
-    MapTask(X17::Field<X17::MapPoint>* map) : map(map) { }
+    MapTask(const X17::Field<X17::MapPoint>& map) : map(map) { }
 };

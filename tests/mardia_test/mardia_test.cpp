@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 {
     TApplication app("app", &argc, argv);
 
-    int n_sets = 50000;
+    int n_sets = 500000;
     int n_points = 100;
     TH1F* hist = new TH1F("hist","hist",150,-7.5,7.5);
     TH1F* hist2 = new TH1F("hist2","hist2",300,0,30);
@@ -21,6 +21,8 @@ int main(int argc, char* argv[])
 
     for (int i = 0; i < n_sets; i++)
     {
+        ReportProgress(i+1,n_sets);
+
         std::vector<X17::EndPoint> points;
         points.reserve(n_points);
 
@@ -60,6 +62,9 @@ int main(int argc, char* argv[])
     chi2_pdf->SetParameters(1.0, k); // [0] = normalization, [1] = k (dof)
     chi2_pdf->SetLineColor(kRed);
     chi2_pdf->Draw("same");
+
+    std::cout << "Mean: " << hist2->GetMean() << "\n";
+    std::cout << "Sigma: " << hist2->GetRMS() << "\n";
 
     app.Run();
     return 0;

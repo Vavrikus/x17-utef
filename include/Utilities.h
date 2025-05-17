@@ -1,6 +1,7 @@
 #pragma once
 
 // C++ dependencies
+#include <iomanip>
 #include <string>
 #include <vector>
 
@@ -74,14 +75,7 @@ T GetAverage(const std::vector<T>& values)
 /// @param quantile The quantile to calculate.
 /// @param sorted Is the vector sorted?
 /// @return The linearly interpolated quantile of the vector.
-inline double GetQuantile(std::vector<double>& values, double quantile, bool sorted = false)
-{
-    if (!sorted) std::sort(values.begin(),values.end());
-    double index = values.size()*quantile;
-    int floor_index = std::floor(index);
-    double mantissa = index - floor_index;
-    return (1-mantissa)*values[floor_index] + mantissa*values[floor_index+1];
-}
+double GetQuantile(std::vector<double>& values, double quantile, bool sorted = false);
 
 /// @brief Calculates the symmetric p-value of a value in a vector.
 /// @param values The vector of values.
@@ -89,3 +83,9 @@ inline double GetQuantile(std::vector<double>& values, double quantile, bool sor
 /// @param sorted Is the vector sorted?
 /// @return The p-value of the value in the vector.
 double GetPvalue(std::vector<double>& values, double value, bool sorted = false);
+
+/// @brief Prints a progress bar to the console.
+/// @param current The current value of the progress.
+/// @param total The total value of the progress.
+/// @param width The width of the progress bar.
+void ReportProgress(int current, int total, int width = 50);

@@ -92,13 +92,22 @@ double StdevBiasFactor(int N)
     return 1.0/(TMath::Sqrt(2.0/(N-1))*TMath::Gamma(0.5*N)/TMath::Gamma(0.5*(N-1)));
 }
 
+double GetQuantile(std::vector<double>& values, double quantile, bool sorted)
+{
+    if (!sorted) std::sort(values.begin(),values.end());
+    double index = values.size()*quantile;
+    int floor_index = std::floor(index);
+    double mantissa = index - floor_index;
+    return (1-mantissa)*values[floor_index] + mantissa*values[floor_index+1];
+}
+
 double GetPvalue(std::vector<double>& values, double value, bool sorted)
 {
     if (!sorted) std::sort(values.begin(), values.end());
     
     // Handle edge cases
-    if (value < values.front()) return 1.0;  // Extremely low (p ≈ 1)
-    if (value > values.back()) return 1.0;   // Extremely high (p ≈ 1)
+    if (value < values.front()) return 0.0;  // Extremely low  (p ≈ 0)
+    if (value > values.back())  return 0.0;  // Extremely high (p ≈ 0)
 
     // Fraction of values ≤ input (left tail)
     double left_p = static_cast<double>(
@@ -112,4 +121,19 @@ double GetPvalue(std::vector<double>& values, double value, bool sorted)
 
     // Two-tailed p-value: min(left, right) × 2
     return 2.0 * std::min(left_p, right_p);
+}
+
+void ReportProgress(int current, int total, int width)
+{
+    float progress = static_cast<float>(current) / total;
+    int filled = static_cast<int>(progress * width);
+
+    std::cout << "\r[";  // Carriage return to overwrite the line
+    for (int i = 0; i < width; ++i)
+        std::cout << (i < filled ? '=' : ' ');
+        
+    std::cout << "] " << std::setw(3) << static_cast<int>(progress * 100) << "%";
+    std::cout.flush();
+
+    if (current == total) std::cout << std::endl;
 }

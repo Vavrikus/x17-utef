@@ -49,7 +49,7 @@ int reco_track()
     std::cout << "Processing " << micro_tracks->GetEntries() << " tracks.\n";
 
     // TrackLoop for multiple microscopic tracks.
-    TrackLoop* multi_loop = new TrackLoop(map,magfield);
+    TrackLoop* multi_loop = new TrackLoop(*map,magfield);
     multi_loop->make_track_plots = !allTracks;
 
     if (!allTracks)

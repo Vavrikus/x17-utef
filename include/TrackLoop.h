@@ -39,7 +39,7 @@ namespace X17
     class TrackLoop
     {
     public:
-        Field<MapPoint>* map;            // The ionization electron drift map.
+        const Field<MapPoint>& map;            // The ionization electron drift map.
         Field<Vector>* magfield;         // The magnetic field simulated data.
 
         TTree* curr_micro_tree;          // Current tree with microscopic simulation result.
@@ -66,7 +66,7 @@ namespace X17
         /// @brief Constructor of TrackLoop.
         /// @param map Pointer to the ionization electron drift map.
         /// @param magfield Pointer to magnetic field data.
-        TrackLoop(Field<MapPoint>* map, Field<Vector>* magfield) : map(map), magfield(magfield) { }
+        TrackLoop(const Field<MapPoint>& map, Field<Vector>* magfield) : map(map), magfield(magfield) { }
 
         /// @brief Adds a task to TrackLoop task list.
         /// @param task The task to be added.

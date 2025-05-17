@@ -97,7 +97,7 @@ namespace X17
             }
         }
         
-        if(cov.IsSymmetric() == false) throw std::runtime_error("Covariance matrix is not symmetric.");
+        if(cov.TMatrixDBase::IsSymmetric() == false) throw std::runtime_error("Covariance matrix is not symmetric.");
         TMatrixDSymEigen eig(cov);
         eigen_vals = eig.GetEigenValues();
         eigen_vecs = eig.GetEigenVectors();

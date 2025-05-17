@@ -189,7 +189,7 @@ namespace X17
         for(auto l : pad_lines)   l->Draw("AL");
     }
 
-    void DefaultLayout::DrawPadsDistortion(double time, TCanvas* c, Field<MapPoint>* map) const
+    void DefaultLayout::DrawPadsDistortion(double time, TCanvas* c, const Field<MapPoint>* map) const
     {
         using namespace constants;
 

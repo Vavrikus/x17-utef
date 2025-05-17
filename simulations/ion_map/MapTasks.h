@@ -25,13 +25,13 @@ class Hist_YX_DX : public MapTask
     std::vector<TH2F*> v_yx_dx;
 
 public:
-    Hist_YX_DX(X17::Field<X17::MapPoint>* map) : MapTask(map) { }
+    Hist_YX_DX(const X17::Field<X17::MapPoint>& map) : MapTask(map) { }
 
     void Z_Loop_Start(double z) override
     {
         std::string h_dx_name = "h_yx_dx_" + std::to_string(z);
         std::string h_dx_title = "XY plane dx (z = " + std::to_string(z) + ");x [cm];y [cm]";
-        v_yx_dx.push_back(new TH2F(h_dx_name.c_str(),h_dx_title.c_str(),map->GetYCells(),map->GetYMin(),map->GetYMax(),map->GetXCells(),map->GetXMin(),map->GetXMax()));
+        v_yx_dx.push_back(new TH2F(h_dx_name.c_str(),h_dx_title.c_str(),map.GetYCells(),map.GetYMin(),map.GetYMax(),map.GetXCells(),map.GetXMin(),map.GetXMax()));
     }
 
     void XYZ_Loop(double x, double y, double z, X17::MapPoint current) override
@@ -50,13 +50,13 @@ class Hist_YX_DY : public MapTask
     std::vector<TH2F*> v_yx_dy;
 
 public:
-    Hist_YX_DY(X17::Field<X17::MapPoint>* map) : MapTask(map) { }
+    Hist_YX_DY(const X17::Field<X17::MapPoint>& map) : MapTask(map) { }
 
     void Z_Loop_Start(double z) override
     {
         std::string h_dy_name = "h_yx_dy_" + std::to_string(z);
         std::string h_dy_title = "XY plane dy (z = " + std::to_string(z) + ");x [cm];y [cm]";
-        v_yx_dy.push_back(new TH2F(h_dy_name.c_str(),h_dy_title.c_str(),map->GetYCells(),map->GetYMin(),map->GetYMax(),map->GetXCells(),map->GetXMin(),map->GetXMax()));
+        v_yx_dy.push_back(new TH2F(h_dy_name.c_str(),h_dy_title.c_str(),map.GetYCells(),map.GetYMin(),map.GetYMax(),map.GetXCells(),map.GetXMin(),map.GetXMax()));
     }
 
     void XYZ_Loop(double x, double y, double z, X17::MapPoint current) override
@@ -77,13 +77,13 @@ class Hist_YX_T1 : public MapTask
     std::vector<TH2F*> v_yx_t1;
 
 public:
-    Hist_YX_T1(X17::Field<X17::MapPoint>* map, double xmin, double xmax, double ymin, double ymax) : MapTask(map),xmin(xmin),xmax(xmax),ymin(ymin),ymax(ymax) { }
+    Hist_YX_T1(const X17::Field<X17::MapPoint>& map, double xmin, double xmax, double ymin, double ymax) : MapTask(map),xmin(xmin),xmax(xmax),ymin(ymin),ymax(ymax) { }
 
     void Z_Loop_Start(double z) override
     {
         std::string h_t1_name = "h_yx_t1_" + std::to_string(z);
         std::string h_t1_title = "XY plane t1 (z = " + std::to_string(z) + ");x [cm];y [cm]";
-        v_yx_t1.push_back(new TH2F(h_t1_name.c_str(),h_t1_title.c_str(),map->GetYCells(),map->GetYMin(),map->GetYMax(),map->GetXCells(),map->GetXMin(),map->GetXMax()));
+        v_yx_t1.push_back(new TH2F(h_t1_name.c_str(),h_t1_title.c_str(),map.GetYCells(),map.GetYMin(),map.GetYMax(),map.GetXCells(),map.GetXMin(),map.GetXMax()));
     }
 
     void XYZ_Loop(double x, double y, double z, X17::MapPoint current) override
@@ -118,7 +118,7 @@ class Graph_YX : public MapTask
     std::vector<TArrow*> arrows;
 
 public:
-    Graph_YX(X17::Field<X17::MapPoint>* map, double xmin, double xmax, double ymin, double ymax) : MapTask(map),xmin(xmin),xmax(xmax),ymin(ymin),ymax(ymax) { }
+    Graph_YX(const X17::Field<X17::MapPoint>& map, double xmin, double xmax, double ymin, double ymax) : MapTask(map),xmin(xmin),xmax(xmax),ymin(ymin),ymax(ymax) { }
 
     void Z_Loop_Start(double z) override
     {
@@ -158,7 +158,7 @@ public:
         c_g_yx->Divide(4,4);
         for (int i = 0; i < v_g_yx.size() - 1; i++)
         {
-            int j = i / map->GetStep();
+            int j = i / map.GetStep();
             if (j >= v_g_yx.size()) j = v_g_yx.size() - 1;
 
             c_g_yx->cd(i+1);
@@ -185,7 +185,7 @@ class Graph_ZT : public MapTask
     TGraph* g_zt;
 
 public:
-    Graph_ZT(X17::Field<X17::MapPoint>* map) : MapTask(map) { }
+    Graph_ZT(const X17::Field<X17::MapPoint>& map) : MapTask(map) { }
 
     void PreLoop() override
     {
@@ -218,7 +218,7 @@ class Graph_XZ : public MapTask
     std::vector<TArrow*> v_g_xz_arrows;
 
 public:
-    Graph_XZ(X17::Field<X17::MapPoint>* map) : MapTask(map) { }
+    Graph_XZ(const X17::Field<X17::MapPoint>& map) : MapTask(map) { }
 
     void PreLoop() override
     {
@@ -259,7 +259,7 @@ class Graph_XT : public MapTask
     TGraphErrors* g_xt;
 
 public:
-    Graph_XT(X17::Field<X17::MapPoint>* map) : MapTask(map) { }
+    Graph_XT(const X17::Field<X17::MapPoint>& map) : MapTask(map) { }
 
     void PreLoop() override
     {
@@ -296,11 +296,11 @@ class Hist_XZ_T1 : public MapTask
     TH2F* xz_t1;
 
 public:
-    Hist_XZ_T1(X17::Field<X17::MapPoint>* map) : MapTask(map) { }
+    Hist_XZ_T1(const X17::Field<X17::MapPoint>& map) : MapTask(map) { }
 
     void PreLoop() override
     {
-        xz_t1 = new TH2F("h_xz_t1","XZ plane t1;x [cm];z [cm]",map->GetXCells(),map->GetXMin(),map->GetXMax(),map->GetZCells(),map->GetZMin(),map->GetZMax());
+        xz_t1 = new TH2F("h_xz_t1","XZ plane t1;x [cm];z [cm]",map.GetXCells(),map.GetXMin(),map.GetXMax(),map.GetZCells(),map.GetZMin(),map.GetZMax());
     }
 
     void ZX_Loop(double z, double x, X17::MapPoint current) override
@@ -321,7 +321,7 @@ class GraphXYT : public MapTask
     std::vector<TPolyLine3D*> v_lines;
 
 public:
-    GraphXYT(X17::Field<X17::MapPoint>* map, TGraph2D* g_endpts) : MapTask(map), g_endpts(g_endpts) { }
+    GraphXYT(const X17::Field<X17::MapPoint>& map, TGraph2D* g_endpts) : MapTask(map), g_endpts(g_endpts) { }
 
     void PreLoop() override
     {

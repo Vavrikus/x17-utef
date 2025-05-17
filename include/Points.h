@@ -308,6 +308,9 @@ namespace X17
         TMatrixD eigen_vecs; // The eigenvectors of the covariance matrix.
         TVectorD eigen_vals; // The eigenvalues of the covariance matrix.
 
+        double mardia_A = -1; // Mardia's skewness statistic p-value (-1 if not calculated).
+        double mardia_B = -1; // Mardia's kurtosis statistic p-value (-1 if not calculated).
+
         /// @brief Default constructor. Coordinates x,y,z set to zero, time to -1.
         MapPoint() : n(0), point(), cov_mat(0), eigen_vecs(4,4), eigen_vals(4) { }
 
