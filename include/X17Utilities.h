@@ -27,8 +27,11 @@ namespace X17
             constexpr double mag_height = 15.0; // Magnet height [cm]
             constexpr double mag_depth  =  1.5; // Magnet depth [cm]
 
-            constexpr double mag_lowxx = 4.626; // Magnet lowest-x corner x-coordinate [cm]
-            constexpr double mag_lowxy = 3.537; // Magnet lowest-x corner y-coordinate [cm]
+            constexpr double mag_lowxx = 5.2542; // Magnet lowest-x corner x-coordinate [cm] (Maxwell simulation)
+            constexpr double mag_lowxy = 3.8995; // Magnet lowest-x corner y-coordinate [cm] (Maxwell simulation)
+
+            constexpr double mag_lowxx_new = 4.626; // Magnet lowest-x corner x-coordinate [cm] (new CAD files)
+            constexpr double mag_lowxy_new = 3.537; // Magnet lowest-x corner y-coordinate [cm] (new CAD files)
 
         // TPC window parameters
             constexpr double win_width  = 3.8; // TPC window width [cm]
@@ -95,8 +98,9 @@ namespace X17
     void GetMinMaxFieldAngle(const Field<Vector>& magfield, double& out_min, double& out_max, double dist);
 
     /// @brief Draws lines around the approximate sensitive area (walls of TPC).
+    /// @param width Width of the lines [px].
     /// @param yxformat If true, the y-coordinate is drawn on the x-axis and vice versa.
-    void DrawTrapezoid(bool yxformat = true);
+    void DrawTrapezoid(double width = 1, bool yxformat = true);
 
     /// @brief Draws the tube circle.
     void DrawTube();

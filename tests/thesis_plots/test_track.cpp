@@ -213,7 +213,7 @@ void PlotDriftYZ(X17::TrackMicro track, std::string filename, bool newcoords = f
     g3->Draw("L same");
 }
 
-void PlotTrackRK(X17::TrackMicro track, X17::Field<X17::Vector>* magfield)
+void PlotTrackRK(X17::TrackMicro track, X17::Field<X17::Vector>* magfield, bool newcoords = false)
 {
     double Ekin = std::sqrt(64E+12 + X17::constants::E0*X17::constants::E0) - X17::constants::E0;
         X17::RK4<8>* trackrk = X17::GetTrackRK(*magfield,true,1E-13,Ekin,X17::Vector(0,0,0),X17::Vector(1,0,0),true);
@@ -232,7 +232,7 @@ void PlotTrackRK(X17::TrackMicro track, X17::Field<X17::Vector>* magfield)
         for (const auto& point : track.points)
         {
             X17::Vector start_old = point.start.point;
-            X17::Vector start_new = {start_old.z,start_old.x,start_old.y};
+            X17::Vector start_new = newcoords ? X17::Vector{start_old.x,start_old.y,start_old.z} : X17::Vector{start_old.z,start_old.x,start_old.y};
 
             X17::Vector closest_point;
             double res2 = X17::GetTrackRKSqDistAndCP(trackrk,start_new,closest_point);
@@ -246,7 +246,7 @@ void PlotTrackRK(X17::TrackMicro track, X17::Field<X17::Vector>* magfield)
             g_diff2->AddPoint(start_new.x,10000*diff.x);
         }
 
-        TCanvas* c_rk = new TCanvas("c_rk","Drift XZ",g_cwidth,g_cheight);
+        TCanvas* c_rk = new TCanvas("","Drift XZ",g_cwidth,g_cheight);
         g_micro->SetMarkerStyle(2);
         g_micro->SetMarkerColor(kRed);
         g_micro->SetLineColor(kNone);
@@ -267,7 +267,7 @@ void PlotTrackRK(X17::TrackMicro track, X17::Field<X17::Vector>* magfield)
         l_rk->SetTextSize(0.043);
         l_rk->Draw();
 
-        TCanvas* c_res = new TCanvas("c_res","Residuals",g_cwidth,g_cheight);
+        TCanvas* c_res = new TCanvas("","Residuals",g_cwidth,g_cheight);
         g_res->SetMarkerStyle(2);
         g_res->SetMarkerColor(kRed);
         g_res->SetLineColor(kNone);
@@ -454,11 +454,12 @@ int main(int argc, char *argv[])
     gStyle->SetPadRightMargin(0.07);
     gStyle->SetPadTopMargin(0.07);
 
-    // PlotTrackRK(track1, magfield);
+    PlotTrackRK(track1, magfield);
+    PlotTrackRK(track2, magfield, true);
 
-    PlotRASD(track1);
-    PlotRASD(track2,true);
-    PlotRASDres2();
+    // PlotRASD(track1);
+    // PlotRASD(track2,true);
+    // PlotRASDres2();
 
     // Reconstruct CircleFit3D + RK4
         // std::vector<X17::RecoPoint> reco_points;

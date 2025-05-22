@@ -88,34 +88,32 @@ namespace X17
         out_max = max_angle;
     }
 
-    void DrawTrapezoid(bool yxformat)
+    void DrawTrapezoid(double width,bool yxformat)
     {
         using namespace constants;
 
-        TLine* l1;
-        TLine* l2;
-        TLine* l3;
-        TLine* l4;
+        TLine* lines[4];
 
         if (yxformat)
         {
-            l1 = new TLine(-yhigh,xmax, yhigh,xmax);
-            l2 = new TLine(-ylow ,xmin, ylow ,xmin);
-            l3 = new TLine(-yhigh,xmax,-ylow ,xmin);
-            l4 = new TLine( yhigh,xmax, ylow ,xmin);
+            lines[0] = new TLine(-yhigh,xmax, yhigh,xmax);
+            lines[1] = new TLine(-ylow ,xmin, ylow ,xmin);
+            lines[2] = new TLine(-yhigh,xmax,-ylow ,xmin);
+            lines[3] = new TLine( yhigh,xmax, ylow ,xmin);
         }
         else
         {
-            l1 = new TLine(xmax,-yhigh,xmax, yhigh);
-            l2 = new TLine(xmin,-ylow ,xmin, ylow );
-            l3 = new TLine(xmax,-yhigh,xmin,-ylow );
-            l4 = new TLine(xmax, yhigh,xmin, ylow );
+            lines[0] = new TLine(xmax,-yhigh,xmax, yhigh);
+            lines[1] = new TLine(xmin,-ylow ,xmin, ylow );
+            lines[2] = new TLine(xmax,-yhigh,xmin,-ylow );
+            lines[3] = new TLine(xmax, yhigh,xmin, ylow );
         }
 
-        l1->Draw("same");
-        l2->Draw("same");
-        l3->Draw("same");
-        l4->Draw("same");
+        for (int i = 0; i < 4; i++)
+        {
+            lines[i]->SetLineWidth(width);
+            lines[i]->Draw("same");
+        }
     }
     void DrawTube()
     {

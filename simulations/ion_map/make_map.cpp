@@ -75,11 +75,11 @@ TGraph* GetQQconfidenceGraph(double sigma, std::vector<std::vector<double>> sq_m
 int make_map()
 {
     // Load data from all files (results of individual jobs).
-    const bool new_data = false;
+    const bool new_data = true;
 
     std::string data_folder = new_data ? "../../../data/ion_map/sample_2.0/" : "../../../data/ion_map/sample_1.0/";
     int files_count         = new_data ? 1000 : 200;
-    double step_size        = new_data ? 0.5 : 1.0;
+    double step_size        = new_data ?  0.5 : 1.0;
     double map_xmin         = new_data ? -1.5 : 0.0;
 
     TChain* map_data_in = LoadData(files_count,data_folder);
@@ -102,6 +102,8 @@ int make_map()
     TGraph2D* g_endpts = new TGraph2D();
     TGraph2D* g_sim  = new TGraph2D();
     TGraph2D* g_reco = new TGraph2D();
+
+    std::unordered_map<double, TGraph*> v_g_yx_endpts;
 
     TRandom3* rand = new TRandom3(0);
     TGraph* g_qq = new TGraph();
@@ -142,7 +144,11 @@ int make_map()
         
         ReportProgress(i+1,map_data_in->GetEntries());
 
-        if (point.start.point.z == -8)
+        if (!v_g_yx_endpts.contains(point.start.z()))
+            v_g_yx_endpts[point.start.z()] = new TGraph();
+        v_g_yx_endpts[point.start.z()]->AddPoint(point.end.y(),point.end.x());
+
+        if (point.start.z() == -8)
             g_endpts->AddPoint(point.end.x(),point.end.y(),point.end.t);
 
         if (point.GetInitPos() == v_prev && (i != map_data_in->GetEntries()-1))
@@ -256,17 +262,28 @@ int make_map()
     
     if(MakePlots)
     {
-        gStyle->SetOptStat(0);
-
         // Plots from the map creation.
             TCanvas* c_sim = new TCanvas("c_sim","Simulation");
             g_sim->SetMarkerStyle(6);
-            g_sim->Draw("AP");
+            g_sim->SetTitle(";x [cm];y [cm];z [cm]");
+            g_sim->GetXaxis()->SetTitleOffset(1.65);
+            g_sim->GetYaxis()->SetTitleOffset(1.65);
+            g_sim->GetXaxis()->SetTitleSize(0.043);
+            g_sim->GetYaxis()->SetTitleSize(0.043);
+            g_sim->GetZaxis()->SetTitleSize(0.043);
+            g_sim->Draw("P");
             c_sim->Write();
         
             TCanvas* c_reco = new TCanvas("c_reco","Reconstruction");
             g_reco->SetMarkerStyle(6);
-            g_reco->Draw("AP");
+            g_reco->SetTitle(";x' [cm];y' [cm];t [ns]");
+            g_reco->GetXaxis()->SetTitleOffset(1.65);
+            g_reco->GetYaxis()->SetTitleOffset(1.65);
+            g_reco->GetZaxis()->SetTitleOffset(1.2);
+            g_reco->GetXaxis()->SetTitleSize(0.043);
+            g_reco->GetYaxis()->SetTitleSize(0.043);
+            g_reco->GetZaxis()->SetTitleSize(0.043);
+            g_reco->Draw("P");
             c_reco->Write();
         
             TCanvas* c_qq = new TCanvas("c_qq","QQ plot");
@@ -350,6 +367,7 @@ int make_map()
             legend3->AddEntry(h_pvalsA,"A statistic","l");
             legend3->AddEntry(h_pvalsB,"B statistic","l");
             legend3->Draw("same");
+            h_pvalsB->GetYaxis()->SetRangeUser(0,1.2); 
             c_pvals->Write();
             
 
@@ -363,10 +381,10 @@ int make_map()
         // plot_tasks.push_back(new Hist_YX_DX(cmap));
         // plot_tasks.push_back(new Hist_YX_DY(cmap));
         // plot_tasks.push_back(new Hist_YX_T1(cmap,xmin,xmax,ymin,ymax));
-        plot_tasks.push_back(new Graph_YX(cmap,xmin,xmax,ymin,ymax));
+        plot_tasks.push_back(new Graph_YX(cmap,xmin,xmax,ymin,ymax,v_g_yx_endpts));
         plot_tasks.push_back(new Graph_ZT(cmap));
         plot_tasks.push_back(new Graph_XZ(cmap));
-        plot_tasks.push_back(new Graph_XT(cmap));
+        plot_tasks.push_back(new Graph_XT(cmap,new_data));
         // plot_tasks.push_back(new Hist_XZ_T1(cmap));
         plot_tasks.push_back(new GraphXYT(cmap,g_endpts));
 

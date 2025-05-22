@@ -123,6 +123,35 @@ namespace X17
         return point;
     }
 
+    TEllipse* MapPoint::GetErrorEllipse(int skip_index, double sigma, bool x_bigger)
+    {
+        double confidence = TMath::Erf(sigma/std::sqrt(2));
+        double factor = TMath::ChisquareQuantile(confidence,2);
+
+        if (skip_index < 0 || skip_index > 3)
+            throw std::out_of_range("MapPoint::GetErrorEllipse skip_index out of range [0,3].");
+        if (skip_index == 2)
+            throw std::runtime_error("MapPoint::GetErrorEllipse z-coordinate already excluded.");
+
+        int min_index = skip_index == 0 ? 1 : 0;
+        int max_index = skip_index == 3 ? 1 : 3;
+        if (x_bigger) std::swap(min_index,max_index);
+
+        double a = this->cov_mat.at(min_index,min_index);
+        double b = this->cov_mat.at(min_index,max_index);
+        double d = this->cov_mat.at(max_index,max_index);
+
+        double lambda_1 = (a + d + std::sqrt((a-d)*(a-d) + 4*b*b)) / 2;
+        double lambda_2 = (a + d - std::sqrt((a-d)*(a-d) + 4*b*b)) / 2;
+
+        X17::Vector v1(b, lambda_1 - a, 0);
+        v1.Normalize();
+
+        double theta = sign(v1.y)*v1.Angle({1,0,0})*180/M_PI;
+
+        return new TEllipse((*this)[min_index],(*this)[max_index],std::sqrt(lambda_1*factor),std::sqrt(lambda_2*factor),0,360,theta);
+    }
+
     double MapPoint::operator[](int i) const
     {
         switch (i)
@@ -141,7 +170,7 @@ namespace X17
             break;
         
         default:
-            throw std::out_of_range("MapPoint[] index out of range.\n");
+            throw std::out_of_range("MapPoint[] index out of range [0,3].\n");
             break;
         }
     }

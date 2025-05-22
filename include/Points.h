@@ -5,6 +5,7 @@
 
 // ROOT dependencies
 #include "TChain.h"
+#include "TEllipse.h"
 #include "TGraph.h"
 #include "TMarker3DBox.h"
 #include "TMatrixD.h"
@@ -327,6 +328,13 @@ namespace X17
         /// @brief Returns a random point using the covariance matrix for multivariate normal distribution
         /// @return The random point.
         EndPoint GetRandomPoint(TRandom3* rand);
+
+        /// @brief Caculates the error ellipse of the point for X, Y, T coordinates.
+        /// @param skip_index The index of the coordinate to skip (must be in range [0,3] -- see operator[]).
+        /// @param sigma Scales the error ellipse using the normal distribution quantiles.
+        /// @param x_bigger Should the coordinate with bigger index be used for the x-axis?
+        /// @return Pointer to the created TEllipse object.
+        TEllipse* GetErrorEllipse(int skip_index, double sigma = 1.0, bool x_bigger = false);
 
         /// @brief Getter for the x variable.
         /// @return The x-coordinate [cm].

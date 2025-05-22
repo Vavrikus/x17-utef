@@ -16,7 +16,7 @@
 		
 		For the reconstruction, we decided to use the~common method used in a~standard \ac{TPC}\red{~(similar to?, cite some source(s)!)}. This will allow us to explore the~significance of the~atypical behavior in our \ac{OFTPC}. Additionally, we assume the~readout is continuous to further simplify the~problem. In this approximation, we reconstruct the~initial position of each ionization electron.
 		
-		The~reconstruction is then defined by the~following relations between the~coordinates of the~detector space and the~readout space (see Section~\ref{sec:coor}):\red{~(some figure, maybe already relating to some track so that it's not too dull)}
+		The~reconstruction is then defined by the~following relations between the~coordinates of the~detector space and the~readout space (see Section~\ref{sec:coor}):
 			\begin{align}
 				x &= x',\\
 				y &= y',\\
@@ -55,19 +55,134 @@
 	
 	\section{Ionization Electron Map}
 	\label{sec:map}
-		Inside an~\ac{OFTPC}\orange{~($\exists$ more than one, also considering it a~general concept rather than the specific OFTPC used at this experiment)}, the~drift of the~secondary (ionization) electrons is significantly affected by its magnetic field\red{~(pictures of the~distortion later, the~effect is bigger for the 90/10 composition)}. We need to take this into account for accurate reconstruction\red{~(should be easy to run the~reconstruction without the map and show how much it improves the results)}. In the~first approximation, we assume a~continuous readout (i.e., we neglect the~anode segmentation into pads). We can then reconstruct the~original position of each ionization electron using its readout coordinates. For this purpose, we use the~ionization electron map.
+		Inside an~\ac{OFTPC}\orange{~($\exists$ more than one, also considering it a~general concept rather than the specific OFTPC used at this experiment)}, the~drift of the~ionization electrons is significantly affected by its magnetic field as shown in Equation~\ref{eq:drift}, see also Figure~\ref{fig:microfirst}. We need to take this into account for accurate reconstruction\red{~(should be easy to run the~reconstruction without the map and show how much it improves the results)}. In the~first approximation, we assume a~continuous readout (i.e., we neglect the~anode segmentation into pads). We can then reconstruct the~original position of each ionization electron using its readout coordinates. For this purpose, we use the~ionization electron map.
 		
-		The~ionization electron map represents a~mapping from the~detector space to the~readout space (see Section~\ref{sec:coor}). It tells us what readout coordinates $(x',y',t)$ we can expect on average for an~ionization electron created at the~detector coordinates $(x,y,z)$. More precisely, it is a~mapping to the~distributions on the~readout space; we can simplify this as only the means $\overbar{\mathcal{M}}$\red{~(inconsistent notation in the text, write the bar everywhere or nowhere)} and the covariance matrices $\mathcal{M}_\text{cov}$, assuming Gaussian distribution\red{~(test this -- some chisq or other statistical test)}.
+		The~ionization electron map represents a~mapping from the~detector space to the~readout space (see Section~\ref{sec:coor}). It tells us what readout coordinates $(x',y',t)$ we can expect on average for an~ionization electron created at the~detector coordinates $(x,y,z)$. More precisely, it is a~mapping to the~distributions on the~readout space; we can simplify this as only the means $\overline{\mathcal{M}}$ and the covariance matrices $\mathcal{M}_\mathbf{\Sigma}$, assuming Gaussian distribution:
+			\begin{alignat}{3}
+				\overline{\mathcal{M}}&\colon \mathcal{D} \longrightarrow \mathcal{R}, &&(x,y,z) \longmapsto \mathbf{\overline{X}}^T\equiv(\bar{x}',\bar{y}',\bar{t}),\\
+				\mathcal{M}_\mathbf{\Sigma}&\colon \mathcal{D} \longrightarrow \mathbb{R}^{3\times3}, &&(x,y,z) \longmapsto \mathbf{\Sigma}^{\phantom{T}} \equiv \scalebox{0.9}{$\begin{pmatrix}
+					\sigma_{x'}^2 & \operatorname{cov}(x',y') & \operatorname{cov}(x',t) \\
+					\operatorname{cov}(y',x') & \sigma_{y'}^2 & \operatorname{cov}(y',t) \\
+					\operatorname{cov}(t,x') & \operatorname{cov}(t,y') & \sigma_{t}^2
+				\end{pmatrix}$},\\
+				\mathcal{M}&\colon \mathcal{D} \longrightarrow D(\mathcal{R}),\ &&(x,y,z) \longmapsto N(\mathbf{X}) \equiv \frac{\exp(-\frac{1}{2}(\mathbf{X}-\mathbf{\overline{X}})^T\mathbf{\Sigma}(\mathbf{X}-\mathbf{\overline{X}}))}{\sqrt{(2\pi)^3 |\mathbf{\Sigma}|}}.
+			\end{alignat}
+		To get an~approximation of this mapping, we simulate the~drift of ionization electrons generated on a~regular Cartesian grid $\mathbb{G}\subset\mathcal{D}$ with spacing~$l$ inside the~volume of our \ac{OFTPC}\footnote{The~detector walls are not considered and we simulate the~drift even outside of the~\ac{OFTPC} which allows us to interpolate even close to the~walls} (see the visualization in Figure~\ref{fig:map_3d}). In Figure~\ref{fig:maplines}, you can see an example of drift lines from a~test of the~simulation. After testing runs, two map simulations were made with different gas composition, their parameters are shown in Table~\ref{tab:map}. 
+		
+		\begin{figure}
+			\centering
+			\includegraphics[width=\textwidth]{map_3dvis.png}
+			\caption{A~3D visualization of the mapping of means $\overline{\mathcal{M}}$ for the 90:10 Ar:CO$_2$ gas. A regular grid $\mathbb{G}$ with $l = \SI{1}{\centi\meter}$ in the detector space is mapped to an~irregular grid $\mathbb{G}^{-1} \equiv \overline{\mathcal{M}}(\mathbb{G})$ in the readout space.}
+			\label{fig:map_3d}
+		\end{figure}
+		
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.5\textwidth]{map_lines.png}
+			\caption{A test of the 90:10 Ar:CO$_2$ map simulation with spacing $l = \SI{1.5}{cm}$. The resulting drift lines of evenly spaced electrons are displayed in orange.}
+			\label{fig:maplines}
+		\end{figure}
+		
+		\begin{table}
+			\centering
+			\caption{Comparison of parameters of two map simulations.}
+			{\renewcommand{\arraystretch}{1.2}
+			\begin{tabular}{|c|c|c|}
+				\hline
+				\textbf{Parameter} & \textbf{90:10 Ar:CO$_2$ map} & \textbf{70:30 Ar:CO$_2$ map}\\
+				\hline
+				$N$ & 100 & 100 \\
+				\hline
+				$l$ & 1.0 cm & 0.5 cm \\
+				\hline
+				$z$ bounds & $[-8,8]$ cm & $[-8,8]$ cm \\
+				\hline
+				$x$ bounds & $[0,15]$ cm & $[-1.5,15.0]$ cm \\
+				\hline
+				$y$ bounds & $|y| \leq x\cdot\tan\frac{\pi}{3}$ & $|y| \leq (x+\SI{1.5}{\centi\meter})\cdot\tan\frac{\pi}{6}$ \\
+				\hline
+			\end{tabular}}
+			\label{tab:map}
+		\end{table}
+		
+		In order to get accurate results, we use the~microscopic simulation of these electrons described in Section~\ref{sec:microsim}\red{~(Monte Carlo from \textit{AvalancheMC} was also considered but it doesn't (didn't? CERES used it from MAGBOLTZ???) include magnetic field, we can probably improve this anyway using the fast track simulation with map proposed in the future section)}. It is also useful to simulate multiple~($N$) electrons originating from the~same position so that we can account for the~random fluctuations due to collisions. Using the readout coordinates of the~electrons, we then estimate the means and the covariance matrix:
 			\begin{equation}
-				\overbar{\mathcal{M}}: \mathcal{D} \longrightarrow \mathcal{R},\; (x,y,z) \longmapsto (\bar{x}',\bar{y}',\bar{t}).
+				\label{eq:cov}
+				\mathbf{\overline{X}} = \frac{1}{N}\sum_{i=1}^{N} \mathbf{X}_i,\qquad \mathbf{\Sigma} = \frac{1}{N-1}\sum_{i=1}^{N}(\mathbf{X}_i-\mathbf{\overline{X}})(\mathbf{X}_i-\mathbf{\overline{X}})^T,
 			\end{equation}
-		To get an~approximation of this mapping, we simulate the~drift of ionization electrons generated on a~regular grid inside the~volume of our \ac{OFTPC}\footnote{The~detector walls are not considered and we simulate the~drift even outside of the~\ac{OFTPC} which allows us to interpolate even close to the~walls}. In order to get accurate results, we use the~microscopic simulation of these electrons described in Section~\ref{sec:microsim}\red{~(Monte Carlo from \textit{AvalancheMC} was also considered but it doesn't (didn't?) include magnetic field, we can probably improve this anyway using the fast track simulation with map proposed in the future section)}. It is also useful to simulate multiple (100 in our case,\red{~this should really only be in a~table since there are two map simulations}) electrons originating from the~same position so that we can account for the~random fluctuations due to collisions.
+		where $\mathbf{X}_i$ represents the readout coordinates $(x'_i, y'_i, t_i)^T$ of the $i$\nobreakdash-th electron. The matrix (resp. its submatrix) can then be used to plot error ellipsoid (resp. ellipse). The axes correspond to the eigenvectors, errors along these axes for a~given confidence level~$p$ can be computed using the chi\nobreakdash-squared distribution
+			\begin{equation}
+				\label{eq:sigma}
+				\sigma_i = \sqrt{\lambda_i \chi^2_k(p)},
+			\end{equation}
+		where $\lambda_i$ is the corresponding eigenvalue and $k$~is the~number of degrees of freedom.
+		
+		As shown in \cref{fig:map_zt,fig:map_xt}, the drift times in the map are no longer proportional to the $z$\nobreakdash-coordinate due to the varying Lorentz angles in the inhomogeneous magnetic field (see Equation~\ref{eq:lorentz}). As expected, the effect is considerably larger in gases with higher drift velocities. Similarly, the drift distortion (i.e., its deviation from the vertical lines) is huge for the "faster" gas, but still significant for the "slower" one, as demonstrated in \cref{fig:map_yx_all,fig:map_bot,fig:map_xz}.
+		
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.48\textwidth]{map_zt_9010.png}
+			\hfill
+			\includegraphics[width=0.48\textwidth]{map_zt_7030.png}
+			\caption{Dependence of the drift times of the simulated map $\overline{\mathcal{M}}$ on the $z$\protect\nobreakdash-coordinate. Two gas mixtures 90:10 (left) and 70:30 Ar:CO$_2$ (right) are compared. The spread is caused by varying Lorentz angles.}
+			\label{fig:map_zt}
+		\end{figure}
+		
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.48\textwidth]{map_xt_9010.png}
+			\hfill
+			\includegraphics[width=0.48\textwidth]{map_xt_7030.png}
+			\caption{The $x't$ projection of the $\mathcal{M}(\mathbb{G}_{y=0})$ mapping of a~part of the~regular grid $\mathbb{G}$. The means $\overline{\mathcal{M}}(\mathbb{G}_{y=0})$ are marked with red crosses, and the diffusion error is denoted by black 95\% confidence error ellipses computed from the diagonalized covariance matrices $\mathcal{M}_{\mathbf{\Sigma}}(\mathbb{G}_{y=0})$. Two gas mixtures 90:10 (left) and 70:30 Ar:CO$_2$ (right) are compared. The first mixture shows differences of~$t$ for electrons with same initial~$z$ but different initial~$x$. For the second mixture, these differences are negligible in comparison with the diffusion.}
+			\label{fig:map_xt}
+		\end{figure}
+		
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.48\textwidth]{map_yx_all_9010.png}
+			\hfill
+			\includegraphics[width=0.48\textwidth]{map_yx_all_7030.png}
+			\caption{The regular grid $\mathbb{G}$ projected by the mapping $\overline{\mathcal{M}}$ from the detector space onto the $x'y'$~plane ($t$ is not plotted). Layers with lower $z$\protect\nobreakdash-coordinate (i.e., further away from the readout) are displayed with darker colors. The~\ac{OFTPC} volume is marked with black lines. Two gas mixtures 90:10 (left) and 70:30 Ar:CO$_2$ (right) are compared.}
+			\label{fig:map_yx_all}
+		\end{figure}
+		
+		\begin{figure}
+			\centering
+			\begin{subfigure}[t]{\textwidth}
+				\centering
+				\includegraphics[width=0.48\textwidth]{map_yx_bottom_9010.png}
+				\hfill
+				\includegraphics[width=0.48\textwidth]{map_yx_bottom_7030.png}
+				\caption{The $x'y'$ projection of $\mathcal{M}(\mathbb{G}_{-8})$ (similar as in Figure~\ref{fig:map_yx_all}), the diffusion is denoted with the 95\% error ellipses from  the diagonalized sample covariance matrices $\mathcal{M}_\mathbf{\Sigma}(\mathbb{G}_{-8})$ $\leftrightarrow$ Equation~\ref{eq:cov}, and computed using Equation~\ref{eq:sigma}. The mean values $\overline{\mathcal{M}}(\mathbb{G}_{-8})$ are connected by black arrows with the corresponding starting position $(x,y)$ of the simulated electrons. The~\ac{OFTPC} volume is marked with black lines.}
+				\label{fig:map_yx_bot}
+			\end{subfigure}
+			
+			\begin{subfigure}[t]{\textwidth}
+				\centering
+				\includegraphics[width=0.48\textwidth]{map_xyt_9010.png}
+				\hfill
+				\includegraphics[width=0.48\textwidth]{map_xyt_7030.png}
+				\caption{The full mapping $\mathcal{M}(\mathbb{G}_{-8})$, the diffusion is marked using standard error bars (black) from the diagonalized sample covariance matrices (Equations~\ref{eq:cov} and~\ref{eq:sigma}).}
+				\label{fig:map_xyt}
+			\end{subfigure}
+			\caption{The $\mathcal{M}(\mathbb{G}_{-8})$ mapping of the~bottom ($z = \SI{-8}{\centi\meter}$) layer $\mathbb{G}_{-8}$ of the regular grid $\mathbb{G}\subset\mathcal{D}$. It includes both the~mapping of means $\overline{\mathcal{M}}$ and of covariances $\mathcal{M}_\mathbf{\Sigma}$. Individual electrons from the map simulation are marked with red dots. Two gas mixtures 90:10 (left) and 70:30 Ar:CO$_2$ (right) are compared.}
+			\label{fig:map_bot}
+		\end{figure}
+		
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.48\textwidth]{map_xz_9010.png}
+			\hfill
+			\includegraphics[width=0.48\textwidth]{map_xz_7030.png}
+			\caption{The readout coordinate~$x'$ for points on the grid $\mathbb{G}_{y=0}$ plotted against their initial coordinate $z$. The means are marked with red crosses, the diffusion in~$x'$ is denoted by standard error bars. Two gas mixtures 90:10 (left) and 70:30 Ar:CO$_2$ (right) are compared.}
+			\label{fig:map_xz}
+		\end{figure}
 		
 		When evaluating the~map inside the~grid, we use trilinear interpolation (see Section~\ref{sec:trilin}). From now on, we will use the~same symbol $\mathcal{M}$ for this interpolated simulation.
 		
-		Finally, we need to invert the~map to get the~original detector coordinates $(x,y,z)$ from the~given readout coordinates $(x',y',t)$. In our case, it is reasonable to assume that the mapping $\overbar{\mathcal{M}}$\red{~(of means (notation inconsistency), we lose the information about the~distribution (a~wild idea how to recover this is in the Future section but it will only make sense if the~GEM is already accounted for and is very preliminary as there are many factors to consider))} is one-to-one (as seen in the simulations). We implemented two methods for this purpose: the gradient descent search (Section~\ref{sec:grad}) and interpolation on the~inverse grid (Section~\ref{sec:interpol}).
+		Finally, we need to invert the~map to get the~original detector coordinates $(x,y,z)$ from the~given readout coordinates $(x',y',t)$. In our case, it is reasonable to assume that the mapping $\overline{\mathcal{M}}$\red{~(we lose the information about the~distribution (a~wild idea how to recover this is in the Future section but it will only make sense if the~GEM is already accounted for and is very preliminary as there are many factors to consider))} is one-to-one (as seen in the simulations). We implemented two methods for this purpose: the gradient descent search (Section~\ref{sec:grad}) and interpolation on the~inverse grid (Section~\ref{sec:interpol}).
 		
-		The~simulation\orange{~(?)} of the~map is a~computationally heavy task. For this reason, we use the~MetaCentrum grid~\cite{metacentrum} to parallelize needed calculations. At first, this was done by evenly distributing the~simulated electrons across the~individual jobs in a~simulation with only one electron per vertex in the~regular grid with a~spacing of one centimeter. Later, a~more efficient approach was implemented, accounting for the~varying lengths of the~drift of individual electrons. If we index the~electrons in the~order of increasing coordinates $y,x,z$\red{~(picture will make things clearer)}, we can express the~number~$n_l$ of full XY~layers (i.e., electrons with the~same $z$~coordinate) of electrons with index less than or equal to $i$
+		The~simulation\orange{~(?)} of the~map is a~computationally heavy task. For this reason, we use the~MetaCentrum grid~\cite{metacentrum} to parallelize needed calculations. At first, this was done by evenly distributing the~simulated electrons across the~individual jobs in a~simulation with only one electron per vertex in the~regular grid~$\mathbb{G}$ with a~spacing of one centimeter. Later, a~more efficient approach was implemented, accounting for the~varying lengths of the~drift of individual electrons. If we index the~vertices of~$\mathbb{G}$ in the~order of increasing coordinates $y,x,z$\red{~(picture will make things clearer)}, we can express the~number~$n_l$ of full XY~layers (i.e., electrons with the~same $z$~coordinate, the mapping of one such layer is shown in Figure~\ref{fig:map_xyt}) with index less than or equal to $i$
 			\begin{equation}
 				n_l(i) = \left\lfloor\frac{i}{n_{xy}}\right\rfloor,
 			\end{equation}
@@ -80,18 +195,15 @@
 				d_\text{sum} = (z_\text{max}-z_\text{min})n_{xy}n_l-\frac{n_l(n_l-1)}{2}n_{xy}l+n_r(z_\text{max}-z_\text{min}-n_l l).
 			\end{equation}
 		We then use a~binary search algorithm to find the~maximum index $i$ such that the value of this sum is less than the~fraction $\frac{\text{job id}}{\text{max job id}}$ of the~total sum. This way we obtain the~minimal and the~maximal index of electrons simulated in the~given job.
-		\red{The~spacing $l$ should be probably defined above + picture of the~simulating grid (1 layer). zmin zmax also}
-		
-		\red{After the~simulation of the~map, we calculate the~mean readout coordinates assuming Gaussian distribution (i.e., we use averages). We also calculate standard deviations in a~later commit, should be upgraded to the~covariance matrix. We never actually plotted the~distributions we get when simulating the~same electron multiple times, so we do not know if our assumptions are accurate (could also run some statistical test to see how well the~Gaussian distribution fits).}
+		\red{Picture of the~simulating grid (1 layer). zmin zmax also}
 		
 		\red{The~obtained map is then stored in a~custom class template \textit{Field}, could expand on that. Maybe earlier, since the~same template is used for the~magnetic field.}
 		
-		\red{Could insert a~table here describing all 4 simulations of the~map (gas composition, spacing, etc.). Simulation inside of one sector (at first double angle). Extra space on the~sensor. Edge cases not taken into account (TPC wall). Using qsub (not sure if important). Add plots of distortion of the~coordinates. Could also do these~plots in a~different way (e.g., drawing all the~endpoints of each ionization electron or some error ellipse plot).\\}
+		\red{Simulation inside of one sector (at first double angle). Extra space on the~sensor. Using qsub (not sure if important). Add plots of distortion of the~coordinates.\\}
 		
 		\noindent\red{Images to add (comparison of both simulations):
 		\begin{itemize}[topsep=4pt,itemsep=2pt]
 			\item Already have a simple 2D map visualization from the RD51 presentation, can use it or make something better
-			\item 3D visualization of the map, simulation example
 			\item $z$ vs. $t$ plot
 			\item XY plane distortion for different $z$ values; with arrows and error bars, for all $z$-layers with different colors
 			\item XZ plane ($y = 0$) distortion in $x$ (maybe not necessary?)
@@ -101,14 +213,7 @@
 		\noindent\red{More images:}
 		\begin{itemize}[topsep=4pt,itemsep=2pt]
 			\item \red{Residuals of the~continuous readout reconstruction.}
-		\end{itemize}		
-		
-		\begin{figure}[H]
-			\centering
-			\includegraphics[width=0.5\textwidth]{map_9010_gen.png}
-			\caption{Example of map generation.\red{~Swap for better image, correct coordinates.}}
-			\label{fig:map9010gen}
-		\end{figure}
+		\end{itemize}
 		
 		\begin{figure}[H]
 			\centering
@@ -119,9 +224,9 @@
 		
 		\subsection{Gradient Descent Algorithm}
 		\label{sec:grad}			
-			The~first implemented method of reconstruction uses a~gradient descent algorithm to calculate an~inversion of the~map $\overbar{\mathcal{M}}$ in a~given point. Gradient descent is an~iterative minimization algorithm for multivariate functions. Let $R\in\mathcal{R}$ be a~point in the~readout space; we want to find a~point $D = (x,y,z) \in\mathcal{D}$ in the~detector space such that 
+			The~first implemented method of reconstruction uses a~gradient descent algorithm to calculate an~inversion of the~map $\overline{\mathcal{M}}$ in a~given point. Gradient descent is an~iterative minimization algorithm for multivariate functions. Let $R\in\mathcal{R}$ be a~point in the~readout space; we want to find a~point $D = (x,y,z) \in\mathcal{D}$ in the~detector space such that 
 				\begin{equation}
-					\overbar{\mathcal{M}}(D) = R = (x'_R,y'_R,t_R).
+					\overline{\mathcal{M}}(D) = R = (x'_R,y'_R,t_R).
 				\end{equation}
 			We define a~function~$f_R$ in the~readout space as a~distance in this space:
 				\begin{equation}
@@ -131,15 +236,15 @@
 				\begin{equation}
 					D_0 = (x'_R,y'_R,v_dt).
 				\end{equation}
-			Assuming we have the $n$-th estimate $D_n$, we calculate the~$i$-th component of the~gradient of $f_R\circ\overbar{\mathcal{M}}$ numerically using central differences:\orange{~(signs look correct)}
+			Assuming we have the $n$-th estimate $D_n$, we calculate the~$i$-th component of the~gradient of $f_R\circ\overline{\mathcal{M}}$ numerically using central differences:\orange{~(signs look correct)}
 				\begin{equation}
-					\left[\nabla(f_R\circ\overbar{\mathcal{M}})\right]^i(D_n) \approx \frac{f_R(\overbar{\mathcal{M}}(D_n+s\cdot e^i))-f_R(\overbar{\mathcal{M}}(D_n-s\cdot e^i))}{2s},
+					\left[\nabla(f_R\circ\overline{\mathcal{M}})\right]^i(D_n) \approx \frac{f_R(\overline{\mathcal{M}}(D_n+s\cdot e^i))-f_R(\overline{\mathcal{M}}(D_n-s\cdot e^i))}{2s},
 				\end{equation}
-			where $e^i\in\mathcal{D}$ is the~$i$-th coordinate vector and $s$ is the~step size. The~step size should be sufficiently small; initially, we set it as a~fraction $s = \frac{l}{10}$ of the~map's grid spacing $l$. During the~minimization, we check that $f_R(\overbar{\mathcal{M}}(D_n))<10s$ at all times\orange{~($s$ can (?) change -- check)}.\red{~When using trilinear interpolation, it would be more efficient to calculate the~gradient explicitly ($\pm$ same result). This could be implemented inside the~\textit{Field} template class.} The~next iteration can be calculated as follows:
+			where $e^i\in\mathcal{D}$ is the~$i$-th coordinate vector and $s$ is the~step size. The~step size should be sufficiently small; initially, we set it as a~fraction $s = \frac{l}{10}$ of the~map's grid spacing $l$. During the~minimization, we check that $f_R(\overline{\mathcal{M}}(D_n))<10s$ at all times\orange{~($s$ can (?) change -- check)}.\red{~When using trilinear interpolation, it would be more efficient to calculate the~gradient explicitly ($\pm$ same result). This could be implemented inside the~\textit{Field} template class.} The~next iteration can be calculated as follows:
 				\begin{equation}
-					D_{n+1} = D_n - \gamma \nabla(f_R\circ\overbar{\mathcal{M}})(D_n),
+					D_{n+1} = D_n - \gamma \nabla(f_R\circ\overline{\mathcal{M}})(D_n),
 				\end{equation}
-			where $\gamma\in\mathbb{R}^+$ is the~damping coefficient. It should be set to a~small enough value to ensure convergence, but large enough for sufficient converging speed. The~minimization stops either when the error $f_R(\overbar{\mathcal{M}}(D_n))$ drops below a~specified value or when the~number of iterations exceeds a~certain limit (in this case, a~message is printed into the~console).
+			where $\gamma\in\mathbb{R}^+$ is the~damping coefficient. It should be set to a~small enough value to ensure convergence, but large enough for sufficient converging speed. The~minimization stops either when the error $f_R(\overline{\mathcal{M}}(D_n))$ drops below a~specified value or when the~number of iterations exceeds a~certain limit (in this case, a~message is printed into the~console).
 			The parameters of this method can be further optimized (e.g., a~better choice of $\gamma$,\red{~gradient computation}); instead, we later decided to use the~interpolation on the~inverse grid described in the~next section.
 			
 			\red{Measure reconstruction duration and compare it with the~inverse grid interpolation? Also compare the~result? Typical evolution of $D_n$ during search. Not sure if this has to be cited.}
@@ -148,7 +253,7 @@
 		\label{sec:interpol}			
 			\red{Interpolation should be generally faster than the~gradient descent since we don't need to iterate. We also don't need to optimize it to improve performance, if it's too slow we can even calculate the~coefficients for the~entire map before reconstruction (again, do some profiling).}
 			
-			The~best current algorithm uses the~interpolation on the~inverse grid. Rather than inverting the~trilinearly interpolated map using a~numerical minimization method as in the~previous section, we take advantage of the~fact that the~map $\overbar{\mathcal{M}}$ is one-to-one\orange{~(isomorphism is supposed to preserve structure, not sure how to interpret that here, }\red{not the best description, we already (kind of) assume it is a~bijection by saying we will invert it)}. Since we have simulated values of this map on a~regular grid in the~detector space $\mathcal{D}$, we also know the~inverse map $\overbar{\mathcal{M}}^{-1}$ on the~irregular inverse grid in the~readout space $\mathcal{R}$. To get an~approximation of the~inverse map in the~entire readout space, we can use interpolation\orange{~(general concept, the specific choice is described below)}.
+			The~best current algorithm uses the~interpolation on the~inverse grid. Rather than inverting the~trilinearly interpolated map using a~numerical minimization method as in the~previous section, we take advantage of the~fact that the~map $\overline{\mathcal{M}}$ is one-to-one\orange{~(isomorphism is supposed to preserve structure, not sure how to interpret that here, }\red{not the best description, we already (kind of) assume it is a~bijection by saying we will invert it)}. Since we have simulated values of this map on a~regular grid in the~detector space $\mathcal{D}$, we also know the~inverse map $\overline{\mathcal{M}}^{-1}$ on the~irregular inverse grid in the~readout space $\mathcal{R}$. To get an~approximation of the~inverse map in the~entire readout space, we can use interpolation\orange{~(general concept, the specific choice is described below)}.
 			
 			Since the~inverse grid is irregular, trilinear interpolation cannot be applied. Given that the~simulated map is dense enough to provide a~good approximation considering the~size of our pads, we can adopt a~similar approach.\footnote{A more complicated and computationally heavy alternative would be natural neighbor interpolation or Kriging.} As shown in Equation~\ref{eq:trilinpoly} in Section~\ref{sec:trilin}, trilinear interpolation\orange{~(shouldn't need an article when talking about a~general concept)} can be expressed as a~polynomial:
 				\begin{equation}
@@ -200,5 +305,5 @@
 			\end{gather}
 		where $x,y_{1,n}$ and $x,y_{2,n}$ are the~opposing pad corner coordinates, and $g$ is the gap between the~pads (described in detail in Section~\ref{sec:coor}). This way, the closest pad is assigned to each readout position within the~\ac{OFTPC} volume\footnote{Some positions near the wall are not handled and some pads extend beyond the~\ac{OFTPC} volume.\red{~This is where an~electric field simulation would come in handy.}}.\red{~Makes sense since the~pads attract the electrons, the inhomogeneity of electric field is neglected.} The number of electrons collected by each pad (i.e., collected charge) in each time bin is then counted and serves as a~weight for the~energy reconstruction. The~reconstructed track consists of points for each $(n,n_t)\in\mathcal{P}$, we get these by reconstructing the~position of a~hypothetical electron with the~readout coordinates of the~pad/time bin center:\footnote{Mapping the~center of the pad (along with the~midpoint of the~time bin) isn't necessarily the~best approach since it might not correspond to the~average parameters of an~electron with these readout parameters.}
 			\begin{equation}
-				\mathcal{D} \ni (x,y,z) = \overbar{\mathcal{M}}\left(x_{c,n},y_{c,n},\left(n_t-\frac{1}{2}\right)t_\text{bin}\right).
+				\mathcal{D} \ni (x,y,z) = \overline{\mathcal{M}}\left(x_{c,n},y_{c,n},\left(n_t-\frac{1}{2}\right)t_\text{bin}\right).
 			\end{equation}

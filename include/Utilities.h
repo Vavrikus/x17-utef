@@ -6,7 +6,12 @@
 #include <vector>
 
 // ROOT dependencies
+#include "TCanvas.h"
+#include "TGraph.h"
+#include "TGraph2D.h"
+#include "TGraphErrors.h"
 #include "TH1F.h"
+#include "TH2F.h"
 #include "TRandom3.h"
 
 /// @brief Find the minimum value among the given parameters.
@@ -89,3 +94,65 @@ double GetPvalue(std::vector<double>& values, double value, bool sorted = false)
 /// @param total The total value of the progress.
 /// @param width The width of the progress bar.
 void ReportProgress(int current, int total, int width = 50);
+
+/// @brief Checks if a type is a member of a parameter pack.
+/// @tparam T The type to check.
+/// @tparam ...Ts The types in the parameter pack.
+template <typename T, typename... Ts>
+constexpr bool is_from = (std::is_same_v<T, Ts> || ...);
+
+template <typename T>
+void ApplyThesisStyle(T* obj)
+{
+    if constexpr (is_from<T, TCanvas, TPad>)
+    {
+        double w = obj->GetWw();
+        if (w > 800)
+        {
+            obj->SetLeftMargin(0.1);
+            obj->SetRightMargin(0.05);
+        }
+        else
+        {
+            obj->SetLeftMargin(0.13);
+            obj->SetRightMargin(0.07);
+        }
+        obj->SetTopMargin(0.07);
+        obj->SetBottomMargin(0.13);
+    }
+
+    else
+    {
+        std::vector<TAxis*> axes;
+        if constexpr (is_from<T, TH1F, TGraph, TGraphErrors>)
+            axes = { obj->GetXaxis(), obj->GetYaxis(), nullptr };
+
+        else if constexpr (is_from<T, TH2F, TGraph2D>)
+            axes = { obj->GetXaxis(), obj->GetYaxis(), obj->GetZaxis() };
+        
+        else
+        {
+            std::cout << "Warning: Can't apply thesis style for object of type " << typeid(obj).name() << std::endl;
+            return;
+        }
+
+        for (TAxis* axis : axes) if (axis)
+        {
+            axis->SetTitleSize(0.06);
+            axis->SetLabelSize(0.055);
+        }
+
+        if (axes[2])
+        {
+            axes[0]->SetTitleOffset(1.2);
+            axes[1]->SetTitleOffset(0.9);
+            axes[2]->SetTitleOffset(1.3);
+        }
+        else
+        {
+            axes[0]->SetTitleOffset(0.9);
+            axes[1]->SetTitleOffset(0.75);
+        }
+        
+    }
+}

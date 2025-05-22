@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 	subpad->cd();
 	subpad->Range(-padding, -ymax-padding, xmax+padding, ymax+padding);
 
-	X17::DrawTrapezoid(false);
+	X17::DrawTrapezoid(1,false);
 	X17::DrawTube();
 	X17::DrawFirstSectorMagnets(false);
 
