@@ -3,7 +3,7 @@
 	
 	The~\textbf{Microscopic Simulation} uses the~\garfieldpp toolkit~\cite{Garfield++}. Within this toolkit:
 		\begin{enumerate}[nosep,label=\alph*)]
-			\item \red{Magboltz, since it is mentioned later}
+			\item \red{Magboltz, since it is mentioned later. Or maybe just class MediumMagboltz with the collision rates?}
 			\item the~\ac{HEED} program~\cite{HEED} is used to simulate the~primary particle,
 			\item the~class \textit{AvalancheMicroscopic} to simulate the~drift of secondary electrons created by ionization in the~gas.
 		\end{enumerate}
@@ -23,7 +23,7 @@
 		
 		The~primary track is simulated using the~program~\ac{HEED}, which is an implementation of the~photo-absorption ionization model~\cite{HEED}\orange{~(see the reference, moved it to the end of sentence)}. This program provides the~parameters of ionizing collisions. \ac{HEED} can also be used to simulate the~transport of delta electrons; we do not account for these in the~current simulation\orange{~(but plan to include them in the~future -- maybe mention only in the conclusion/future section)}. The~photons created in the~atomic relaxation cascade\red{~(fluorescence reabsorption, related to the spread of avalanches in GM det.?)} are also not simulated.
 		
-		Finally, we use the~microscopic tracking provided by the~class \textit{AvalancheMicroscopic} in \garfieldpp to simulate the~drift of the~ionization electrons. Each electron is followed from collision to collision using the~equation of motion and the~collision rates calculated by Magboltz.
+		Finally, we use the~microscopic tracking provided by the~class \textit{AvalancheMicroscopic} in \garfieldpp to simulate the~drift of the~ionization electrons. Each electron is followed from collision to collision using the~equation of motion and the~collision rates calculated by Magboltz\red{~(how fast is this? maybe it slows down the simulation when spreading it across multiple jobs?)}.
 		
 		\red{Add more detailed and better description of HEED, and microscopic tracking (each their own subsection?). Could also mention Monte Carlo (requires gas file generation - Magboltz) and Runge-Kutta simulation implemented in Garfield, why we don't use them (another subsection? rename the~section to \garfieldpp simulation and mention all relevant parts?).}
 		
@@ -35,7 +35,7 @@
 					\item the initial direction is along the positive $x$-axis,
 					\item the momentum is $8~\text{MeV}/c$ (the kinetic energy is 7.505~MeV).
 				\end{itemize}
-			Such a~track moves in the~XZ plane in the~toroidal magnetic field of the~detector, because the particle's velocity vector is always perpendicular to the~field. At first, we simulated such a~track in 90:10 Ar:CO$_2$ gas mixture, later we added a~simulation in 70:30 Ar:CO$_2$, which we plan to use in our detector. The comparison of both simulations is in Figure~\ref{fig:microfirst}.
+			Such a~track moves in the~XZ plane in the~toroidal magnetic field of the~detector, because the particle's velocity vector is always perpendicular to the~field. At first, we simulated such a~track in 90:10 Ar:CO$_2$ gas mixture, later we added a~simulation in 70:30 Ar:CO$_2$, which we plan to use in our detector. The comparison of both simulations is in \cref{fig:microfirst}.
 			
 			\begin{figure}
 				\centering
@@ -87,7 +87,7 @@
 					\item 21 different azimuth angles $\varphi \in [-16.3^\circ,16.3^\circ]$ and
 					\item 21 different elevation angles $\theta \in [-17.1^\circ,17.1^\circ]$.
 				\end{itemize}
-			A~visualization of a~set of $e^+/e^-$~tracks with the~same kinetic energy is shown in Figure~\ref{fig:microgrid}\red{~(plotting actual HEED tracks using ROOT should be also possible (but hard to make look good?))}. In the~70:30 Ar:CO$_2$ atmosphere, each track takes 5-30~CPU hours to simulate. Every tenth point on the drift line was stored, the~whole sample has 3.1~terabytes (or 1.4~gigabytes without drift lines).
+			A~visualization of a~set of $e^+/e^-$~tracks with the~same kinetic energy is shown in \cref{fig:microgrid}\red{~(plotting actual HEED tracks using ROOT should be also possible (but hard to make look good?))}. In the~70:30 Ar:CO$_2$ atmosphere, each track takes 5-30~CPU hours to simulate. Every tenth point on the drift line was stored, the~whole sample has 3.1~terabytes (or 1.4~gigabytes without drift lines).
 			
 				\begin{figure}
 					\centering
@@ -156,7 +156,7 @@
 				\item the~starting point of the~track is a~random point in the~\ac{OFTPC} window,
 				\item the~initial direction is given by the~line connecting a~random point on the~target\footnote{To generate a~random point on the~target, we generate a~random angle $\alpha$ and a~random square of the~distance from origin $r^2$ to get a~uniform distribution.} (a~disc with 1~mm radius in the~YZ plane).
 			\end{itemize}
-		Since the~Runge-Kutta simulation is quite fast\footnote{One track with $\tau_\text{step} = 0.1$~ps takes less than one millisecond to simulate.}, it can be run locally on any computer.\red{~Add a figure with simulated tracks (sample).} An~example Runge-Kutta track is compared with the~corresponding microscopic track in Figure~\ref{fig:rkmicro}.
+		Since the~Runge-Kutta simulation is quite fast\footnote{One track with $\tau_\text{step} = 0.1$~ps takes less than one millisecond to simulate.}, it can be run locally on any computer.\red{~Add a figure with simulated tracks (sample).} An~example Runge-Kutta track is compared with the~corresponding microscopic track in \cref{fig:rkmicro}.
 		
 		\begin{figure}
 			\centering

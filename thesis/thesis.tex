@@ -53,9 +53,19 @@
 \linenumbers
 \usepackage{float}			% force picture placement
 \usepackage{xspace}			% space insertion in macros
-\usepackage{physics}
+\usepackage{textcomp}
 \usepackage{siunitx}
-\sisetup{per-mode=symbol}
+\usepackage{physics}
+\sisetup{
+	per-mode=symbol,
+	range-phrase = -,
+	range-units = single
+}
+\AtBeginDocument{\RenewCommandCopy\qty\SI}
+\ExplSyntaxOn
+\msg_redirect_name:nnn { siunitx } { physics-pkg } { none }
+\ExplSyntaxOff
+\show\qty
 \usepackage{caption}
 \usepackage{subcaption}
 \captionsetup[subfigure]{font=footnotesize}
@@ -90,6 +100,8 @@
 \usepackage[a-2u]{pdfx} % Generate PDF/A-2u
 \usepackage{hyperref}   % references to sections
 \usepackage[capitalise,nameinlink]{cleveref}
+\crefname{equation}{Eq.}{Eqs.}
+\Crefname{equation}{Eq.}{Eqs.}
 
 %%% Basic information on the thesis
 

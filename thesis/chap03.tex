@@ -26,7 +26,7 @@
 			\begin{equation}
 				d_r(t) = v_d t + d_0.
 			\end{equation}
-		The fit was applied on two tracks with different gas composition, the result is in Figure~\ref{fig:zt}.\red{~Compare with real drift velocities -- a good indication of the~tilt of drift lines.} The obtained parameters are then used for the reconstruction shown in Figure~\ref{fig:rasd_xz}. From the~residuals shown in Figure~\ref{fig:rasd_res}, we can see that this reconstruction algorithm leads to significant deviations from the simulated track (up to 1.1~cm for 90:10, and up to 0.3~cm for 70:30 Ar:CO$_2$), especially in the~faster gas mixture 90:10 (as expected -- for a~higher mean time between collisions in Equation~\ref{eq:drift}, the effect of the magnetic field is bigger). These deviations are mainly caused by the~shift in the $x$\nobreakdash-coordinate due to the~tilt of the drift lines in magnetic field. In order to account for this, we need to develop a~better algorithm.\red{~There is also a~small irregularity in the $z$\nobreakdash-coordinate but it is comparable with the diffusion. We can/will also later show that this has a significant effect on the reconstructed energy.}
+		The fit was applied on two tracks with different gas composition, the result is in \cref{fig:zt}.\red{~Compare with real drift velocities -- a good indication of the~tilt of drift lines.} The obtained parameters are then used for the reconstruction shown in \cref{fig:rasd_xz}. From the~residuals shown in \cref{fig:rasd_res}, we can see that this reconstruction algorithm leads to significant deviations from the simulated track (up to 1.1~cm for 90:10, and up to 0.3~cm for 70:30 Ar:CO$_2$), especially in the~faster gas mixture 90:10 (as expected -- for a~higher mean time between collisions in Equation~\ref{eq:drift}, the effect of the magnetic field is bigger). These deviations are mainly caused by the~shift in the $x$\nobreakdash-coordinate due to the~tilt of the drift lines in magnetic field. In order to account for this, we need to develop a~better algorithm.\red{~There is also a~small irregularity in the $z$\nobreakdash-coordinate but it is comparable with the diffusion. We can/will also later show that this has a significant effect on the reconstructed energy.}
 		
 		\begin{figure}
 			\centering
@@ -42,7 +42,7 @@
 			\includegraphics[width=0.48\textwidth]{9010_xz_rasd.png}
 			\hfill
 			\includegraphics[width=0.48\textwidth]{7030_xz_rasd.png}
-			\caption{Reconstruction (black) of the~starting position of ionization electrons (red) using parameters obtained from the~fit (Figure~\ref{fig:zt}). Two gas compositions 90:10 (left) and 70:30 Ar:CO$_2$ (right) are compared.}
+			\caption{Reconstruction (black) of the~starting position of ionization electrons (red) using parameters obtained from the~fit (\cref{fig:zt}). Two gas compositions 90:10 (left) and 70:30 Ar:CO$_2$ (right) are compared.}
 			\label{fig:rasd_xz}
 		\end{figure}
 		
@@ -55,7 +55,7 @@
 	
 	\section{Ionization Electron Map}
 	\label{sec:map}
-		Inside an~\ac{OFTPC}\orange{~($\exists$ more than one, also considering it a~general concept rather than the specific OFTPC used at this experiment)}, the~drift of the~ionization electrons is significantly affected by its magnetic field as shown in Equation~\ref{eq:drift}, see also Figure~\ref{fig:microfirst}. We need to take this into account for accurate reconstruction\red{~(should be easy to run the~reconstruction without the map and show how much it improves the results)}. In the~first approximation, we assume a~continuous readout (i.e., we neglect the~anode segmentation into pads). We can then reconstruct the~original position of each ionization electron using its readout coordinates. For this purpose, we use the~ionization electron map.
+		Inside an~\ac{OFTPC}\orange{~($\exists$ more than one, also considering it a~general concept rather than the specific OFTPC used at this experiment)}, the~drift of the~ionization electrons is significantly affected by its magnetic field as shown in Equation~\ref{eq:drift}, see also \cref{fig:microfirst}. We need to take this into account for accurate reconstruction\red{~(should be easy to run the~reconstruction without the map and show how much it improves the results)}. In the~first approximation, we assume a~continuous readout (i.e., we neglect the~anode segmentation into pads). We can then reconstruct the~original position of each ionization electron using its readout coordinates. For this purpose, we use the~ionization electron map.
 		
 		The~ionization electron map represents a~mapping from the~detector space to the~readout space (see Section~\ref{sec:coor}). It tells us what readout coordinates $(x',y',t)$ we can expect on average for an~ionization electron created at the~detector coordinates $(x,y,z)$. More precisely, it is a~mapping to the~distributions on the~readout space; we can simplify this as only the means $\overline{\mathcal{M}}$ and the covariance matrices $\mathcal{M}_\mathbf{\Sigma}$, assuming Gaussian distribution:
 			\begin{alignat}{3}
@@ -67,7 +67,7 @@
 				\end{pmatrix}$},\\
 				\mathcal{M}&\colon \mathcal{D} \longrightarrow D(\mathcal{R}),\ &&(x,y,z) \longmapsto N(\mathbf{X}) \equiv \frac{\exp(-\frac{1}{2}(\mathbf{X}-\mathbf{\overline{X}})^T\mathbf{\Sigma}(\mathbf{X}-\mathbf{\overline{X}}))}{\sqrt{(2\pi)^3 |\mathbf{\Sigma}|}}.
 			\end{alignat}
-		To get an~approximation of this mapping, we simulate the~drift of ionization electrons generated on a~regular Cartesian grid $\mathbb{G}\subset\mathcal{D}$ with spacing~$l$ inside the~volume of our \ac{OFTPC}\footnote{The~detector walls are not considered and we simulate the~drift even outside of the~\ac{OFTPC} which allows us to interpolate even close to the~walls} (see the visualization in Figure~\ref{fig:map_3d}). In Figure~\ref{fig:maplines}, you can see an example of drift lines from a~test of the~simulation. After testing runs, two map simulations were made with different gas composition, their parameters are shown in Table~\ref{tab:map}. 
+		To get an~approximation of this mapping, we simulate the~drift of ionization electrons generated on a~regular Cartesian grid $\mathbb{G}\subset\mathcal{D}$ with spacing~$l$ inside the~volume of our \ac{OFTPC}\footnote{The~detector walls are not considered and we simulate the~drift even outside of the~\ac{OFTPC} which allows us to interpolate even close to the~walls} (see the visualization in \cref{fig:map_3d}). In \cref{fig:maplines}, you can see an example of drift lines from a~test of the~simulation. After testing runs, two map simulations were made with different gas composition, their parameters are shown in Table~\ref{tab:map}. 
 		
 		\begin{figure}
 			\centering
@@ -153,7 +153,7 @@
 				\includegraphics[width=0.48\textwidth]{map_yx_bottom_9010.png}
 				\hfill
 				\includegraphics[width=0.48\textwidth]{map_yx_bottom_7030.png}
-				\caption{The $x'y'$ projection of $\mathcal{M}(\mathbb{G}_{-8})$ (similar as in Figure~\ref{fig:map_yx_all}), the diffusion is denoted with the 95\% error ellipses from  the diagonalized sample covariance matrices $\mathcal{M}_\mathbf{\Sigma}(\mathbb{G}_{-8})$ $\leftrightarrow$ Equation~\ref{eq:cov}, and computed using Equation~\ref{eq:sigma}. The mean values $\overline{\mathcal{M}}(\mathbb{G}_{-8})$ are connected by black arrows with the corresponding starting position $(x,y)$ of the simulated electrons. The~\ac{OFTPC} volume is marked with black lines.}
+				\caption{The $x'y'$ projection of $\mathcal{M}(\mathbb{G}_{-8})$ (similar as in \cref{fig:map_yx_all}), the diffusion is denoted with the 95\% error ellipses from  the diagonalized sample covariance matrices $\mathcal{M}_\mathbf{\Sigma}(\mathbb{G}_{-8})$ $\leftrightarrow$ Equation~\ref{eq:cov}, and computed using Equation~\ref{eq:sigma}. The mean values $\overline{\mathcal{M}}(\mathbb{G}_{-8})$ are connected by black arrows with the corresponding starting position $(x,y)$ of the simulated electrons. The~\ac{OFTPC} volume is marked with black lines.}
 				\label{fig:map_yx_bot}
 			\end{subfigure}
 			
@@ -182,7 +182,7 @@
 		
 		Finally, we need to invert the~map to get the~original detector coordinates $(x,y,z)$ from the~given readout coordinates $(x',y',t)$. In our case, it is reasonable to assume that the mapping $\overline{\mathcal{M}}$\red{~(we lose the information about the~distribution (a~wild idea how to recover this is in the Future section but it will only make sense if the~GEM is already accounted for and is very preliminary as there are many factors to consider))} is one-to-one (as seen in the simulations). We implemented two methods for this purpose: the gradient descent search (Section~\ref{sec:grad}) and interpolation on the~inverse grid (Section~\ref{sec:interpol}).
 		
-		The~simulation\orange{~(?)} of the~map is a~computationally heavy task. For this reason, we use the~MetaCentrum grid~\cite{metacentrum} to parallelize needed calculations. At first, this was done by evenly distributing the~simulated electrons across the~individual jobs in a~simulation with only one electron per vertex in the~regular grid~$\mathbb{G}$ with a~spacing of one centimeter. Later, a~more efficient approach was implemented, accounting for the~varying lengths of the~drift of individual electrons. If we index the~vertices of~$\mathbb{G}$ in the~order of increasing coordinates $y,x,z$\red{~(picture will make things clearer)}, we can express the~number~$n_l$ of full XY~layers (i.e., electrons with the~same $z$~coordinate, the mapping of one such layer is shown in Figure~\ref{fig:map_xyt}) with index less than or equal to $i$
+		The~simulation\orange{~(?)} of the~map is a~computationally heavy task. For this reason, we use the~MetaCentrum grid~\cite{metacentrum} to parallelize needed calculations. At first, this was done by evenly distributing the~simulated electrons across the~individual jobs in a~simulation with only one electron per vertex in the~regular grid~$\mathbb{G}$ with a~spacing of one centimeter. Later, a~more efficient approach was implemented, accounting for the~varying lengths of the~drift of individual electrons. If we index the~vertices of~$\mathbb{G}$ in the~order of increasing coordinates $y,x,z$\red{~(picture will make things clearer)}, we can express the~number~$n_l$ of full XY~layers (i.e., electrons with the~same $z$~coordinate, the mapping of one such layer is shown in \cref{fig:map_xyt}) with index less than or equal to $i$
 			\begin{equation}
 				n_l(i) = \left\lfloor\frac{i}{n_{xy}}\right\rfloor,
 			\end{equation}
@@ -296,7 +296,7 @@
 		
 		\red{It is also possible to make this a~subsection of the~map, making the previous subsections parts of a~new subsection 'Map Inversion'.}
 		
-		In order to get a~more realistic representation of a~track measured in the~\ac{OFTPC}, we need to take the~discretization of the~position and time data into account. The~readout of the~\ac{OFTPC} will consist of 128~pads, their layout is shown in Figure~\ref{fig:padlayout}. Time is read out in discrete bins of size $t_\text{bin} = 100$~ns.
+		In order to get a~more realistic representation of a~track measured in the~\ac{OFTPC}, we need to take the~discretization of the~position and time data into account. The~readout of the~\ac{OFTPC} will consist of 128~pads, their layout is shown in \cref{fig:padlayout}. Time is read out in discrete bins of size $t_\text{bin} = 100$~ns.
 		
 		As the~first approximation, we can neglect the~multiplication in the~triple\nobreakdash-\ac{GEM} and assume an~ideal charge readout. The~time measurement starts at the~beginning of the~electron/positron simulation\orange{~(depending on the specific simulation it can correspond to the~production in the target or when entering the OFTPC, here the specific time doesn't matter too much since the primary particle travels basically at light speed (30~ps/cm) which is circa immediate given the time binning)}.\red{~Randomize this time a bit and see what it does to the~reconstruction.} The~readout coordinates ${(x',y',t)\in\mathcal{R}}$ of each ionization electron can be mapped to the pad coordinates~$(n_\text{pad},n_t) \in \mathcal{P}$:
 			\begin{gather}

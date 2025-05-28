@@ -1,50 +1,32 @@
 \chapter{Time Projection Chamber}
 \label{sec:tpc}
 	\red{Using (2010 -- a little old) \scriptsize{\url{https://cds.cern.ch/record/1302071/files/CERN-PH-EP-2010-047.pdf}}\\}
-	A~\acf{TPC} is a~type of gaseous detector that uses the~drift in an~electric field of free charges (electrons and cations\red{, also anions if attachment of electrons to the gas particles is considered}) produced by an~ionizing particle to reconstruct its 3D~trajectory. When placed inside a~magnetic field, the~momentum of the~incident particle can be inferred from the~curvature of its trajectory. Particle identification is also possible using the~ionization energy loss inside the~\ac{TPC} (see Figure~\ref{fig:particleid}). The~detector used 80:20 Ar:CH$_4$ mixture at 8.5~atm pressure.
+	A~\acf{TPC} is a~gaseous detector that uses the~drift times of ionization electrons produced by a~charged particle in an (ideally uniform) electric field to reconstruct the particle's 3D~trajectory. The 2D~projection is measured by an amplification stage at the end of the drift volume. When placed inside a~magnetic field (typically parallel to the electric field), the~momentum of the~incident particle can be inferred from the~curvature of its trajectory. Particle identification is also possible using the~ionization energy loss inside the~\ac{TPC} (see \cref{fig:particleid}).
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.5\textwidth]{particle_id.png}
-		\caption{Particle identification in the~PEP-4 \ac{TPC} at SLAC based on the~energy loss per distance $\dv{E}{x}$~\cite{particleid}.}
+		\includegraphics[width=0.6\textwidth]{particle_id.png}
+		\caption{Particle identification in the~PEP-4 \ac{TPC} at SLAC based on the~energy loss per distance $\dv{E}{x}$ in the 80:20 Ar:CH$_4$ filling at \qty{8.5}{atm} pressure~\cite{particleid}.\orange{~The reference doesn't point to the original PEP-4 article because this adapted version of the original picture that they used in the DUNE article looks better.}}
 		\label{fig:particleid}
 	\end{figure}
 	
-	The original \ac{TPC} used in the~PEP-4 experiment at SLAC (Figure~\ref{fig:pep4}) was a $2\times2$~m cylinder with a~central cathode that produced a~strong electric field, making the~ionization electrons drift towards one of the bases. The~readout consisted of \ac{MWPC}s, where electrons are accelerated towards the~anode wires enough to further ionize the~gas and cause an avalanche.
+	Large \acp{TPC} are sensitive to small distortions in the electric field (imperfections in the field cage, accumulation of positive ions in the gas volume) and to $\mathbf{E}\cross\mathbf{B}$ effects on the drift velocity (see \cref{eq:drift} below). Diffusion of the drifting electrons deteriorates the spacial resolution significantly, but it can be reduced up to \textapprox10~times by a~strong $\mathbf{B}\parallel\mathbf{E}$ field (see \cref{eq:difmag}).
 	
-	\begin{figure}
-		\centering
-		\includegraphics[width=0.7\textwidth]{pep4_tpc.png}
-		\caption{Schematic view of the~PEP-4 \ac{TPC}~\cite{pep4}. A~charged particle produced in a~collision in the~beam pipe creates a~spiral ionization track in the~magnetic field. The central cathode then accelerates ionization electrons towards the~endcap anode wires where they are multiplied and read out.}
-		\label{fig:pep4}
-	\end{figure}
-	
-	When a~charged particle crosses the~volume of a~\ac{TPC}, it loses energy by excitation and ionization of the detector gas\red{~(how much -- from dE/dx + density $\rightarrow$ footnote?)}. Most ionizing collision produce a~single ionization electron, sometimes a~few secondary electrons are produced close to the~collision vertex. In rare cases, the~ionization electron has energy large enough to create a measurable track, such an~electron is called a~$\delta$\nobreakdash-electron\orange{~(terminology, just like bellow -- technically it's a (primary) ionization electron causing other (secondary) ionization)}.\red{~Penning transfer (collisions, light -- factor 10 for gas gain in Ar/CO2 viz PDG CERN)?}
-	
-	\red{CERES/NA45 -- very inhomogeneous magnetic field. They used look-up tables for reconstruction, which they calculated by integrating the Langevin drift velocity equation with Runge-Kutta.}
-	
-	\blue{From~\cite{ceres}:\\ 10.2 Coordinate transformation
-		The detector specific hit coordinates (pad, time, plane) are transformed to
-		spatial coordinates (x, y, z) via look-up tables. The transformation contains
-		the information about the transport process of the charged clusters in the
-		electric and magnetic fields inside the TPC.
-		The look-up tables are calculated using a Runge-Kutta method [39] that
-		calculates the drift trajectory using in each point the drift velocity vector
-		(Eq. 3), starting at the cathode plane. The drift between the cathode plane
-		and the pad plane is absorbed in a $\varphi$-dependent time offset due the fact that
-		each Front-End Electronic (FEE) channel had a slightly different capacitance.
-		The difference between the MAGBOLTZ Monte Carlo drift [19] and the actual
-		drift velocity vector is accounted for with a z- and r(E)-dependent correction
-		for the drift velocity component parallel to the electric field and the one parallel
-		to E × B}
+	In neutrino and other rare-event experiments, large (up to 600 tons) \acp{LArTPC} are used for particle identification and calorimetry. The ionization electrons can be drifted for many meters with a~small diffusion. Scintillation photons are also measured.\red{~Negative ions?}
 	
 	\section{Charge transport in gases}
-		\subsection{Drift}
-			Produced ionization electrons\orange{~(terminology -- called ionization electrons in the rest of the thesis, ionoelectrons?)} are accelerated towards the~readout by the~electric field inside the~chamber. At the same time, they lose speed by colliding with the~gas particles, quickly reaching a~constant (for a~given field $\mathbf{E}, \mathbf{B}$) mean drift velocity. The~electrons might be absorbed by electronegative impurities, such as halides and oxygen.
+		When a~charged particle crosses the~volume of a~\ac{TPC}, it loses energy by excitation and ionization of the detector gas\red{~(how much -- from dE/dx + density $\rightarrow$ footnote?)}. Most ionizing collision produce a~single ionization electron, sometimes a~few secondary electrons are produced near the~collision vertex, creating a~cluster. In rare cases, the~ionization electron has energy large enough to create a measurable track, such an~electron is called a~$\delta$\nobreakdash-electron\orange{~(terminology, just like bellow -- technically it's a (primary) ionization electron causing other (secondary) ionization)}.
+		
+		After their release, the ionization electrons are separated from positive ions by the electric field and they both drift and diffuse in opposite directions towards the electrodes. The~charges are accelerated\orange{~(different word?)} by the~electric field inside the~chamber, and they lose speed by colliding with the~gas particles, quickly reaching a~constant (for a~given field $\mathbf{E}, \mathbf{B}$) mean drift velocity. The~electrons can be absorbed by electronegative impurities, such as halides, O$_2$, and H$_2$O.
+		
+		In mixtures with a~noble gas component, if the excitation energy of the noble gas is higher then the ionization potential of an~admixture, more free electrons can be produced through collisions of the gas particles (so\nobreakdash-called Penning transfer) and through absorption of emitted photons.
+		
+		If the~electric field is strong enough, the electrons can cause further ionization and excitation of the gas, leading to the development of a~Townsend avalanche\red{~(ref)}.
+	
+		\subsection{Drift}			
+			In many gases (called "hot", e.g., Ar or CH$_4$), the~drift velocity is much greater than that of their thermal motion thanks to a~high proportion of elastic collisions. On the other hand, "cold" gases like CO$_2$ have a higher proportion of inelastic collisions (e.g., thanks to the~excitation of rotational and vibrational states) and therefore much lower\orange{~(value? magnitude (implied)?)} drift velocity.\red{~Or maybe it is not so simple, because slowing down the electrons inelastically into a certain minimum of elastic scattering cross-section increases drift velocity? In case of Ar+CO$_2$ this is clearly not the case for low electric fields, so maybe irrelevant here (or is the effect opposite for small additions?).}
 			
-			In many gases (called "hot", e.g., Ar or CH$_4$), the~drift velocity\orange{~(def? the paragraph above not enough?)} is much greater than that of their thermal motion thanks to a~high proportion of elastic collisions. On the other hand, "cold" gases like CO$_2$ have a higher proportion of inelastic collisions (e.g., thanks to the~excitation of rotational and vibrational states) and therefore much lower\orange{~(value? magnitude (implied)?)} drift velocity.
-			
-			The ions produced by the~ionization lose a significant portion of their energy during each collision since their mass is close to the~mass of the~gas particles\orange{~(see the source material -- average energy loss during collision $\Delta E = \frac{2m_i M}{(m_i+M)^2}$, this way it's more accurate)}. This, together with their large collision cross section, makes their drift velocity much smaller and their energy is close to thermal. Since their momenta aren't randomized to such an~extent during collisions, their diffusion is smaller\orange{~(more in the~sense of distribution of positions, could move this to the diffusion subsection)}.
+			The ions produced by the~ionization lose a significant portion of their energy during each collision since their mass is close to the~mass of the~gas particles\orange{~(see the source material -- average energy loss during collision $\Delta E = \frac{2m_i M}{(m_i+M)^2}$, this way it's more accurate)}. This, together with their large collision cross section, makes their drift velocity much smaller (about three orders of magnitude) and their energy is close to thermal. Since their momenta are not randomized to such an~extent during collisions, their diffusion is smaller\red{~(move this to the diffusion subsection, reformulate)}.
 			
 			The drift is also influenced by the~magnetic field. Langevin derived a~good approximation for the~drift velocity vector:
 				\begin{equation}
@@ -56,14 +38,15 @@
 					\label{eq:lorentz}
 					\tan\psi = -\omega\tau.
 				\end{equation}
-			The~drift of ions is only negligibly influenced by the~magnetic field ($\omega\tau\sim10^{-4}$ is small due to the~low drift velocity\orange{~-- better (?) because it takes $\tau$ into account and differs only by E/B ratio (if the magnetic contribution to the magnitude is small)}). In a~standard \ac{TPC}, $\mathbf{E}$ is nearly parallel to $\mathbf{B}$ and the~influence of the~magnetic field on the~drift is minimal. Without magnetic field, we can write
+			The~drift of ions is only negligibly influenced by the~magnetic field ($\omega\tau\sim10^{-4}$ is small due to the~low drift velocity\orange{~-- better (?) because it takes $\tau$ into account and differs only by E/B ratio (if the magnetic contribution to the magnitude is small)}). In a~standard \ac{TPC}, $\mathbf{E}$ is parallel to $\mathbf{B}$ and the~influence of the~magnetic field on the~drift is minimal. Without magnetic field, we can write
 				\begin{equation}
 					\mathbf{v}_d = \frac{q\tau}{m} \mathbf{E} = \mu \mathbf{E},
 				\end{equation}
 			where $\mu$ is called charge mobility.
 			
 		\subsection{Diffusion}
-			Due to collisions a~cloud of electrons or ions originating from the~same point will show a~Gaussian density distribution at time $t$ while drifting in the~electric field $\mathbf{E} = (0,0,E_z)$ along the $z$\nobreakdash-coordinate\orange{~(coordinates defined by the electric field)}:
+			\orange{All of the theory is from the same source mentioned at the beginning. None of the simulations explicitly depend on this.}
+			Due to collisions, a~cloud of electrons or ions originating from the~same point will show a~Gaussian density distribution at time $t$ while drifting in the~electric field $\mathbf{E} = (0,0,E_z)$ along the $z$\nobreakdash-coordinate\orange{~(coordinates defined by the electric field)}:
 				\begin{equation}
 					\rho(x,y,z,t) = (4\pi Dt)^{-\frac{3}{2}} \exp\left(-\frac{x^2+y^2+(z-v_dt)^2}{4Dt}\right),
 				\end{equation}
@@ -71,53 +54,131 @@
 				\begin{equation}
 					D = \frac{\lambda^2}{3\tau} = \frac{\lambda v_\text{d}}{3} = \frac{v_\text{d}^2\tau}{3} = \frac{2\varepsilon\tau}{3m},
 				\end{equation}
-			where $\lambda$ is the mean free path and $\varepsilon$ the mean energy. The lateral diffusion width $\sigma_x$ after a drift distance $L$ can be expressed as
+			where $\lambda$ is the mean free path and $\varepsilon$ the mean kinetic energy. The lateral diffusion width $\sigma_x$ after a drift distance $L$ can be expressed as
 				\begin{equation}
-					\sigma_x^2 = 2Dt = \frac{4\varepsilon L}{3qE}.
+					\sigma_x^2 = 2Dt = \frac{4\varepsilon L}{3qE_z}.
 				\end{equation}
 			The minimal diffusion width is given by the~lowest possible energy of the~particles $\varepsilon_\text{th} = \frac{3}{2}kT$ (corresponding to thermal motion):
 				\begin{equation}
 					\sigma_{x, \,\text{min}}^2 = \frac{2kTL}{qE}.
 				\end{equation}
-			For electrons in "cold gases" (e.g., Ar/CO$_2$ mixture), the diffusion approaches this limit up to a~certain field intensity ($\sim 100~\text{V}/\text{cm}$ at 1~atm pressure)\footnote{\red{For us $\sigma_{x, \,\text{min}} = 0.45$~mm, quite close to the actual diffusion 0.5-0.7~mm -- details of the calculation.}}. In reality, the~transversal diffusion of electrons can differ significantly from their longitudinal diffusion and simulations are necessary to get a~precise result.
+			For electrons in "cold gases" (e.g., Ar/CO$_2$ mixture), the diffusion approaches this limit up to a~certain field intensity (\textapprox\qty{100}{\V\per\cm} at 1~atm pressure)\footnote{\red{For us $\sigma_{x, \,\text{min}} = 0.45$~mm, quite close to the actual diffusion 0.5-0.7~mm -- details of the calculation.}}. In reality, the~transversal diffusion of electrons can differ significantly from their longitudinal diffusion and simulations are necessary to get a~precise result.
 			
-			In most \ac{TPC}s, the~transversal (but not the~longitudinal) diffusion is reduced by the~magnetic field, since it is parallel to the~electric field and curves the~diffusing electrons around their mean trajectory:
+			In most \acp{TPC}, the~transversal (but not the~longitudinal) diffusion is reduced by the~magnetic field, since it is parallel to the~electric field and curves the~diffusing electrons around their mean trajectory:
 				\begin{equation}
 					\label{eq:difmag}
 					\frac{D_\text{T}(B)}{D_\text{T}(0)} = \frac{1}{C+\omega^2\tau_2^2},
 				\end{equation}
 			where $C$ and $\tau_2$ are parameters dependent on the~gas used. At low intensity of the~magnetic field, we can use an~approximation $C\approx1$ and $\tau_2\approx\tau$.
+			
+	\section{Examples of \acp{TPC}}
+		\subsection{The original \ac{TPC} at PEP-4 at SLAC}
+			The original \ac{TPC} used in the~PEP-4 experiment at SLAC in the 1980s (\cref{fig:pep4}) was a $2\times2$~m cylinder with a~central cathode that produced a~strong electric field, making the~ionization electrons drift towards one of the endcaps. The~readout consisted of \acp{MWPC}, where electrons are accelerated towards the~anode wires enough to further ionize the~gas and cause an avalanche.
+			
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.7\textwidth]{pep4_tpc.png}
+				\caption{Schematic view of the~PEP-4 \ac{TPC}~\cite{pep4}. A~charged particle produced in a~collision in the~beam pipe creates a~spiral ionization track in the~magnetic field. The central cathode then accelerates ionization electrons towards the~endcap anode wires where they are multiplied and read out.}
+				\label{fig:pep4}
+			\end{figure}
+		
+		\subsection{The ALICE TPC}
+			
+			
+		\subsection{The CERES/NA45 radial drift TPC}
+			\red{CERES/NA45 -- very inhomogeneous magnetic field. They used look-up tables for reconstruction, which they calculated by integrating the Langevin drift velocity equation with Runge-Kutta.}
+			
+			\blue{From~\cite{ceres}:\\ 10.2 Coordinate transformation
+				The detector specific hit coordinates (pad, time, plane) are transformed to
+				spatial coordinates (x, y, z) via look-up tables. The transformation contains
+				the information about the transport process of the charged clusters in the
+				electric and magnetic fields inside the TPC.
+				The look-up tables are calculated using a Runge-Kutta method [39] that
+				calculates the drift trajectory using in each point the drift velocity vector
+				(Eq. 3), starting at the cathode plane. The drift between the cathode plane
+				and the pad plane is absorbed in a $\varphi$-dependent time offset due the fact that
+				each Front-End Electronic (FEE) channel had a slightly different capacitance.
+				The difference between the MAGBOLTZ Monte Carlo drift [19] and the actual
+				drift velocity vector is accounted for with a z- and r(E)-dependent correction
+				for the drift velocity component parallel to the electric field and the one parallel
+				to E × B}
 	
 	\section{Readout}
 		\subsection{Multi-Wire Proportional Chamber}
-			In most\red{~(2010 -- almost all)} \ac{TPC}s operated in experiments \acf{MWPC}\orange{~(actually wire chamber? -- similar? seems like it can be used for readout, e.g., CERES)} was used for the~readout. The electrons enter the chamber through a~cathode grid and get accelerated in the~strong electric field towards the~thin anode wires and create a~Townsend avalanche\red{~(ref)}, multiplying the~signal.\red{~Alternating with field wires? That is the difference between MWPC and a drift chamber?} The~trajectory can be reconstructed using signal from each separate wire. Segmented cathode is also often used for the readout of produced cations.\red{~Gating grid (reduction of space charge effect, blocking backflow of ions?, closed for electrons B=0, $\Delta V$, static mode (loss of 25\% el.) x opening on trigger)? (gas amplification $>10000$ required for good SNR, 100-200~ns shaping time), figure -- field (acts as a plane from far away and the field only gets strong enough for avalanches)?}
+			In most \acp{TPC} operated in experiments, \acf{MWPC} was used for the~readout. The electrons enter the chamber through a~cathode grid and get accelerated by a~strong electric field towards the parallel, thin anode wires and create an avalanche, multiplying the~signal. The~trajectory can be reconstructed from the drift time and two coordinates measured using
+			\begin{enumerate}[nosep,label=\alph*)]
+				\item two segmented cathodes (wires or strips) rotated by $\ang{90}$ or
+				\item the~ratio of charge collected on two sides of the hit resistive wires.
+			\end{enumerate}
+			For high counting rates, the positive ions from the avalanches accumulate, creating a~space charge that distorts the electric field. This can be solved by using a~gating grid near the readout plane to collect these ions at the cost of introducing a~dead time in the detector.\red{~Add some figure.}
 			
-		\subsection{Gas Electron Multiplier}
-			A~\acf{GEM} is a~thin metal-coated polymer sheet with a~high density of small holes (Figure~\ref{fig:gemhole}). The amplification is achieved by applying voltage on the~metal layers, creating a strong electric field inside the~holes and causing avalanches (see Figure~\ref{fig:gemsim}). Double or triple stack of \ac{GEM}s is usually used to create a~sufficient gain. From the last foil, the~electrons drift to a~segmented anode where the~signal is read. The~backflow of cations is reduced compared to \ac{MWPC}.\red{~Typical parameters (vs thick GEM?).}
-			\begin{figure}
-				\centering
-				\includegraphics[width=0.5\textwidth]{gem_hole.png}
-				\caption{A~scanning electron microscope image of a~\ac{GEM} foil~\cite{gemhole}.}
-				\label{fig:gemhole}
-			\end{figure}
-			\begin{figure}
-				\centering
-				\includegraphics[width=0.8\textwidth]{gemsim.png}
-				\caption{Garfield simulation of an avalanche in a \ac{GEM} hole~\cite{gemsim}. An incoming electron (orange) is accelerated in the~strong electric field of the~\ac{GEM} and causes further ionization multiplying the number of free electrons (orange). Most of the~produced cations (red) are captured by the~\ac{GEM} cathode.}
-				\label{fig:gemsim}
-			\end{figure}
-		
-		\subsection{Micromegas}
-			In a~\ac{Micromegas}\orange{~(in sources I viewed it is not capitalized)} electrons pass through a~fine mesh (made out of very thin wires) into the~narrow amplification gap where they are multiplied in the~high field and read as signal on the~segmented anode. Very high field (30-80 kV/cm$^2$) is necessary to achieve sufficient gain. Cation backflow is heavily suppressed by the~mesh.
+		\subsection{Micro-Pattern Gaseous Detectors}
+			In order to avoid \ac{MWPC} limitations (e.g., diffusion, wire $\mathbf{E}\cross\mathbf{B}$ effect, space charge effects), a~family of \acf{MPGD} technologies are being developed. The readouts can reach higher spatial resolution (down to $\qty{30}{\um}$) with faster response time ($\unit{\ns}$ range) and much higher rate capability.
 			
-		\subsection{Parallel Plate Chamber}
-			\red{..., microwell? -- these readouts and Micromegas are not used in our detector, so maybe just mention them at the beginning of the readout section without excessive detail (some subfigures showing how they look without describing each too much)}
+			\subsubsection{Gas Electron Multiplier}
+				A~\acf{GEM} is a~thin metal-coated polyimide sheet with a~dense pattern of small, chemically etched holes (\cref{fig:gem}). The amplification is achieved by applying voltage across the~metal layers and placing the foil between two moderate uniform electric fields. This creates a~strong electric field inside the~holes that accelerates the incoming electrons and causes avalanches (see \cref{fig:gemsim}). Some charges may land on the dielectric surfaces due to diffusion, modifying the field and affecting gain.
+				
+				\begin{figure}
+					\centering
+					\begin{subfigure}[c]{0.48\textwidth}
+						\centering
+						\includegraphics[width=\textwidth]{gem_schem.png}
+						\caption{A~schematic view of a~\ac{GEM} cell with its typical dimensions, electric field lines (red), and equipotentials (blue)~\cite{pdg2024}.}
+						\label{fig:gem_schem}
+					\end{subfigure}
+					\hfill
+					\begin{subfigure}[c]{0.48\textwidth}
+						\centering
+						\includegraphics[width=\textwidth]{gem_hole.png}
+						\caption{A~scanning electron microscope image of a~\ac{GEM} foil~\cite{gemhole}.}
+						\label{fig:gemhole}
+					\end{subfigure}
+					\caption{\acf{GEM}.}
+					\label{fig:gem}
+				\end{figure}
+				\begin{figure}
+					\centering
+					\includegraphics[width=0.8\textwidth]{gemsim.png}
+					\caption{Garfield simulation of an avalanche in a \ac{GEM} hole~\cite{gemsim}. An incoming electron (orange) is accelerated in the~strong electric field of the~\ac{GEM} and causes further ionization multiplying the number of free electrons (orange). Most of the~produced cations (red) are captured by the~\ac{GEM} cathode.}
+					\label{fig:gemsim}
+				\end{figure}
+				
+				Double or triple stacks of \acp{GEM} are usually used to create a~sufficient gain while maintaining stability (reducing discharges). From the last foil, the~electrons drift to a~segmented anode where the~signal is read. The~ion backflow is reduced compared to \ac{MWPC}.
+				
+				A~cheaper alternative (especially for large area coverage) is a~\ac{THGEM} with a~\textapprox10\nobreakdash-fold upscaling of geometrical parameters. It can be made by mechanically drilling holes into a~standard \ac{PCB} and creating a~circular rim around the holes by etching the metal coating.
 			
+			\subsubsection{Micromegas}
+				In a~\ac{Micromegas}\orange{~(in sources I viewed it is not capitalized)} electrons pass through a~fine mesh (made out of very thin wires) into a~narrow amplification gap where they are multiplied in the~high field and read as a~signal on the~segmented anode (\cref{fig:micromegas_schem}). Very high field (\qtyrange{30}{80}{\kV\per\cm\squared}) is necessary to achieve sufficient gain. Ion backflow is heavily suppressed by the~mesh. 
+				
+				A~Timepix chip (a~high granularity pixel detector) can be used for the~readout anode to achieve the best spatial resolution, making an integrated readout called GridPix (\cref{fig:micromegas_sem}). Thanks to the high spatial resolution, it is possible to distinguish individual electron clusters, which enables a~new method of particle identification.
+				
+				\begin{figure}
+					\centering
+					\begin{subfigure}[c]{0.54\textwidth}
+						\centering
+						\includegraphics[width=\textwidth]{micromegas_schem.png}
+						\caption{A~schematic view of a~\ac{Micromegas} detector.}
+						\label{fig:micromegas_schem}
+					\end{subfigure}
+					\hfill
+					\begin{subfigure}[c]{0.44\textwidth}
+						\centering
+						\includegraphics[width=\textwidth]{micromegas_sem.png}
+						\caption{A~scanning electron microscope image of a~\ac{Micromegas} "GridPix" detector.}
+						\label{fig:micromegas_sem}
+					\end{subfigure}
+					\caption{\acf{Micromegas}~\cite{pdg2024}.}
+					\label{fig:micromegas}
+				\end{figure}
 			
+			\subsubsection{Other \acp{MPGD}}
+				A~\ac{RPWELL} consists of a~\ac{THGEM} with only the top side metal-coated, mounted on a~resistive film deposited on a~thin isolating sheet (which is read out similarly to a~\ac{RPC}). Due to the higher field in the closed holes of the~\ac{THGEM}, a~higher gain can be reached for the same voltage. A~\ac{uRWELL} is a~similar architecture with \textapprox7~times smaller pitch (distance between holes). These options provide a~better spark resistance and could allow to cover large areas for a~lower cost.
+				
+				A~\ac{uPIC} is a~\ac{PCB} with anode strips on one side and orthogonal cathode strips on the other. The cathode has a~resistive coating and a~regular pattern of uncoated regions with anode "dots" penetrating the \ac{PCB} at the centers.
 	
 	\section{Orthogonal Fields TPC at IEAP CTU}
 	\label{sec:oftpc}
-		At \ac{IEAPCTU}, we are going to use six identical atypical \ac{TPC}s with inhomogeneous toroidal magnetic field \textbf{orthogonal} to the~electric field\orange{~(details below)}, hereafter referred to as \acf{OFTPC}. It has the~shape of isosceles trapezoidal prism 16~centimeters high with triple\nobreakdash-\ac{GEM} readout on one of its bases. Dimensions of the~\ac{OFTPC} are discussed in detail in section~\ref{sec:coor} below. Throughout this thesis, we assume a~uniform electric field along the~$z$~axis with $E_z = -400$~V/cm.\red{~Isn't the field affected by the~\ac{MWPC}s? Eventually a simulation will be needed.} Measured particles enter the~\ac{OFTPC} through a~window after crossing the~\ac{MWPC}.\red{~Gas mixture used in the~detector (70/30) and its effect -- some graph with the mixture. Argon used because of price (helium better for multiple scattering)? Add a~figure of the~real TPC.}
+		At \ac{IEAPCTU}, we are going to use six identical atypical \acp{TPC} with inhomogeneous toroidal magnetic field \textbf{orthogonal} to the~electric field\orange{~(details below)}, hereafter referred to as \acf{OFTPC}. It has the~shape of isosceles trapezoidal prism 16~centimeters high with triple\nobreakdash-\ac{GEM} readout on one of its bases. Dimensions of the~\ac{OFTPC} are discussed in detail in section~\ref{sec:coor} below. Throughout this thesis, we assume a~uniform electric field along the~$z$~axis with $E_z = -400$~V/cm.\red{~Isn't the field affected by the~\acp{MWPC}? Eventually a simulation will be needed.} Measured particles enter the~\ac{OFTPC} through a~window after crossing the~\ac{MWPC}.\red{~Gas mixture used in the~detector (70/30) and its effect -- some graph with the mixture, reasons for the choice. Add a~figure of the~real TPC. More about the design choices.}
 		
 		
 		\subsection{Motivation and Associated Challenges}
@@ -126,7 +187,7 @@
 					\item we use permanent magnets instead of a~solenoid and parallel fields are difficult to accomplish this way,
 					\item granularity of the~\ac{TPC} readout is limited in order to fit one SAMPA/SRS hybrid in each sector -- parallel fields would bend the~trajectories parallel to the~readout requiring more pads and different architecture.
 				\end{enumerate}
-			In this thesis, we will show that such a~setup can reach a~similar energy resolution as common cylindrical \ac{TPC}s while reducing the~overall cost.
+			In this thesis, we will show that such a~setup can reach a~similar energy resolution as common cylindrical \acp{TPC} while reducing the~overall cost.
 			
 			The layout introduces two complications to the~track reconstruction -- the trajectory in inhomogeneous field is not circular and the drift is distorted by the magnetic field as shown in the~Equation~\ref{eq:drift}(in our case $\omega\tau \approx 0.08$\red{~for 0.3~T assuming $\mu\approx0.25$~T$^{-1}$, varies inside the detector}). We will deal with these effects in the upcoming chapters.
 			
@@ -137,7 +198,7 @@
 			In order to describe events in our detector, we use three distinct spaces: the~detector space $\mathcal{D}$, the~readout space $\mathcal{R}$ and the~pad space $\mathcal{P}$\orange{~(different spaces that describe different things and each has their own coordinate system, so maybe rename the section somehow?)}. Each space is later used to represent ionization electrons at different stages of the~detection process: their creation in the gas, their final position when hitting the readout plane, and finally their representation in the discrete pad space.
 		
 			\subsubsection{Detector Space}
-				The~detector space $\mathcal{D}$ represents the~physical space of our detector. We describe it using Cartesian coordinates $(x,y,z)$. The~$z$-axis is the~detector's axis of symmetry, with its negative direction aligned with the~proton beam. The~origin $(0,0,0)$ is located at the~center of the~irradiated target. The~positive $x$\nobreakdash-axis passes through the~center of one the~\ac{OFTPC}s along the~intersection of its two planes of symmetry. The~$y$\nobreakdash-axis is then chosen to maintain a~right-handed coordinate system.
+				The~detector space $\mathcal{D}$ represents the~physical space of our detector. We describe it using Cartesian coordinates $(x,y,z)$. The~$z$-axis is the~detector's axis of symmetry, with its negative direction aligned with the~proton beam. The~origin $(0,0,0)$ is located at the~center of the~irradiated target. The~positive $x$\nobreakdash-axis passes through the~center of one the~\acp{OFTPC} along the~intersection of its two planes of symmetry. The~$y$\nobreakdash-axis is then chosen to maintain a~right-handed coordinate system.
 				
 				Since the~detector has a~hexagonal symmetry, we use only one of its sectors in this work -- the~first sector $\mathcal{D}_1 \subset \mathcal{D}$ which is defined by the~condition:
 					\begin{equation}
@@ -154,7 +215,7 @@
 					\end{linenomath}
 				where $y_\text{max}(x)$ is the~maximal value of the~$y$-coordinate for a~given $x$. The~readout is located at $z = 8$~cm; for some purposes, we also define the distance to the~readout $d_r = 8\;\text{cm}-z$ as an~alternative to the~$z$-coordinate.\orange{~Keeping this paragraph as it is because the~\ac{OFTPC} volume is distinct from the~first sector and some parts of this thesis use the~space beyond this volume.} The~\ac{OFTPC} window has width 3.8~cm and height 4.0~cm.
 				
-				We also use spherical coordinates $(r,\theta,\varphi)$ with the~elevation angle~$\theta$ measured relative to the~$xy$ plane. Angles~$\theta$ and~$\varphi$ are useful when describing the~direction of $e^+/e^-$~tracks. Their maximal values considered for the~initial direction in simulations are $\theta_\text{max} \approx 17.1^\circ$ and $\varphi_\text{max} \approx 16.3^\circ$ as shown in Figure~\ref{fig:oftpc}.
+				We also use spherical coordinates $(r,\theta,\varphi)$ with the~elevation angle~$\theta$ measured relative to the~$xy$ plane. Angles~$\theta$ and~$\varphi$ are useful when describing the~direction of $e^+/e^-$~tracks. Their maximal values considered for the~initial direction in simulations are $\theta_\text{max} \approx 17.1^\circ$ and $\varphi_\text{max} \approx 16.3^\circ$ as shown in \cref{fig:oftpc}.
 				
 				\begin{figure}
 					\centering
@@ -175,7 +236,7 @@
 					\end{equation}
 				\red{\textbf{Rewrite to reflect this:} Technically both values can be zero as defined in the~code (max channel 127). It is not really a~subspace of $\mathcal{R}$ but there is a mapping from $\mathcal{R}$ to $\mathcal{P}$. It is a discretization of a~part of $\mathcal{R}$, the mapping can be adjusted depending on the~simulation. If we assume uniform electric field there will be gaps, we don't use gaps in the reconstruction since the~electrons should be pulled towards the~pads.}
 				
-				The~readout of the~\ac{OFTPC} will consist\red{~(is the design final?)} of 128~rectangular pads arranged in a~staggered pattern. Parameters of the~pad layout are shown in Figure~\ref{fig:padlayout}. The bottom left corner of $n$\nobreakdash-th pad has coordinates $(x_{1,n},y_{1,n})$, the~ top right $(x_{2,n},y_{2,n})$ and its center has coordinates $(x_{c,n},y_{c,n})$. The gap between neighboring pads is $g=0.08$~cm. Time will be read out in discrete bins of size $t_\text{bin}=100$~ns\red{~(details?)}.\red{~Could also describe pad-related functions.}
+				The~readout of the~\ac{OFTPC} will consist\red{~(is the design final?)} of 128~rectangular pads arranged in a~staggered pattern. Parameters of the~pad layout are shown in \cref{fig:padlayout}. The bottom left corner of $n$\nobreakdash-th pad has coordinates $(x_{1,n},y_{1,n})$, the~ top right $(x_{2,n},y_{2,n})$ and its center has coordinates $(x_{c,n},y_{c,n})$. The gap between neighboring pads is $g=0.08$~cm. Time will be read out in discrete bins of size $t_\text{bin}=100$~ns\red{~(details?)}.\red{~Could also describe pad-related functions.}
 			
 				\begin{figure}[H]
 					\centering
@@ -186,7 +247,7 @@
 		
 		\subsection{Magnetic Field Simulation}
 		\label{sec:mag}
-			The~magnetic field inside our detector is produced by six permanent magnets. It was simulated using Ansys Maxwell\red{~(citation)} which gives us values on a~regular grid.\red{~More details, vacuum tube, magnets (homogeneous?, density?).} Visualization of the~magnetic field is shown in Figure~\ref{fig:mag}. Whenever we need to work with values outside this grid, we use trilinear interpolation described below.
+			The~magnetic field inside our detector is produced by six permanent magnets. It was simulated using Ansys Maxwell\red{~(citation)} which gives us values on a~regular grid.\red{~More details, vacuum tube, magnets (homogeneous?, density?).} Visualization of the~magnetic field is shown in \cref{fig:mag}. Whenever we need to work with values outside this grid, we use trilinear interpolation described below.
 			
 			\begin{figure}
 				\centering
@@ -209,7 +270,7 @@
 			\label{sec:trilin}
 				Trilinear interpolation is a~3D generalization of linear interpolation\footnote{Linear interpolation in point $x\in(x_1,x_2)$ of a~function $f\colon\mathbb{R}\to\mathbb{R}$ known in points $x_1 < x_2$ is the~convex combination $\widehat{f}(x) = (1-x_d)f(x_1)+x_d f(x_2)$, where $x_d = \frac{x-x_1}{x_2-x_1} \in (0,1)$.}. It can be used to interpolate a~function whose values are known on a~regular grid with rectangular prism cells. We use this simple method for interpolating the~magnetic field, and it is later used in Section~\ref{sec:grad} to interpolate the~Ionization Electron Map, a~key component of our track reconstruction algorithm. In both cases, we use a~regular cubic grid\red{~(apparently it is also called a~Cartesian grid)}.
 				
-				Let us consider a~cell of our regular grid (a~cube) with an~edge of length~$a$ containing the~point $\mathbf{C} = (x,y,z)$ where we want to interpolate a~function $f\colon\mathbb{R}^3\to\mathbb{R}$. We know the~values of this function at the~vertices of the~cell $\mathbf{C}_{ijk} = (x_0+ia,y_0+ja,z_0+ka)$, where $\mathbf{C}_{000} = (x_0,y_0,z_0)$ is the~origin of the~cell\orange{~(is that clear?)}, and $i,j,k \in \{0,1\}$ are indices. We also define the~points $\mathbf{C}_{ij} = (x,y_0+ia,z_0+ja)$ and $\mathbf{C}_i=(x,y,z_0+ia)$. Then the~interpolated value $\widehat{f}(\mathbf{C})$ can be calculated as a~composition of three linear interpolations (see Figure~\ref{fig:trilin}):
+				Let us consider a~cell of our regular grid (a~cube) with an~edge of length~$a$ containing the~point $\mathbf{C} = (x,y,z)$ where we want to interpolate a~function $f\colon\mathbb{R}^3\to\mathbb{R}$. We know the~values of this function at the~vertices of the~cell $\mathbf{C}_{ijk} = (x_0+ia,y_0+ja,z_0+ka)$, where $\mathbf{C}_{000} = (x_0,y_0,z_0)$ is the~origin of the~cell\orange{~(is that clear?)}, and $i,j,k \in \{0,1\}$ are indices. We also define the~points $\mathbf{C}_{ij} = (x,y_0+ia,z_0+ja)$ and $\mathbf{C}_i=(x,y,z_0+ia)$. Then the~interpolated value $\widehat{f}(\mathbf{C})$ can be calculated as a~composition of three linear interpolations (see \cref{fig:trilin}):
 					\begin{alignat}{3}
 						\label{eq:linterpol}
 						\widehat{f}(\mathbf{C}_{ij}) &= (1-x_d)\,f(\mathbf{C}_{0ij}) \,&+&\,x_d\, f(\mathbf{C}_{1ij}),\\
@@ -236,7 +297,7 @@
 						\widehat{f}(\mathbf{C}) = \sum_{i,j,k \in \{0,1\}} t_x^i t_y^j t_z^k f(\mathbf{C}_{ijk}),\\
 						t_\alpha \stackrel{\text{def}}{=} \begin{pmatrix}t_\alpha^0\\ t_\alpha^1\end{pmatrix} = \begin{pmatrix}1-\alpha_d\\ \alpha_d\end{pmatrix},
 					\end{eqnarray}
-				where $\alpha \in \{x,y,z\}$ is an index. This gives a~nice geometric interpretation to the trilinear interpolation as shown in Figure~\ref{fig:trilin2}. From this form and the figure, it is apparent that the final interpolated value does not depend on the~order of axes along which we perform linear interpolations (see Figure~\ref{fig:trilin}). Furthermore, we can write $\widehat{f}(\mathbf{C})$ as a~polynomial:
+				where $\alpha \in \{x,y,z\}$ is an index. This gives a~nice geometric interpretation to the trilinear interpolation as shown in \cref{fig:trilin2}. From this form and the figure, it is apparent that the final interpolated value does not depend on the~order of axes along which we perform linear interpolations (see \cref{fig:trilin}). Furthermore, we can write $\widehat{f}(\mathbf{C})$ as a~polynomial:
 					\begin{equation}
 						\label{eq:trilinpoly}
 						\widehat{f}(\mathbf{C}) = \sum_{\alpha,\beta,\gamma \in \{0,1\}}\sum^{\alpha}_{i=0}\sum^{\beta}_{j=0}\sum^{\gamma}_{k=0} 	(-1)^{(\alpha-i)+(\beta-j)+(\gamma-k)} f(\mathbf{C}_{ijk}) x_d^\alpha y_d^\beta z_d^\gamma.

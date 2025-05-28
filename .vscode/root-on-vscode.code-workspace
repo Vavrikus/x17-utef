@@ -89,7 +89,10 @@
       "plot_drift.C": "cpp",
       "optional": "cpp",
       "bfield.C": "cpp",
-      "cview_update.C": "cpp"
+      "cview_update.C": "cpp",
+      "charconv": "cpp",
+      "source_location": "cpp",
+      "format": "cpp"
     },
     "C_Cpp.default.includePath": [
       "/home/vavrik/work/X17/include",
