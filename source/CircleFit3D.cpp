@@ -233,6 +233,14 @@ namespace X17
         Vector arc_beg_vector = m_originc - point.AsVector();
         Vector arc_end_vector = m_origin2 - point.AsVector();
 
+        // Checking if the point is on the arc.
+        double angle1 = arc_beg_vector.Angle(projection);
+        double angle2 = arc_end_vector.Angle(projection);
+        if (angle1 + angle2 > m_phi_max)
+        {
+            circle_vector = angle1 < angle2 ? arc_beg_vector : arc_end_vector;
+        }
+
         return find_min(circle_vector.SqMagnitude(),arc_beg_vector.SqMagnitude(),arc_end_vector.SqMagnitude());
     }
     
