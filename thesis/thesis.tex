@@ -59,14 +59,15 @@
 \sisetup{
 	per-mode=symbol,
 	range-phrase = -,
-	range-units = single
+	range-units = single,
+	product-units = power
 }
 \AtBeginDocument{\RenewCommandCopy\qty\SI}
 \ExplSyntaxOn
 \msg_redirect_name:nnn { siunitx } { physics-pkg } { none }
 \ExplSyntaxOff
 \show\qty
-\usepackage{caption}
+\usepackage[labelfont=bf]{caption}
 \usepackage{subcaption}
 \captionsetup[subfigure]{font=footnotesize}
 \usepackage{enumitem}
@@ -100,8 +101,11 @@
 \usepackage[a-2u]{pdfx} % Generate PDF/A-2u
 \usepackage{hyperref}   % references to sections
 \usepackage[capitalise,nameinlink]{cleveref}
+\creflabelformat{equation}{#2\textup{#1}#3}
 \crefname{equation}{Eq.}{Eqs.}
 \Crefname{equation}{Eq.}{Eqs.}
+\crefname{section}{Sec.}{Secs.}
+\Crefname{section}{Sec.}{Secs.}
 
 %%% Basic information on the thesis
 
