@@ -89,7 +89,31 @@ double GetFWHM(TH1F* h, bool draw)
 
 double StdevBiasFactor(int N)
 {
-    return 1.0/(TMath::Sqrt(2.0/(N-1))*TMath::Gamma(0.5*N)/TMath::Gamma(0.5*(N-1)));
+    // Using logarithmic version of the gamma function to avoid overflow
+    double log_g1 = std::lgamma(0.5 * N);
+    double log_g2 = std::lgamma(0.5 * (N - 1));
+    double root = std::sqrt(2.0/(N-1));
+
+    double val = 1.0 / (root * std::exp(log_g1 - log_g2));
+    return val;
+}
+
+X17::Vector GetStDev(const std::vector<X17::Vector>& values, double* mag_sigma)
+{
+    X17::Vector average = GetAverage(values);
+    X17::Vector sum_sq(0,0,0);
+    for (X17::Vector value : values)
+    {
+        X17::Vector diff = value - average;
+        sum_sq += X17::Vector(diff.x*diff.x, diff.y*diff.y, diff.z*diff.z);
+    }
+    sum_sq /= values.size() - 1;
+
+    double mag = std::sqrt(sum_sq.x + sum_sq.y + sum_sq.z);
+    *mag_sigma = mag*StdevBiasFactor(values.size());
+
+    X17::Vector stdev(std::sqrt(sum_sq.x), std::sqrt(sum_sq.y), std::sqrt(sum_sq.z));
+    return stdev*StdevBiasFactor(values.size());
 }
 
 double GetQuantile(std::vector<double>& values, double quantile, bool sorted)

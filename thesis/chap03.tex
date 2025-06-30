@@ -2,7 +2,7 @@
 \label{sec:track}
 	As the first step of the reconstruction algorithm, we reconstruct the track of a~primary particle -- either an~electron or a~positron. Then, using this information, we determine the energy of the particle (Section~\ref{sec:energy}).
 	
-	The~\textbf{Reconstruction Assuming Steady Drift} uses the standard \ac{TPC} approach. With parallel fields, the drift inside a~uniform electric field remains undistorted (as shown in Equation~\ref{eq:drift}). Therefore, we only need to reconstruct the $z$\nobreakdash-coordinate from the drift time using the known drift velocity. We also assume that the readout coordinates ($x'$,~$y'$,~$t$) are known exactly, neglecting the pads and time binning.
+	The~\textbf{\acf{RASD}} uses the standard \ac{TPC} approach. With parallel fields, the drift inside a~uniform electric field remains undistorted (as shown in Equation~\ref{eq:drift}). Therefore, we only need to reconstruct the $z$\nobreakdash-coordinate from the drift time using the known drift velocity. We also assume that the readout coordinates ($x'$,~$y'$,~$t$) are known exactly, neglecting the pads and time binning.
 	
 	Reconstruction using an~\textbf{Ionization Electron Map} (from now on referred to as \emph{the map}) uses a~simulation of the drift of secondary (ionization) electrons within the detector volume. This simulation can then be used to interpolate the initial position of the secondary electrons. In the first iteration of this method the readout is assumed to be continuous.
 	
@@ -14,7 +14,7 @@
 	\label{sec:trackfirst}
 		As the first step, we tried to reconstruct a~simulated electron track with a~special set of initial parameters, described in detail in Section~\ref{sec:microfirst}. The~starting point is given by the origin of our coordinate system and its initial direction is given by the positive $x$\nobreakdash-axis. This means the magnetic field of our detector is perpendicular to the momentum of the particle at all times, and we can reduce the problem to two-dimensional space.
 		
-		For the reconstruction, we decided to use the common method used in a~standard \ac{TPC}\red{~(similar to?, cite some source(s)!)}. This will allow us to explore the significance of the atypical behavior in our \ac{OFTPC}. Additionally, we assume the readout is continuous to further simplify the problem. In this approximation, we reconstruct the initial position of each ionization electron.
+		For the reconstruction, we decided to use the common method used in a~standard \ac{TPC}\red{~(similar to?, cite some source(s)!)}. We call this method \textit{\acf{RASD}}. This will allow us to explore the significance of the atypical behavior in our \ac{OFTPC}. Additionally, we assume the readout is continuous to further simplify the problem. In this approximation, we reconstruct the initial position of each ionization electron.
 		
 		The~reconstruction is then defined by the following relations between the coordinates of the detector space and the readout space (see Section~\ref{sec:coor}):
 			\begin{align}
@@ -99,7 +99,11 @@
 				\hline
 				$x$ bounds & $[0,15]$ cm & $[-1.5,15.0]$ cm \\
 				\hline
-				$y$ bounds & $|y| \leq x\cdot\tan\frac{\pi}{3}$ & $|y| \leq (x+\SI{1.5}{\centi\meter})\cdot\tan\frac{\pi}{6}$ \\
+				$y$ bounds & $|y| \leq x\cdot\tan\frac{\pi}{3}$ & $|y| \leq (x+\qty{1.5}{\centi\meter})\cdot\tan\frac{\pi}{6}$ \\
+				\hline
+				initial energy & 0.1 eV & 0.1 eV \\
+				\hline
+				init. direction & randomized & randomized \\
 				\hline
 			\end{tabular}}
 			\label{tab:map}
@@ -182,45 +186,24 @@
 		
 		Finally, we need to invert the map to get the original detector coordinates $(x,y,z)$ from the given readout coordinates $(x',y',t)$. In our case, it is reasonable to assume that the mapping $\overline{\mathcal{M}}$\red{~(we lose the information about the distribution (a~wild idea how to recover this is in the Future section but it will only make sense if the GEM is already accounted for and is very preliminary as there are many factors to consider))} is one-to-one (as seen in the simulations). We implemented two methods for this purpose: the gradient descent search (Section~\ref{sec:grad}) and interpolation on the inverse grid (Section~\ref{sec:interpol}).
 		
-		The~simulation\orange{~(?)} of the map is a~computationally heavy task. For this reason, we use the MetaCentrum grid~\cite{metacentrum} to parallelize needed calculations. At first, this was done by evenly distributing the simulated electrons across the individual jobs in a~simulation with only one electron per vertex in the regular grid~$\mathbb{G}$ with a~spacing of one centimeter. Later, a~more efficient approach was implemented, accounting for the varying lengths of the drift of individual electrons. If we index the vertices of~$\mathbb{G}$ in the order of increasing coordinates $y,x,z$\red{~(picture will make things clearer)}, we can express the number~$n_l$ of full XY~layers (i.e., electrons with the same $z$~coordinate, the mapping of one such layer is shown in \cref{fig:map_xyt}) with index less than or equal to $i$
-			\begin{equation}
-				n_l(i) = \left\lfloor\frac{i}{n_{xy}}\right\rfloor,
-			\end{equation}
-		where $n_{xy}$ is the number of electrons in each XY~layer calculated simply by counting the electrons that satisfy boundary conditions for $x$~and~$y$.\red{~These conditions should be mentioned above; sector condition + maximal $x$ value.} The~number of electrons remaining in the top layer is then
-			\begin{equation}
-				n_r(i) = i\!\!\!\!\mod n_{xy}.
-			\end{equation}
-		Finally, we can calculate the sum of the drift gaps of electrons up to index~$i$
-			\begin{equation}
-				d_\text{sum} = (z_\text{max}-z_\text{min})n_{xy}n_l-\frac{n_l(n_l-1)}{2}n_{xy}l+n_r(z_\text{max}-z_\text{min}-n_l l).
-			\end{equation}
-		We then use a~binary search algorithm to find the maximum index $i$ such that the value of this sum is less than the fraction $\frac{\text{job id}}{\text{max job id}}$ of the total sum. This way we obtain the minimal and the maximal index of electrons simulated in the given job.
-		\red{Picture of the simulating grid (1 layer). zmin zmax also}
-		
-		\red{The~obtained map is then stored in a~custom class template \textit{Field}, could expand on that. Maybe earlier, since the same template is used for the magnetic field.}
-		
-		\red{Simulation inside of one sector (at first double angle). Extra space on the sensor. Using qsub (not sure if important). Add plots of distortion of the coordinates.\\}
-		
-		\noindent\red{Images to add (comparison of both simulations):
-		\begin{itemize}[topsep=4pt,itemsep=2pt]
-			\item Already have a simple 2D map visualization from the RD51 presentation, can use it or make something better
-			\item $z$ vs. $t$ plot
-			\item XY plane distortion for different $z$ values; with arrows and error bars, for all $z$-layers with different colors
-			\item XZ plane ($y = 0$) distortion in $x$ (maybe not necessary?)
-			\item XT plot ($y = 0$) showing (small) distortion in drift times\\
-		\end{itemize}}
-		
-		\noindent\red{More images:}
-		\begin{itemize}[topsep=4pt,itemsep=2pt]
-			\item \red{Residuals of the continuous readout reconstruction.}
-		\end{itemize}
-		
-		\begin{figure}[H]
-			\centering
-			\includegraphics[width=0.5\textwidth]{9010_reco.png}
-			\caption{Example reconstruction with the map.\red{~Swap for better image, correct coordinates.}}
-			\label{fig:9010reco}
-		\end{figure}
+		\subsection{Map Simulation}
+			The~simulation\orange{~(?)} of the map is a~computationally heavy task. For this reason, we use the MetaCentrum grid~\cite{metacentrum} to parallelize needed calculations. At first, this was done by evenly distributing the simulated electrons across the individual jobs in a~simulation with only one electron per vertex in the regular grid~$\mathbb{G}$ with a~spacing of one centimeter. Later, a~more efficient approach was implemented, accounting for the varying lengths of the drift of individual electrons. If we index the vertices of~$\mathbb{G}$ in the order of increasing coordinates $y,x,z$\red{~(picture will make things clearer)}, we can express the number~$n_l$ of full XY~layers (i.e., electrons with the same $z$~coordinate, the mapping of one such layer is shown in \cref{fig:map_xyt}) with index less than or equal to $i$
+				\begin{equation}
+					n_l(i) = \left\lfloor\frac{i}{n_{xy}}\right\rfloor,
+				\end{equation}
+			where $n_{xy}$ is the number of electrons in each XY~layer calculated simply by counting the electrons that satisfy boundary conditions for $x$~and~$y$.\red{~These conditions should be mentioned above; sector condition + maximal $x$ value.} The~number of electrons remaining in the top layer is then
+				\begin{equation}
+					n_r(i) = i\!\!\!\!\mod n_{xy}.
+				\end{equation}
+			Finally, we can calculate the sum of the drift gaps of electrons up to index~$i$
+				\begin{equation}
+					d_\text{sum} = (z_\text{max}-z_\text{min})n_{xy}n_l-\frac{n_l(n_l-1)}{2}n_{xy}l+n_r(z_\text{max}-z_\text{min}-n_l l).
+				\end{equation}
+			We then use a~binary search algorithm to find the maximum index $i$ such that the value of this sum is less than the fraction $\frac{\text{job id}}{\text{max job id}}$ of the total sum. This way we obtain the minimal and the maximal index of electrons simulated in the given job.
+			
+			\red{The~obtained map is then stored in a~custom class template \textit{Field}, could expand on that. Maybe earlier, since the same template is used for the magnetic field.}
+			
+			\red{Simulation inside of one sector (at first double angle). Extra space on the sensor. Using qsub (not sure if important). Add plots of distortion of the coordinates.\\}
 		
 		\subsection{Gradient Descent Algorithm}
 		\label{sec:grad}			
@@ -240,18 +223,23 @@
 				\begin{equation}
 					\left[\nabla(f_R\circ\overline{\mathcal{M}})\right]^i(D_n) \approx \frac{f_R(\overline{\mathcal{M}}(D_n+s\cdot e^i))-f_R(\overline{\mathcal{M}}(D_n-s\cdot e^i))}{2s},
 				\end{equation}
-			where $e^i\in\mathcal{D}$ is the $i$-th coordinate vector and $s$ is the step size. The~step size should be sufficiently small; initially, we set it as a~fraction $s = \frac{l}{10}$ of the map's grid spacing $l$. During the minimization, we check that $f_R(\overline{\mathcal{M}}(D_n))<10s$ at all times\orange{~($s$ can (?) change -- check)}.\red{~When using trilinear interpolation, it would be more efficient to calculate the gradient explicitly ($\pm$ same result). This could be implemented inside the \textit{Field} template class.} The~next iteration can be calculated as follows:
+			where $e^i\in\mathcal{D}$ is the $i$-th coordinate vector and $s$ is the step size. The~step size should be sufficiently small; initially, we set it as a~fraction $s = \frac{l}{10}$ of the map's grid spacing $l$. During the minimization, we check that $f_R(\overline{\mathcal{M}}(D_n))<10s$ at all times and decrease the step if needed.\red{~When using trilinear interpolation, it would be more efficient to calculate the gradient explicitly ($\pm$ same result). This could be implemented inside the \textit{Field} template class.} The~next iteration can be calculated as follows:
 				\begin{equation}
 					D_{n+1} = D_n - \gamma \nabla(f_R\circ\overline{\mathcal{M}})(D_n),
 				\end{equation}
-			where $\gamma\in\mathbb{R}^+$ is the damping coefficient. It should be set to a~small enough value to ensure convergence, but large enough for sufficient converging speed. The~minimization stops either when the error $f_R(\overline{\mathcal{M}}(D_n))$ drops below a~specified value or when the number of iterations exceeds a~certain limit (in this case, a~message is printed into the console).
-			The parameters of this method can be further optimized (e.g., a~better choice of $\gamma$,\red{~gradient computation}); instead, we later decided to use the interpolation on the inverse grid described in the next section.
+			where $\gamma\in\mathbb{R}^+$ is the damping coefficient. It should be set to a~small enough value to ensure convergence, but large enough for sufficient converging speed. In order to avoid oscillation around the minimum, we also check that the size of the damped gradient does not exceed (or get too close to) the current value of the non-negative function:
+				\begin{equation}
+					10 \norm{\gamma \nabla(f_R\circ\overline{\mathcal{M}})(D_n)} < f_R(D_n),
+				\end{equation}
+			and lower $\gamma$ otherwise. The~minimization stops either when the error $f_R(\overline{\mathcal{M}}(D_n))$ drops below a~specified value or when the number of iterations exceeds a~certain limit (in this case, a~message is printed into the console).
+			
+			The parameters of this method can be further optimized (e.g., a~better choice of $\gamma$ and~$s$, analytical computation of the gradient\footnote{The gradient can be computed analytically when using the trilinear interpolation, see \cref{eq:trilinpoly}.}); instead, we later decided to use the interpolation on the inverse grid described in the next section.
 			
 			\red{Measure reconstruction duration and compare it with the inverse grid interpolation? Also compare the result? Typical evolution of $D_n$ during search. Not sure if this has to be cited.}
 		
 		\subsection{Interpolation on the Inverse Grid}
 		\label{sec:interpol}			
-			\red{Interpolation should be generally faster than the gradient descent since we don't need to iterate. We also don't need to optimize it to improve performance, if it's too slow we can even calculate the coefficients for the entire map before reconstruction (again, do some profiling).}
+			\red{Interpolation should be generally faster than the gradient descent since we don't need to iterate. We also don't need to optimize it to improve performance, if it's too slow we can even calculate the coefficients for the entire map before reconstruction (again, do some profiling). Very rough profiling shows that the difference in the current state is at least one order of magnitude.}
 			
 			The~best current algorithm uses the interpolation on the inverse grid. Rather than inverting the trilinearly interpolated map using a~numerical minimization method as in the previous section, we take advantage of the fact that the map $\overline{\mathcal{M}}$ is one-to-one\orange{~(isomorphism is supposed to preserve structure, not sure how to interpret that here, }\red{not the best description, we already (kind of) assume it is a~bijection by saying we will invert it)}. Since we have simulated values of this map on a~regular grid in the detector space $\mathcal{D}$, we also know the inverse map $\overline{\mathcal{M}}^{-1}$ on the irregular inverse grid in the readout space $\mathcal{R}$. To get an~approximation of the inverse map in the entire readout space, we can use interpolation\orange{~(general concept, the specific choice is described below)}.
 			
@@ -290,13 +278,52 @@
 				\caption{Selection of the points for interpolation.\red{~Create better images; use the explanation interpolation vs. extrapolation strange property. Solution~2 probably does not make much sense.}}
 				\label{fig:interpol}
 			\end{figure}
+			
+		\section{Reconstruction testing}
+			The continuous reconstruction using the map was tested on microscopic tracks with parameters described in \cref{sec:microfirst}. The difference between the reconstructed positions obtained using the two map inversion algorithms was found to be smaller than the uncertainty from diffusion by several orders of magnitude. In its unoptimized state, the gradient descent search was significantly slower (at least ten times) than the interpolation on the inverse grid.
+			
+			An example of reconstruction of tracks in 90:10 and 70:30 Ar:CO$_2$ gas mixture is shown in \cref{fig:reco_map}. We can clearly see that the results have improved compare to the \acf{RASD} (shown in \cref{fig:rasd_xz}). A~comparison of the residuals of reconstructed positions (i.e., their distances to the real starting positions) is shown in \cref{fig:rasd_map}. The histograms of residuals, as well as residuals of individual coordinates, are shown in \cref{fig:9010_map_res,fig:7030_map_res}. The bin width for the histograms was chosen using the Scott's rule\footnote{The optimal bin width for normally distributed data of size~$N$ with sample standard deviation $\hat{\sigma}$ is $\hat{\sigma}\sqrt[3]{\frac{24\sqrt{\pi}}{N}}$~\cite{scott}.}. As expected, the mean values of the coordinate residuals is zero. The only exception is the $z$\nobreakdash-coordinate in the 70:30 Ar:CO$_2$ track, where the mean is \qty{-0.064}{\cm} (further than one standard deviation \qty{0.051}{\cm} from zero). This is caused by the non-zero initial energy of the ionization electrons (neglected in the other track) which is unaccounted for in the map simulation. Since the primary electron bends towards negative~$z$, the ionization electrons are more likely to be released in this direction (and also bend in the magnetic field towards this direction).
+			
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.48\textwidth]{9010_reco_map.png}
+				\hfill
+				\includegraphics[width=0.48\textwidth]{7030_reco_map.png}
+				\caption{Reconstruction (black) of the starting position of ionization electrons (red) using the inversion of the ionization electron map. Two gas compositions 90:10 (left) and 70:30 Ar:CO$_2$ (right) are compared.}
+				\label{fig:reco_map}
+			\end{figure}
+			
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.48\textwidth]{9010_rasd_map.png}
+				\hfill
+				\includegraphics[width=0.48\textwidth]{7030_rasd_map.png}
+				\caption{Comparison of residuals from the \ac{RASD} (black) and map inversion (red) reconstruction methods. Tracks in two different gas compositions 90:10 (left) and 70:30 Ar:CO$_2$ (right) are compared.}
+				\label{fig:rasd_map}
+			\end{figure}
+			
+			\begin{figure}
+				\centering
+				\includegraphics[width=\textwidth]{9010_map_res.png}
+				\caption{Map inversion reconstruction residuals (for the individual coordinates and total) of the testing track in 90:10 Ar:CO$_2$ gas mixture.}
+				\label{fig:9010_map_res}
+			\end{figure}
+			
+			\begin{figure}
+				\centering
+				\includegraphics[width=\textwidth]{7030_map_res.png}
+				\caption{Map inversion reconstruction residuals (for the individual coordinates and total) of the testing track in 70:30 Ar:CO$_2$ gas mixture.}
+				\label{fig:7030_map_res}
+			\end{figure}
+			
+			
 		
 	\section{Discrete Reconstruction}
 		\red{Reconstruction with pads and time bins. Maybe testing different pads.}
 		
 		\red{It is also possible to make this a~subsection of the map, making the previous subsections parts of a~new subsection 'Map Inversion'.}
 		
-		In order to get a~more realistic representation of a~track measured in the \ac{OFTPC}, we need to take the discretization of the position and time data into account. The~readout of the \ac{OFTPC} will consist of 128~pads, their layout is shown in \cref{fig:padlayout}. Time is read out in discrete bins of size $t_\text{bin} = 100$~ns.
+		In order to get a~more realistic representation of a~track measured in the \ac{OFTPC}, we need to take the discretization of the position and time data into account. The~readout of the \ac{OFTPC} will consist of 128~pads, their layout is shown in \cref{fig:padlayout}. Time is read out in discrete bins of size $t_\text{bin} = \qty{100}{\ns}$.
 		
 		As the first approximation, we can neglect the multiplication in the triple\nobreakdash-\ac{GEM} and assume an~ideal charge readout. The~time measurement starts at the beginning of the electron/positron simulation\orange{~(depending on the specific simulation it can correspond to the production in the target or when entering the OFTPC, here the specific time doesn't matter too much since the primary particle travels basically at light speed (30~ps/cm) which is circa immediate given the time binning)}.\red{~Randomize this time a bit and see what it does to the reconstruction.} The~readout coordinates ${(x',y',t)\in\mathcal{R}}$ of each ionization electron can be mapped to the pad coordinates~$(n_\text{pad},n_t) \in \mathcal{P}$:
 			\begin{gather}

@@ -99,7 +99,8 @@ namespace X17
                     break;
                 }
             }
-            if (!not_zero) std::cerr << "WARNING: Singular matrix.\n";
+            if (!not_zero)
+                std::cerr << "WARNING: Matrix::Reduce(): Singular matrix.\n";
 
             // Normalize selected row.
             double first = this->at(c, c);

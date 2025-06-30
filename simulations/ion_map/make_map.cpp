@@ -117,8 +117,8 @@ int make_map()
     double Bmin = -7.5;
     double Bmax = 7.5;
     // Scott's rule
-    double Bbins      = (Bmax-Bmin)/(3.5*1/std::pow(651*16,1.0/3.0));
-    double Bbins_rand = (Bmax-Bmin)/(3.5*1/std::pow(nsets,1.0/3.0));
+    double Bbins      = GetBinsScott(Bmin,Bmax,1.0,651*16);
+    double Bbins_rand = GetBinsScott(Bmin,Bmax,1.0,nsets);
     TH1F* h_mardia       = new TH1F("h_mardia","Mardia's multivariate normality test",Bbins,Bmin,Bmax);
     TH1F* h_mardia_rand  = new TH1F("h_mardia_rand","Mardia's multivariate normality test",Bbins_rand,Bmin,Bmax);
     
@@ -144,7 +144,7 @@ int make_map()
         
         ReportProgress(i+1,map_data_in->GetEntries());
 
-        if (!v_g_yx_endpts.contains(point.start.z()))
+        if (v_g_yx_endpts.find(point.start.z()) == v_g_yx_endpts.end())
             v_g_yx_endpts[point.start.z()] = new TGraph();
         v_g_yx_endpts[point.start.z()]->AddPoint(point.end.y(),point.end.x());
 
@@ -241,6 +241,7 @@ int make_map()
                     }
                 }
                 
+                if (p_vec.size() < 100) std::cout << "WARNING: Map point has only " << p_vec.size() << " entries!\n";
                 p_vec.clear();
             }
 

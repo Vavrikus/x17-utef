@@ -25,6 +25,7 @@
 #include "CircleFit3D.h"
 #include "Color.h"
 #include "Field.h"
+#include "Reconstruction.h"
 #include "RK4.h"
 #include "Track.h"
 #include "X17Utilities.h"
@@ -289,7 +290,7 @@ void PlotTrackRK(X17::TrackMicro track, X17::Field<X17::Vector>* magfield, bool 
         // g_diff2->Draw("P same");
 }
 
-void PlotRASD(X17::TrackMicro track, bool newcoords = false)
+void PlotRASD(X17::TrackMicro track, X17::Field<X17::MapPoint>* map, bool newcoords = false)
 {
     TGraph* g_drift_noTPC = new TGraph();
     TGraph* g_drift_TPC = new TGraph();
@@ -345,35 +346,66 @@ void PlotRASD(X17::TrackMicro track, bool newcoords = false)
     TCanvas* c_rasd = new TCanvas("","RASD",g_cwidth,g_cheight);
     TGraph* xz_original = new TGraph();
     TGraph* xz_reconstructed = new TGraph();
+    TGraph* xz_reco_map = new TGraph();
     TGraph* g_res = new TGraph();
+    TGraph* g_res_map = new TGraph();
+    std::vector<X17::Vector> residuals, oldvsnew;
+    double max_residual = -1;
+    double max_oldvsnew = -1;
+    double x_limit = 2; //newcoords ? -1 : 2;
     for (const auto& point : track.points)
     {
         using namespace X17::constants;
         double z_end = newcoords ? point.end.z() : point.end.y();
         if(z_end > 7.5)
         {
-            X17::Vector orig,reco;
+            X17::Vector orig,reco_rasd;
+            X17::RecoPoint reco_map, reco_map_old;
 
             if (newcoords)
             {
                 orig = {point.start.x(), point.start.y(),point.start.z()};
-                reco = {point.end.x(), point.end.y(), 8-(b0+b1*point.end.t/1000)};
+                reco_rasd = {point.end.x(), point.end.y(), 8-(b0+b1*point.end.t/1000)};
+                if (orig.x > x_limit && orig.x < map->GetXMax())
+                {
+                    reco_map_old = X17::ReconstructOld(*map, point.end.x(),point.end.y(),point.end.t,1E-9,false);
+                    reco_map = X17::Reconstruct(*map,point);
+                }
             }
             else
             {
                 orig = {point.start.z(), point.start.x(),point.start.y()};
-                reco = {point.end.z(), point.end.x(), 8-(b0+b1*point.end.t/1000)};
+                reco_rasd = {point.end.z(), point.end.x(), 8-(b0+b1*point.end.t/1000)};
+                if (orig.x > x_limit && orig.x < map->GetXMax())
+                {
+                    reco_map_old = X17::ReconstructOld(*map, point.end.z(),point.end.x(),point.end.t,1E-9);
+                    reco_map = X17::Reconstruct(*map, X17::EndPoint(point.end.z(),point.end.x(),point.end.y(),point.end.t));
+                }
             }
+            // std::cout << "Original:            (" << orig.x << ", " << orig.y << ", " << orig.z << ")" << std::endl;
             xz_original->AddPoint(orig.x,orig.z);
-            xz_reconstructed->AddPoint(reco.x,reco.z);
-            g_res->AddPoint(reco.x,std::sqrt(reco.SqDist(orig)));//reco.z-orig.z);//reco.x-orig.x);//
+            xz_reconstructed->AddPoint(reco_rasd.x,reco_rasd.z);
+            if (orig.x > x_limit && orig.x < map->GetXMax())
+            {
+                xz_reco_map->AddPoint(reco_map.x(),reco_map.z());
+                g_res->AddPoint(reco_rasd.x,reco_rasd.Dist(orig));
+                g_res_map->AddPoint(reco_map.x(),reco_map.AsVector().Dist(orig));
+
+                X17::Vector residual = reco_map.AsVector() - orig;
+                if(residual.Magnitude() > max_residual) max_residual = residual.Magnitude();
+                residuals.push_back(residual);
+
+                X17::Vector oldvnew = reco_map_old.AsVector() - reco_map.AsVector();
+                if(oldvnew.Magnitude() > max_oldvsnew) max_oldvsnew = oldvnew.Magnitude();
+                oldvsnew.push_back(oldvnew);
+            }
         }
     }
     xz_original->SetMarkerStyle(7);
     xz_original->SetMarkerColor(kRed);
     xz_reconstructed->SetMarkerStyle(2);
     xz_reconstructed->SetMarkerColor(kBlack);
-
+    
     gStyle->SetTitleYOffset(1.05);
     TMultiGraph* mg_rasd = new TMultiGraph();
     mg_rasd->Add(xz_original,"P");
@@ -381,24 +413,95 @@ void PlotRASD(X17::TrackMicro track, bool newcoords = false)
     mg_rasd->GetXaxis()->SetTitle("x [cm]");
     mg_rasd->GetYaxis()->SetTitle("z [cm]");
     mg_rasd->Draw("A");
-
+    
     TLegend* l_rasd = new TLegend(0.69,0.82,0.93,0.93);
     l_rasd->AddEntry(xz_original,"simulation","p");
     l_rasd->AddEntry(xz_reconstructed,"reconstructed","p");
     l_rasd->SetTextSize(0.043);
     l_rasd->Draw();
-
+    
     TCanvas* c_res = new TCanvas("","Residuals",g_cwidth,g_cheight);
     g_res->SetMarkerStyle(2);
-    g_res->SetMarkerColor(kRed);
+    g_res->SetMarkerColor(kBlack);
     g_res->GetXaxis()->SetTitle("x [cm]");
     g_res->GetYaxis()->SetTitle("residual [cm]");
     g_res->Draw("AP");
-
-    TLegend* l_res = new TLegend(0.17,0.855,0.5,0.91);
-    l_res->AddEntry(g_res,"reconstr. residuals","p");
+    g_res_map->SetMarkerStyle(2);
+    g_res_map->SetMarkerColor(kRed);
+    g_res_map->Draw("P same");
+    
+    TLegend* l_res = new TLegend(0.17,0.8,0.5,0.91);
+    l_res->AddEntry(g_res,"RASD residuals","p");
+    l_res->AddEntry(g_res_map,"Map residuals","p");
     l_res->SetTextSize(0.043);
     l_res->Draw();
+    
+    TCanvas* c_map = new TCanvas("","Reco map",g_cwidth,g_cheight);
+    xz_reco_map->SetMarkerStyle(2);
+    xz_reco_map->SetMarkerColor(kBlack);
+    TMultiGraph* mg_map = new TMultiGraph();
+    mg_map->Add(xz_original,"P");
+    mg_map->Add(xz_reco_map,"P");
+    mg_map->GetXaxis()->SetTitle("x [cm]");
+    mg_map->GetYaxis()->SetTitle("z [cm]");
+    mg_map->Draw("A");
+
+    TLegend* l_map = new TLegend(0.69,0.82,0.93,0.93);
+    l_map->AddEntry(xz_original,"simulation","p");
+    l_map->AddEntry(xz_reco_map,"reconstructed","p");
+    l_map->SetTextSize(0.043);
+    l_map->Draw();
+    
+    double mag_sigma;
+    X17::Vector sigma = GetStDev(residuals,&mag_sigma);
+    double hmin = -1.2*max_residual;
+    double hmax =  1.2*max_residual;
+
+    TH1F* h_xres = new TH1F("",";x residual [cm];# of electrons",GetBinsScott(hmin,hmax,sigma.x,residuals.size()),hmin,hmax);
+    TH1F* h_yres = new TH1F("",";y residual [cm];# of electrons",GetBinsScott(hmin,hmax,sigma.y,residuals.size()),hmin,hmax);
+    TH1F* h_zres = new TH1F("",";z residual [cm];# of electrons",GetBinsScott(hmin,hmax,sigma.z,residuals.size()),hmin,hmax);
+    TH1F* h_res = new TH1F("",";residual [cm];# of electrons",GetBinsScott(0,hmax,mag_sigma,residuals.size()),0,hmax);
+
+    for (X17::Vector residual : residuals)
+    {
+        h_xres->Fill(residual.x);
+        h_yres->Fill(residual.y);
+        h_zres->Fill(residual.z);
+        h_res->Fill(residual.Magnitude());
+    }
+    
+    TCanvas* c2 = new TCanvas("","Residual histograms",2*g_cwidth,2*g_cheight);
+    c2->Divide(2,2);
+    c2->cd(1); h_xres->Draw("hist");
+    c2->cd(2); h_yres->Draw("hist");
+    c2->cd(3); h_zres->Draw("hist");
+    c2->cd(4); h_res->Draw("hist");
+    
+
+    double mag_sigma2;
+    X17::Vector sigma2 = GetStDev(oldvsnew,&mag_sigma2);
+    double hmin2 = -1.2*max_oldvsnew;
+    double hmax2 =  1.2*max_oldvsnew;
+
+    TH1F* h_yres2 = new TH1F("","Y residuals;#Delta y [cm];# of electrons",GetBinsScott(hmin2,hmax2,sigma2.y,oldvsnew.size()),hmin2,hmax2);
+    TH1F* h_xres2 = new TH1F("","X residuals;#Delta x [cm];# of electrons",GetBinsScott(hmin2,hmax2,sigma2.x,oldvsnew.size()),hmin2,hmax2);
+    TH1F* h_zres2 = new TH1F("","Z residuals;#Delta z [cm];# of electrons",GetBinsScott(hmin2,hmax2,sigma2.z,oldvsnew.size()),hmin2,hmax2);
+    TH1F* h_res2 = new TH1F("","Residuals;Deviation [cm];# of electrons",GetBinsScott(0,hmax2,mag_sigma2,oldvsnew.size()),0,hmax2);
+
+    for (X17::Vector residual : oldvsnew)
+    {
+        h_yres2->Fill(residual.y);
+        h_xres2->Fill(residual.x);
+        h_zres2->Fill(residual.z);
+        h_res2->Fill(residual.Magnitude());
+    }
+    
+    TCanvas* c3 = new TCanvas("","Residual histograms old vs new reco",g_cwidth,g_cheight);
+    c3->Divide(2,2);
+    c3->cd(2); h_yres2->Draw("hist");
+    c3->cd(1); h_xres2->Draw("hist");
+    c3->cd(3); h_zres2->Draw("hist");
+    c3->cd(4); h_res2->Draw("hist");
 
     if (!g_g_res1) g_g_res1 = g_res;
     else if (!g_g_res2) g_g_res2 = g_res;
@@ -434,6 +537,10 @@ int main(int argc, char *argv[])
     TColor* orange = new TColor(orange_index,1,0.6,0);
 
     X17::Field<X17::Vector>* magfield = X17::LoadField("../../../data/elmag/VecB2.txt",{-20,-30,-30},{20,30,30},0.5);
+    TFile* map_input = new TFile("../../../data/ion_map/sample_1.0/map.root");
+    TFile* map_input2 = new TFile("../../../data/ion_map/sample_2.0/map.root");
+    X17::Field<X17::MapPoint>* map9010 = (X17::Field<X17::MapPoint>*)map_input->Get("map");
+    X17::Field<X17::MapPoint>* map7030 = (X17::Field<X17::MapPoint>*)map_input2->Get("map");
 
     X17::TrackMicro track1 = LoadTrack("original");
     // PlotDriftXZ(track1);
@@ -454,11 +561,13 @@ int main(int argc, char *argv[])
     gStyle->SetPadRightMargin(0.07);
     gStyle->SetPadTopMargin(0.07);
 
-    PlotTrackRK(track1, magfield);
-    PlotTrackRK(track2, magfield, true);
+    // PlotTrackRK(track1, magfield);
+    // PlotTrackRK(track2, magfield, true);
+    
+    gStyle->SetOptStat(0);
 
-    // PlotRASD(track1);
-    // PlotRASD(track2,true);
+    PlotRASD(track1,map9010);
+    PlotRASD(track2,map7030,true);
     // PlotRASDres2();
 
     // Reconstruct CircleFit3D + RK4

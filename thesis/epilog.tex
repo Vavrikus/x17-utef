@@ -50,13 +50,14 @@
 				\item Using TRandom3 for random number generation.
 				\item Does the RK fit error correlate with the actual error?
 				\item Some Garfield settings in micro track generation probably not mentioned
+				\item one-to-one only means injection (not bijection)? Make sure correct terminology is used.
 			\end{itemize}
 		}
 	\section*{Future}
 		\red{Things planned for the future:
 		\begin{itemize}[topsep=4pt,itemsep=2pt]
 			\item Testing the reconstruction algorithm by measuring real particles with a~known energy distribution (at first just laser, muons?).
-			\item The~\textbf{Fast Simulation with Ionization Electron Map} is planned for the future. It will use the \ac{HEED} program~\cite{HEED} to simulate the primary particle and the Ionization Electron Map (see Section~\ref{sec:map}) to simulate the drift of secondary electrons. It should be significantly faster than the Microscopic Simulation but offer comparable precision since it will rely on an already simulated drift map. (Primary track simulated in HEED. Readout parameters by interpolating the map.	Diffusion from the map for randomization.)
+			\item The~\textbf{Fast Simulation with Ionization Electron Map} is planned for the future. It will use the \ac{HEED} program~\cite{HEED} to simulate the primary particle and the Ionization Electron Map (see Section~\ref{sec:map}) to simulate the drift of secondary electrons. It should be significantly faster than the Microscopic Simulation but offer comparable precision since it will rely on an already simulated drift map. (Primary track simulated in HEED. Readout parameters by interpolating the map. Diffusion from the map for randomization.) Currently more or less implemented, but it turns out that the initial energy of ionization electrons cannot be discarded.
 			\item Account for GEM, delta electrons, ...
 			\item Likelihood approach instead of least squares (if it improves the reconstruction significantly), we should at least use a~better method than taking the center of the TPC bin.
 			\item More detailed electric field simulation (if needed, GEM will have more complex field, some irregularities in the field should be considered)

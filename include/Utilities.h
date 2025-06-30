@@ -1,6 +1,7 @@
 #pragma once
 
 // C++ dependencies
+#include <cmath>
 #include <iomanip>
 #include <string>
 #include <vector>
@@ -13,6 +14,9 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TRandom3.h"
+
+// X17 dependencies
+#include "Vector.h"
 
 /// @brief Find the minimum value among the given parameters.
 /// @tparam T The type of the parameters, must be a numeric type.
@@ -70,10 +74,16 @@ double StdevBiasFactor(int N);
 template <typename T>
 T GetAverage(const std::vector<T>& values)
 {
-    T sum = 0;
+    T sum = T();
     for (T value : values) sum += value;
     return sum/values.size();
 }
+
+/// @brief Calculates the standard deviation of a vector of X17::Vector values taking each component separately.
+/// @param values The vector of values.
+/// @param mag_sigma To be set to the standard deviation of the magnitude of the vectors.
+/// @return The standard deviation of the vector.
+X17::Vector GetStDev(const std::vector<X17::Vector>& values, double* mag_sigma = nullptr);
 
 /// @brief Calculates the linearly interpolated quantile of a vector.
 /// @param values The vector of values.
@@ -89,6 +99,18 @@ double GetQuantile(std::vector<double>& values, double quantile, bool sorted = f
 /// @return The p-value of the value in the vector.
 double GetPvalue(std::vector<double>& values, double value, bool sorted = false);
 
+/// @brief Calculates the optimal number of histogram bins according to Scott's rule.
+/// @param min The minimal value of the range.
+/// @param max The maximal value of the range.
+/// @param sigma The standard deviation of the data.
+/// @param N The number of samples.
+/// @return The recommended number of bins.
+inline int GetBinsScott(double min, double max, double sigma, double N)
+{
+    double bin_width = sigma * std::pow(24*std::sqrt(M_PI) / N,1./3.);
+    return std::round((max-min) / bin_width);
+}
+
 /// @brief Prints a progress bar to the console.
 /// @param current The current value of the progress.
 /// @param total The total value of the progress.
@@ -101,6 +123,10 @@ void ReportProgress(int current, int total, int width = 50);
 template <typename T, typename... Ts>
 constexpr bool is_from = (std::is_same_v<T, Ts> || ...);
 
+/// @brief Applies a common style for plots in the thesis.
+/// @param obj The ROOT object to which the style should be applied.
+/// @details Currently, it sets the margins and title/label sizes for TCanvas, TH1F, TH2F, TGraph, TGraphErrors and TGraph2D.
+/// @note The style is designed for plots with a width of 800 pixels or higher.
 template <typename T>
 void ApplyThesisStyle(T* obj)
 {

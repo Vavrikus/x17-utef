@@ -62,7 +62,7 @@ The project uses the following folder structure:
         - **single_track**
             - Contains files with single simulated track for different settings
             - *original*, *original_v2*, *originalMC*, *track1* are tracks with 8 MeV momentum and use old coordinates
-            - *new_9010*, *new_7030* are tracks with 8 MeV momentum and use new coordinates
+            - *new_9010*, *new_7030* are tracks with 8 MeV momentum and use new coordinates; the latter is the only track in this group with non-0.1 eV starting ionization electron energies
             - *newest_7030* is a track with 10 MeV (?) momentum and uses new coordinates and struct MicroPoint
     - **include**
         - Contains headers for the project with doxygen comments (and .inl files with definitions of templated functions)

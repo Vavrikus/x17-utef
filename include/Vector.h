@@ -45,6 +45,11 @@ namespace X17
         /// @return The square of the distance.
         double SqDist(Vector other) const { return pow(x - other.x, 2) + pow(y - other.y, 2) + pow(z - other.z, 2); }
 
+        /// @brief Compute the distance between this vector and another vector.
+        /// @param[in] other The other vector.
+        /// @return The distance.
+        double Dist(Vector other) const { return std::sqrt(this->SqDist(other)); }
+
         /// @brief Add another vector to this vector.
         /// @param[in] v The vector to add.
         void operator+=(Vector v);

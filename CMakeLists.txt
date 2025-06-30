@@ -38,6 +38,7 @@ include_directories(${ROOT_INCLUDE_DIRS})
 link_directories(${ROOT_LIBRARY_DIR})
 
 find_package(GSL REQUIRED)
+message(STATUS "CMAKE_CXX_STANDARD: ${CMAKE_CXX_STANDARD}")
 
 # ---Add subdirectory containing source code----------------------------------------------
 include_directories(include)

@@ -10,6 +10,8 @@
 #include "Points.h"
 #include "Reconstruction.h"
 
+// #define DEBUG
+
 namespace X17
 {
     //// Functions related to reconstruction.
@@ -33,7 +35,7 @@ namespace X17
 
     std::array<std::array<double,8>,3> GetInterpolCoef(const Field<MapPoint>& map, const int (&indices)[6])
     {
-        double bounds[6]; // Array {xmin, xmax, ymin, ymax, zmin, zmax}.
+        double bounds[6]; // Array {xmin, xmax, ymin, ymax, z_tmin, z_tmax}.
 
         bounds[0] = indices[0] * map.GetStep() + map.GetXMin();
         bounds[1] = indices[1] * map.GetStep() + map.GetXMin();
@@ -95,6 +97,7 @@ namespace X17
         int var2 = (var == 2) ? 3 : var;
 
         // Z search is inverted so the stopping condition has to be inverted
+        // (i_min for var == 2 is zi_tmin <--> zimax and vice versa).
         auto should_continue = [&i_min, &i_max, &var](){
             if (var == 2) return (i_max + 1) < i_min;
             else return (i_min + 1) < i_max;
@@ -147,12 +150,12 @@ namespace X17
 
         int ximin = indices[0], ximax = indices[1];
         int yimin = indices[2], yimax = indices[3];
-        int zimin = indices[4], zimax = indices[5];
+        int zi_tmin = indices[4], zi_tmax = indices[5];
 
         // Bound checks.
         for (int xi : {ximin, ximax})
         for (int yi : {yimin, yimax})
-        for (int zi : {zimin, zimax})
+        for (int zi : {zi_tmin, zi_tmax})
         {
             const EndPoint& mappoint = map.at(xi, yi, zi).point;
 
@@ -166,9 +169,9 @@ namespace X17
             if (yi == yimax && end_point.y() > mappoint.y())
                 std::cerr << "INFO: Maximal y bound not maximal.\n";
 
-            if (zi == zimin && end_point.t < mappoint.t)
+            if (zi == zi_tmin && end_point.t < mappoint.t)
                 std::cerr << "INFO: Minimal z bound not minimal.\n";
-            if (zi == zimax && end_point.t > mappoint.t)
+            if (zi == zi_tmax && end_point.t > mappoint.t)
                 std::cerr << "INFO: Maximal z bound not maximal.\n";
         }
         std::cout << "-------------------------------------------------------------------------------\n\n";
@@ -181,14 +184,14 @@ namespace X17
         const double t1 = end_point.t;
 
         // Find 8 closest points using binary search (assuming ordering).
-        int ximin = 0;                   // Starting minimal search x index.
-        int ximax = map.GetXCells() - 1; // Starting maximal search x index.
-        int yimin = 0;                   // Starting minimal search y index.
-        int yimax = map.GetYCells() - 1; // Starting maximal search y index.
-        int zimin = map.GetZCells() - 1; // Starting minimal search z index (inverted - time is maximal for z minimal).
-        int zimax = 0;                   // Starting maximal search z index (inverted - time is maximal for z minimal).
+        int ximin = 0;                     // Starting minimal search x index.
+        int ximax = map.GetXCells() - 1;   // Starting maximal search x index.
+        int yimin = 0;                     // Starting minimal search y index.
+        int yimax = map.GetYCells() - 1;   // Starting maximal search y index.
+        int zi_tmin = map.GetZCells() - 1; // Starting minimal t search z index (inverted - time is maximal for z minimal).
+        int zi_tmax = 0;                   // Starting maximal t search z index (inverted - time is maximal for z minimal).
 
-        int i_mid[3] = { (ximin + ximax) / 2, (yimin + yimax) / 2, (zimin + zimax) / 2}; // Midpoint array.
+        int i_mid[3] = { (ximin + ximax) / 2, (yimin + yimax) / 2, (zi_tmin + zi_tmax) / 2}; // Midpoint array.
 
         for (int i = 0; i < 2; i++)
         {
@@ -205,39 +208,43 @@ namespace X17
             }
 
             FindMapMinMaxIndex(map, yimin, yimax, i_mid, 1, y1);
-            FindMapMinMaxIndex(map, zimin, zimax, i_mid, 2, t1);
+            FindMapMinMaxIndex(map, zi_tmin, zi_tmax, i_mid, 2, t1);
         }
 
         // Sanity check.
-        // PrintCube(map, { ximin, ximax, yimin, yimax, zimin, zimax }, end_point);
+        // PrintCube(map, { ximin, ximax, yimin, yimax, zi_tmin, zi_tmax }, end_point);
 
         // Interpolation from map.
-        std::array<std::array<double,8>,3> coef = GetInterpolCoef(map, {ximin, ximax, yimin, yimax, zimin, zimax});
+        std::array<std::array<double,8>,3> coef = GetInterpolCoef(map, {ximin, ximax, yimin, yimax, zi_tmin, zi_tmax});
 
         double xout = coef[0][0] + coef[0][1]*x1 + coef[0][2]*y1 + coef[0][3]*t1 + coef[0][4]*x1*y1 + coef[0][5]*x1*t1 + coef[0][6]*y1*t1 + coef[0][7]*x1*y1*t1;
         double yout = coef[1][0] + coef[1][1]*x1 + coef[1][2]*y1 + coef[1][3]*t1 + coef[1][4]*x1*y1 + coef[1][5]*x1*t1 + coef[1][6]*y1*t1 + coef[1][7]*x1*y1*t1;
         double zout = coef[2][0] + coef[2][1]*x1 + coef[2][2]*y1 + coef[2][3]*t1 + coef[2][4]*x1*y1 + coef[2][5]*x1*t1 + coef[2][6]*y1*t1 + coef[2][7]*x1*y1*t1;
 
+        double x,y,z;
+        // std::cout << "Min corner:          (" << map.GetXMin()+ximin*map.GetStep() << ", " << map.GetYMin()+yimin*map.GetStep() << ", " << map.GetZMin()+zi_tmax*map.GetStep() << ")\n";
+        // std::cout << "Reconstructed point: (" << xout << ", " << yout << ", " << zout << ")\n";
         return RecoPoint(xout, yout, zout, 1);
     }
 
-    double Offset(MapPoint p, double x1, double y1, double t1)
+    double Offset(MapPoint p, double x1, double y1, double t1, double tfact)
     {
-        constexpr double tfact = 0.00327; // Time is measured at different scale, it needs weight.
         return std::sqrt(pow(x1 - p.point.x(), 2) + pow(y1 - p.point.y(), 2) + pow(tfact * (t1 - p.point.t), 2));
     }
 
-    RecoPoint ReconstructOld(const Field<MapPoint>& map, double x1, double y1, double t1, double max_err)
+    RecoPoint ReconstructOld(const Field<MapPoint>& map, double x1, double y1, double t1, double max_err, bool gas9010)
     {
         // Start looking at the same position.
         double x = x1;
         double y = y1;
         double z = (map.GetZMax() + map.GetZMin()) / 2;
-        double step = map.GetStep() / 10;
+        double step = map.GetStep() / 1000;
 
-        double offset;       // Metric of distance between points.
-        int iterations = 0;  // Number of iterations should not exceed 100.
-        double damp = 0.005; // Damping coefficient.
+        double offset;      // Metric of distance between points.
+        int iterations = 0; // Number of iterations should not exceed 100.
+        double damp = 0.05; // Damping coefficient.
+
+        double tfact = gas9010 ? 0.00327 : 0.000939;
 
         // Loop for offset minimization.
         do
@@ -250,12 +257,12 @@ namespace X17
             MapPoint za = map.GetField(x,y,z+step);
             MapPoint zb = map.GetField(x,y,z-step);
 
-            double oxa = Offset(xa,x1,y1,t1);
-            double oxb = Offset(xb,x1,y1,t1);
-            double oya = Offset(ya,x1,y1,t1);
-            double oyb = Offset(yb,x1,y1,t1);
-            double oza = Offset(za,x1,y1,t1);
-            double ozb = Offset(zb,x1,y1,t1);
+            double oxa = Offset(xa,x1,y1,t1,tfact);
+            double oxb = Offset(xb,x1,y1,t1,tfact);
+            double oya = Offset(ya,x1,y1,t1,tfact);
+            double oyb = Offset(yb,x1,y1,t1,tfact);
+            double oza = Offset(za,x1,y1,t1,tfact);
+            double ozb = Offset(zb,x1,y1,t1,tfact);
 
             double gradx = (oxa-oxb)/(2*step);
             double grady = (oya-oyb)/(2*step);
@@ -275,14 +282,18 @@ namespace X17
 
             // Calculate values at current position.
             MapPoint cur = map.GetField(x,y,z);
-            offset = Offset(cur,x1,y1,t1);
+            offset = Offset(cur,x1,y1,t1,tfact);
 
             // Make sure step isn't too high.
-            if(offset < 10 * step) step /= 10;
+            if (offset < 10 * step) step /= 10;
+
+            double damped_grad_size = damp*std::sqrt(gradx*gradx + grady*grady + gradz*gradz);
+            if (damped_grad_size > 0.1 * offset) damp /= 10; 
 
             iterations++;
-            // cout << "iter: " << iterations << "\n";        
-            if (iterations == 1000) std::cout << "1000 iterations.\n";
+            
+            if (iterations == 1000) 
+                std::cout << "1000 iterations.\n";
         }
         while ((offset > max_err) && (iterations < 1000));
 
