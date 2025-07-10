@@ -62,6 +62,17 @@ namespace X17
 	/// @return A pointer to the TSpline3 object representing the fitted spline.
 	template<int nodes>
 	TSpline3* FitSplines(TGraph* graph, double min, double max);
+
+    /// @brief Function for energy reconstruction from spline fit.
+    /// @param sp_fit Fitted splines.
+    /// @param magfield Magnetic data.
+    /// @param energy Output graph for reconstructed energy as function of coordinate.
+    /// @param radius Output graph for reconstructed radius as function of coordinate.
+    /// @param magnetic Output graph for magnetic field along fitted trajectory.
+    /// @param min Lower bound [cm].
+    /// @param max Upper bound [cm].
+    /// @param step Step between iterations.
+    void RecoEnergy(TSpline3* sp_fit, const Field<Vector>& magfield, TGraph* energy, TGraph* radius, TGraph* magnetic, double min, double max, double step);
 } // namespace X17
 
 // Templated function definitions.

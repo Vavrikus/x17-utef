@@ -8,11 +8,11 @@ namespace X17
 	template<int N>
 	double NSpline<N>::Eval(double* x, double* par) const
 	{
-		/*Fit parameters:
-		par[0-N-1]=X of nodes (to be fixed in the fit!)
-		par[N-2N-1]=Y of nodes
-		par[2N-2N+1]=first derivative at begin and end (to be fixed in the fit!)
-		*/
+		// Fit parameters:
+		// 	par[0-N-1]   = X of nodes (to be fixed in the fit!)
+		// 	par[N-2N-1]  = Y of nodes
+		// 	par[2N-2N+1] = first derivative at begin and end (to be fixed in the fit!)
+		
 
 		for (int i = 0; i < N; ++i) par[i] = m_nodes_x[i];
 

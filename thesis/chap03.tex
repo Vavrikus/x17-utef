@@ -57,7 +57,7 @@
 	\label{sec:map}
 		Inside an~\ac{OFTPC}\orange{~($\exists$ more than one, also considering it a~general concept rather than the specific OFTPC used at this experiment)}, the drift of the ionization electrons is significantly affected by its magnetic field as shown in Equation~\ref{eq:drift}, see also \cref{fig:microfirst}. We need to take this into account for accurate reconstruction\red{~(should be easy to run the reconstruction without the map and show how much it improves the results)}. In the first approximation, we assume a~continuous readout (i.e., we neglect the anode segmentation into pads). We can then reconstruct the original position of each ionization electron using its readout coordinates. For this purpose, we use the ionization electron map.
 		
-		The~ionization electron map represents a~mapping from the detector space to the readout space (see Section~\ref{sec:coor}). It tells us what readout coordinates $(x',y',t)$ we can expect on average for an~ionization electron created at the detector coordinates $(x,y,z)$. More precisely, it is a~mapping to the distributions on the readout space; we can simplify this as only the means $\overline{\mathcal{M}}$ and the covariance matrices $\mathcal{M}_\mathbf{\Sigma}$, assuming Gaussian distribution:
+		The~ionization electron map represents a~mapping from the detector space to the readout space (see Section~\ref{sec:coor}). It tells us what readout coordinates $(x',y',t)$ we can expect on average for an~ionization electron created at the detector coordinates $(x,y,z)$. More precisely, it is a~mapping to the distributions on the readout space; we can simplify this as only the means $\overline{\mathcal{M}}$ and the covariance matrices $\mathcal{M}_\mathbf{\Sigma}$, assuming Gaussian distribution\footnote{The applicability of Gaussian distribution was tested on simulated points of the map using the Mardia's test.}:
 			\begin{alignat}{3}
 				\overline{\mathcal{M}}&\colon \mathcal{D} \longrightarrow \mathcal{R}, &&(x,y,z) \longmapsto \mathbf{\overline{X}}^T\equiv(\bar{x}',\bar{y}',\bar{t}),\\
 				\mathcal{M}_\mathbf{\Sigma}&\colon \mathcal{D} \longrightarrow \mathbb{R}^{3\times3}, &&(x,y,z) \longmapsto \mathbf{\Sigma}^{\phantom{T}} \equiv \scalebox{0.9}{$\begin{pmatrix}
@@ -187,7 +187,7 @@
 		Finally, we need to invert the map to get the original detector coordinates $(x,y,z)$ from the given readout coordinates $(x',y',t)$. In our case, it is reasonable to assume that the mapping $\overline{\mathcal{M}}$\red{~(we lose the information about the distribution (a~wild idea how to recover this is in the Future section but it will only make sense if the GEM is already accounted for and is very preliminary as there are many factors to consider))} is one-to-one (as seen in the simulations). We implemented two methods for this purpose: the gradient descent search (Section~\ref{sec:grad}) and interpolation on the inverse grid (Section~\ref{sec:interpol}).
 		
 		\subsection{Map Simulation}
-			The~simulation\orange{~(?)} of the map is a~computationally heavy task. For this reason, we use the MetaCentrum grid~\cite{metacentrum} to parallelize needed calculations. At first, this was done by evenly distributing the simulated electrons across the individual jobs in a~simulation with only one electron per vertex in the regular grid~$\mathbb{G}$ with a~spacing of one centimeter. Later, a~more efficient approach was implemented, accounting for the varying lengths of the drift of individual electrons. If we index the vertices of~$\mathbb{G}$ in the order of increasing coordinates $y,x,z$\red{~(picture will make things clearer)}, we can express the number~$n_l$ of full XY~layers (i.e., electrons with the same $z$~coordinate, the mapping of one such layer is shown in \cref{fig:map_xyt}) with index less than or equal to $i$
+			Simulation of the map is a~computationally heavy task. For this reason, we use the MetaCentrum grid~\cite{metacentrum} to parallelize needed calculations. At first, this was done by evenly distributing the simulated electrons across the individual jobs in a~simulation with only one electron per vertex in the regular grid~$\mathbb{G}$ with a~spacing of one centimeter. Later, a~more efficient approach was implemented, accounting for the varying lengths of the drift of individual electrons. If we index the vertices of~$\mathbb{G}$ in the order of increasing coordinates $y,x,z$\red{~(picture will make things clearer)}, we can express the number~$n_l$ of full XY~layers (i.e., electrons with the same $z$~coordinate, the mapping of one such layer is shown in \cref{fig:map_xyt}) with index less than or equal to $i$
 				\begin{equation}
 					n_l(i) = \left\lfloor\frac{i}{n_{xy}}\right\rfloor,
 				\end{equation}
@@ -203,7 +203,7 @@
 			
 			\red{The~obtained map is then stored in a~custom class template \textit{Field}, could expand on that. Maybe earlier, since the same template is used for the magnetic field.}
 			
-			\red{Simulation inside of one sector (at first double angle). Extra space on the sensor. Using qsub (not sure if important). Add plots of distortion of the coordinates.\\}
+			\red{Extra space on the sensor. Using qsub (not sure if important).\\}
 		
 		\subsection{Gradient Descent Algorithm}
 		\label{sec:grad}			
@@ -223,7 +223,7 @@
 				\begin{equation}
 					\left[\nabla(f_R\circ\overline{\mathcal{M}})\right]^i(D_n) \approx \frac{f_R(\overline{\mathcal{M}}(D_n+s\cdot e^i))-f_R(\overline{\mathcal{M}}(D_n-s\cdot e^i))}{2s},
 				\end{equation}
-			where $e^i\in\mathcal{D}$ is the $i$-th coordinate vector and $s$ is the step size. The~step size should be sufficiently small; initially, we set it as a~fraction $s = \frac{l}{10}$ of the map's grid spacing $l$. During the minimization, we check that $f_R(\overline{\mathcal{M}}(D_n))<10s$ at all times and decrease the step if needed.\red{~When using trilinear interpolation, it would be more efficient to calculate the gradient explicitly ($\pm$ same result). This could be implemented inside the \textit{Field} template class.} The~next iteration can be calculated as follows:
+			where $e^i\in\mathcal{D}$ is the $i$-th coordinate vector and $s$ is the step size. The~step size should be sufficiently small; initially, we set it as a~fraction $s = \frac{l}{10}$ of the map's grid spacing $l$. During the minimization, we check that $f_R(\overline{\mathcal{M}}(D_n))<10s$ at all times and decrease the step if needed. The~next iteration can be calculated as follows:
 				\begin{equation}
 					D_{n+1} = D_n - \gamma \nabla(f_R\circ\overline{\mathcal{M}})(D_n),
 				\end{equation}
@@ -235,12 +235,10 @@
 			
 			The parameters of this method can be further optimized (e.g., a~better choice of $\gamma$ and~$s$, analytical computation of the gradient\footnote{The gradient can be computed analytically when using the trilinear interpolation, see \cref{eq:trilinpoly}.}); instead, we later decided to use the interpolation on the inverse grid described in the next section.
 			
-			\red{Measure reconstruction duration and compare it with the inverse grid interpolation? Also compare the result? Typical evolution of $D_n$ during search. Not sure if this has to be cited.}
+			\red{Typical evolution of $D_n$ during search? Not sure if this has to be cited.}
 		
 		\subsection{Interpolation on the Inverse Grid}
 		\label{sec:interpol}			
-			\red{Interpolation should be generally faster than the gradient descent since we don't need to iterate. We also don't need to optimize it to improve performance, if it's too slow we can even calculate the coefficients for the entire map before reconstruction (again, do some profiling). Very rough profiling shows that the difference in the current state is at least one order of magnitude.}
-			
 			The~best current algorithm uses the interpolation on the inverse grid. Rather than inverting the trilinearly interpolated map using a~numerical minimization method as in the previous section, we take advantage of the fact that the map $\overline{\mathcal{M}}$ is one-to-one\orange{~(isomorphism is supposed to preserve structure, not sure how to interpret that here, }\red{not the best description, we already (kind of) assume it is a~bijection by saying we will invert it)}. Since we have simulated values of this map on a~regular grid in the detector space $\mathcal{D}$, we also know the inverse map $\overline{\mathcal{M}}^{-1}$ on the irregular inverse grid in the readout space $\mathcal{R}$. To get an~approximation of the inverse map in the entire readout space, we can use interpolation\orange{~(general concept, the specific choice is described below)}.
 			
 			Since the inverse grid is irregular, trilinear interpolation cannot be applied. Given that the simulated map is dense enough to provide a~good approximation considering the size of our pads, we can adopt a~similar approach.\footnote{A more complicated and computationally heavy alternative would be natural neighbor interpolation or Kriging.} As shown in Equation~\ref{eq:trilinpoly} in Section~\ref{sec:trilin}, trilinear interpolation\orange{~(shouldn't need an article when talking about a~general concept)} can be expressed as a~polynomial:
@@ -268,16 +266,11 @@
 				\end{equation}
 			which has a~unique solution for the coefficients for most values of $(x_n, y_n, z_n)$ and $f(x_n,y_n,z_n)$, where $n\in\{1,\ldots,8\}$.
 			
-			This approach introduces a~small complication: finding the correct pseudocell (i.e., the image of eight vertices forming a~cubic cell in the regular grid) in the inverse grid. The~eight irregularly spaced vertices of this pseudocell do not define a~unique volume, so there are multiple possible ways to partition $\mathcal{R}$ into pseudocells, with no obvious choice among them.
+			This approach introduces a~small complication: finding the correct pseudocell (i.e., the image of eight vertices forming a~cubic cell in the regular grid) in the inverse grid. The~eight irregularly spaced vertices of this pseudocell do not define a~unique volume, so there are multiple possible ways to partition $\mathcal{R}$ into pseudocells, with no obvious choice among them. This problem could be solved by determining the exact volume boundary using the gradient descent search described above. However, since the difference between the interpolation polynomials is small near the boundary of the pseudocell, we choose one of them arbitrarily.
 			
-			\red{We are currently ignoring this problem and performing binary search along $x$, $y$, $z$ (in this order). It shouldn't matter too much because the 70/30 map doesn't cause such a big distortion and was even accidentally extrapolated for all $z$ different from the central plane.}
+			In the code, the map is stored in an array, and its individual points can be accessed using three indexes corresponding to the $x$, $y$, and~$z$ coordinates. Points outside of the area of the simulation are initialized with zeros. The search for the pseudocell finds the indices corresponding to the eight vertices. It starts by performing a~binary search along the $x$\nobreakdash-coordinate (comparing the $x'$\nobreakdash-coordinate of the map vertices with that of the point, whose preimage we want to find) with indices corresponding to~$y$ and~$z$ fixed to half of their maximal value. After that, we fix the $x$ and $z$ indices and perform a binary search along~$y$ (making sure to exclude the zeros from initialization outside the simulation range beforehand), and finally, we fix the $x$ and $y$ indices and perform a search along~$z$ (inverted, since higher~$z$ corresponds to lower~$t$). This procedure is then repeated until the pseudocell "contains" the preimage of the given point (meaning that for all readout coordinates $x'$, $y'$, $t$, there is a~vertex of the pseudocell with a~higher and a~vertex with a~lower value of that coordinate).\red{~Or until 3 iterations are exceeded, then we print an error message. We also attempt to fix the error by choosing a neighboring cell.}
 			
-			\begin{figure}[H]
-				\centering
-				\includegraphics[width=0.8\textwidth]{interpol.png}
-				\caption{Selection of the points for interpolation.\red{~Create better images; use the explanation interpolation vs. extrapolation strange property. Solution~2 probably does not make much sense.}}
-				\label{fig:interpol}
-			\end{figure}
+			This approach should generally be faster than the gradient descent method, since we do not need to iterate. Currently, we are calculating the coefficients of the interpolation polynomial during the reconstruction of every point. If further optimization is needed in the future, we can precalculate them for the whole map.
 			
 		\section{Reconstruction testing}
 			The continuous reconstruction using the map was tested on microscopic tracks with parameters described in \cref{sec:microfirst}. The difference between the reconstructed positions obtained using the two map inversion algorithms was found to be smaller than the uncertainty from diffusion by several orders of magnitude. In its unoptimized state, the gradient descent search was significantly slower (at least ten times) than the interpolation on the inverse grid.
@@ -325,7 +318,7 @@
 		
 		In order to get a~more realistic representation of a~track measured in the \ac{OFTPC}, we need to take the discretization of the position and time data into account. The~readout of the \ac{OFTPC} will consist of 128~pads, their layout is shown in \cref{fig:padlayout}. Time is read out in discrete bins of size $t_\text{bin} = \qty{100}{\ns}$.
 		
-		As the first approximation, we can neglect the multiplication in the triple\nobreakdash-\ac{GEM} and assume an~ideal charge readout. The~time measurement starts at the beginning of the electron/positron simulation\orange{~(depending on the specific simulation it can correspond to the production in the target or when entering the OFTPC, here the specific time doesn't matter too much since the primary particle travels basically at light speed (30~ps/cm) which is circa immediate given the time binning)}.\red{~Randomize this time a bit and see what it does to the reconstruction.} The~readout coordinates ${(x',y',t)\in\mathcal{R}}$ of each ionization electron can be mapped to the pad coordinates~$(n_\text{pad},n_t) \in \mathcal{P}$:
+		As the first approximation, we can neglect the multiplication in the triple\nobreakdash-\ac{GEM} and assume an~ideal charge readout. The~time measurement starts at the beginning of the electron/positron simulation\orange{~(depending on the specific simulation it can correspond to the production in the target or when entering the OFTPC, here the specific time doesn't matter too much since the primary particle travels basically at light speed (30~ps/cm) which is circa immediate given the time binning)}.\red{~Randomize this time a bit and see what it does to the reconstruction ($\rightarrow$ Future?).} The~readout coordinates ${(x',y',t)\in\mathcal{R}}$ of each ionization electron can be mapped to the pad coordinates~$(n_\text{pad},n_t) \in \mathcal{P}$:
 			\begin{gather}
 				n_\text{pad} = n\colon (x',y') \in \left[x_{1,n}-\frac{g}{2},x_{2,n}+\frac{g}{2}\right)\times\left[y_{1,n}-\frac{g}{2},y_{2,n}+\frac{g}{2}\right),\\
 				n_t = \left\lceil \frac{t}{t_\text{bin}}\right\rceil,

@@ -133,10 +133,65 @@ namespace X17
         // if(i_mid_is_max) { i_max = i_mid[var]; i_min = i_max - 1; }
         // else             { i_min = i_mid[var]; i_max = i_min + 1; }
     }
-    
+
+    bool CellContainsReco(const Field<MapPoint> &map, const int (&indices)[6], EndPoint end_point, int& out_status)
+    {
+        int ximin = indices[0], ximax = indices[1];
+        int yimin = indices[2], yimax = indices[3];
+        int zi_tmin = indices[4], zi_tmax = indices[5];
+        
+        bool contains_smaller[3] = { false, false, false };
+        bool contains_bigger[3]  = { false, false, false };
+
+        for (int xi : {ximin, ximax})
+        for (int yi : {yimin, yimax})
+        for (int zi : {zi_tmin, zi_tmax})
+        {
+            const EndPoint& mappoint = map.at(xi, yi, zi).point;
+
+            if (end_point.x() > mappoint.x())
+                contains_smaller[0] = true;
+            if (end_point.x() < mappoint.x())
+                contains_bigger[0] = true;
+
+            if (end_point.y() > mappoint.y())
+                contains_smaller[1] = true;
+            if (end_point.y() < mappoint.y())
+                contains_bigger[1] = true;
+
+            if (end_point.t > mappoint.t)
+            contains_smaller[2] = true;
+            if (end_point.t < mappoint.t)
+            contains_bigger[2] = true;
+        }
+        
+        bool is_ok = true;
+        out_status = -1;
+        for (int i = 0; i < 3; i++)
+        {
+            if (!contains_smaller[i])
+            {
+                is_ok = false;
+                out_status = 2*i;
+            }
+            else if (!contains_bigger[i])
+            {
+                is_ok = false;
+                out_status = 2*i+1;
+            }
+        }
+
+        return is_ok;
+    }
+
     void PrintCube(const Field<MapPoint>& map, const int (&indices)[6], EndPoint end_point)
     {
+        int status;
+        if (CellContainsReco(map,indices,end_point,status)) return;
+
         std::cout << "\n-------------------------------------------------------------------------------\n";
+        std::cerr << "ERROR: Found pseudocell does not contain the endpoint in its circumscribed cube (status " << status << ").\n\n";
+
         std::cout << "Cube for (x1,y1,t1) = (" << end_point.x() << ", " << end_point.y() << ", " << end_point.t << "): \n";
         for (int i = 0; i < 8; i++)
         {
@@ -145,56 +200,38 @@ namespace X17
             std::cout << ci << cj << ck << ": [" << xi << "][" << yi << "][" << zi << "],";
             std::cout << " (x,y,t) = (" << map.at(xi,yi,zi).point.x() << ", " << map.at(xi,yi,zi).point.y() << ", " << map.at(xi,yi,zi).point.t << ")\n";
         }
-
-        std::cout << "\n";
-
-        int ximin = indices[0], ximax = indices[1];
-        int yimin = indices[2], yimax = indices[3];
-        int zi_tmin = indices[4], zi_tmax = indices[5];
-
-        // Bound checks.
-        for (int xi : {ximin, ximax})
-        for (int yi : {yimin, yimax})
-        for (int zi : {zi_tmin, zi_tmax})
-        {
-            const EndPoint& mappoint = map.at(xi, yi, zi).point;
-
-            if (xi == ximin && end_point.x() < mappoint.x())
-                std::cerr << "INFO: Minimal x bound not minimal.\n";
-            if (xi == ximax && end_point.x() > mappoint.x())
-                std::cerr << "INFO: Maximal x bound not maximal.\n";
-
-            if (yi == yimin && end_point.y() < mappoint.y())
-                std::cerr << "INFO: Minimal y bound not minimal.\n";
-            if (yi == yimax && end_point.y() > mappoint.y())
-                std::cerr << "INFO: Maximal y bound not maximal.\n";
-
-            if (zi == zi_tmin && end_point.t < mappoint.t)
-                std::cerr << "INFO: Minimal z bound not minimal.\n";
-            if (zi == zi_tmax && end_point.t > mappoint.t)
-                std::cerr << "INFO: Maximal z bound not maximal.\n";
-        }
         std::cout << "-------------------------------------------------------------------------------\n\n";
     }
 
-    RecoPoint Reconstruct(const Field<MapPoint>& map, EndPoint end_point)
+    RecoPoint Reconstruct(const Field<MapPoint>& map, EndPoint end_point, TGraph2D* g_map_pts)
     {
         const double x1 = end_point.x();
         const double y1 = end_point.y();
         const double t1 = end_point.t;
 
         // Find 8 closest points using binary search (assuming ordering).
-        int ximin = 0;                     // Starting minimal search x index.
-        int ximax = map.GetXCells() - 1;   // Starting maximal search x index.
-        int yimin = 0;                     // Starting minimal search y index.
-        int yimax = map.GetYCells() - 1;   // Starting maximal search y index.
-        int zi_tmin = map.GetZCells() - 1; // Starting minimal t search z index (inverted - time is maximal for z minimal).
-        int zi_tmax = 0;                   // Starting maximal t search z index (inverted - time is maximal for z minimal).
+        int boundaries[6] = { 0, map.GetXCells() - 1, 0, map.GetYCells() - 1, map.GetZCells() - 1, 0 };
+        int& ximin   = boundaries[0]; // Starting minimal search x index.
+        int& ximax   = boundaries[1]; // Starting maximal search x index.
+        int& yimin   = boundaries[2]; // Starting minimal search y index.
+        int& yimax   = boundaries[3]; // Starting maximal search y index.
+        int& zi_tmin = boundaries[4]; // Starting minimal t search z index (inverted - time is maximal for z minimal).
+        int& zi_tmax = boundaries[5]; // Starting maximal t search z index (inverted - time is maximal for z minimal).
+
+        int cells[3] = { map.GetXCells(), map.GetYCells(), map.GetZCells() };
 
         int i_mid[3] = { (ximin + ximax) / 2, (yimin + yimax) / 2, (zi_tmin + zi_tmax) / 2}; // Midpoint array.
 
-        for (int i = 0; i < 2; i++)
+        int i = 0;
+        int status;
+        do
         {
+            if (i > 3)
+            {
+                // std::cerr << "WARNING: Three iterations did not find the pseudocell.\n";
+                break;
+            }
+
             ximin = 0;
             ximax = map.GetXCells() - 1;
 
@@ -209,13 +246,62 @@ namespace X17
 
             FindMapMinMaxIndex(map, yimin, yimax, i_mid, 1, y1);
             FindMapMinMaxIndex(map, zi_tmin, zi_tmax, i_mid, 2, t1);
+
+            i++;
+        }
+        while (!CellContainsReco(map, boundaries, end_point, status));
+
+        // Fix off-by-one-cell error
+        // PrintCube(map, boundaries, end_point);
+        bool fix_failed = false;
+        while (status != -1)
+        {
+            // std::cout << "Fixing status " << status << "\n";
+
+            int var = status / 2;
+            bool err_max = status % 2;
+
+            bool var_is_z = var == 2;
+            if (var_is_z) err_max = !err_max;
+            
+            if (err_max && boundaries[2*var+(int)!var_is_z] < cells[var]-1)
+            {
+                // std::cout << "Boundaries increased\n";
+                boundaries[2*var]++;
+                boundaries[2*var+1]++;
+            }
+            else if (!err_max && boundaries[2*var+(int)var_is_z] > 0)
+            {
+                // std::cout << "Boundaries decreased\n";
+                boundaries[2*var]--;
+                boundaries[2*var+1]--;
+            }
+            else
+            {
+                fix_failed = true;
+                // std::cerr << "ERROR: Fixing failed\n";
+                break;
+            }
+
+            CellContainsReco(map, boundaries, end_point, status);
         }
 
         // Sanity check.
-        // PrintCube(map, { ximin, ximax, yimin, yimax, zi_tmin, zi_tmax }, end_point);
+        if(!fix_failed) PrintCube(map, boundaries, end_point);
+
+        // Plotting map points used for reconstruction.
+        if (g_map_pts)
+        for (int i = 0; i < 8; i++)
+        {
+            const auto [xi,yi,zi] = CubeCorner(boundaries,i);
+            // X17::MapPoint map_pt = map.at(xi,yi,zi);
+
+            double map_step = map.GetStep();
+            g_map_pts->AddPoint(map.GetXMin() + xi*map_step, map.GetYMin() + yi*map_step, map.GetZMin() + zi*map_step);
+        }
 
         // Interpolation from map.
-        std::array<std::array<double,8>,3> coef = GetInterpolCoef(map, {ximin, ximax, yimin, yimax, zi_tmin, zi_tmax});
+        std::array<std::array<double,8>,3> coef = GetInterpolCoef(map, boundaries);
 
         double xout = coef[0][0] + coef[0][1]*x1 + coef[0][2]*y1 + coef[0][3]*t1 + coef[0][4]*x1*y1 + coef[0][5]*x1*t1 + coef[0][6]*y1*t1 + coef[0][7]*x1*y1*t1;
         double yout = coef[1][0] + coef[1][1]*x1 + coef[1][2]*y1 + coef[1][3]*t1 + coef[1][4]*x1*y1 + coef[1][5]*x1*t1 + coef[1][6]*y1*t1 + coef[1][7]*x1*y1*t1;

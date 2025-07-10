@@ -38,60 +38,33 @@ namespace X17
         double r_mid = std::sqrt(pow(x_mid,2) + pow(y_mid,2));
 
         double r_c = std::sqrt(pow(radius,2) - pow(r_mid,2));
-        double x0 = node1_x + x_mid - y_mid * r_c / r_mid;
-        double y0 = node1_y + y_mid + x_mid * r_c / r_mid;
+        double x0 = node1_x + x_mid + y_mid * r_c / r_mid;
+        double y0 = node1_y + y_mid - x_mid * r_c / r_mid;
 
-        double a1 = (node1_x - x0) / std::sqrt(pow(radius,2) - pow(node1_x - x0,2));
-        double a2 = (node2_x - x0) / std::sqrt(pow(radius,2) - pow(node2_x - x0,2));
+        double a1 = (x0 - node1_x) / std::sqrt(pow(radius,2) - pow(node1_x - x0,2));
+        double a2 = (x0 - node2_x) / std::sqrt(pow(radius,2) - pow(node2_x - x0,2));
         double b1 = node1_y - a1 * node1_x;
         double b2 = node2_y - a2 * node2_x;
 
         if (xx < node1_x) return a1 * xx + b1;
         if (xx > node2_x) return a2 * xx + b2;    
-        return y0 - std::sqrt(pow(radius,2) - pow(xx - x0,2));
+        return y0 + std::sqrt(pow(radius,2) - pow(xx - x0,2));
     }
 
     TF1* FitCircle2(TGraph* graph, double min, double max)
     {
         TF1* circle = new TF1("circle",circle_func,min,max,5);
-        circle->SetParameter(0,50);
+        circle->SetParameter(0,20);
+        circle->SetParLimits(0,5,500);
         circle->SetParameter(1,4);
+        circle->SetParLimits(1,0,7);
         circle->SetParameter(2,12);
-        circle->SetParameter(3,8);
-        circle->SetParameter(4,10);
-        // circle->Draw();
+        circle->SetParLimits(2,7,20);
+        circle->SetParameter(3,0);
+        circle->SetParameter(4,-2);
+        
         graph->Fit(circle,"M","",min,max);
         return circle;
-    }
-
-    void RecoEnergy(TSpline3* sp_fit, const Field<Vector>& magfield, TGraph* energy, TGraph* radius, TGraph* magnetic, double min, double max, double step)
-    {
-        using namespace constants;
-
-        for (double x = min; x <= max; x += step)
-        {
-            int i_node = sp_fit->FindX(x);
-
-            double xnode, ynode, b, c, d;
-            sp_fit->GetCoeff(i_node, xnode, ynode, b, c, d);
-
-            // Calculate the radius [m] of the track from the fitted spline.
-            double dx   = x - xnode;
-            double der  = b + dx * (2 * c + 3 * d * dx);
-            double der2 = 2 * c + 6 * d * dx;
-            double r    = cm2m * pow(1 + der * der, 1.5) / der2;
-            
-            Vector B      = magfield.GetField(x, 0, 8 - sp_fit->Eval(x));
-            double betasq = 1 / (1 + pow((E0 / (c * r * B.x)), 2));
-            double Ekin   = E0 * (1 / std::sqrt(1 - betasq) - 1);
-
-            if (x > 4)
-                energy->AddPoint(x, Ekin / 1e6);
-            if (r < 1 && r > 0)
-                radius->AddPoint(x, r * m2cm);
-
-            magnetic->AddPoint(x, B.y);
-        }
     }
 
     void RecoEnergy(TF1* fit, const Field<Vector>& magfield, TGraph* magnetic, double min, double max, double step)
@@ -101,11 +74,11 @@ namespace X17
         double r = cm2m * fit->GetParameter(0);
 
         // Mean magnetic field.
-        Vector B = magfield.GetField((max + min) / 2, 0, 8 - fit->Eval((max + min) / 2));
+        Vector B = magfield.GetField((xmax + xmin) / 2, 0, fit->Eval((xmax + xmin) / 2));
 
         for (double x = min; x <= max; x += step)
         {
-            Vector B2 = magfield.GetField(x, 0, 8-fit->Eval(x));
+            Vector B2 = magfield.GetField(x, 0, fit->Eval(x));
             magnetic->AddPoint(x,B2.y);
         }
         

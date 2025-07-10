@@ -11,10 +11,12 @@
 #include "TFile.h"
 #include "TGraph.h"
 #include "TH2F.h"
+#include "TH3F.h"
 #include "TImage.h"
 #include "TLine.h"
 #include "TLegend.h"
 #include "TMultiGraph.h"
+#include "TPolyLine3D.h"
 #include "TStyle.h"
 #include "TSystem.h"
 #include "TTree.h"
@@ -22,9 +24,12 @@
 #include "../../build/X17_dict.cxx"
 
 // X17 dependencies
+#include "CircleFit2D.h"
 #include "CircleFit3D.h"
 #include "Color.h"
 #include "Field.h"
+#include "NSpline.h"
+#include "PadLayout.h"
 #include "Reconstruction.h"
 #include "RK4.h"
 #include "Track.h"
@@ -528,6 +533,267 @@ void PlotRASDres2()
     l_res->Draw();
 }
 
+void PlotPadReco(const X17::Field<X17::MapPoint>& map, bool m7030 = true)
+{
+    int pad_id = 127;//66;
+    double x1,y1,x2,y2,xc,yc;
+
+    X17::DefaultLayout::GetDefaultLayout().GetPadCorners(pad_id,x1,y1,x2,y2,true);
+
+    double max_time = m7030 ? 17050 : 4750;
+    double time_step = 10;
+    int i_max = max_time / time_step;
+    double time_step2 = 100;
+    int plane_steps = 20;
+    int i_max2 = max_time / time_step2;
+    X17::Vector corners[4] = {
+        {x1, y1, -8},
+        {x1, y2, -8},
+        {x2, y1, -8},
+        {x2, y2, -8}
+    };
+    std::vector<TPolyLine3D*> pad_lines;
+    TGraph2D* g_center = new TGraph2D();
+    TGraph2D* g_map_pts = new TGraph2D();
+    X17::DefaultLayout::GetDefaultLayout().GetPadCenter(pad_id,xc,yc);
+
+    double x_min = 1e6;
+    double x_max = -1e6;
+    double y_min = 1e6;
+    double y_max = -1e6;
+
+    // Corner lines
+    for (auto v_corner : corners)
+    {
+        TPolyLine3D* corner_line = new TPolyLine3D(i_max + 1);
+
+        for (int i = 0; i < i_max; i++)
+        {
+            double time = i * time_step;
+            X17::EndPoint t_corner (v_corner, time);
+            X17::RecoPoint reco = X17::Reconstruct(map,t_corner);
+            corner_line->SetPoint(i,reco.x(),reco.y(),reco.z());
+
+            if (reco.x() < x_min) x_min = reco.x();
+            if (reco.x() > x_max) x_max = reco.x();
+            if (reco.y() < y_min) y_min = reco.y();
+            if (reco.y() > y_max) y_max = reco.y();
+        }
+
+        pad_lines.push_back(corner_line);
+    }
+
+    // Plane lines and centers
+    for (int i = 0; i < i_max2; i++)
+    {
+        double time = i * time_step2;
+
+        X17::RecoPoint creco = X17::Reconstruct(map,{xc,yc,-8,time+time_step2/2.},g_map_pts);
+        g_center->AddPoint(creco.x(),creco.y(),creco.z());
+
+        TPolyLine3D* lines[4] = {
+            new TPolyLine3D (plane_steps),
+            new TPolyLine3D (plane_steps),
+            new TPolyLine3D (plane_steps),
+            new TPolyLine3D (plane_steps)
+        };
+
+        for (int j = 0; j < plane_steps; j++)
+        {
+            std::vector<X17::RecoPoint> points = {
+                X17::Reconstruct(map,{x1 + j*(x2 - x1) / (plane_steps - 1), y1, -8, time}),
+                X17::Reconstruct(map,{x2, y1 + j*(y2 - y1) / (plane_steps - 1), -8, time}),
+                X17::Reconstruct(map,{x1 + j*(x2 - x1) / (plane_steps - 1), y2, -8, time}),
+                X17::Reconstruct(map,{x1, y1 + j*(y2 - y1) / (plane_steps - 1), -8, time})
+            };
+
+            for (int k = 0; k < 4; k++)
+                lines[k]->SetPoint(j,points[k].x(),points[k].y(),points[k].z());
+        }
+
+        for (int l = 0; l < 4; l++)
+            pad_lines.push_back(lines[l]);        
+    }
+
+    x_min -= 0.1;
+    x_max += 0.1;
+
+    double y_avg = (y_min+y_max)/2;
+    y_max = y_avg + (x_max-x_min)/2;
+    y_min = y_avg - (x_max-x_min)/2;
+
+    TCanvas* c = new TCanvas("","Pad inversion",g_cwidth,g_cheight);
+    ApplyThesisStyle(c);
+    TH3F* h = new TH3F("",";x [cm];y [cm];z [cm]", 1, x_min, x_max, 1, y_min, y_max, 1, -8, 8);
+    ApplyThesisStyle(h);
+    h->Draw();
+    for (auto line : pad_lines)
+        line->Draw("same");
+    g_center->SetMarkerStyle(8);
+    g_center->SetMarkerColor(kRed);
+    g_center->Draw("P same");
+    g_map_pts->SetMarkerStyle(8);
+    g_map_pts->SetMarkerColor(kBlue);
+    g_map_pts->Draw("P same");
+}
+
+void PlotSplineAndCirc2D(X17::TrackMicro track, X17::Field<X17::Vector>* magfield, X17::Field<X17::MapPoint>* map, bool newcoords = false)
+{
+    TGraph* xz_original = new TGraph();
+    TGraph* xz_reco_map = new TGraph();
+    TGraph* xz_reco_map_copy = new TGraph();
+    double x_limit = 2; //newcoords ? -1 : 2;
+    for (const auto& point : track.points)
+    {
+        using namespace X17::constants;
+        double z_end = newcoords ? point.end.z() : point.end.y();
+        if (z_end > 7.5)
+        {
+            X17::Vector orig,reco_rasd;
+            X17::RecoPoint reco_map, reco_map_old;
+
+            if (newcoords)
+            {
+                orig = {point.start.x(), point.start.y(),point.start.z()};
+                if (orig.x > x_limit && orig.x < map->GetXMax())
+                {
+                    reco_map_old = X17::ReconstructOld(*map, point.end.x(),point.end.y(),point.end.t,1E-9,false);
+                    reco_map = X17::Reconstruct(*map,point);
+                }
+            }
+            else
+            {
+                orig = {point.start.z(), point.start.x(),point.start.y()};
+                if (orig.x > x_limit && orig.x < map->GetXMax())
+                {
+                    reco_map_old = X17::ReconstructOld(*map, point.end.z(),point.end.x(),point.end.t,1E-9);
+                    reco_map = X17::Reconstruct(*map, X17::EndPoint(point.end.z(),point.end.x(),point.end.y(),point.end.t));
+                }
+            }
+            // std::cout << "Original:            (" << orig.x << ", " << orig.y << ", " << orig.z << ")" << std::endl;
+            xz_original->AddPoint(orig.x,orig.z);
+            if (orig.x > x_limit && orig.x < map->GetXMax())
+            {
+                xz_reco_map->AddPoint(reco_map.x(),reco_map.z());
+                xz_reco_map_copy->AddPoint(reco_map.x(),reco_map.z());
+            }
+        }
+    }
+    xz_original->SetMarkerStyle(7);
+    xz_original->SetMarkerColor(kRed);
+    
+    gStyle->SetTitleYOffset(1.05);
+    
+    TSpline3* spline = X17::FitSplines<4>(xz_reco_map,x_limit,map->GetXMax());
+    TF1* f_spline = xz_reco_map->GetFunction("fit");
+    f_spline->SetLineColor(kBlue);
+
+    TCanvas* c_map = new TCanvas("","Spline (map)",g_cwidth,g_cheight);
+    xz_reco_map->SetMarkerStyle(2);
+    xz_reco_map->SetMarkerColor(kBlack);
+    xz_reco_map->SetLineColor(kBlue);
+
+    TMultiGraph* mg_map = new TMultiGraph();
+    mg_map->Add(xz_original,"P");
+    mg_map->Add(xz_reco_map,"P");
+    mg_map->GetXaxis()->SetTitle("x [cm]");
+    mg_map->GetYaxis()->SetTitle("z [cm]");
+    mg_map->Draw("A");
+
+    TLegend* l_map = new TLegend(0.69,0.765,0.93,0.93);
+    l_map->AddEntry(xz_original,"simulation","p");
+    l_map->AddEntry(xz_reco_map,"reconstructed","p");
+    l_map->AddEntry(f_spline,"spline fit","l");
+    l_map->SetTextSize(0.043);
+    l_map->Draw();
+
+    int xsteps = 200;
+    TGraph* g_magfield = new TGraph();
+    TGraph* g_radius = new TGraph();
+    TGraph* g_energy = new TGraph();
+
+    for (double x = x_limit; x < map->GetXMax(); x += (map->GetXMax()-x_limit)/xsteps)
+    {
+        double z = spline->Eval(x);
+        X17::Vector bfield = magfield->GetField(x,0,z);
+        g_magfield->AddPoint(x,bfield.y);
+
+        int i_node = spline->FindX(x);
+
+        double xnode,ynode,b,c,d;
+        spline->GetCoeff(i_node,xnode,ynode,b,c,d);
+        double dx   = x-xnode;
+        double der  = b+dx*(2*c+3*d*dx);
+        double der2 = 2*c+6*d*dx;
+        double r = std::abs(0.01*pow(1+der*der,1.5)/der2);
+        const double clight = 299792458;
+        const double E0 = 510998.95;
+        double betasq = 1/(1+pow((E0/(clight*r*bfield.y)),2));
+        double Ekin = E0*(1/sqrt(1-betasq)-1);
+        if (x > 4 && r < 1.5 && r > 0)
+        {
+            g_radius->AddPoint(x,r*100);
+            g_energy->AddPoint(x,Ekin/1e6);
+        }
+    }
+    
+    TCanvas* c_magfield = new TCanvas("","Magnetic field",g_cwidth,g_cheight);
+    g_magfield->SetMarkerStyle(2);
+    g_magfield->SetMarkerColor(kBlack);
+    g_magfield->GetXaxis()->SetTitle("x [cm]");
+    g_magfield->GetYaxis()->SetTitle("B [T]");
+    g_magfield->Draw("AP");
+
+    TCanvas* c_radius = new TCanvas("","Reconstructed Radius",g_cwidth,g_cheight);
+    g_radius->SetMarkerStyle(2);
+    g_radius->SetMarkerColor(kBlack);
+    g_radius->GetXaxis()->SetTitle("x [cm]");
+    g_radius->GetYaxis()->SetTitle("r [cm]");
+    g_radius->Draw("AP");
+    
+    TCanvas* c_energy = new TCanvas("","Reconstructed Energy",g_cwidth,g_cheight);
+    g_energy->SetMarkerStyle(2);
+    g_energy->SetMarkerColor(kBlack);
+    g_energy->GetXaxis()->SetTitle("x [cm]");
+    g_energy->GetYaxis()->SetTitle("E [MeV]");
+    g_energy->Draw("AP");
+
+    TF1* circ2 = X17::FitCircle2(xz_reco_map_copy,x_limit,map->GetXMax());
+    TF1* circ = xz_reco_map_copy->GetFunction("circle");
+    circ->SetLineColor(kBlue);
+    circ->SetLineWidth(2);
+    // circ->Draw("same");
+
+    TCanvas* c_map2 = new TCanvas("","Circle 2D (map)",g_cwidth,g_cheight);
+    xz_reco_map_copy->SetMarkerStyle(2);
+    xz_reco_map_copy->SetMarkerColor(kBlack);
+    xz_reco_map_copy->SetLineColor(kBlue);
+
+    TMultiGraph* mg_map2 = new TMultiGraph();
+    mg_map2->Add(xz_original,"P");
+    mg_map2->Add(xz_reco_map_copy,"P");
+    mg_map2->GetXaxis()->SetTitle("x [cm]");
+    mg_map2->GetYaxis()->SetTitle("z [cm]");
+    mg_map2->Draw("A");
+
+    TLegend* l_map2 = new TLegend(0.69,0.765,0.93,0.93);
+    l_map2->AddEntry(xz_original,"simulation","p");
+    l_map2->AddEntry(xz_reco_map_copy,"reconstructed","p");
+    l_map2->AddEntry(circ,"circle fit","l");
+    l_map2->SetTextSize(0.043);
+    l_map2->Draw();
+
+    TGraph* g_magfield2 = new TGraph();
+    X17::RecoEnergy(circ,*magfield,g_magfield2,x_limit,map->GetXMax(),0.1);
+
+    TCanvas* c_magfield2 = new TCanvas("","Magnetic field",g_cwidth,g_cheight);
+    g_magfield2->SetMarkerStyle(2);
+    g_magfield2->SetMarkerColor(kBlack);
+    g_magfield2->GetXaxis()->SetTitle("x [cm]");
+    g_magfield2->GetYaxis()->SetTitle("B [T]");
+    g_magfield2->Draw("AP");
+}
+
 int main(int argc, char *argv[])
 {
     TApplication app("app", &argc, argv);
@@ -566,9 +832,14 @@ int main(int argc, char *argv[])
     
     gStyle->SetOptStat(0);
 
-    PlotRASD(track1,map9010);
-    PlotRASD(track2,map7030,true);
+    // PlotRASD(track1,map9010);
+    // PlotRASD(track2,map7030,true);
     // PlotRASDres2();
+
+    // PlotPadReco(*map9010,false);
+    // PlotPadReco(*map7030,true);
+
+    PlotSplineAndCirc2D(track2,magfield,map7030,true);
 
     // Reconstruct CircleFit3D + RK4
         // std::vector<X17::RecoPoint> reco_points;

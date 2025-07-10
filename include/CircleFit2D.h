@@ -15,7 +15,7 @@ namespace X17
     /// @return Fitted function.
     TF1* FitCircle(TGraph* graph, double min, double max);
 
-    /// @brief Function for circular arc with smoothly attached lines at endpoints (nodes).
+    /// @brief Function for circular arc (upper half) with smoothly attached lines at endpoints (nodes).
     /// @param x Variable x [cm].
     /// @param par Set of parameters (radius of the circle, 1st and 2nd node x and y coordinates).
     /// @return Value at x.
@@ -27,17 +27,6 @@ namespace X17
     /// @param max Upper bound of the fit [cm].
     /// @return Fitted function.
     TF1* FitCircle2(TGraph* graph, double min, double max);
-
-    /// @brief Function for energy reconstruction from spline fit.
-    /// @param sp_fit Fitted splines.
-    /// @param magfield Magnetic data.
-    /// @param energy Output graph for reconstructed energy as function of coordinate.
-    /// @param radius Output graph for reconstructed radius as function of coordinate.
-    /// @param magnetic Output graph for magnetic field along fitted trajectory.
-    /// @param min Lower bound [cm].
-    /// @param max Upper bound [cm].
-    /// @param step Step between iterations.
-    void RecoEnergy(TSpline3* sp_fit, const Field<Vector>& magfield, TGraph* energy, TGraph* radius, TGraph* magnetic, double min, double max, double step);
 
     /// @brief Function for energy reconstruction from circle with lines fit.
     /// @param fit Fitted circle with lines function.

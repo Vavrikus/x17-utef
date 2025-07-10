@@ -13,6 +13,7 @@
 #include "TGraphErrors.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TH3F.h"
 #include "TRandom3.h"
 
 // X17 dependencies
@@ -153,7 +154,7 @@ void ApplyThesisStyle(T* obj)
         if constexpr (is_from<T, TH1F, TGraph, TGraphErrors>)
             axes = { obj->GetXaxis(), obj->GetYaxis(), nullptr };
 
-        else if constexpr (is_from<T, TH2F, TGraph2D>)
+        else if constexpr (is_from<T, TH2F, TGraph2D, TH3F>)
             axes = { obj->GetXaxis(), obj->GetYaxis(), obj->GetZaxis() };
         
         else
@@ -171,14 +172,17 @@ void ApplyThesisStyle(T* obj)
         if (axes[2])
         {
             axes[0]->SetTitleOffset(1.2);
-            axes[1]->SetTitleOffset(0.9);
-            axes[2]->SetTitleOffset(1.3);
+            axes[1]->SetTitleOffset(1.2); // previously also 0.9
+
+            double zmax = axes[2]->GetXmax();
+            double z_offset = std::ceil(std::log10(zmax)) * 0.2 + 0.5;
+            axes[2]->SetTitleOffset(z_offset); // previously 1.3 for times in 1000s of ns
         }
+
         else
         {
             axes[0]->SetTitleOffset(0.9);
             axes[1]->SetTitleOffset(0.75);
-        }
-        
+        }   
     }
 }

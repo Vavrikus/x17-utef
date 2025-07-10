@@ -35,6 +35,14 @@ namespace X17
     /// @param value The value to search for.
     void FindMapMinMaxIndex(const Field<MapPoint>& map, int& i_min, int& i_max, int (&i_mid)[3], int var, double value);
 
+    /// @brief Does the pseudocell in the inverse grid given by the indices of the map contain the point in its circumscribed box?
+    /// @param map The 3D map of ionization electron drift.
+    /// @param indices An array of 6 integers representing the indices of the MapPoint values to use for interpolation.
+    ///                The array should contain indices for {xmin, xmax, ymin, ymax, z_tmin <--> zmax, z_tmax <--> zmin}.
+    /// @param end_point The electron endpoint to be checked.
+    /// @param out_status Will be set to a code 0-5 based on what parameter caused false (otherwise -1).
+    bool CellContainsReco(const Field<MapPoint>& map, const int (&indices)[6], EndPoint end_point, int& out_status);
+
     /// @brief Prints the cube defined by a set of indices and checks if an endpoint coordinates are within the bounds.
     /// @param map The 3D map of ionization electron drift.
     /// @param indices An array of 6 integers representing the indices of the MapPoint values to use for interpolation.
@@ -46,7 +54,7 @@ namespace X17
     /// @param map The 3D map of ionization electron drift used for interpolation.
     /// @param end_point An EndPoint object that represents the point in 3D space to be reconstructed. (x1,y1,t1)
     /// @return A RecoPoint object that represents the reconstructed point in 3D space. (x0,y0,z0)
-    RecoPoint Reconstruct(const Field<MapPoint>& map, EndPoint end_point);
+    RecoPoint Reconstruct(const Field<MapPoint>& map, EndPoint end_point, TGraph2D* g_map_pts = nullptr);
 
     /// @brief Reconstructs an EndPoint using interpolation from the ionization electron drift map.
     /// @param map The 3D map of ionization electron drift used for interpolation.

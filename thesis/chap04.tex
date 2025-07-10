@@ -8,13 +8,6 @@
 	
 	The~\textbf{Runge-Kutta Fit} uses the 4th order Runge-Kutta numerical integration described in Section~\ref{sec:rks}. Initial parameters of the track (including the particle's energy) are optimized so that the integrated trajectory fits to the reconstructed one. This fit can also be performed as a~single parameter (i.e., energy) fit if we get the initial position and orientation of the particle on the entrance to the \ac{TPC} from previous detectors (\ac{TPX3} and \ac{MWPC}, see Section~\ref{sec:IEAP}).
 	
-	\begin{figure}
-		\centering
-		\includegraphics[width=0.5\textwidth]{9010_3d.png}
-		\caption{Example of a~fitted reconstructed track.\red{~Swap for better image.}}
-		\label{fig:90103d}
-	\end{figure}
-	
 	\section{Cubic Spline Fit}
 	\label{sec:cspline}
 		The~first method for the estimation of the kinetic energy of the particle uses a~cubic spline fit. We use an~electron track simulated using the microscopic simulation, described in detail in Section~\ref{sec:microfirst}. The track was reconstructed using the map described in Section~\ref{sec:map}.
@@ -44,14 +37,35 @@
 				\label{eq:ekin2}
 				E_\text{kin}(x) = \left(\frac{1}{\sqrt{1-\beta^2(x)}}-1\right)E_{0e}.
 			\end{equation}
-		We can then average these estimates at multiple points (\red{possibly using some weights to account for the change in accuracy, }this wasn't optimized and we just ended with the graph) to get a~single value. This method was later rejected in favor of the circle and lines fit\orange{~(the name was already established at the beginning of the chapter)} described in the next section.
-		\red{Add some figures.}
+		We could then average these estimates at multiple points (\red{possibly using some weights to account for the change in accuracy}) to get a~single value. An example of the~reconstruction for a~reconstructed track is shown in \cref{fig:spline}. This method was later rejected in favor of the circle and lines fit\orange{~(the name was already established at the beginning of the chapter)} described in the next section.
 		
 		\begin{figure}
 			\centering
-			\includegraphics[width=0.8\textwidth]{9010_splines.png}
-			\caption{First attempt at a~track reconstruction using only the drift velocity. Spline energy reconstruction attempt.\red{~Swap for better image(s) -- subfigure environment, correct coordinates.}}
-			\label{fig:9010splines}
+			\begin{subfigure}[t]{0.48\textwidth}
+				\centering
+				\includegraphics[width=\textwidth]{spline_fit.png}
+				\caption{Spline fit of a~reconstructed track.}
+			\end{subfigure}
+			\hfill
+			\begin{subfigure}[t]{0.48\textwidth}
+				\centering
+				\includegraphics[width=\textwidth]{spline_mag.png}
+				\caption{Magnetic field along the track.}
+			\end{subfigure}
+			\hfill
+			\begin{subfigure}[t]{0.48\textwidth}
+				\centering
+				\includegraphics[width=\textwidth]{spline_radius.png}
+				\caption{Reconstructed radius of curvature along the track.}
+			\end{subfigure}
+			\hfill
+			\begin{subfigure}[t]{0.48\textwidth}
+				\centering
+				\includegraphics[width=\textwidth]{spline_energy.png}
+				\caption{Reconstructed energy along the track.}
+			\end{subfigure}
+			\caption{Energy reconstruction of a~\qty{7.51}{\MeV} track in a~70:30 Ar:CO$_2$ gas mixture (described in detail in \cref{sec:microfirst}) using a~cubic spline fit with four evenly spaced nodes of points reconstructed using the map.}
+			\label{fig:spline}
 		\end{figure}
 	
 	\section{Circle and Lines Fit}
@@ -103,13 +117,17 @@
 						z_0 = \frac{z_1+z_2}{2} - \frac{x_2-x_1}{2} \sqrt{\frac{r^2}{\left(\frac{x_2-x_1}{2}\right)^2+\left(\frac{z_2-z_1}{2}\right)^2}-1}.
 					\end{aligned}
 				\end{gather}
-			The~function defined in Equation~\ref{eq:clines2d} along with equations~\ref{eq:a12}, \ref{eq:b12}, and \ref{eq:xz0} derived using the continuity and smoothness conditions (combined with the relations for $z_{1,2}$) fully define our fitted function with parameters $r,x_{1,2},z_{1,2}$.\red{~Some pictures of the fit on the tested track. Results of the fit. Again, the actual fit uses 8-z. Use GeoGebra schematics to generate a~picture of 2D geometry.}
+			The~function defined in Equation~\ref{eq:clines2d} along with equations~\ref{eq:a12}, \ref{eq:b12}, and \ref{eq:xz0} derived using the continuity and smoothness conditions (combined with the relations for $z_{1,2}$) fully define our fitted function with parameters $r,x_{1,2},z_{1,2}$.
+			
+			For the calculation of kinetic energy from the radius of the circle, we use the value of the magnetic field in the middle of the \ac{OFTPC}\red{~(this could be further optimized in the future)}. An example of a~fit of vertices reconstructed with the map is shown in \cref{fig:circle2d}.\red{~Use GeoGebra schematics to generate a~picture of 2D geometry.}
 			
 			\begin{figure}
 				\centering
-				\includegraphics[width=0.8\textwidth]{9010_circle2D.png}
-				\caption{First attempt at a~track reconstruction using only the drift velocity. Circle and Lines Fit in 2D.\red{~Swap for better image, correct coordinates.}\orange{~Bias should be described in the previous chapter, not here.}}
-				\label{fig:9010circle2D}
+				\includegraphics[width=0.48\textwidth]{circ2d_fit.png}
+				\hfill
+				\includegraphics[width=0.48\textwidth]{circ2d_mag.png}
+				\caption{Circle and lines 2D energy reconstruction of a \qty{7.51}{\MeV} track in a~70:30 Ar:CO$_2$ gas mixture (described in detail in \cref{sec:microfirst}). The resulting energy is \qty{7.70}{\MeV}, the magnetic field along the track is shown on the right.}
+				\label{fig:circle2d}
 			\end{figure}
 		
 		\subsection{Three-dimensional fit}
