@@ -80,4 +80,15 @@ namespace X17
     /// @param gas9010 If true, uses the 90/10 time weight, otherwise uses the 70/30 time weight.
     /// @return The reconstructed point.
     RecoPoint ReconstructOld(const Field<MapPoint>& map, double x1, double y1, double t1, double max_err, bool gas9010 = true);
+
+    /// @brief Reconstructs a point with given final coordinates using the map of ion electron drift. Uses gradient descend. Old function.
+    /// @param map The field map to use for reconstruction.
+    /// @param point An EndPoint object that represents the point in 3D space to be reconstructed. (x1,y1,t1)
+    /// @param max_err The maximum allowed error between reconstructed point and actual point.
+    /// @param gas9010 If true, uses the 90/10 time weight, otherwise uses the 70/30 time weight.
+    /// @return The reconstructed point.
+    inline RecoPoint ReconstructOld(const Field<MapPoint>& map, EndPoint point, double max_err, bool gas9010 = true)
+    {
+        return ReconstructOld(map, point.x(), point.y(), point.t, max_err, gas9010);
+    }
 } // namespace X17

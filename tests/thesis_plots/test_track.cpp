@@ -533,9 +533,8 @@ void PlotRASDres2()
     l_res->Draw();
 }
 
-void PlotPadReco(const X17::Field<X17::MapPoint>& map, bool m7030 = true)
+void PlotPadReco(const X17::Field<X17::MapPoint>& map, int pad_id, bool m7030 = true, bool old_reco = false)
 {
-    int pad_id = 127;//66;
     double x1,y1,x2,y2,xc,yc;
 
     X17::DefaultLayout::GetDefaultLayout().GetPadCorners(pad_id,x1,y1,x2,y2,true);
@@ -567,11 +566,13 @@ void PlotPadReco(const X17::Field<X17::MapPoint>& map, bool m7030 = true)
     {
         TPolyLine3D* corner_line = new TPolyLine3D(i_max + 1);
 
+        std::cout << "\nCorner line:\n";
         for (int i = 0; i < i_max; i++)
         {
+            ReportProgress(i,i_max);
             double time = i * time_step;
             X17::EndPoint t_corner (v_corner, time);
-            X17::RecoPoint reco = X17::Reconstruct(map,t_corner);
+            X17::RecoPoint reco = old_reco ? X17::ReconstructOld(map,t_corner,1e-6,!m7030) : X17::Reconstruct(map,t_corner);
             corner_line->SetPoint(i,reco.x(),reco.y(),reco.z());
 
             if (reco.x() < x_min) x_min = reco.x();
@@ -584,11 +585,13 @@ void PlotPadReco(const X17::Field<X17::MapPoint>& map, bool m7030 = true)
     }
 
     // Plane lines and centers
+    std::cout << "\nPlane lines and centers:\n";
     for (int i = 0; i < i_max2; i++)
     {
+        ReportProgress(i,i_max2);
         double time = i * time_step2;
 
-        X17::RecoPoint creco = X17::Reconstruct(map,{xc,yc,-8,time+time_step2/2.},g_map_pts);
+        X17::RecoPoint creco = old_reco ? X17::ReconstructOld(map,xc,yc,time+time_step2/2.,1e-6,!m7030) : X17::Reconstruct(map,{xc,yc,-8,time+time_step2/2.},g_map_pts);
         g_center->AddPoint(creco.x(),creco.y(),creco.z());
 
         TPolyLine3D* lines[4] = {
@@ -600,12 +603,26 @@ void PlotPadReco(const X17::Field<X17::MapPoint>& map, bool m7030 = true)
 
         for (int j = 0; j < plane_steps; j++)
         {
-            std::vector<X17::RecoPoint> points = {
-                X17::Reconstruct(map,{x1 + j*(x2 - x1) / (plane_steps - 1), y1, -8, time}),
-                X17::Reconstruct(map,{x2, y1 + j*(y2 - y1) / (plane_steps - 1), -8, time}),
-                X17::Reconstruct(map,{x1 + j*(x2 - x1) / (plane_steps - 1), y2, -8, time}),
-                X17::Reconstruct(map,{x1, y1 + j*(y2 - y1) / (plane_steps - 1), -8, time})
-            };
+            std::vector<X17::RecoPoint> points;
+            if (old_reco)
+            {
+                points = {
+                    X17::ReconstructOld(map,{x1 + j*(x2 - x1) / (plane_steps - 1), y1, -8, time},1e-6,!m7030),
+                    X17::ReconstructOld(map,{x2, y1 + j*(y2 - y1) / (plane_steps - 1), -8, time},1e-6,!m7030),
+                    X17::ReconstructOld(map,{x1 + j*(x2 - x1) / (plane_steps - 1), y2, -8, time},1e-6,!m7030),
+                    X17::ReconstructOld(map,{x1, y1 + j*(y2 - y1) / (plane_steps - 1), -8, time},1e-6,!m7030)
+                };
+            }
+
+            else
+            {
+                points = {
+                    X17::Reconstruct(map,{x1 + j*(x2 - x1) / (plane_steps - 1), y1, -8, time}),
+                    X17::Reconstruct(map,{x2, y1 + j*(y2 - y1) / (plane_steps - 1), -8, time}),
+                    X17::Reconstruct(map,{x1 + j*(x2 - x1) / (plane_steps - 1), y2, -8, time}),
+                    X17::Reconstruct(map,{x1, y1 + j*(y2 - y1) / (plane_steps - 1), -8, time})
+                };
+            }
 
             for (int k = 0; k < 4; k++)
                 lines[k]->SetPoint(j,points[k].x(),points[k].y(),points[k].z());
@@ -622,10 +639,15 @@ void PlotPadReco(const X17::Field<X17::MapPoint>& map, bool m7030 = true)
     y_max = y_avg + (x_max-x_min)/2;
     y_min = y_avg - (x_max-x_min)/2;
 
-    TCanvas* c = new TCanvas("","Pad inversion",g_cwidth,g_cheight);
+    TCanvas* c = new TCanvas("","Pad inversion",g_cwidth,2*g_cheight);
     ApplyThesisStyle(c);
     TH3F* h = new TH3F("",";x [cm];y [cm];z [cm]", 1, x_min, x_max, 1, y_min, y_max, 1, -8, 8);
     ApplyThesisStyle(h);
+    if (m7030)
+    {
+        h->GetXaxis()->SetNdivisions(505);
+        h->GetYaxis()->SetNdivisions(505);
+    }
     h->Draw();
     for (auto line : pad_lines)
         line->Draw("same");
@@ -637,12 +659,12 @@ void PlotPadReco(const X17::Field<X17::MapPoint>& map, bool m7030 = true)
     g_map_pts->Draw("P same");
 }
 
-void PlotSplineAndCirc2D(X17::TrackMicro track, X17::Field<X17::Vector>* magfield, X17::Field<X17::MapPoint>* map, bool newcoords = false)
+std::pair<TGraph*,TGraph*> MapRecoPoints(X17::TrackMicro track, X17::Field<X17::Vector>* magfield, X17::Field<X17::MapPoint>* map, bool newcoords = false)
 {
     TGraph* xz_original = new TGraph();
     TGraph* xz_reco_map = new TGraph();
-    TGraph* xz_reco_map_copy = new TGraph();
     double x_limit = 2; //newcoords ? -1 : 2;
+
     for (const auto& point : track.points)
     {
         using namespace X17::constants;
@@ -670,18 +692,28 @@ void PlotSplineAndCirc2D(X17::TrackMicro track, X17::Field<X17::Vector>* magfiel
                     reco_map = X17::Reconstruct(*map, X17::EndPoint(point.end.z(),point.end.x(),point.end.y(),point.end.t));
                 }
             }
-            // std::cout << "Original:            (" << orig.x << ", " << orig.y << ", " << orig.z << ")" << std::endl;
+            
             xz_original->AddPoint(orig.x,orig.z);
             if (orig.x > x_limit && orig.x < map->GetXMax())
             {
                 xz_reco_map->AddPoint(reco_map.x(),reco_map.z());
-                xz_reco_map_copy->AddPoint(reco_map.x(),reco_map.z());
             }
         }
     }
     xz_original->SetMarkerStyle(7);
     xz_original->SetMarkerColor(kRed);
-    
+    xz_reco_map->SetMarkerStyle(2);
+    xz_reco_map->SetMarkerColor(kBlack);
+    xz_reco_map->SetLineColor(kBlue);
+
+    return {xz_original,xz_reco_map};
+}
+
+void PlotSpline(X17::TrackMicro track, X17::Field<X17::Vector>* magfield, X17::Field<X17::MapPoint>* map, bool newcoords = false)
+{
+    double x_limit = 2;
+    auto [xz_original,xz_reco_map] = MapRecoPoints(track,magfield,map,newcoords);
+
     gStyle->SetTitleYOffset(1.05);
     
     TSpline3* spline = X17::FitSplines<4>(xz_reco_map,x_limit,map->GetXMax());
@@ -689,10 +721,6 @@ void PlotSplineAndCirc2D(X17::TrackMicro track, X17::Field<X17::Vector>* magfiel
     f_spline->SetLineColor(kBlue);
 
     TCanvas* c_map = new TCanvas("","Spline (map)",g_cwidth,g_cheight);
-    xz_reco_map->SetMarkerStyle(2);
-    xz_reco_map->SetMarkerColor(kBlack);
-    xz_reco_map->SetLineColor(kBlue);
-
     TMultiGraph* mg_map = new TMultiGraph();
     mg_map->Add(xz_original,"P");
     mg_map->Add(xz_reco_map,"P");
@@ -757,28 +785,30 @@ void PlotSplineAndCirc2D(X17::TrackMicro track, X17::Field<X17::Vector>* magfiel
     g_energy->GetXaxis()->SetTitle("x [cm]");
     g_energy->GetYaxis()->SetTitle("E [MeV]");
     g_energy->Draw("AP");
+}
 
-    TF1* circ2 = X17::FitCircle2(xz_reco_map_copy,x_limit,map->GetXMax());
-    TF1* circ = xz_reco_map_copy->GetFunction("circle");
+void PlotCircle2D(X17::TrackMicro track, X17::Field<X17::Vector>* magfield, X17::Field<X17::MapPoint>* map, bool newcoords = false)
+{
+    double x_limit = 2;
+    auto [xz_original,xz_reco_map] = MapRecoPoints(track,magfield,map,newcoords);
+
+    TF1* circ2 = X17::FitCircle2(xz_reco_map,x_limit,map->GetXMax());
+    TF1* circ = xz_reco_map->GetFunction("circle");
     circ->SetLineColor(kBlue);
     circ->SetLineWidth(2);
     // circ->Draw("same");
 
     TCanvas* c_map2 = new TCanvas("","Circle 2D (map)",g_cwidth,g_cheight);
-    xz_reco_map_copy->SetMarkerStyle(2);
-    xz_reco_map_copy->SetMarkerColor(kBlack);
-    xz_reco_map_copy->SetLineColor(kBlue);
-
     TMultiGraph* mg_map2 = new TMultiGraph();
     mg_map2->Add(xz_original,"P");
-    mg_map2->Add(xz_reco_map_copy,"P");
+    mg_map2->Add(xz_reco_map,"P");
     mg_map2->GetXaxis()->SetTitle("x [cm]");
     mg_map2->GetYaxis()->SetTitle("z [cm]");
     mg_map2->Draw("A");
 
     TLegend* l_map2 = new TLegend(0.69,0.765,0.93,0.93);
     l_map2->AddEntry(xz_original,"simulation","p");
-    l_map2->AddEntry(xz_reco_map_copy,"reconstructed","p");
+    l_map2->AddEntry(xz_reco_map,"reconstructed","p");
     l_map2->AddEntry(circ,"circle fit","l");
     l_map2->SetTextSize(0.043);
     l_map2->Draw();
@@ -835,11 +865,12 @@ int main(int argc, char *argv[])
     // PlotRASD(track1,map9010);
     // PlotRASD(track2,map7030,true);
     // PlotRASDres2();
+    
+    // PlotSpline(track2,magfield,map7030,true);
+    // PlotCircle2D(track2,magfield,map7030,true);
 
-    // PlotPadReco(*map9010,false);
-    // PlotPadReco(*map7030,true);
-
-    PlotSplineAndCirc2D(track2,magfield,map7030,true);
+    PlotPadReco(*map9010,12,false);
+    PlotPadReco(*map7030,12,true);
 
     // Reconstruct CircleFit3D + RK4
         // std::vector<X17::RecoPoint> reco_points;

@@ -320,6 +320,9 @@ namespace X17
 
     RecoPoint ReconstructOld(const Field<MapPoint>& map, double x1, double y1, double t1, double max_err, bool gas9010)
     {
+        if (t1 == 0)
+            return RecoPoint(x1, y1, 8.0, 1);
+        
         // Start looking at the same position.
         double x = x1;
         double y = y1;

@@ -108,7 +108,7 @@ double GetPvalue(std::vector<double>& values, double value, bool sorted = false)
 /// @return The recommended number of bins.
 inline int GetBinsScott(double min, double max, double sigma, double N)
 {
-    double bin_width = sigma * std::pow(24*std::sqrt(M_PI) / N,1./3.);
+    double bin_width = sigma * std::pow(24*std::sqrt(M_PI) / N, 1./3.);
     return std::round((max-min) / bin_width);
 }
 
@@ -176,6 +176,8 @@ void ApplyThesisStyle(T* obj)
 
             double zmax = axes[2]->GetXmax();
             double z_offset = std::ceil(std::log10(zmax)) * 0.2 + 0.5;
+            double zmin = axes[2]->GetXmin();
+            if (zmin < 0) z_offset += 0.2;
             axes[2]->SetTitleOffset(z_offset); // previously 1.3 for times in 1000s of ns
         }
 
