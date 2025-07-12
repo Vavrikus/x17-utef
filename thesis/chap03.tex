@@ -311,11 +311,7 @@
 			
 			
 		
-	\section{Discrete Reconstruction}
-		\red{Reconstruction with pads and time bins. Maybe testing different pads.}
-		
-		\red{It is also possible to make this a~subsection of the map, making the previous subsections parts of a~new subsection 'Map Inversion'.}
-		
+	\section{Discrete Reconstruction}		
 		In order to get a~more realistic representation of a~track measured in the \ac{OFTPC}, we need to take the discretization of the position and time data into account. The readout of the \ac{OFTPC} will consist of 128~pads, their layout is shown in \cref{fig:padlayout}. Time is read out in discrete bins of size $t_\text{bin} = \qty{100}{\ns}$.
 		
 		As the first approximation, we can neglect the multiplication in the triple\nobreakdash-\ac{GEM} and assume an ideal charge readout. The time measurement starts at the beginning of the electron/positron simulation\orange{~(depending on the specific simulation it can correspond to the production in the target or when entering the OFTPC, here the specific time doesn't matter too much since the primary particle travels basically at light speed (30~ps/cm) which is circa immediate given the time binning)}.\red{~Randomize this time a bit and see what it does to the reconstruction ($\rightarrow$ Future?).} The readout coordinates ${(x',y',t)\in\mathcal{R}}$ of each ionization electron can be mapped to the pad coordinates~$(n_\text{pad},n_t) \in \mathcal{P}$:
@@ -327,7 +323,7 @@
 			\begin{equation}
 				\mathcal{D} \ni (x,y,z) = \overline{\mathcal{M}}\left(x_{c,n},y_{c,n},\left(n_t-\frac{1}{2}\right)t_\text{bin}\right).
 			\end{equation}
-		Examples of positions reconstructed for a~single pad are shown in \cref{fig:pad_reco}. For pads near the magnet poles, the interpolation becomes problematic, due to large distortion. We can use the slower, unoptimized gradient descent search instead, the results are shown in \cref{fig:pad_reco_old}.
+		Examples of positions reconstructed for a~single pad are shown in \cref{fig:pad_reco}. For pads near the magnet poles, the interpolation becomes problematic, due to large distortion. We can use the slower, unoptimized gradient descent search instead, the results are shown in \cref{fig:pad_reco_old}. An example of a~track from the grid-like testing sample described in \cref{sec:microgrid} is shown in \cref{fig:pad_track}
 		
 		\begin{figure}
 			\centering
@@ -364,4 +360,11 @@
 			\includegraphics[width=0.48\textwidth]{pad_12_7030_old.png}
 			\caption{Reconstruction of detector coordinates corresponding to pad 12 (near the magnet pole) for different time bins. Unlike \cref{fig:pad_reco}, we used the gradient descent search, which handles the large distortion better. In its current unoptimized state, these figures took 280 times longer to produce, compared to the interpolation on the inverse grid.}
 			\label{fig:pad_reco_old}
+		\end{figure}
+		
+		\begin{figure}
+			\centering
+			\includegraphics[width=\textwidth]{pads_track.png}
+			\caption{Discrete reconstruction of an~\qty{8}{\MeV} track from the grid-like testing sample (described in \cref{sec:microgrid}) with minimal values of $\theta$ and $\phi$ initial direction angles. The simulated ionization vertices are shown in red, the reconstructed track is shown with the colored boxes. The number of electrons in each pad/time bin is denoted with the size of the boxes and their color.}
+			\label{fig:pad_track}
 		\end{figure}

@@ -69,8 +69,9 @@ The project uses the following folder structure:
     - **presentations**
         - Contains presentation from meetings and seminars (tex and pdf files)
     - **reconstruction**
-        - *reco_track.cpp* -- script for track reconstruction
+        - *reco_mtracks.cpp* -- script for reconstruction of microscopic tracks
         - *reco_plots.cpp* -- script for plots of the reconstruction (comparison of simulated and reconstructed energy)
+        - *reco_test.cpp* -- script for reconstruction testing (single track plots, Runge-Kutta tracks circle fit)
     - **remote**
         - Useful scripts for MetaCentrum (uses absolute paths, needs to be adjusted)
         - *sync.sh* -- Syncing with MetaCentrum

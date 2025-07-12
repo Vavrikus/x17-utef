@@ -629,7 +629,7 @@ void PlotPadReco(const X17::Field<X17::MapPoint>& map, int pad_id, bool m7030 = 
         }
 
         for (int l = 0; l < 4; l++)
-            pad_lines.push_back(lines[l]);        
+            pad_lines.push_back(lines[l]);
     }
 
     x_min -= 0.1;

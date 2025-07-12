@@ -175,8 +175,10 @@ void ApplyThesisStyle(T* obj)
             axes[1]->SetTitleOffset(1.2); // previously also 0.9
 
             double zmax = axes[2]->GetXmax();
-            double z_offset = std::ceil(std::log10(zmax)) * 0.2 + 0.5;
             double zmin = axes[2]->GetXmin();
+            if (abs(zmin) > zmax) zmax = abs(zmin);
+            if (zmax < 9) zmax = 9;
+            double z_offset = std::ceil(std::log10(zmax)) * 0.2 + 0.5;
             if (zmin < 0) z_offset += 0.2;
             axes[2]->SetTitleOffset(z_offset); // previously 1.3 for times in 1000s of ns
         }
