@@ -20,7 +20,7 @@ using namespace X17::constants;
 
 int rk_tracks()
 {
-    constexpr int n_tracks  =  100000;         // The number of tracks to be simulated by Runge-Kutta.
+    constexpr int n_tracks  =  10000;         // The number of tracks to be simulated by Runge-Kutta.
     constexpr double step   =  1E-13;          // The step of Runge-Kutta [s].
 
     // Loading the magnetic field.
@@ -39,7 +39,8 @@ int rk_tracks()
     // The loop for the track simulation.
     for (int i = 0; i < n_tracks; i++)
     {
-        if ((100 * i) % n_tracks == 0) std::cout << "Progress: " << 100*i/n_tracks << " \%\n";
+        // if ((100 * i) % n_tracks == 0) std::cout << "Progress: " << 100*i/n_tracks << " \%\n";
+        ReportProgress(i,n_tracks);
 
         // Generating random initial parameters.
         bool electron;
@@ -82,7 +83,7 @@ int rk_tracks()
     
     X17::DefaultLayout::GetDefaultLayout().DrawPads3D(height);
     
-    TFile* outfile = new TFile("../../../data/rk_tracks/rk_tracks.root","RECREATE");
+    TFile* outfile = new TFile("../../../data/rk_tracks/rk_tracks2.root","RECREATE");
     simulated_tracks->Write();
     c_tracks->Write();
 

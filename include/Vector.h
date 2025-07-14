@@ -3,6 +3,9 @@
 // C++ dependencies
 #include <cmath>
 
+// ROOT dependencies
+#include "Rtypes.h"
+
 namespace X17
 {
     /// @brief A 3D vector class with x, y, and z components.
@@ -37,7 +40,7 @@ namespace X17
         /// @return The angle between the two vectors in radians.
         double Angle(Vector other) const
         {
-            return acos((x * other.x + y * other.y + z * other.z) / (this->Magnitude() * other.Magnitude()));
+            return std::acos((x * other.x + y * other.y + z * other.z) / (this->Magnitude() * other.Magnitude()));
         }
 
         /// @brief Compute the square of the distance between this vector and another vector.
@@ -115,6 +118,8 @@ namespace X17
         {
             return x * v2.x + y * v2.y + z * v2.z;
         }
+
+        ClassDefNV(Vector, 1)
     };
 
     /// @brief Scalar multiplication of a vector.

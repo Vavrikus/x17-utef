@@ -161,3 +161,15 @@ void ReportProgress(int current, int total, int width)
 
     if (current == total) std::cout << std::endl;
 }
+
+TPolyLine3D *GetLine3D(TGraph2D *graph)
+{
+    if (graph->GetN() > 1)
+    {
+        TPolyLine3D *line = new TPolyLine3D(graph->GetN());
+        for (int i = 0; i < graph->GetN(); ++i)
+            line->SetPoint(i, graph->GetX()[i], graph->GetY()[i], graph->GetZ()[i]);
+        return line;
+    }
+    return nullptr;
+}

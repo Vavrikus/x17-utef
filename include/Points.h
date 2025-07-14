@@ -4,6 +4,7 @@
 #include <cmath>
 
 // ROOT dependencies
+#include "Rtypes.h"
 #include "TChain.h"
 #include "TEllipse.h"
 #include "TGraph.h"
@@ -54,6 +55,8 @@ namespace X17
             point = other.point;
             t = other.t;
         }
+
+        ClassDefNV(StartPoint, 1);
     };
 
     /// @brief A struct for storing the coordinates and the time of the final point of an ionization electron.
@@ -158,6 +161,8 @@ namespace X17
         {
             return EndPoint{point - p2.point, t - p2.t};
         }
+
+        ClassDefNV(EndPoint, 1);
     };
 
     /// @brief Scalar multiplication of a endpoint.
@@ -199,6 +204,8 @@ namespace X17
     {
         int n_pad;    // The channel (pad) number.
         int time_bin; // Number of the time bin (time bin size 100 ns).
+
+        ClassDefNV(EndPointDiscrete, 1);
     };
 
     /// @brief A struct for storing the results of microscopic simulation of ionization electrons.
@@ -260,6 +267,8 @@ namespace X17
         /// @brief Sets the branches of a TTree to this MicroPoint object. Uses different branch structure than MakeTTreeBranches.
         /// @param tree Pointer to a TTree object.
         void SetTTreeBranches(TTree* tree);
+
+        ClassDefNV(MicroPoint, 1);
     };
     
     /// @brief A struct for storing a Runge-Kutta generated track point.
@@ -296,6 +305,8 @@ namespace X17
         /// @brief Returns the coordinates of the point as Vector object.
         /// @return The vector with coordinates of the point.
         Vector AsVector() const { return point.point; }
+
+        ClassDefNV(RKPoint, 1);
     };
 
     /// @brief A struct for storing the results of map simulation (multiple ionization electrons with same initial coordinates).
@@ -413,6 +424,8 @@ namespace X17
                 std::cerr << "WARNING: Subtracting map points with different number of electrons!\n";
             return MapPoint{n, point - p2.point, cov_mat - p2.cov_mat};
         }
+
+        ClassDefNV(MapPoint, 1)
     };
 
     /// @brief Scalar multiplication of a map point.
@@ -472,6 +485,8 @@ namespace X17
     {
         EndPointDiscrete point; // The binned time and position information.
         double count;           // The number of electrons or charge.
+
+        ClassDefNV(DataPoint, 1)
     };
 
     /// @brief A struct for storing a point on an ionization electron driftline.
@@ -501,5 +516,7 @@ namespace X17
         /// @brief Getter for the z variable.
         /// @return The z-coordinate [cm].
         double z() const { return point.z; }
+
+        ClassDefNV(DriftLinePoint, 1)
     };
 } // namespace X17

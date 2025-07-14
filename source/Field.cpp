@@ -4,8 +4,15 @@
 
 // X17 dependencies
 #include "Field.h"
+#include "Points.h"
 #include "Vector.h"
 #include "X17Utilities.h"
+
+template class X17::Field<X17::Vector>;
+ClassImp(X17::Field<X17::Vector>)
+
+template class X17::Field<X17::MapPoint>;
+ClassImp(X17::Field<X17::MapPoint>)
 
 namespace X17
 {

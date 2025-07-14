@@ -94,7 +94,8 @@
       "source_location": "cpp",
       "format": "cpp",
       "any": "cpp",
-      "geometry.C": "cpp"
+      "geometry.C": "cpp",
+      "graph2d_overlay_test.C": "cpp"
     },
     "C_Cpp.default.includePath": [
       "/home/vavrik/work/X17/include",

@@ -133,12 +133,12 @@ namespace X17
         // Top magnet corners
         double x1 = mag_lowxx;
         double y1 = mag_lowxy;
-        double x2 = x1 + mag_depth * sin(angle);
-        double y2 = y1 - mag_depth * cos(angle);
-        double x3 = x2 + mag_width * cos(angle);
-        double y3 = y2 + mag_width * sin(angle);
-        double x4 = x3 - mag_depth * sin(angle);
-        double y4 = y3 + mag_depth * cos(angle);
+        double x2 = x1 + mag_depth * std::sin(angle);
+        double y2 = y1 - mag_depth * std::cos(angle);
+        double x3 = x2 + mag_width * std::cos(angle);
+        double y3 = y2 + mag_width * std::sin(angle);
+        double x4 = x3 - mag_depth * std::sin(angle);
+        double y4 = y3 + mag_depth * std::cos(angle);
 
         // Top magnet
         TLine *t1, *t2, *t3, *t4;

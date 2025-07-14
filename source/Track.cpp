@@ -6,6 +6,10 @@
 #include "Utilities.h"
 #include "X17Utilities.h"
 
+ClassImp(X17::TrackRK)
+ClassImp(X17::TrackMicro)
+ClassImp(X17::TrackInfo)
+
 namespace X17
 {
     void GetRandomTrackParams(TRandom3* rand, bool& electron, Vector& origin, Vector& orient, double& e_kin)
@@ -29,8 +33,8 @@ namespace X17
         // Simulation of the initial track parameters.
         double phi = RandomMinMax(rand,0,2*M_PI);                 // The azimuth of the initial point on the circle target.
         double r   = std::sqrt(RandomMinMax(rand,0,r_max*r_max)); // The distance of the initial point from the circle target.
-        double y0  = r*cos(phi);                                  // The y-coordinate of the initial point.
-        double z0  = r*sin(phi);                                  // The z-coordinate of the initial point.
+        double y0  = r*std::cos(phi);                                  // The y-coordinate of the initial point.
+        double z0  = r*std::sin(phi);                                  // The z-coordinate of the initial point.
 
         double y1 = RandomMinMax(rand,y1_min,y1_max);             // The y-coordinate of the window point (TPC entry).
         double z1 = RandomMinMax(rand,z1_min,z1_max);             // The z-coordinate of the window point (TPC entry).

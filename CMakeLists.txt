@@ -46,7 +46,7 @@ file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
 add_library(X17_source_lib STATIC ${SOURCES} X17_dict.cxx)
 target_link_libraries(X17_source_lib PUBLIC ${ROOT_LIBRARIES} Garfield::Garfield GSL::gsl ROOT::RIO)
 
-ROOT_GENERATE_DICTIONARY(X17_dict Field.h Points.h MODULE X17_source_lib LINKDEF LinkDef.h)
+ROOT_GENERATE_DICTIONARY(X17_dict Field.h Matrix.h Points.h Track.h Vector.h MODULE X17_source_lib LINKDEF LinkDef.h)
 
 # ---Build executables--------------------------------------------------------------------
 # Create the build folder for the root project

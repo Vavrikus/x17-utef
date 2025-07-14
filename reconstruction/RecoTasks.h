@@ -16,6 +16,7 @@
 #include "TPaletteAxis.h"
 #include "TPolyLine3D.h"
 #include "TStyle.h"
+#include "TSystem.h"
 #include "TTree.h"
 
 // X17 dependencies
@@ -318,7 +319,7 @@ class RecoPadsTask : public RecoTask
 
         for (int i = 0; i < channels; i++)
         {
-            ReportProgress(i,channels);
+            // ReportProgress(i,channels);
             for (int j = 0; j < timebins; j++)
             {
                 int charge = padhits[i][j];
@@ -547,7 +548,7 @@ class CircleAndRKFitTask : public RecoTask
         // Circle fit of the original track.
             cfit3d->SetFitter(4,false);
             if (m_loop->curr_loop == TrackLoop::MULTI)
-                cfit3d->SetParameters(0,10,1.5,m_loop->curr_microtrack->electron);
+                cfit3d->SetParameters(0,20,0.6,m_loop->curr_microtrack->electron);
             cfit3d->FitCircle3D();
             cfit3d->PrintFitParams();
 
@@ -567,7 +568,7 @@ class CircleAndRKFitTask : public RecoTask
 
             cfit3d_reco->SetFitter(4,false);
             if (m_loop->curr_loop == TrackLoop::MULTI)
-                cfit3d_reco->SetParameters(0,10,1.5,m_loop->curr_microtrack->electron);
+                cfit3d_reco->SetParameters(0,20,0.6,m_loop->curr_microtrack->electron);
             cfit3d_reco->FitCircle3D();
             cfit3d_reco->PrintFitParams();
 
@@ -589,22 +590,24 @@ class CircleAndRKFitTask : public RecoTask
         {
             TGraph2D* g_cfit3d = cfit3d->GetGraph(0.1,0);
             TGraph* g_en = cfit3d->GetEnergyGraph(*magfield);
-            g_cfit3d->SetLineColor(kGreen);
-            g_cfit3d->SetLineWidth(2);
-            // g_cfit3d->Draw("LINE same");
+            TPolyLine3D* l_cfit3d = GetLine3D(g_cfit3d);
+            l_cfit3d->SetLineColor(kGreen);
+            l_cfit3d->SetLineWidth(2);
+            l_cfit3d->Draw("same");
 
 
             TGraph2D* g_cfit3d_reco = cfit3d_reco->GetGraph(0.1,0);
             TGraph* g_en_reco = cfit3d_reco->GetEnergyGraph(*magfield);
-            g_cfit3d_reco->SetLineColor(kBlue);
-            g_cfit3d_reco->SetLineWidth(2);
-            g_cfit3d_reco->Draw("LINE same");
+            TPolyLine3D* l_cfit3d_reco = GetLine3D(g_cfit3d_reco);
+            l_cfit3d_reco->SetLineColor(kBlue);
+            l_cfit3d_reco->SetLineWidth(2);
+            l_cfit3d_reco->Draw("same");
 
 
             TGraph2D* g_rkfit = rkfit->GetFitGraph();
-            g_rkfit->SetLineColor(kMagenta);
-            g_rkfit->SetLineWidth(2);
-            g_rkfit->Draw("LINE same");
+            TPolyLine3D* l_rkfit = GetLine3D(g_rkfit);
+            l_rkfit->SetLineColor(kMagenta);
+            l_rkfit->SetLineWidth(2);
 
             TLegend* leg_xyz = new TLegend(0.741,0.742,0.956,0.931);
             leg_xyz->AddEntry(reco_task->g_xyz,"original trajectory","p");
@@ -612,9 +615,9 @@ class CircleAndRKFitTask : public RecoTask
             leg_xyz->AddEntry(reco_task->g_xyz_reco,"reconstructed trajectory (with pads)","p");
             leg_xyz->AddEntry(g_cfit3d_reco,"reconstructed trajectory fit by circle");
             leg_xyz->AddEntry(g_rkfit,"reconstructed trajectory fit by Runge-Kutta");
-            leg_xyz->Draw("same");
+            // leg_xyz->Draw("same");
 
-            reco_task->c_reco->Write();
+            reco_task->c_reco->Write(nullptr,TObject::kOverwrite);
 
 
             std::string c_fit3d_name = "c_fit3d" + std::to_string(m_loop->curr_track_index);
@@ -685,6 +688,8 @@ public:
 /// @brief Class for plotting Runge-Kutta simulated energy vs circle fit reconstruction.
 class CircleFitEnergyTask : public RecoTask
 {
+    friend class PlotSelectionTask;
+
     TH2F* h_energy;
     std::vector<TH1F*> h_energy_diff;
     int bins;
@@ -698,7 +703,8 @@ class CircleFitEnergyTask : public RecoTask
         const char* h_energy_title = "Original RK vs circle fit energy;RK energy [MeV];circle fit energy [MeV]";
         h_energy = new TH2F("h_energy",h_energy_title,bins,4,12,bins,0,15);
 
-        for (int i = 4; i < 12; i++)
+        // Simulation from 3 to 13 MeV
+        for (int i = 3; i < 13; i++)
         {
             std::string name  = "h_energy_diff_" + std::to_string(i);
             std::string title = "Difference between measured and fitted energy;Energy difference [MeV];Count";
@@ -713,9 +719,10 @@ class CircleFitEnergyTask : public RecoTask
     {
         const TrackRK* track = m_loop->curr_rk;
 
-        CircleFit3D* cfit = new CircleFit3D(track->origin,track->orientation);
+        cfit->SetOrigOrient(track->origin,track->orientation);
         tracks.push_back(new TGraph2D());
-        cfit->SetAlpha(track->electron);
+        cfit->SetFitter(4,false);
+        cfit->SetParameters(0,20,0.5,track->electron);
     }
 
     void ElectronLoop() override
@@ -723,7 +730,8 @@ class CircleFitEnergyTask : public RecoTask
         const TrackRK* track = m_loop->curr_rk;
         RKPoint p = m_loop->curr_rkpoint;
 
-        cfit->AddPoint(p);tracks.back()->AddPoint(p.x(),p.y(),p.z());//g_2d->AddPoint(p.x,p.y,p.z);
+        cfit->AddPoint(p);
+        tracks.back()->AddPoint(p.x(),p.y(),p.z());//g_2d->AddPoint(p.x,p.y,p.z);
     }
 
     void PostElectronLoop() override
@@ -735,7 +743,8 @@ class CircleFitEnergyTask : public RecoTask
         // g_fit = cfit->GetGraph();
 
         h_energy->Fill(track->kin_energy / 1e+6,cfit->GetEnergy(*(m_loop->magfield)) / 1e+6);
-        h_energy_diff[floor(track->kin_energy / 1e+6) - 4]->Fill((track->kin_energy+cfit->GetEnergy(*(m_loop->magfield))-track->kin_energy) / 1e+6);
+        int index = floor(track->kin_energy / 1e+6) - 3; // Zeroth bin is 3+ MeV
+        h_energy_diff[index]->Fill((track->kin_energy+cfit->GetEnergy(*(m_loop->magfield))-track->kin_energy) / 1e+6);
         if (abs(cfit->GetEnergy(*(m_loop->magfield))-track->kin_energy) > Ediff_max)
         {
             std::cout << "\n Electron track? --> " << track->electron << "\n";
@@ -745,7 +754,7 @@ class CircleFitEnergyTask : public RecoTask
         if (abs(cfit->GetEnergy(*(m_loop->magfield))-track->kin_energy) < Ediff_max) tracks.pop_back();         
     }
 
-    void PostLoop()
+    void PostTrackLoop() override
     {
         using namespace X17::constants;
         TCanvas* c = new TCanvas("c_cfit_energy","Original vs reconstructed energy");
@@ -753,16 +762,20 @@ class CircleFitEnergyTask : public RecoTask
         h_energy->Draw("colz");
         TF1 *f1 = new TF1("f1","x",4,12);
         f1->Draw("same");
+        c->Write();
+
         // TCanvas* c = new TCanvas();
         // g_2d->Draw("LINE");
         // g_2d->SetLineColor(kBlue);
         // g_2d->SetTitle("RK track (blue) and its fit (red);x [cm];y [cm];z [cm]");
         // g_fit->Draw("LINE same");
         // g_fit->SetLineColor(kRed);
+
         TCanvas* c0 = new TCanvas("c_energy_diff","Energy difference");
         TH1F* h1 = c0->DrawFrame(-2,0,14,50);
         for(TH1F* h : h_energy_diff) h->Draw("same plc hist");
         gStyle->SetOptStat(1111);
+        c0->Write();
 
         TCanvas* c1 = new TCanvas("c_cfit_failed","Tracks with failed circle fit");
         // A histogram for scalling of the axes.
@@ -785,6 +798,7 @@ class CircleFitEnergyTask : public RecoTask
         }
 
         std::cout << "n_failed_fits: " << tracks.size() << "\n";
+        c1->Write();
     }
 
 public:
@@ -797,19 +811,20 @@ class PlotSelectionTask : public RecoTask
 {
     std::vector<TGraph2D*> tracks;
     double E_max;
-    CircleFit3D* cfit = nullptr;
+    // CircleFit3D* cfit = nullptr;
+    CircleFitEnergyTask* cfit_energy = nullptr;
 
     void PreTrackLoop() override
     {
-        cfit = new CircleFit3D();
-        cfit->SetFitter();
+        // cfit = new CircleFit3D();
+        // cfit->SetFitter();
     }
 
     void PreElectronLoop() override
     {
         const TrackRK* track = m_loop->curr_rk;
 
-        cfit = new CircleFit3D(track->origin,track->orientation);
+        // cfit = new CircleFit3D(track->origin,track->orientation);
         tracks.push_back(new TGraph2D());
     }
 
@@ -818,18 +833,18 @@ class PlotSelectionTask : public RecoTask
         const TrackRK* track = m_loop->curr_rk;
         RKPoint p = m_loop->curr_rkpoint;
 
-        cfit->AddPoint(p);
+        // cfit->AddPoint(p);
         tracks.back()->AddPoint(p.x(),p.y(),p.z());
     }
 
     void PostElectronLoop() override
     {   
-        cfit->FitCircle3D();
+        // cfit->FitCircle3D();
 
-        if (cfit->GetEnergy(*(m_loop->magfield)) > E_max) tracks.pop_back(); 
+        if (cfit_energy->cfit->GetEnergy(*(m_loop->magfield)) > E_max) tracks.pop_back(); 
     }
 
-    void PostLoop()
+    void PostTrackLoop() override
     {
         using namespace X17::constants;
         TCanvas* c = new TCanvas("c_cfit_failed","Tracks with failed circle fit");
@@ -847,11 +862,13 @@ class PlotSelectionTask : public RecoTask
             g->Draw("LINE same");
         }
 
-        std::cout << "n_failed_fits: " << tracks.size() << "\n";
+        c->Write();
+
+        std::cout << "PlotSelectionTask: failed fits: " << tracks.size() << "\n";
     }
 
 public:
-    PlotSelectionTask(double E_max = 3.5e+6) : E_max(E_max) {}
+    PlotSelectionTask(CircleFitEnergyTask* cfit, double E_max = 3.5e+6) : E_max(E_max), cfit_energy(cfit) {}
 };
 
 

@@ -82,9 +82,9 @@ namespace X17
         e_kin        = E_min     + (E_max     - E_min)     * E_bin     * (1.0 / (energy_bins - 1));
 
         // Setting the orientation from theta and phi.
-        orient = {cos(phi)*cos(theta), sin(phi)*cos(theta), sin(theta)};
+        orient = {std::cos(phi)*std::cos(theta), std::sin(phi)*std::cos(theta), std::sin(theta)};
 
         // Setting the origin point from the orientation vector (assuming straight line motion from (0,0,0)).
-        origin = orient * constants::xmin / (cos(phi)*cos(theta));
+        origin = orient * constants::xmin / (std::cos(phi)*std::cos(theta));
     }
 } // namespace X17

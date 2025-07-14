@@ -37,6 +37,7 @@ void watchAndDisplay(const char* filename, const char* canvasName)
             {
                 std::cerr << "Failed to open file\n";
                 delete f;
+                lastMTime = -1;
                 sleep(1);
                 continue;
             }

@@ -9,6 +9,7 @@
 #include "TVirtualFitter.h"
 
 // X17 dependencies
+#include "Debugging.h"
 #include "Field.h"
 #include "Points.h"
 #include "Vector.h"
@@ -21,7 +22,7 @@ namespace X17
         typedef void(*EvalFn)(Int_t&, Double_t*, Double_t&, Double_t*, Int_t);
 
     private:
-        static CircleFit3D* lastfit; // Pointer to the last instance.
+        static inline CircleFit3D* lastfit = nullptr; // Pointer to the last instance.
 
         std::vector<RecoPoint> m_fit_data; // An std::vector of reconstructed points to be fitted.
         Vector m_origin;                   // Origin of the first line [cm].
@@ -30,6 +31,8 @@ namespace X17
         double m_alpha;                    // Rotation angle of the arc around the first line (if 0 curves towards negative z) [rad].
         double m_radius;                   // Radius of the arc [cm].
         double m_phi_max;                  // Maximal angle on the arc [rad].
+
+        double m_theta, m_varphi;
 
         double m_cos_theta; // Cosine of theta.
         double m_sin_theta; // Sine of theta.
@@ -45,15 +48,28 @@ namespace X17
         Vector m_origin2;      // Origin of the second line (to be calculated).
         Vector m_orientation2; // Orientation vector of the second line (to be calculated).
 
-        TVirtualFitter* m_fitter;  // Contains TVirtualFitter instance used for the fit.
+        TVirtualFitter* m_fitter = nullptr;  // Contains TVirtualFitter instance used for the fit.
         double m_l_err;            // The m_length fit error.
         double m_a_err;            // The m_alpha fit error.
         double m_r_err;            // The m_radius fit error.
         double m_phi_err;          // The m_phi_max fit error.
 
+        double m_theta_err;  // The m_theta fit error.
+        double m_varphi_err; // The m_varphi fit error.
+
     public:
         /// @brief Default constructor for the 3D circle fitting algorithm that smoothly attaches lines.
-        CircleFit3D() { lastfit = this; }
+        CircleFit3D()
+        {
+            lastfit = this;
+
+            m_length = 0;
+            m_radius = 10;
+            m_phi_max = 0.5;
+            // m_radius.setCallback(coutCallback<double>("CircleFit3D::m_radius"));
+
+            _UpdateCurve();
+        }
 
         /// @brief Constructor for the 3D circle fitting algorithm that smoothly attaches lines.
         /// @param orig Origin of the first line [cm].
@@ -98,6 +114,11 @@ namespace X17
         /// @param print If true, the fit will printout the fitting status. If false, the fit will be silent.
         void SetFitter(int parameters = 4, bool print = true);
 
+        /// @brief Sets the origin and orientation of the first line.
+        /// @param orig Origin of the first line [cm].
+        /// @param orient Orientation vector of the first line.
+        void SetOrigOrient(Vector orig, Vector orient);
+
         /// @brief Set initial values of parameters.
         /// @param length Length of the first line (also max parameter value) [cm].
         /// @param radius Radius of the arc [cm].
@@ -110,6 +131,8 @@ namespace X17
             m_length  = length;
             m_radius  = radius;
             m_phi_max = phi_max;
+
+            _UpdateCurve();
         }
 
         /// @brief Fits a 3D circle using a maximum of max_iter iterations and the given toleration.

@@ -210,9 +210,12 @@ namespace X17
     { lastfit = this; }
 
     void RKFit::SetFitter(int parameters, bool print)
-    {        
-        m_fitter = TVirtualFitter::Fitter(nullptr,parameters);
-        m_fitter->SetFCN(this->_Eval);
+    {
+        if(!m_fitter)
+        {
+            m_fitter = TVirtualFitter::Fitter(nullptr,parameters);
+            m_fitter->SetFCN(this->_Eval);
+        }
 
         if(!print)
         {
@@ -224,6 +227,9 @@ namespace X17
 
     void RKFit::FitRK(double max_iter, double toleration)
     {
+        // Make sure that the fitter calls the correct function.
+        lastfit = this;
+        
         m_fitter->SetParameter(0,"kin_en",m_kin_en,1000,1000000,16000000);
 
         double arglist[2] = {max_iter,toleration};    // Maximum iterations, step size (toleration).

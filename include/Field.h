@@ -3,6 +3,9 @@
 // C++ dependencies
 #include <vector>
 
+// ROOT dependencies
+#include "Rtypes.h"
+
 // X17 dependencies
 #include "Vector.h"
 
@@ -103,15 +106,15 @@ namespace X17
 
         /// @brief Get the number of x cells.
         /// @return Number of x cells.
-        double GetXCells() const { return m_num_x_cells; }
+        int GetXCells() const { return m_num_x_cells; }
 
         /// @brief Get the number of y cells.
         /// @return Number of y cells.
-        double GetYCells() const { return m_num_y_cells; }
+        int GetYCells() const { return m_num_y_cells; }
 
         /// @brief Get the number of z cells.
         /// @return Number of z cells.
-        double GetZCells() const { return m_num_z_cells; }
+        int GetZCells() const { return m_num_z_cells; }
 
         /// @brief Returns the number of grid cells.
         /// @return Total number of grid cells.
@@ -188,6 +191,8 @@ namespace X17
         /// @param zi Output parameter that will be set to the z-index of the corresponding grid cell.
         /// @throws std::out_of_range if the specified coordinates are out of bounds.
         void _GetPointIndices(double x, double y, double z, int& xi, int& yi, int& zi) const;
+
+        ClassDefNV(Field, 1)
     };
 
     /// @brief Loads field data from a file and stores it in a Field<Vector>.

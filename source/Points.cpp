@@ -12,6 +12,15 @@
 #include "Points.h"
 #include "X17Utilities.h"
 
+ClassImp(X17::StartPoint)
+ClassImp(X17::EndPoint)
+ClassImp(X17::EndPointDiscrete)
+ClassImp(X17::MicroPoint)
+ClassImp(X17::RKPoint)
+ClassImp(X17::MapPoint)
+ClassImp(X17::DataPoint)
+ClassImp(X17::DriftLinePoint)
+
 namespace X17
 {
     //// Public MicroPoint methods.

@@ -4,6 +4,8 @@
 // X17 dependencies
 #include "Vector.h"
 
+ClassImp(X17::Vector)
+
 namespace X17
 {
     //// Public methods.

@@ -1,5 +1,11 @@
 #pragma once
 
+// C++ dependencies
+#include <array>
+
+// ROOT dependencies
+#include "Rtypes.h"
+
 namespace X17
 {
     /// @brief A templated Matrix class with M rows and N columns. This class represents a matrix of size M x N,
@@ -84,6 +90,8 @@ namespace X17
 
         /// @brief Reduces the matrix to row echelon form using Gaussian elimination.
         void Reduce();
+
+        ClassDefNV(Matrix, 1)
     };
 
     /// @brief Adds two matrices element-wise and returns the result.

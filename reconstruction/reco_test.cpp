@@ -28,11 +28,27 @@ int main(int argc, char const *argv[])
     track_selection.Branch("track_small",&track_Evf_100);
     
     std::string single_track_folder = "../../data/micro_tracks/grid_01/";
+
+    // 8 MeV, min theta, min phi
     TFile* input = new TFile((single_track_folder + "tracks_small910.root").c_str());
     TTree* tracks910 = (TTree*)input->Get("tracks_small");
     tracks910->SetBranchAddress("track_small",&track_Evf_100);
     tracks910->GetEntry(1);
     track_selection.Fill();
+
+    // 8 MeV, zero theta, zero phi
+    TFile* input2 = new TFile((single_track_folder + "tracks_small1000.root").c_str());
+    TTree* tracks1000 = (TTree*)input2->Get("tracks_small");
+    tracks1000->SetBranchAddress("track_small",&track_Evf_100);
+    tracks1000->GetEntry(4);
+    // track_selection.Fill();
+
+    // 3 MeV, zero theta, zero phi
+    TFile* input3 = new TFile((single_track_folder + "tracks_small92.root").c_str());
+    TTree* tracks92 = (TTree*)input3->Get("tracks_small");
+    tracks92->SetBranchAddress("track_small",&track_Evf_100);
+    tracks92->GetEntry(1);
+    // track_selection.Fill();
     
     // TrackLoop for single microscopic track.
     TrackLoop* loop = new TrackLoop(*map,magfield);
@@ -40,22 +56,27 @@ int main(int argc, char const *argv[])
     
     RecoPadsTask* t = new RecoPadsTask();
     loop->AddTask(t);
-    // loop->AddTask(new CircleAndRKFitTask(t));
+    loop->AddTask(new CircleAndRKFitTask(t));
     
     // Loading file with Runge-Kutta tracks.
-    // TFile* input2 = new TFile("../../data/rk_tracks/rk_tracks.root");
-    // TTree* rk_tracks = (TTree*)input2->Get("rk_tracks");
+    TFile* input_rk = new TFile("../../data/rk_tracks/rk_tracks2.root");
+    TTree* rk_tracks = (TTree*)input_rk->Get("rk_tracks");
+    // rk_tracks->Print();
     
     // TrackLoop for Runge-Kutta simulated tracks.
-    // TrackLoop* rk_loop = new TrackLoop(map,magfield);
-    // rk_loop->AddTask(new CircleFitEnergyTask());
-    // rk_loop->AddTask(new PlotSelectionTask());
+    TrackLoop* rk_loop = new TrackLoop(*map,magfield);
+    auto t2 = new CircleFitEnergyTask();
+    rk_loop->AddTask(t2);
+    // rk_loop->AddTask(new PlotSelectionTask(t2));
     
     // Processing.
     TFile out_file("track_plots.root","RECREATE","Tracks from microscopic simulation");
     loop->ProcessMulti(&track_selection);
     out_file.Close();
+
+    // TFile out_file2("rk_plots.root","RECREATE","Tracks from Runge-Kutta simulation");
     // rk_loop->ProcessRK(rk_tracks);
+    // out_file2.Close();
     
     return 0;
 }

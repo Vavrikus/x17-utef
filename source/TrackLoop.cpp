@@ -60,6 +60,10 @@ namespace X17
             // if(curr_microtrack->electron) continue; // ONLY FOR TEST!!!
             if((100 * i) % n_tracks == 0) std::cout << "Progress: " << 100 * i / n_tracks << " \%\n";
             std::cout << "Track " << i+1 << " out of " << n_tracks << ".\n";
+            std::cout << "   electron: " << curr_microtrack->electron << " Ek: " << curr_microtrack->kin_energy;
+            std::cout << " origin: (" << curr_microtrack->origin.x << "," << curr_microtrack->origin.y << "," << curr_microtrack->origin.z << ")\n";
+            std::cout << "   orientation: (" << curr_microtrack->orientation.x << "," << curr_microtrack->orientation.y << "," << curr_microtrack->orientation.z << ")\n";
+            std::cout << "   theta: " << std::asin(curr_microtrack->orientation.z) << " phi: " << std::acos(curr_microtrack->orientation.x/std::cos(std::asin(curr_microtrack->orientation.z)))*sign(curr_microtrack->orientation.y) << "\n";
 
             for (RecoTask* t : m_tasks) t->PreElectronLoop();
 
@@ -89,6 +93,7 @@ namespace X17
     {
         curr_loop = RK;
 
+        curr_rk = nullptr;
         rk_tracks->SetBranchAddress("track",&curr_rk);
         for (RecoTask* t : m_tasks) t->PreTrackLoop();
 
@@ -98,6 +103,7 @@ namespace X17
             rk_tracks->GetEntry(i);
             if((100 * i) % n_tracks == 0) std::cout << "Progress: " << 100 * i / n_tracks << " \%\n";
             std::cout << "Track " << i+1 << " out of " << n_tracks << ".\n";
+            if (!curr_rk) std::cout << "Track " << i+1 << " not found.\n";
 
             for (RecoTask* t : m_tasks) t->PreElectronLoop();
 

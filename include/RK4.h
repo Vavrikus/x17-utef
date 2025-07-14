@@ -146,7 +146,7 @@ namespace X17
     class RKFit
     {
     private:
-        static RKFit* lastfit; // A static pointer to the last instance of RKFit class created.
+        static inline RKFit* lastfit = nullptr; // A static pointer to the last instance of RKFit class created.
 
         Field<Vector>* m_magfield; // A pointer to the magnetic field that the particle is traveling through.
         bool m_electron;           // A boolean indicating whether the particle is an electron (true) or a positron (false).
@@ -158,7 +158,7 @@ namespace X17
         std::vector<RecoPoint> m_fit_data; // A vector containing the reconstructed points used for fitting.
         RK4<8>* m_curr_rk = nullptr;       // A pointer to the RK4 object used to compute the trajectory of the particle.
 
-        TVirtualFitter* m_fitter; // A pointer to the ROOT fitter used for fitting.
+        TVirtualFitter* m_fitter = nullptr; // A pointer to the ROOT fitter used for fitting.
 
         double m_kin_en; // The kinetic energy of the particle [eV].
         double m_e_err;  // The error of the kinetic energy [eV].
@@ -221,8 +221,6 @@ namespace X17
             lastfit->_SumSqDist(npar,gin,sumsq,par,iflag);
         }
     };
-
-    inline RKFit* RKFit::lastfit = nullptr;
 } // namespace X17
 
 // Templated function definitions.

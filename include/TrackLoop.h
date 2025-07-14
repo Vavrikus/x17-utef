@@ -46,11 +46,11 @@ namespace X17
         MicroPoint curr_micro;           // Current microscopic simulation point.
         RecoPoint curr_reco;             // Current reconstructed point.
 
-        TrackRK* curr_rk;                // Current Runge-Kutta simulated track.
+        const TrackRK* curr_rk = 0;      // Current Runge-Kutta simulated track.
         RKPoint curr_rkpoint;            // Current point on the current Runge-Kutta track.
 
-        TrackMicro* curr_microtrack = 0; // Current microscopically simulated track.
-        int curr_track_index;            // Index of the current track in the file(s).
+        const TrackMicro* curr_microtrack = 0; // Current microscopically simulated track.
+        int curr_track_index;                  // Index of the current track in the file(s).
 
         /// @brief Enumeration of the type of the loop currently running.
         enum LoopType { NONE, SINGLE, MULTI, RK };

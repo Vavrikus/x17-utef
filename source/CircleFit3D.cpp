@@ -15,8 +15,6 @@
 
 namespace X17
 {
-    CircleFit3D* CircleFit3D::lastfit = nullptr;
-
     //// Public methods.
 
     CircleFit3D::CircleFit3D(Vector orig, Vector orient)
@@ -25,33 +23,69 @@ namespace X17
         this->m_orientation = orient;
         this->m_orientation.Normalize();
 
+        this->m_theta = std::acos(this->m_orientation.z);
+        this->m_varphi = std::acos(this->m_orientation.x / std::sin(this->m_theta));
+
+        this->m_radius = 0;
+        // this->m_radius.setCallback(coutCallback<double>("CircleFit3D::m_radius"));
+
         // Setting the fitter again every time would take much more time.
-        if (lastfit != nullptr) this->m_fitter = lastfit->m_fitter;
+        // if (lastfit != nullptr) this->m_fitter = lastfit->m_fitter;
         lastfit = this;
     }
 
     void CircleFit3D::SetFitter(int parameters, bool print)
-    {        
-        m_fitter = TVirtualFitter::Fitter(nullptr,parameters);
-        m_fitter->SetFCN(this->_Eval);
+    {
+        if (!m_fitter) //(!m_fitter || m_fitter->GetNumberTotalParameters() != parameters)
+        {
+            m_fitter = TVirtualFitter::Fitter(nullptr,parameters);
+            m_fitter->SetFCN(this->_Eval);
+        }
 
-        if(!print)
+        if (!print)
         {
             double arg = -1;
             m_fitter->ExecuteCommand("SET PRINTOUT",&arg,1);
             m_fitter->ExecuteCommand("SET NOW", &arg ,1);
         }
+
+        // m_fitter->SetParameter(0,"length",m_length,1,-5,5);
+        // m_fitter->SetParameter(1,"alpha",m_alpha,0.1,-M_PI/2,(3/2)*M_PI);
+        // m_fitter->SetParameter(2,"radius",m_radius,1,5,40);
+        // m_fitter->SetParameter(3,"phi_max",m_phi_max,0.1,0.15,M_PI/1.5);
+        m_fitter->SetParameter(0,"length",m_length,0.01,-5,5);
+        m_fitter->SetParameter(1,"alpha",m_alpha,0.001,-M_PI/2,(3/2)*M_PI);
+        m_fitter->SetParameter(2,"radius",m_radius,0.01,5,40);
+        m_fitter->SetParameter(3,"phi_max",m_phi_max,0.001,0.15,M_PI/1.5);
+
+        if (parameters == 6)
+        {
+            m_fitter->SetParameter(4,"m_theta",m_theta,0.001,M_PI/6,5*M_PI/6);
+            m_fitter->SetParameter(5,"m_varphi",m_varphi,0.001,-M_PI/6,M_PI/6);
+        }
+
+        std::cout << "SetFitter: Fitter set with " << m_fitter->GetNumberFreeParameters() << " free parameters.\n";
+    }
+
+    void CircleFit3D::SetOrigOrient(Vector orig, Vector orient)
+    {
+        m_origin      = orig;
+        m_orientation = orient;
+        m_orientation.Normalize();
+
+        m_theta = std::acos(m_orientation.z);
+        m_varphi = std::acos(m_orientation.x / std::sin(m_theta));
     }
 
     void CircleFit3D::FitCircle3D(double max_iter, double toleration)
     {
-        m_fitter->SetParameter(0,"length",m_length,0.01,-10,5);
-        m_fitter->SetParameter(1,"alpha",m_alpha,0.001,-M_PI/2,(3/2)*M_PI);
-        m_fitter->SetParameter(2,"radius",m_radius,0.01,5,50);
-        m_fitter->SetParameter(3,"phi_max",m_phi_max,0.001,0.15,M_PI/1.5);
+        // Make sure that the fitter calls the correct function.
+        lastfit = this;
 
         double arglist[2] = {max_iter,toleration};    // Maximal number of iterations, step size (toleration).
-        m_fitter->ExecuteCommand("MIGRAD",arglist,2); // Last parameter is the number of prints (verbosity).
+        // m_fitter->ExecuteCommand("SIMPLEX", arglist, 2);
+        int err = m_fitter->ExecuteCommand("MIGRAD",arglist,2); // Last parameter is the number of parameters in arglist.
+        std::cout << "FitCircle3D: MIGRAD returned " << err << "\n";
 
         m_length  = m_fitter->GetParameter(0);
         m_l_err   = m_fitter->GetParError(0);
@@ -62,16 +96,32 @@ namespace X17
         m_phi_max = m_fitter->GetParameter(3);
         m_phi_err = m_fitter->GetParError(3);
 
+        if (m_fitter->GetNumberFreeParameters() == 6)
+        {
+            m_theta   = m_fitter->GetParameter(4);
+            m_theta_err = m_fitter->GetParError(4);
+            m_varphi  = m_fitter->GetParameter(5);
+            m_varphi_err = m_fitter->GetParError(5);
+        }
+
         _UpdateCurve();
     }
     
     void CircleFit3D::PrintFitParams() const
     {
         std::cout << "\nCIRCLE FIT PARAMETERS:\n";
-        std::cout << "Length:  " << m_length  << " +- " << m_l_err   << "\n";
-        std::cout << "Alpha:   " << m_alpha   << " +- " << m_a_err   << "\n";
-        std::cout << "Radius:  " << m_radius  << " +- " << m_r_err   << "\n";
-        std::cout << "Phi_max: " << m_phi_max << " +- " << m_phi_err << "\n\n";
+        std::cout << "Length:  " << m_length           << " +- " << m_l_err            << " cm\n";
+        std::cout << "Alpha:   " << m_alpha*180/M_PI   << " +- " << m_a_err*180/M_PI   << " deg\n";
+        std::cout << "Radius:  " << m_radius           << " +- " << m_r_err            << " cm\n";
+        std::cout << "Phi_max: " << m_phi_max*180/M_PI << " +- " << m_phi_err*180/M_PI << " deg\n";
+        
+        if (m_fitter->GetNumberFreeParameters() == 6)
+        {
+            std::cout << "Theta:   " << m_theta*180/M_PI  << " +- " << m_theta_err*180/M_PI  << " deg\n";
+            std::cout << "Varphi:  " << m_varphi*180/M_PI << " +- " << m_varphi_err*180/M_PI << " deg\n";
+        }
+
+        std::cout << "Final sum of squares: " << _SumSq() << "\n\n";
     }
 
     TGraph2D* CircleFit3D::GetGraph(double step, double dist) const
@@ -167,8 +217,8 @@ namespace X17
 
     Vector CircleFit3D::_GetCirclePoint(double varphi) const
     {
-        double cos_varphi = cos(varphi);
-        double sin_varphi = sin(varphi);
+        double cos_varphi = std::cos(varphi);
+        double sin_varphi = std::sin(varphi);
 
         return m_originc + m_radius * Vector{  (1-cos_varphi) * (m_cos_alpha*m_cos_theta*m_cos_phi - m_sin_alpha*m_sin_phi) + sin_varphi*m_sin_theta*m_cos_phi,
                                                (1-cos_varphi) * (m_cos_alpha*m_cos_theta*m_sin_phi + m_sin_alpha*m_cos_phi) + sin_varphi*m_sin_theta*m_sin_phi,
@@ -177,6 +227,9 @@ namespace X17
 
     void CircleFit3D::_UpdateCurve()
     {
+        if (m_fitter && m_fitter->GetNumberFreeParameters() == 6)
+            m_orientation = { std::sin(m_theta) * std::cos(m_varphi), std::sin(m_theta) * std::sin(m_varphi), std::cos(m_theta) };
+
         m_cos_theta = m_orientation.z;
         m_sin_theta = std::sqrt(1 - m_cos_theta * m_cos_theta);
 
@@ -185,8 +238,8 @@ namespace X17
         m_cos_phi = m_orientation.x / m_sin_theta;
         m_sin_phi = m_orientation.y / m_sin_theta;
 
-        m_cos_alpha = cos(m_alpha);
-        m_sin_alpha = sin(m_alpha);
+        m_cos_alpha = std::cos(m_alpha);
+        m_sin_alpha = std::sin(m_alpha);
 
         m_originc = this->_GetLinePoint(m_length,true);
 
@@ -200,8 +253,8 @@ namespace X17
         
         m_origin2 = this->_GetCirclePoint(m_phi_max);
 
-        double cos_varphi = cos(m_phi_max);
-        double sin_varphi = sin(m_phi_max);
+        double cos_varphi = std::cos(m_phi_max);
+        double sin_varphi = std::sin(m_phi_max);
 
         m_orientation2 = Vector{ sin_varphi * (m_cos_alpha*m_cos_theta*m_cos_phi - m_sin_alpha*m_sin_phi) + cos_varphi*m_sin_theta*m_cos_phi,
                                  sin_varphi * (m_cos_alpha*m_cos_theta*m_sin_phi + m_sin_alpha*m_cos_phi) + cos_varphi*m_sin_theta*m_sin_phi,
@@ -216,7 +269,7 @@ namespace X17
 
         double t_close = orient * (point.AsVector() - orig) / orient.SqMagnitude();
         if (first_line  && (t_close > m_length)) t_close = m_length;
-        if (!first_line && (t_close < 0))      t_close = 0;
+        if (!first_line && (t_close < 0))        t_close = 0;
 
         Vector line_vector = orig + t_close * orient - point.AsVector();
 
@@ -234,12 +287,12 @@ namespace X17
         Vector arc_end_vector = m_origin2 - point.AsVector();
 
         // Checking if the point is on the arc.
-        double angle1 = arc_beg_vector.Angle(projection);
-        double angle2 = arc_end_vector.Angle(projection);
-        if (angle1 + angle2 > m_phi_max)
-        {
-            circle_vector = angle1 < angle2 ? arc_beg_vector : arc_end_vector;
-        }
+        // double angle1 = (m_originc - m_center).Angle(projection);
+        // double angle2 = (m_origin2 - m_center).Angle(projection);
+        // if (angle1 + angle2 > m_phi_max)
+        // {
+        //     circle_vector = angle1 < angle2 ? arc_beg_vector : arc_end_vector;
+        // }
 
         return find_min(circle_vector.SqMagnitude(),arc_beg_vector.SqMagnitude(),arc_end_vector.SqMagnitude());
     }
@@ -256,7 +309,13 @@ namespace X17
     double CircleFit3D::_SumSq() const
     {
         double sum = 0;
-        for (RecoPoint point : m_fit_data) sum += point.count*_SqDistance(point);
+        for (RecoPoint point : m_fit_data)
+            sum += point.count*_SqDistance(point);
+
+        // Penalize small arc lengths
+        // double arc_length = m_phi_max * m_radius;
+        // if (arc_length < 6.0) sum += std::exp(40/arc_length);
+
         return sum;
     }
 
@@ -266,6 +325,12 @@ namespace X17
         m_alpha   = par[1];
         m_radius  = par[2];
         m_phi_max = par[3];
+
+        if (npar == 6)
+        {
+            m_theta   = par[4];
+            m_varphi  = par[5];
+        }
 
         _UpdateCurve();
 

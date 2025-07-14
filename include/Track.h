@@ -4,6 +4,7 @@
 #include <vector>
 
 // ROOT dependencies
+#include "Rtypes.h"
 #include "TRandom3.h"
 
 // X17 dependencies
@@ -32,6 +33,8 @@ namespace X17
         /// @param Ek Kinetic energy of the particle.
         TrackRK(bool e, const std::vector<RKPoint>& pts, Vector orig, Vector orient, double Ek)
             : electron(e), points(pts), origin(orig), orientation(orient), kin_energy(Ek) { }
+        
+        ClassDefNV(TrackRK, 1)
     };
 
     /// @brief Struct for information about microscopic simulated track.
@@ -57,6 +60,8 @@ namespace X17
         /// @param dlines Vector of drift lines.
         TrackMicro(bool e, const std::vector<MicroPoint>& pts, Vector orig, Vector orient, double Ek, const std::vector<std::vector<DriftLinePoint>>& dlines)
             : electron(e), points(pts), origin(orig), orientation(orient), kin_energy(Ek), driftlines(dlines) { }
+        
+        ClassDefNV(TrackMicro, 1)
     };
 
     /// @brief Generates random initial parameters for track simulation.
@@ -85,6 +90,8 @@ namespace X17
         /// @brief Function for calculating the relative error of the Runge-Kutta energy reconstruction.
         /// @return The relative error ΔE/E in % of the Runge-Kutta energy reconstruction.
         double GetRKRelError() { return 100 * (rkfit_energy - kin_energy) / kin_energy; }
+
+        ClassDefNV(TrackInfo, 1)
     };
     
 } // namespace X17
