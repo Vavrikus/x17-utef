@@ -25,6 +25,8 @@ namespace X17
         static inline CircleFit3D* lastfit = nullptr; // Pointer to the last instance.
 
         std::vector<RecoPoint> m_fit_data; // An std::vector of reconstructed points to be fitted.
+        Watched<int> m_total_count;        // Total number of points in the track (can be weighted).
+
         Vector m_origin;                   // Origin of the first line [cm].
         Vector m_orientation;              // Orientation vector of the first line. Used for theta and phi calculation.
         double m_length;                   // Length of the first line (also max parameter value) [cm].
@@ -32,7 +34,11 @@ namespace X17
         double m_radius;                   // Radius of the arc [cm].
         double m_phi_max;                  // Maximal angle on the arc [rad].
 
-        double m_theta, m_varphi;
+        double m_alpha_min = -M_PI/2;  // Minimal alpha bound for the fit [rad].
+        double m_alpha_max = 3*M_PI/2; // Maximal alpha bound for the fit [rad].
+
+        double m_theta;  // Initial orientation zenith angle [rad].
+        double m_varphi; // Initial orientation azimuth angle [rad].
 
         double m_cos_theta; // Cosine of theta.
         double m_sin_theta; // Sine of theta.
@@ -86,6 +92,9 @@ namespace X17
         /// @return The std::vector of RecoPoints used for fitting.
         std::vector<RecoPoint> GetData() const { return m_fit_data; }
 
+        /// @brief Empty the fit data points.
+        void ResetData() { m_fit_data.clear(); }
+
         /// @brief Add a new RecoPoint to the fit data.
         /// @param x The x-coordinate of the RecoPoint.
         /// @param y The y-coordinate of the RecoPoint.
@@ -103,11 +112,7 @@ namespace X17
 
         /// @brief Set the m_alpha angle for the circle fit.
         /// @param electron If true, set m_alpha to 0; if false, set m_alpha to pi.
-        void SetAlpha(bool electron)
-        {
-            if (electron) m_alpha = 0;
-            else          m_alpha = M_PI;
-        }
+        void SetAlpha(bool electron);
 
         /// @brief Sets up the TVirtualFitter for the circle fitting with the number of parameters and printout options.
         /// @param parameters Number of fitting parameters.
@@ -124,16 +129,7 @@ namespace X17
         /// @param radius Radius of the arc [cm].
         /// @param phi_max Maximal angle on the arc [rad].
         /// @param electron If true, set m_alpha to 0; if false, set m_alpha to pi.
-        void SetParameters(double length, double radius, double phi_max, bool electron)
-        {
-            SetAlpha(electron);
-
-            m_length  = length;
-            m_radius  = radius;
-            m_phi_max = phi_max;
-
-            _UpdateCurve();
-        }
+        void SetParameters(double length, double radius, double phi_max, bool electron);
 
         /// @brief Fits a 3D circle using a maximum of max_iter iterations and the given toleration.
         /// @param max_iter Maximum number of iterations for the fit. Defaults to 500.
@@ -160,6 +156,10 @@ namespace X17
         /// @param step Step size for the parameter along the track.
         /// @return TGraph object representing the energy as a function of the parameter.
         TGraph* GetEnergyGraph(const Field<Vector>& magfield, double step = 0.1) const;
+
+        /// @brief Returns the sum of squared residuals of the fit.
+        /// @return Sum of squared residuals.
+        double GetSumSq() const { return _SumSq(); }
 
     private:
         /// @brief Returns a point on the line.

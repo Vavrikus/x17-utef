@@ -100,6 +100,10 @@ namespace X17
 
     RK4<8>* GetTrackRK(const Field<Vector>& magfield, bool electron, double step, double kin_en, Vector origin, Vector orientation, bool big_volume)
     {
+        // Adjust step by gamma factor.
+        double gamma = 1 + kin_en / constants::E0;
+        // double gamma8 = 1 + 8e+6 / constants::E0;
+        step /= gamma;///gamma8;
         Matrix<8,1> init = GetInitParams(kin_en,origin,orientation);
         auto f = [&magfield, electron](double t, const Matrix<8, 1>& y, Matrix<8, 1>& dydt) {
             EMMotion(magfield, electron, t, y, dydt);

@@ -11,7 +11,7 @@ auto coutCallback(const std::string& name)
 {
     return [name](const T& oldVal, const T& newVal)
     {
-        // std::cout << name << " changed from " << oldVal << " to " << newVal << "\n";
+        std::cout << name << " changed from " << oldVal << " to " << newVal << "\n";
     };
 }
 

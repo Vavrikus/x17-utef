@@ -102,7 +102,7 @@ namespace X17
         {
             rk_tracks->GetEntry(i);
             if((100 * i) % n_tracks == 0) std::cout << "Progress: " << 100 * i / n_tracks << " \%\n";
-            std::cout << "Track " << i+1 << " out of " << n_tracks << ".\n";
+            std::cout << "\nTrack " << i+1 << " out of " << n_tracks << ".\n";
             if (!curr_rk) std::cout << "Track " << i+1 << " not found.\n";
 
             for (RecoTask* t : m_tasks) t->PreElectronLoop();

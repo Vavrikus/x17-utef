@@ -70,13 +70,13 @@ int main(int argc, char const *argv[])
     // rk_loop->AddTask(new PlotSelectionTask(t2));
     
     // Processing.
-    TFile out_file("track_plots.root","RECREATE","Tracks from microscopic simulation");
-    loop->ProcessMulti(&track_selection);
-    out_file.Close();
+    // TFile out_file("track_plots.root","RECREATE","Tracks from microscopic simulation");
+    // loop->ProcessMulti(&track_selection);
+    // out_file.Close();
 
-    // TFile out_file2("rk_plots.root","RECREATE","Tracks from Runge-Kutta simulation");
-    // rk_loop->ProcessRK(rk_tracks);
-    // out_file2.Close();
+    TFile out_file2("../../data/rk_tracks/rk_plots2.root","RECREATE","Tracks from Runge-Kutta simulation fit");
+    rk_loop->ProcessRK(rk_tracks);
+    out_file2.Close();
     
     return 0;
 }

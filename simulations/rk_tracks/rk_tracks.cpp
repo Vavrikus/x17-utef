@@ -20,8 +20,8 @@ using namespace X17::constants;
 
 int rk_tracks()
 {
-    constexpr int n_tracks  =  10000;         // The number of tracks to be simulated by Runge-Kutta.
-    constexpr double step   =  1E-13;          // The step of Runge-Kutta [s].
+    constexpr int n_tracks  =  10000;        // The number of tracks to be simulated by Runge-Kutta.
+    constexpr double step   =  1E-13*16.66;   // The step of Runge-Kutta [s] (original times 8 MeV gamma factor).
 
     // Loading the magnetic field.
     X17::Field<X17::Vector>* magfield = X17::LoadField("../../../data/elmag/VecB2.txt",{-20,-30,-30},{20,30,30},0.5);
@@ -83,7 +83,7 @@ int rk_tracks()
     
     X17::DefaultLayout::GetDefaultLayout().DrawPads3D(height);
     
-    TFile* outfile = new TFile("../../../data/rk_tracks/rk_tracks2.root","RECREATE");
+    TFile* outfile = new TFile("../../../data/rk_tracks/rk_tracks3.root","RECREATE");
     simulated_tracks->Write();
     c_tracks->Write();
 

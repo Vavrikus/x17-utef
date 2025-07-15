@@ -135,7 +135,7 @@
 				\begin{pmatrix}\gamma c\\ \gamma v_x\\ \gamma v_y\\ \gamma v_z\end{pmatrix},
 				\renewcommand{\arraystretch}{1}
 			\end{equation}
-		where $c$ is the speed of light in vacuum, $\mathbf{v} = (v_x,v_y,v_z)$ is the particle's velocity and $\gamma = \left(1-\frac{v^2}{c^2}\right)^{-\frac{1}{2}}$ is the Lorentz factor\red{~(wrong magnetic field sign in the implementation???)}. Together with the equation
+		where $c$ is the speed of light in vacuum, $\mathbf{v} = (v_x,v_y,v_z)$ is the particle's velocity and $\gamma = \left(1-\frac{v^2}{c^2}\right)^{-\frac{1}{2}}$ is the Lorentz factor. Together with the equation
 			\begin{equation}
 				\derivative{}{\tau} \begin{pmatrix} ct\\ x\\ y\\ z\end{pmatrix} = \begin{pmatrix}\gamma c\\ \gamma v_x\\ \gamma v_y\\ \gamma v_z\end{pmatrix} = u^\mu,
 			\end{equation}
@@ -144,19 +144,18 @@
 				\gamma &= 1 + \frac{E_\text{kin}}{E_0},\\
 				\norm{\mathbf{v}} &= c\sqrt{1-\gamma^{-2}}.
 			\end{align}
+		An example Runge-Kutta track is compared with the corresponding microscopic track in \cref{fig:rkmicro}.
 			
 		\subsection{Testing sample}
-		\label{sec:rktest}
-		\red{Example of RK simulation -- first testing track, randomized sample of 100000 tracks (could also move them to circle 3D fit).}
-		
-		In order to test the simulation and reconstruction, a~sample of $100\,000$ tracks with randomized parameters was generated:
+		\label{sec:rktest}		
+		In order to test the simulation and reconstruction, a~sample of \num{1000000} tracks with randomized parameters was generated:
 			\begin{itemize}[topsep=4pt,itemsep=2pt]
-				\item the Runge-Kutta step was set to 0.1~ns (proper time\red{,~which wouldn't be a problem but this way the "spatial" step depends on energy}),
-				\item the kinetic energy of the particle $E_\text{kin} \in [3,13]$~MeV,
+				\item the Runge-Kutta step was set to \qty{1.67}{\ps} (coordinate time, each proper time step is adjusted by the gamma factor once at the beginning; for an \qty{8}{\MeV} track, $\tau_\text{step} = \qty{0.1}{\ps}$),
+				\item the kinetic energy of the particle $E_\text{kin} = \qtyrange{3}{13}{\MeV}$,
 				\item the starting point of the track is a~random point in the \ac{OFTPC} window,
 				\item the initial direction is given by the line connecting a~random point on the target\footnote{To generate a~random point on the target, we generate a~random angle $\alpha$ and a~random square of the distance from origin $r^2$ to get a~uniform distribution.} (a~disc with 1~mm radius in the YZ plane).
 			\end{itemize}
-		Since the Runge-Kutta simulation is quite fast\footnote{One track with $\tau_\text{step} = 0.1$~ps takes less than one millisecond to simulate.}, it can be run locally on any computer.\red{~Add a figure with simulated tracks (sample).} An example Runge-Kutta track is compared with the corresponding microscopic track in \cref{fig:rkmicro}.
+		Since the Runge-Kutta simulation is quite fast\footnote{One track with $t_\text{step} = \qty{1.67}{\ps}$ takes less than one millisecond to simulate.}, it can be run locally on any computer.
 		
 		\begin{figure}
 			\centering

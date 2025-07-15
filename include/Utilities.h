@@ -108,6 +108,18 @@ inline int GetBinsScott(double min, double max, double sigma, double N)
     return std::round((max-min) / bin_width);
 }
 
+/// @brief Calculates the optimal number of histogram bins according to Freedman-Diaconis' rule.
+/// @param values The vector of values.
+/// @param min The minimal value of the range.
+/// @param max The maximal value of the range.
+/// @return The recommended number of bins.
+inline int GetBinsFreedmanDiaconis(std::vector<double>& values, double min, double max)
+{
+    double IQR = GetQuantile(values, 0.75) - GetQuantile(values, 0.25);
+    double bin_width = 2.0 * IQR / std::pow(values.size(), 1./3.);
+    return std::round((max - min) / bin_width);
+}
+
 /// @brief Prints a progress bar to the console.
 /// @param current The current value of the progress.
 /// @param total The total value of the progress.

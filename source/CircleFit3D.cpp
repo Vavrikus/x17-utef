@@ -19,12 +19,7 @@ namespace X17
 
     CircleFit3D::CircleFit3D(Vector orig, Vector orient)
     {
-        this->m_origin      = orig;
-        this->m_orientation = orient;
-        this->m_orientation.Normalize();
-
-        this->m_theta = std::acos(this->m_orientation.z);
-        this->m_varphi = std::acos(this->m_orientation.x / std::sin(this->m_theta));
+        SetOrigOrient(orig, orient);
 
         this->m_radius = 0;
         // this->m_radius.setCallback(coutCallback<double>("CircleFit3D::m_radius"));
@@ -32,6 +27,22 @@ namespace X17
         // Setting the fitter again every time would take much more time.
         // if (lastfit != nullptr) this->m_fitter = lastfit->m_fitter;
         lastfit = this;
+    }
+
+    void CircleFit3D::SetAlpha(bool electron)
+    {
+        if (electron) 
+        {
+            m_alpha = 0;
+            // m_alpha_min = -M_PI/3;
+            // m_alpha_max = M_PI/3;
+        }
+        else
+        {
+            m_alpha = M_PI;
+            // m_alpha_min = 2*M_PI/3;
+            // m_alpha_max = 4*M_PI/3;
+        }
     }
 
     void CircleFit3D::SetFitter(int parameters, bool print)
@@ -49,14 +60,10 @@ namespace X17
             m_fitter->ExecuteCommand("SET NOW", &arg ,1);
         }
 
-        // m_fitter->SetParameter(0,"length",m_length,1,-5,5);
-        // m_fitter->SetParameter(1,"alpha",m_alpha,0.1,-M_PI/2,(3/2)*M_PI);
-        // m_fitter->SetParameter(2,"radius",m_radius,1,5,40);
-        // m_fitter->SetParameter(3,"phi_max",m_phi_max,0.1,0.15,M_PI/1.5);
-        m_fitter->SetParameter(0,"length",m_length,0.01,-5,5);
-        m_fitter->SetParameter(1,"alpha",m_alpha,0.001,-M_PI/2,(3/2)*M_PI);
-        m_fitter->SetParameter(2,"radius",m_radius,0.01,5,40);
-        m_fitter->SetParameter(3,"phi_max",m_phi_max,0.001,0.15,M_PI/1.5);
+        m_fitter->SetParameter(0,"length",m_length,0.01,-5,7);
+        m_fitter->SetParameter(1,"alpha",m_alpha,0.001,m_alpha_min-0.3,m_alpha_max+0.3);
+        m_fitter->SetParameter(2,"radius",m_radius,0.01,5,5000);
+        m_fitter->SetParameter(3,"phi_max",m_phi_max,0.001,0.03,M_PI/1.125);
 
         if (parameters == 6)
         {
@@ -77,10 +84,26 @@ namespace X17
         m_varphi = std::acos(m_orientation.x / std::sin(m_theta));
     }
 
+    void CircleFit3D::SetParameters(double length, double radius, double phi_max, bool electron)
+    {
+        SetAlpha(electron);
+
+        m_length  = length;
+        m_radius  = radius;
+        m_phi_max = phi_max;
+
+        _UpdateCurve();
+    }
+
     void CircleFit3D::FitCircle3D(double max_iter, double toleration)
     {
         // Make sure that the fitter calls the correct function.
         lastfit = this;
+
+        double count = 0;
+        for (auto& p : m_fit_data) count += p.count;
+        m_total_count = count;
+        m_total_count.setCallback(coutCallback<int>("CircleFit3D::m_total_count"));
 
         double arglist[2] = {max_iter,toleration};    // Maximal number of iterations, step size (toleration).
         // m_fitter->ExecuteCommand("SIMPLEX", arglist, 2);
@@ -110,15 +133,15 @@ namespace X17
     void CircleFit3D::PrintFitParams() const
     {
         std::cout << "\nCIRCLE FIT PARAMETERS:\n";
-        std::cout << "Length:  " << m_length           << " +- " << m_l_err            << " cm\n";
-        std::cout << "Alpha:   " << m_alpha*180/M_PI   << " +- " << m_a_err*180/M_PI   << " deg\n";
-        std::cout << "Radius:  " << m_radius           << " +- " << m_r_err            << " cm\n";
-        std::cout << "Phi_max: " << m_phi_max*180/M_PI << " +- " << m_phi_err*180/M_PI << " deg\n";
+        std::cout << "   Length:  " << m_length           << " +- " << m_l_err            << " cm\n";
+        std::cout << "   Alpha:   " << m_alpha*180/M_PI   << " +- " << m_a_err*180/M_PI   << " deg\n";
+        std::cout << "   Radius:  " << m_radius           << " +- " << m_r_err            << " cm\n";
+        std::cout << "   Phi_max: " << m_phi_max*180/M_PI << " +- " << m_phi_err*180/M_PI << " deg\n";
         
         if (m_fitter->GetNumberFreeParameters() == 6)
         {
-            std::cout << "Theta:   " << m_theta*180/M_PI  << " +- " << m_theta_err*180/M_PI  << " deg\n";
-            std::cout << "Varphi:  " << m_varphi*180/M_PI << " +- " << m_varphi_err*180/M_PI << " deg\n";
+            std::cout << "   Theta:   " << m_theta*180/M_PI  << " +- " << m_theta_err*180/M_PI  << " deg\n";
+            std::cout << "   Varphi:  " << m_varphi*180/M_PI << " +- " << m_varphi_err*180/M_PI << " deg\n";
         }
 
         std::cout << "Final sum of squares: " << _SumSq() << "\n\n";
@@ -311,10 +334,13 @@ namespace X17
         double sum = 0;
         for (RecoPoint point : m_fit_data)
             sum += point.count*_SqDistance(point);
+        // sum /= m_total_count;
 
-        // Penalize small arc lengths
-        // double arc_length = m_phi_max * m_radius;
-        // if (arc_length < 6.0) sum += std::exp(40/arc_length);
+        // Penalize m_origin2 outside of the OFTPC.
+        // if (m_origin2.x > constants::xmax)
+        // {
+        //     sum += std::pow((m_origin2.x - constants::xmax)/2.5e+9,2) / m_total_count;
+        // }
 
         return sum;
     }
