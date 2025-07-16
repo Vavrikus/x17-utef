@@ -2,12 +2,15 @@
 *.bbl
 *.bcf
 *.blg
+*.fdb_latexmk
+*.fls
 *.log
 *.lot
 *.lof
 *.run.xml
 *.synctex.gz
 *.toc
+*.xmpdata
 *.1
 *.Aend
 *.eledsec1

@@ -222,7 +222,7 @@ void PlotDriftYZ(X17::TrackMicro track, std::string filename, bool newcoords = f
 void PlotTrackRK(X17::TrackMicro track, X17::Field<X17::Vector>* magfield, bool newcoords = false)
 {
     double Ekin = std::sqrt(64E+12 + X17::constants::E0*X17::constants::E0) - X17::constants::E0;
-        X17::RK4<8>* trackrk = X17::GetTrackRK(*magfield,true,1E-13,Ekin,X17::Vector(0,0,0),X17::Vector(1,0,0),true);
+        X17::RK4<8>* trackrk = X17::GetTrackRK(*magfield,true,1E-13*16.66,Ekin,X17::Vector(0,0,0),X17::Vector(1,0,0),true);
         trackrk->Integrate();
         std::vector<X17::RKPoint> rk_points;
         for (const auto& vec : trackrk->GetResults())
@@ -892,7 +892,7 @@ int main(int argc, char *argv[])
 
         // std::cout << "Reconstructed energy (circle fit no pads): " << cfit3d_E_mid << " (middle field), " << cfit3d_E_avg << " (average field).\n";
 
-        // X17::RKFit fit = X17::RKFit(magfield, true, 1E-13, X17::Vector(0,0,0), X17::Vector(1,0,0), reco_points, true);
+        // X17::RKFit fit = X17::RKFit(magfield, true, 1E-13*16.66, X17::Vector(0,0,0), X17::Vector(1,0,0), reco_points, true);
         // fit.SetFitter();
         // fit.SetEnergy(cfit3d_E_mid);
         // fit.FitRK();

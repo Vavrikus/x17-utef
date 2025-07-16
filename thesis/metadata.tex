@@ -1,0 +1,89 @@
+%%% Please fill in basic information on your thesis, which will be automatically
+%%% inserted at the right places. You need to replace \xxx{...} by real data.
+
+% Type of your thesis:
+%	"bc" for Bachelor's
+%	"mgr" for Master's
+%	"phd" for PhD
+%	"rig" for rigorosum
+\def\ThesisType{bc}
+
+% Language of your study programme:
+%	"cs" for Czech
+%	"en" for English
+\def\StudyLanguage{cs}
+
+% Thesis title in English (exactly as in the formal assignment)
+\def\ThesisTitle{Simulation and Reconstruction of~Charged Particle Trajectories in~an Aty\-pic Time Projection Chamber}
+
+% Author of the thesis (you)
+\def\ThesisAuthor{Martin Vavřík}
+
+% Year when the thesis is submitted
+\def\YearSubmitted{2025}
+
+% Name of the department or institute, where the work was officially assigned
+% (according to the Organizational Structure of MFF UK in English,
+% see https://www.mff.cuni.cz/en/faculty/organizational-structure,
+% or a full name of a department outside MFF)
+\def\Department{Institute of Particle and Nuclear Physics}
+
+% Is it a department (katedra), or an institute (ústav)?
+\def\DeptType{Institute}
+
+% Thesis supervisor: name, surname and titles
+\def\Supervisor{Mgr. Tomáš Sýkora, Ph.D.}
+
+% Supervisor's department (again according to Organizational structure of MFF)
+\def\SupervisorsDepartment{Institute of Particle and Nuclear Physics}
+
+% Study programme and specialization
+\def\StudyProgramme{Physics}
+%%% OLD??? \def\StudyBranch{Physics}
+
+% An optional dedication: you can thank whomever you wish (your supervisor,
+% consultant, a person who lent the software, etc.)
+\def\Dedication{%
+	Dedication.
+}
+
+% Abstract (recommended length around 80-200 words, try <= 120; this is not a copy of your thesis assignment!)
+\def\Abstract{%
+	In this work, we describe the development of a~reconstruction algorithm for atypical \acfp{TPC} that will be used at \acs{IEAPCTU} to search for the ATOMKI anomalous internal pair creation~\cite{atomki_be}. The chambers have an inhomogeneous toroidal magnetic field orthogonal to their electric field, hence we call them \acfp{OFTPC}. This arrangement causes a~distortion of the drift inside the chamber and complicates the shape of electron/positron trajectories. We present a~few approaches to tackle these problems, the best of which uses a~simulated ionization electron drift map for track reconstruction, and Runge-Kutta fit for energy reconstruction. Finally, we show from simulations that, for an ideal charge readout with no multiplication and no noise, we can reach an energy resolution .......
+}
+
+% 3 to 5 keywords (recommended) separated by \sep
+% Keywords are useful for indexing and searching for the theses by topic.
+\def\ThesisKeywords{%
+	simulation \sep reconstruction \sep time projection chamber
+}
+
+% If any of your metadata strings contains TeX macros, you need to provide
+% a plain-text version for use in XMP metadata embedded in the output PDF file.
+% If you are not sure, check the generated thesis.xmpdata file.
+\def\ThesisAuthorXMP{\ThesisAuthor}
+\def\ThesisTitleXMP{\ThesisTitle}
+\def\ThesisKeywordsXMP{\ThesisKeywords}
+\def\AbstractXMP{chybííííí}
+
+% If your abstracts are long and do not fit in the infopage, you can make the
+% fonts a bit smaller by this setting. (Also, you should try to compress your abstract more.)
+\def\InfoPageFont{}
+%\def\InfoPageFont{\small}  % uncomment to decrease font size
+
+% If you are studing in a Czech programme, you also need to provide metadata in Czech:
+% (in English programmes, this is not used anywhere)
+
+\def\ThesisTitleCS{Simulace a rekonstrukce drah nabitých částic v atypické časově projekční komoře}
+\def\DepartmentCS{Ústav částicové a jaderné fyziky}
+\def\DeptTypeCS{Ústav}
+\def\SupervisorsDepartmentCS{Ústav částicové a jaderné fyziky}
+\def\StudyProgrammeCS{Fyzika}
+
+\def\ThesisKeywordsCS{%
+    simulace \sep rekonstrukce \sep časová projekční komora
+}
+
+\def\AbstractCS{%
+    Abstrakt práce přeložte také do češtiny!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+}

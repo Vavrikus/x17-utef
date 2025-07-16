@@ -1,5 +1,11 @@
 %%% The main file. It contains definitions of basic parameters and includes all other parts.
 
+% Meta-data of your thesis (please edit)
+\input metadata.tex
+
+% Generate metadata in XMP format for use by the pdfx package
+\input xmp.tex
+
 %% Settings for single-side (simplex) printing
 % Margins: left 40mm, right 25mm, top and bottom 25mm
 % (but beware, LaTeX adds 1in implicitly)
@@ -25,34 +31,69 @@
 % \setlength\headheight{0mm}
 % \let\openright=\cleardoublepage
 
-%% Character encoding: usually latin2, cp1250 or utf8:
-\usepackage[utf8]{inputenc}
+%% Generate PDF/A-2u
+\usepackage[a-2u]{pdfx}
 
 %% Prefer Latin Modern fonts
 \usepackage{lmodern}
 
+% If we are not using LuaTeX, we need to set up character encoding:
+\usepackage{iftex}
+\ifpdftex
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\fi
+
 %% Further useful packages (included in most LaTeX distributions)
-\usepackage{acronym}
-\usepackage{amsmath,amssymb}   % extensions for typesetting of math
-\usepackage{amsfonts}          % math fonts
-\usepackage{amsthm}            % theorems, definitions, etc.
-%\usepackage{bbding}           % various symbols (squares, asterisks, scissors, ...)
-\usepackage{bm}                % boldface symbols (\bm)
-\usepackage{graphicx}          % embedding of pictures
-\usepackage{fancyvrb}          % improved verbatim environment
-%\usepackage{natbib}            % citation style AUTHOR (YEAR), or AUTHOR [NUMBER]
-%\usepackage[nottoc]{tocbibind} % makes sure that bibliography and the lists
-                               % of figures/tables are included in the table
-                               % of contents
-                               
-\usepackage{dcolumn}        % improved alignment of table columns
-\usepackage{booktabs}       % improved horizontal lines in tables
-\usepackage{paralist}       % improved enumerate and itemize
-\usepackage{xcolor}         % typesetting in color
-\usepackage{lineno}			% line numbering
-\linenumbers
-\usepackage{float}			% force picture placement
-\usepackage{xspace}			% space insertion in macros
+\usepackage{amsmath,amssymb}         % extensions for typesetting of math
+\usepackage{amsfonts}                % math fonts
+\usepackage{amsthm}                  % theorems, definitions, etc.
+\usepackage{bm}                      % boldface symbols (\bm)
+\usepackage{booktabs}                % improved horizontal lines in tables
+\usepackage{caption}                 % custom captions of floating objects (MY OPTION)
+\usepackage{dcolumn}                 % improved alignment of table columns
+\usepackage{floatrow}                % custom float environments
+\usepackage{graphicx}                % embedding of pictures
+\usepackage{indentfirst}             % indent the first paragraph of a chapter
+\usepackage[nopatch=item]{microtype} % micro-typographic refinement
+\usepackage{paralist}                % improved enumerate and itemize
+\usepackage[nottoc]{tocbibind}       % makes sure that bibliography and the lists
+									 % of figures/tables are included in the table
+									 % of contents
+\usepackage{xcolor}                  % typesetting in color
+
+% The hyperref package for clickable links in PDF and also for storing
+% metadata to PDF (including the table of contents).
+% Most settings are pre-set by the pdfx package.
+\hypersetup{unicode}
+\hypersetup{breaklinks=true}
+%%% if needed (old?)
+%\hypersetup{
+%	colorlinks=true,
+%	allcolors=black,  % Sets all other links (non-URLs) to black/unstyled
+%	urlbordercolor=blue,
+%	pdfborder={0 0 1},
+%	urlcolor=blue
+%}
+
+% Packages for computer science theses
+\usepackage{algpseudocode}  % part of algorithmicx package
+\usepackage{algorithm}
+\usepackage{fancyvrb}       % improved verbatim environment
+\usepackage{listings}       % pretty-printer of source code
+
+% You might want to use cleveref for references --> MY OPTION
+\usepackage[capitalise,nameinlink]{cleveref}
+\creflabelformat{equation}{#2\textup{#1}#3}
+\crefname{equation}{Eq.}{Eqs.}
+\Crefname{equation}{Eq.}{Eqs.}
+\crefname{section}{Sec.}{Secs.}
+\Crefname{section}{Sec.}{Secs.}
+
+%%% MY OPTIONS %%%
+\usepackage{float}			         % force picture placement
+\usepackage{xspace}			         % space insertion in macros
 \usepackage{textcomp}
 \usepackage{siunitx}
 \usepackage{physics}
@@ -61,17 +102,23 @@
 	range-phrase = -,
 	range-units = single,
 	product-units = power
-}
+	}
 \AtBeginDocument{\RenewCommandCopy\qty\SI}
 \ExplSyntaxOn
 \msg_redirect_name:nnn { siunitx } { physics-pkg } { none }
 \ExplSyntaxOff
 \show\qty
-\usepackage[labelfont=bf]{caption}
 \usepackage{subcaption}
 \captionsetup[subfigure]{font=footnotesize}
 \usepackage{enumitem}
 \usepackage[warnundef]{jabbrv}
+\usepackage{acronym}
+%%% MY OPTIONS (end) %%%
+
+%%% OLD
+%%% \usepackage{lineno}	% line numbering
+%%% \linenumbers
+%%% \usepackage{hyperref}   % references to sections
 
 % Set up formatting of bibliography (references to literature)
 % Details can be adjusted in macros.tex.
@@ -81,7 +128,7 @@
 % format with your supervisor.
 %
 % The basic format according to the ISO 690 standard with numbered references
-\usepackage[natbib,style=iso-numeric,sorting=none]{biblatex}
+\usepackage[natbib,style=iso-numeric,sorting=none,backend=biber]{biblatex}
 % ISO 690 with alphanumeric references (abbreviations of authors' names)
 %\usepackage[natbib,style=iso-alphabetic]{biblatex}
 % ISO 690 with references Author (year)
@@ -98,78 +145,11 @@
 % Load the file with bibliography entries
 \addbibresource{bibliography.bib}
 
-\usepackage[a-2u]{pdfx} % Generate PDF/A-2u
-\usepackage{hyperref}   % references to sections
-\usepackage[capitalise,nameinlink]{cleveref}
-\creflabelformat{equation}{#2\textup{#1}#3}
-\crefname{equation}{Eq.}{Eqs.}
-\Crefname{equation}{Eq.}{Eqs.}
-\crefname{section}{Sec.}{Secs.}
-\Crefname{section}{Sec.}{Secs.}
-
-%%% Basic information on the thesis
-
-% Thesis title in English (exactly as in the formal assignment)
-\def\ThesisTitle{Simulation and Reconstruction of~Charged Particle Trajectories in~an Aty\-pic Time Projection Chamber}
-
-% Author of the thesis
-\def\ThesisAuthor{Martin Vavřík}
-
-% Year when the thesis is submitted
-\def\YearSubmitted{2025}
-
-% Name of the department or institute, where the work was officially assigned
-% (according to the Organizational Structure of MFF UK in English,
-% or a full name of a department outside MFF)
-\def\Department{Institute of Particle and Nuclear Physics}
-
-% Is it a department (katedra), or an institute (ústav)?
-\def\DeptType{Institute}
-
-% Thesis supervisor: name, surname and titles
-\def\Supervisor{Mgr. Tomáš Sýkora, Ph.D.}
-
-% Supervisor's department (again according to Organizational structure of MFF)
-\def\SupervisorsDepartment{Institute of Particle and Nuclear Physics}
-
-% Study programme and specialization
-\def\StudyProgramme{Physics}
-\def\StudyBranch{Physics}
-
-% An optional dedication: you can thank whomever you wish (your supervisor,
-% consultant, a person who lent the software, etc.)
-\def\Dedication{%
-	Dedication.
-}
-
-% Abstract (recommended length around 80-200 words; this is not a copy of your thesis assignment!)
-\def\Abstract{%
-	In this work, we describe the development of a~reconstruction algorithm for atypical \acfp{TPC} that will be used at \acs{IEAPCTU} to search for the ATOMKI anomalous internal pair creation~\cite{atomki_be}. The chambers have an inhomogeneous toroidal magnetic field orthogonal to their electric field, hence we call them \acfp{OFTPC}. This arrangement causes a~distortion of the drift inside the chamber and complicates the shape of electron/positron trajectories. We present a~few approaches to tackle these problems, the best of which uses a~simulated ionization electron drift map for track reconstruction, and Runge-Kutta fit for energy reconstruction. Finally, we show from simulations that, for an ideal charge readout with no multiplication and no noise, we can reach an energy resolution .......
-}
-
-% 3 to 5 keywords (recommended), each enclosed in curly braces
-\def\Keywords{%
-	{simulation} {reconstruction} {time projection chamber}
-}
-
-%% The hyperref package for clickable links in PDF and also for storing
-%% metadata to PDF (including the table of contents).
-%% Most settings are pre-set by the pdfx package.
-\hypersetup{unicode}
-\hypersetup{breaklinks=true}
-%\hypersetup{
-%	colorlinks=true,
-%	allcolors=black,  % Sets all other links (non-URLs) to black/unstyled
-%	urlbordercolor=blue,
-%	pdfborder={0 0 1},
-%	urlcolor=blue
-%}
+% Definitions of macros (see description inside)
+\input{macros}
 
 % Path to images
 \graphicspath{{figures/}}
-
-% Definitions of macros (see description inside)
-\input{macros}
 
 % Title page and various mandatory informational pages
 \begin{document}
@@ -213,10 +193,10 @@
 	%%% source code, data files, interactive charts, etc.). Electronic attachments
 	%%% should be uploaded to SIS and optionally also included in the thesis on a~CD/DVD.
 	%%% Allowed file formats are specified in provision of the rector no. 72/2017.
-	\appendix
+	% \appendix
 	%\chapter{Attachments}
 	
 	%\section{First Attachment}
 	
-	\openright
+	% \openright
 \end{document}

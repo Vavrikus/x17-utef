@@ -1,6 +1,47 @@
 %%% This file contains definitions of various useful macros and environments %%%
 %%% Please add more macros here instead of cluttering other files with them. %%%
 
+%%% Switches based on thesis type
+
+\def\TypeBc{bc}
+\def\TypeMgr{mgr}
+\def\TypePhD{phd}
+\def\TypeRig{rig}
+
+\ifx\ThesisType\TypeBc
+\def\ThesisTypeName{bachelor}
+\def\ThesisTypeTitle{BACHELOR THESIS}
+\fi
+
+\ifx\ThesisType\TypeMgr
+\def\ThesisTypeName{master}
+\def\ThesisTypeTitle{MASTER THESIS}
+\fi
+
+\ifx\ThesisType\TypePhD
+\def\ThesisTypeName{doctoral}
+\def\ThesisTypeTitle{DOCTORAL THESIS}
+\fi
+
+\ifx\ThesisType\TypeRig
+\def\ThesisTypeName{rigorosum}
+\def\ThesisTypeTitle{RIGOROSUM THESIS}
+\fi
+
+\ifx\ThesisTypeName\undefined
+\PackageError{thesis}{Unknown thesis type.}{Please check the definition of ThesisType in metadata.tex.}
+\fi
+
+%%% Switches based on study program language
+
+\def\LangCS{cs}
+\def\LangEN{en}
+
+\ifx\StudyLanguage\LangCS
+\else\ifx\StudyLanguage\LangEN
+\else\PackageError{thesis}{Unknown study language.}{Please check the definition of StudyLanguage in metadata.tex.}
+\fi\fi
+
 %%% Minor tweaks of style
 
 % These macros employ a little dirty trick to convince LaTeX to typeset
@@ -37,14 +78,21 @@
 \newtheorem{thm}{Theorem}
 %\newtheorem{lemma}[thm]{Lemma}
 \newtheorem{claim}[thm]{Claim}
-
-\theoremstyle{plain}
 \newtheorem{defn}{Definition}
 
 \theoremstyle{remark}
 \newtheorem*{cor}{Corollary}
 \newtheorem*{rem}{Remark}
 \newtheorem*{example}{Example}
+
+%%% Style of captions of floating objects (figures etc.)
+
+\ifcsname DeclareCaptionStyle\endcsname
+\DeclareCaptionStyle{thesis}{style=base,font=small,labelfont=bf,labelsep=quad}
+\captionsetup{style=thesis}
+\captionsetup[algorithm]{style=thesis,singlelinecheck=off}
+\captionsetup[listing]{style=thesis,singlelinecheck=off}
+\fi
 
 %%% An environment for proofs
 
@@ -61,6 +109,26 @@
 
 \DefineVerbatimEnvironment{code}{Verbatim}{fontsize=\small, frame=single}
 
+% Settings for lstlisting -- program listing with syntax highlighting
+\ifcsname lstset\endcsname
+\lstset{
+  language=C++,
+  tabsize=2,
+  showstringspaces=false,
+  basicstyle=\footnotesize\tt\color{black!75},
+  identifierstyle=\bfseries\color{black},
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{red!50!black},
+  keywordstyle=\color{blue!75!black}}
+\fi
+
+% Floating listings, used in the same way as the figure environment
+\ifcsname DeclareNewFloatType\endcsname
+\DeclareNewFloatType{listing}{}
+\floatsetup[listing]{style=ruled}
+\floatname{listing}{Program}
+\fi
+
 %%% The field of all real and natural numbers
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\N}{\mathbb{N}}
@@ -74,6 +142,9 @@
 %%% Transposition of a vector/matrix
 \newcommand{\T}[1]{#1^\top}
 
+%%% Asymptotic "O"
+\def\O{\mathcal{O}}
+
 %%% Various math goodies
 \newcommand{\goto}{\rightarrow}
 \newcommand{\gotop}{\stackrel{P}{\longrightarrow}}
@@ -86,13 +157,16 @@
 \newcommand{\pulrad}[1]{\raisebox{1.5ex}[0pt]{#1}}
 \newcommand{\mc}[1]{\multicolumn{1}{c}{#1}}
 
+%%% TODO items: remove before submitting :)
+\newcommand{\xxx}[1]{\textcolor{red!}{#1}}
+
 %%% Custom
 \newcommand{\iso}[2]{\textsuperscript{#2}#1} % Shortcut for isotopes
 \newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu} % Better bars
 \newcommand{\pder}[2]{\frac{\partial #1}{\partial #2}} % partial derivative
 \newcommand{\garfieldpp}{Garfield\texttt{++}\xspace}
 \DeclareMathOperator{\sgn}{\textrm{sgn}} % sign function
-\renewcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}} % Better tilde
+\renewcommand{\textapprox}{{\textasciitilde}} % Better tilde
 \newcommand{\antiH}{$\overbar{\text{H}}$\xspace}
 \newcommand{\antip}{$\overbar{\text{p}}$\xspace}
 
