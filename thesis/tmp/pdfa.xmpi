@@ -65,7 +65,7 @@
    <dc:title><rdf:Alt><rdf:li xml:lang="x-default">Simulation and Reconstruction of Charged Particle Trajectories in an Aty\-pic Time Projection Chamber</rdf:li></rdf:Alt></dc:title>
    <dc:creator><rdf:Seq><rdf:li>Martin Vavřík</rdf:li></rdf:Seq></dc:creator>
    <dc:publisher><rdf:Bag><rdf:li>Charles University</rdf:li></rdf:Bag></dc:publisher>
-   <dc:description><rdf:Alt><rdf:li xml:lang="x-default">chybííííí</rdf:li></rdf:Alt></dc:description>
+   <dc:description><rdf:Alt><rdf:li xml:lang="x-default">In this work, we describe the development of a reconstruction algorithm for atypical Time Projection Chamber (TPC) that will be used at IEAP, CTU to search for the ATOMKI anomalous internal pair creation. The chambers have an inhomogeneous toroidal magnetic field orthogonal to their electric field, hence we call them Orthogonal Fields TPCs (OFTPCs). This arrangement causes a distortion of the drift inside the chamber and complicates the shape of electron/positron trajectories. We present a few approaches to tackle these problems, the best of which uses a simulated ionization electron drift map for track reconstruction, and Runge-Kutta fit for energy reconstruction. Finally, we show from simulations that, for an ideal charge readout with no multiplication and no noise, and exact knowledge of initial position and direction, we can reach FWHM resolution 1.56 % for electrons, and 1.95 % for positrons without correcting systematic errors dependent on the track parameters.</rdf:li></rdf:Alt></dc:description>
    <dc:subject><rdf:Bag><rdf:li>simulation </rdf:li>
      <rdf:li>reconstruction </rdf:li>
      <rdf:li>time projection chamber </rdf:li></rdf:Bag></dc:subject>
@@ -80,15 +80,15 @@
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmp="http://ns.adobe.com/xap/1.0/"> 
    <xmp:CreatorTool>LaTeX with hyperref</xmp:CreatorTool> 
-   <xmp:ModifyDate>2025-07-16T22:35:34+02:00</xmp:ModifyDate> 
-   <xmp:CreateDate>2025-07-16T22:35:34+02:00</xmp:CreateDate> 
-   <xmp:MetadataDate>2025-07-16T22:35:34+02:00</xmp:MetadataDate> 
+   <xmp:ModifyDate>2025-07-16T23:52:36+02:00</xmp:ModifyDate> 
+   <xmp:CreateDate>2025-07-16T23:52:36+02:00</xmp:CreateDate> 
+   <xmp:MetadataDate>2025-07-16T23:52:36+02:00</xmp:MetadataDate> 
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmpRights = "http://ns.adobe.com/xap/1.0/rights/"> 
   </rdf:Description> 
   <rdf:Description rdf:about="" xmlns:xmpMM="http://ns.adobe.com/xap/1.0/mm/"> 
    <xmpMM:DocumentID>uuid:C8CFC28F-88E1-7995-E9AD-F6D12EAD346B</xmpMM:DocumentID> 
-   <xmpMM:InstanceID>uuid:92945035-9DA3-5B0F-2B87-36F46A1A1B31</xmpMM:InstanceID> 
+   <xmpMM:InstanceID>uuid:EC4E04BC-9565-9DE5-E958-DEFAFBA66775</xmpMM:InstanceID> 
   </rdf:Description> 
  </rdf:RDF> 
 </x:xmpmeta> 
