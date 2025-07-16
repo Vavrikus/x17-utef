@@ -269,7 +269,9 @@
 			\end{figure}			
 			
 			\subsection{Testing on a~Runge-Kutta sample}
-				The three dimensional circle and lines fit was tested on a~sample of Runge-Kutta tracks with randomized parameters described in Section~\ref{sec:rktest}. These tracks of primary electrons and positrons consist of points calculated with the \ac{RK4} algorithm for a~given time step. The parameter ranges in the MIGRAD minimizer have to be carefully tuned, simple exclusion of pathologic values can lead to convergence towards an edge value. After the tuning, only \num{4163} out of \num{1000000} tracks failed to converge to energy within \qty{2}{\MeV} from the simulation. We compared the two methods of choosing the magnetic fields. The resulting relative errors of reconstructed energy are shown in \cref{fig:cfit_rk}. The average field method systematically underestimates the particle's energy, but has \textapprox25 times lower \acs{FWHM}.
+				The three dimensional circle and lines fit was tested on a~sample of Runge-Kutta tracks with randomized parameters described in Section~\ref{sec:rktest}. These tracks of primary electrons and positrons consist of points calculated with the \ac{RK4} algorithm for a~given time step. The parameter ranges in the MIGRAD minimizer have to be carefully tuned, simple exclusion of pathologic values can lead to convergence towards an edge value. After the tuning, only \num{4163} out of \num{1000000} tracks failed to converge to energy within \qty{2}{\MeV} from the simulation. We compared the two methods of choosing the magnetic fields. The resulting relative errors of reconstructed energy are shown in \cref{fig:cfit_rk}. When appropriate, we use the Freedman-Diaconis rule\footnote{The Freedman-Diaconis rule is equivalent to the Scott's rule for normally distributed data, but it uses the interquartile range instead of the sample standard deviation, which makes it less sensitive to outliers.} for bin width selection~\cite{FreedmanDiac}.
+
+				We see that the average field method systematically underestimates the particle's energy, but has \textapprox25 times lower \acs{FWHM} (only \qty{0.77}{\percent}) than the average field method. This shows that, when corrected, this method can serve as a good initial estimate of the particle's energy, before it gets refined by the Runge-Kutta fit.
 				
 				\begin{figure}
 					\centering
@@ -285,7 +287,7 @@
 						\includegraphics[width=0.48\textwidth]{cfit_diff_mid.png}
 						\hfill
 						\includegraphics[width=0.48\textwidth]{cfit_diff_avg.png}
-						\caption{Overall relative error for both magnetic field selection methods. Freedman-Diaconis rule was used for bin width selection~\cite{FreedmanDiac}.}
+						\caption{Overall relative error for both magnetic field selection methods. Freedman-Diaconis rule was used for bin width selection.}
 					\end{subfigure}
 					\caption{Relative error of the energy of Runge-Kutta tracks reconstructed with the 3D circle and lines fit. The middle field (left) and the average field (right) methods are compared. Dependence on the initial direction angles $\theta$ and $\varphi$ is small in comparison.}
 					\label{fig:cfit_rk}

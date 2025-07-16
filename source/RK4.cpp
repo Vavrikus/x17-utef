@@ -218,15 +218,16 @@ namespace X17
         if(!m_fitter)
         {
             m_fitter = TVirtualFitter::Fitter(nullptr,parameters);
-            m_fitter->SetFCN(this->_Eval);
         }
-
+        
         if(!print)
         {
             double arg = -1;
             m_fitter->ExecuteCommand("SET PRINTOUT",&arg,1);
             m_fitter->ExecuteCommand("SET NOW", &arg ,1);
         }
+        
+        m_fitter->SetFCN(this->_Eval);
     }
 
     void RKFit::FitRK(double max_iter, double toleration)

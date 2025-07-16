@@ -81,9 +81,9 @@ namespace X17
         double kin_energy; // Simulated kinetic energy of the particle [MeV].
 
         double cfit_nopads_energy_mid; // Circle fit energy (not accounting for pads) [MeV] calculated using middle field.
-        double cfit_nopads_energy_avg; // Circle fit energy (not accounting for pads) [MeV] calculated using average field.
+        double cfit_nopads_energy_avg; // Circle fit energy (not accounting for pads) [MeV] calculated using average field (corrected).
         double cfit_pads_energy_mid;   // Circle fit energy (accounting for pads) [MeV] calculated using middle field.
-        double cfit_pads_energy_avg;   // Circle fit energy (accounting for pads) [MeV] calculated using average field.
+        double cfit_pads_energy_avg;   // Circle fit energy (accounting for pads) [MeV] calculated using average field (corrected).
         double rkfit_energy;           // Runge-Kutta fit energy (accounting for pads) [MeV].
         double rkfit_energy_err;       // Runge-Kutta fit energy error (accounting for pads) [MeV].
 

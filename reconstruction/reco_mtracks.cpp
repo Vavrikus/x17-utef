@@ -27,7 +27,7 @@ int reco_track()
 
     // Loading the ionization electron drift map.
     TFile* map_input = new TFile("../../data/ion_map/sample_2.0/map.root");
-    X17::Field<X17::MapPoint>* map = (X17::Field<X17::MapPoint>*)map_input->Get("map");
+    const X17::Field<X17::MapPoint>* const map = (X17::Field<X17::MapPoint>*)map_input->Get("map");
 
     // Loading file(s) with microscopic tracks.
     std::string micro_tracks_folder;
@@ -73,7 +73,17 @@ int reco_track()
     else out_file = new TFile((micro_tracks_folder + "track_plots1000.root").c_str(),"RECREATE","Tracks from microscopic simulation");
 
     multi_loop->ProcessMulti(micro_tracks);
+    
     out_file->Close();
+    map_input->Close();
+
+    delete out_file;
+    delete map_input;
+
+    delete magfield;
+    delete map;
+    delete micro_tracks;
+    delete multi_loop;
 
     return 0;
 }

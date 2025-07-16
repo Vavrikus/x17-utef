@@ -50,16 +50,16 @@ namespace X17
         if (!m_fitter) //(!m_fitter || m_fitter->GetNumberTotalParameters() != parameters)
         {
             m_fitter = TVirtualFitter::Fitter(nullptr,parameters);
-            m_fitter->SetFCN(this->_Eval);
         }
-
+        
         if (!print)
         {
             double arg = -1;
             m_fitter->ExecuteCommand("SET PRINTOUT",&arg,1);
             m_fitter->ExecuteCommand("SET NOW", &arg ,1);
         }
-
+        
+        m_fitter->SetFCN(this->_Eval);
         m_fitter->SetParameter(0,"length",m_length,0.01,-5,7);
         m_fitter->SetParameter(1,"alpha",m_alpha,0.001,m_alpha_min-0.3,m_alpha_max+0.3);
         m_fitter->SetParameter(2,"radius",m_radius,0.01,5,5000);
@@ -196,6 +196,8 @@ namespace X17
 
         double betasq = 1 / (1 + pow((E0 / (c * (cm2m * m_radius) * b_proj)), 2));
         double Ekin   = E0 * (1 / std::sqrt(1 - betasq) - 1);
+
+        if (!middle) Ekin /= 0.9263; // corection given by the test on RK tracks
 
         return Ekin;
     }

@@ -69,6 +69,11 @@ void cview_update()
     std::string filename, canvasName;
     std::cout << "Enter filename: ";
     std::getline(std::cin, filename);
+
+    TFile* f = TFile::Open(filename.c_str());
+    if (f) f->ls();
+    delete f;
+
     std::cout << "Enter canvas name: ";
     std::getline(std::cin, canvasName);
     watchAndDisplay(filename.c_str(), canvasName.c_str());
