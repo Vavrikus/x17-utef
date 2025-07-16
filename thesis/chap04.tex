@@ -372,6 +372,63 @@
 		\red{Same details with MIGRAD etc. as previously.}
 		
 		\subsection{Testing on a~microscopic sample}
-			The Runge-Kutta fit together with the 3D circle-and-lines pre-fit was tested on a~sample of tracks simulated using the microscopic simulation described in Section~\ref{sec:microsim}. At first, few tracks with randomized initial parameters (same as the Runge-Kutta sample in Section~\ref{sec:rktest}) were generated for preliminary testing. Later, a~sample with a~grid-like distribution of track parameters was generated (see Section~\ref{sec:microgrid} for details).
+			The Runge-Kutta fit together with the 3D circle-and-lines pre-fit was tested on a~sample of tracks simulated using the microscopic simulation described in Section~\ref{sec:microsim}. At first, few tracks with randomized initial parameters (same as the Runge-Kutta sample in Section~\ref{sec:rktest}) were generated for preliminary testing. Later, a~sample with a~grid-like distribution of track parameters was generated (see Section~\ref{sec:microgrid} for details). This allows us to test the performance of energy reconstruction from the microscopic tracks reconstructed with the discrete map inversion reconstruction.
 			
-			\red{Initial parameters of the HEED track (also should be in the first testing track). Initial parameters set in the circle fit (if electron set alpha one way, otherwise other way) and parameter bounds.}
+			The dependence of the resulting relative differences of reconstructed Runge-Kutta versus simulated energy for electron and positron tracks are shown in \cref{fig:rk_dE_theta,fig:rk_dE_phi,fig:rk_dE_energy}, the overall resolution without corrections is shown in \cref{fig:rk_dE}. We can see that electrons, as well as tracks with high values of $\theta$, are reconstructed with a~higher precision thanks to the larger drift distance of ionization electrons, which results in their spreading across more readout channels (pads and time bins). The energy of electron tracks, especially for high energies, tends to be overestimated (and vice versa for positrons). This is related to the uncorrected shift in the map inversion $z$\nobreakdash-coordinate reconstruction as seen from the residuals in \cref{fig:7030_map_res}. This shift is caused by non-zero initial velocities of ionization electrons that is not accounted for by the map. It has opposite directions for electrons and positrons, because the ionization electrons are more likely to follow the direction of the ionizing particle, and it deforms the track, since it strengthens as the track curves. The effect is more pronounced for higher energies, where the curve is more sensitive to slight changes, as shown in \cref{fig:rk_forward}.
+
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.48\textwidth]{rk_e_dE_th.png}
+				\hfill
+				\includegraphics[width=0.48\textwidth]{rk_p_dE_th.png}
+				\caption{Dependence on theta of relative differences of reconstructed Runge-Kutta versus simulated energy for the Runge-Kutta fit for electrons (left) and positrons (right).}
+				\label{fig:rk_dE_theta}
+			\end{figure}
+
+
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.48\textwidth]{rk_e_dE_ph.png}
+				\hfill
+				\includegraphics[width=0.48\textwidth]{rk_p_dE_ph.png}
+				\caption{Dependence on theta of relative differences of reconstructed Runge-Kutta versus simulated energy for the Runge-Kutta fit for electrons (left) and positrons (right).}
+				\label{fig:rk_dE_phi}
+			\end{figure}
+
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.48\textwidth]{rk_e_dE_E.png}
+				\hfill
+				\includegraphics[width=0.48\textwidth]{rk_p_dE_E.png}
+				\caption{Dependence on simulated energy of relative differences of reconstructed Runge-Kutta versus simulated energy for the Runge-Kutta fit for electrons (left) and positrons (right).}
+				\label{fig:rk_dE_energy}
+			\end{figure}
+
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.48\textwidth]{rk_e_dE.png}
+				\hfill
+				\includegraphics[width=0.48\textwidth]{rk_p_dE.png}
+				\caption{The overall relative differences of reconstructed versus simulated energy for the Runge-Kutta fit for electrons (left) and positrons (right).}
+				\label{fig:rk_dE}
+			\end{figure}
+			
+			Since the Runge-Kutta fit is quite slow (each step of the MIGRAD algorithm has to simulate a~new track), we use the circle and lines fit to provide a~fast estimate, and to ensure the fit convergence. From \cref{fig:cfit_rk}, we see that the average field method offers the best estimate when corrected. We can again save both estimates from the circle and lines fit, this time measuring its performance on a~track reconstructed with discrete map inversion. The resulting histograms for electron and positron tracks are shown in \cref{fig:cfit_avg,fig:cfit_mid}. We again find that the average field method performs much better.
+			
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.48\textwidth]{cfit_avg_e_dE.png}
+				\hfill
+				\includegraphics[width=0.48\textwidth]{cfit_avg_p_dE.png}
+				\caption{The overall relative differences of reconstructed versus simulated energy for the circle-and-lines (average field, corrected) for electrons (left) and positrons (right).}
+				\label{fig:cfit_avg}
+			\end{figure}
+			
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.48\textwidth]{cfit_mid_e_dE.png}
+				\hfill
+				\includegraphics[width=0.48\textwidth]{cfit_mid_p_dE.png}
+				\caption{The overall relative differences of reconstructed versus simulated energy for the circle-and-lines (middle field) for electrons (left) and positrons (right).}
+				\label{fig:cfit_mid}
+			\end{figure}

@@ -20,7 +20,7 @@ using namespace X17::constants;
 
 int rk_tracks()
 {
-    constexpr int n_tracks  =  10000;        // The number of tracks to be simulated by Runge-Kutta.
+    constexpr int n_tracks  =  25;        // The number of tracks to be simulated by Runge-Kutta.
     constexpr double step   =  1E-13*16.66;   // The step of Runge-Kutta [s] (original times 8 MeV gamma factor).
 
     // Loading the magnetic field.
@@ -47,7 +47,11 @@ int rk_tracks()
         X17::Vector origin,orientation;
         double kin_en;
 
-        X17::GetRandomTrackParams(rand,electron,origin,orientation,kin_en);
+        // X17::GetRandomTrackParams(rand,electron,origin,orientation,kin_en);
+        electron = true;
+        origin = {X17::constants::xmin,0,0};
+        orientation = {1,0,0};
+        kin_en = 3e+6 + i*1.0/n_tracks*(13e+6 - 3e+6);
 
         // The actual track simulation.
         X17::RK4<8>* track = GetTrackRK(*magfield,electron,step,kin_en,origin,orientation);
@@ -83,7 +87,7 @@ int rk_tracks()
     
     X17::DefaultLayout::GetDefaultLayout().DrawPads3D(height);
     
-    TFile* outfile = new TFile("../../../data/rk_tracks/rk_tracks3.root","RECREATE");
+    TFile* outfile = new TFile("../../../data/rk_tracks/rk_tracks_forward.root","RECREATE");
     simulated_tracks->Write();
     c_tracks->Write();
 

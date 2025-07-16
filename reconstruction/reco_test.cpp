@@ -59,22 +59,23 @@ int main(int argc, char const *argv[])
     loop->AddTask(new CircleAndRKFitTask(t));
     
     // Loading file with Runge-Kutta tracks.
-    TFile* input_rk = new TFile("../../data/rk_tracks/rk_tracks2.root");
+    TFile* input_rk = new TFile("../../data/rk_tracks/rk_tracks_forward.root");
     TTree* rk_tracks = (TTree*)input_rk->Get("rk_tracks");
     // rk_tracks->Print();
     
     // TrackLoop for Runge-Kutta simulated tracks.
     TrackLoop* rk_loop = new TrackLoop(*map,magfield);
-    auto t2 = new CircleFitEnergyTask();
-    rk_loop->AddTask(t2);
+    // auto t2 = new CircleFitEnergyTask();
+    // rk_loop->AddTask(t2);
     // rk_loop->AddTask(new PlotSelectionTask(t2));
+    rk_loop->AddTask(new PlotForwardTask());
     
     // Processing.
     // TFile out_file("track_plots.root","RECREATE","Tracks from microscopic simulation");
     // loop->ProcessMulti(&track_selection);
     // out_file.Close();
 
-    TFile out_file2("../../data/rk_tracks/rk_plots2.root","RECREATE","Tracks from Runge-Kutta simulation fit");
+    TFile out_file2("../../data/rk_tracks/rk_plots_forward.root","RECREATE","Tracks from Runge-Kutta simulation fit");
     rk_loop->ProcessRK(rk_tracks);
     out_file2.Close();
     

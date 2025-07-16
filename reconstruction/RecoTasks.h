@@ -1101,6 +1101,67 @@ public:
 
 
 
+class PlotForwardTask : public RecoTask
+{
+    std::vector<TLine*> track_segments;
+    double x_prev = X17::constants::xmin;
+    double z_prev = 0;
+    int color;
+
+    void PreElectronLoop() override
+    {
+        double norm_energy = (m_loop->curr_rk->kin_energy - 3e+6)/10e+6;
+
+        int color_index = norm_energy * (gStyle->GetNumberOfColors() - 1);
+        color = gStyle->GetColorPalette(color_index);
+    }
+
+    void ElectronLoop() override
+    {
+        const TrackRK* track = m_loop->curr_rk;
+        RKPoint p = m_loop->curr_rkpoint;
+        TLine* line = new TLine(x_prev,z_prev,p.x(),p.z());
+        line->SetLineColor(color);
+        x_prev = p.x();
+        z_prev = p.z();
+        if (p.x() < 15) track_segments.push_back(line);
+    }
+
+    void PostElectronLoop() override
+    {
+        x_prev = X17::constants::xmin;
+        z_prev = 0;
+    }
+    
+    void PostTrackLoop() override
+    {
+        using namespace X17::constants;
+
+        TCanvas* c = new TCanvas("c_forward","Forward tracks with different energies",500/0.72,500/7*8.5/0.8);
+        c->SetTopMargin(0.07);
+        c->SetBottomMargin(0.13);
+        c->SetRightMargin(0.2);
+        TH2F* scale = new TH2F("scale",";x [cm];z [cm];E [MeV]",10,xmin,15,10,-6,1);
+        scale->SetStats(0);
+        scale->SetBinContent(1,3);
+        scale->SetMinimum(3);
+        scale->SetMaximum(13);
+        scale->GetXaxis()->SetLabelSize(0.055);
+        scale->GetXaxis()->SetTitleSize(0.06);
+        scale->GetYaxis()->SetLabelSize(0.055);
+        scale->GetYaxis()->SetTitleSize(0.06);
+        scale->GetZaxis()->SetLabelSize(0.055);
+        scale->GetZaxis()->SetTitleSize(0.06);
+        scale->GetXaxis()->SetTitleOffset(0.9);
+        scale->GetYaxis()->SetTitleOffset(0.7); 
+        scale->GetZaxis()->SetTitleOffset(1);
+        scale->Draw("colz");
+
+        for (TLine* l : track_segments) l->Draw("same");
+        c->Write();
+    }
+};
+
 
 
 
