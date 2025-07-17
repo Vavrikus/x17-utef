@@ -33,8 +33,8 @@
 			\item Charge multiplication on the triple-\ac{GEM} and limited efficiency of the readout. In some cases, the spreading of charge between multiple pads during multiplication might have a~positive effect on the resolution.
 			\item Noise in the data. We are currently tuning an algorithm for track de-noising using a~convolutional neural network~\cite{Gajdoš_2025}.
 			\item Delta electrons released by the particle.
-			\item Attachment and Penning transfer in the gas mixture. Influence of even small amounts of other gases needs to be considered.
-			\item Multiple scattering of the primary electrons and positrons.
+			\item Electron attachment and Penning transfer in the gas mixture. Influence of even small amounts of other gases needs to be considered.
+			\item Energy loss of the primary electrons and positrons.
 			\item Better simulation of magnetic and electric fields; so far we have been assuming that the electric field is homogeneous. A~simulation of the triple~\ac{GEM} could be included, but some simplifications would be necessary, since the microscopic simulation needed for such a~structure is extremely time consuming.
 			\item Account for the triggering in \ac{MWPC} and \acf{TPX3} detector layers. While a~small uncertainty of the drift time measurement may not be relevant for the energy reconstruction in a~standard \ac{TPC} with a~homogeneous magnetic field, a~shift of the entire trajectory along the $z$\nobreakdash-coordinate in our detector changes the magnetic field along the track, and therefore the reconstructed energy.
 			\item An optimization study of the pad layout is possible with the current algorithm.
@@ -52,46 +52,16 @@
 	\subsubsection*{Reconstruction algorithm}
 		Several tweaks are being considered to improve the reconstruction algorithm in the future:
 		\begin{itemize}
+			\item Optimization --- multiple Runge-Kutta fits could be run with gradually decreasing step size.
+			\item Estimation of errors using the error of the fit.
 			\item Accounting for the variable initial velocity of ionization electrons produced by the incident particle. The current map uses initial energy \qty{0.1}{\eV}, which led to systematic errors in the $z$\nobreakdash-coordinate reconstruction, as shown in \cref{fig:7030_map_res}. Another map could be simulated with different initial direction and energy distributions, tracking the ionization electrons only until they slow down to the mean drift velocity, and using the already simulated map from there. Alternatively, we could correct the reconstructed $z$\nobreakdash-coordinate based on the reconstructed curve of the track using some rough estimate obtained from a~grid-like simulation of microscopic tracks.
 			\item If a~speed optimization is needed, a~discrete pad map could be calculated ahead of time, instead of repeated calculation during the reconstruction. At this moment, the most computationally expensive part of the reconstruction are the individual fits. The slower gradient descent map inversion technique may be used to avoid issues with the interpolation on the inverse grid (shown in \cref{fig:pad_reco}).
 			\item At the end of the fitting procedure, we could refine the origin and the initial direction of the track obtained from the previous detector layers with some kind of global fit.
 			\item Using maximum likelihood for the energy fit, instead of the least square method. Currently, in the discrete map inversion reconstruction, we reconstruct the center of each hit pad and time bin. However, due to the drift distortion, this may not correspond to the most likely, or even the average position to be hit by an ionization electron.
 			
-			In theory, we could by taking into account the whole map $\mathcal{M}$ (including the covariance matrices, describing the multivariate normal distribution tha describes each map point well according to our preliminary tests), we could make an "inverse map" from $\mathcal{R}$ to distributions on $\mathcal{D}$. We could achieve this by taking the normalized probability density of an electron with initial coordinates $(x,y,z)$ having readout coordinates $(x',y',t)$. If we fix $(x',y',t)$, we get an unnormalized probability density $f(x,y,z) = \mathcal{M}_{(x,y,z)}(x',y',t)$ (assuming that all initial coordinates are a~priori equally likely). This could potentially improve the discrete reconstruction if we take the mean value of this probability density across the pad and time bin
+			In theory, we could by taking into account the whole map $\mathcal{M}$ (including the covariance matrices, describing the multivariate normal distribution that describes each map point well according to our preliminary tests), we could make an "inverse map" from $\mathcal{R}$ to distributions on $\mathcal{D}$. We could achieve this by taking the normalized probability density of an electron with initial coordinates $(x,y,z)$ having readout coordinates $(x',y',t)$. If we fix $(x',y',t)$, we get an unnormalized probability density $f(x,y,z) = \mathcal{M}_{(x,y,z)}(x',y',t)$ (assuming that all initial coordinates are a~priori equally likely). This could potentially improve the discrete reconstruction if we take the mean value of this probability density across the pad and time bin
 			\begin{equation}
 				f_\text{pad, bin}(x,y,z) = \frac{1}{A_\text{pad} \Delta t_\text{bin}} \int_\text{pad, bin} \mathcal{M}_{(x,y,z)}(x',y',t) 	\text{d}x'\text{d}y'\text{d}t
 			\end{equation}
-			and using it for a~likelihood fit instead of using least squares. This still assumes that all initial coordinates are equally likely which is clearly not the case for a~primary particle track. In the future, we could even use the fast track simulation with the map (it should be possible to make around 1000 tracks or more per minute per core with current settings), create a~big set of tracks with reasonable parameters and use these to get an approximation of the probability distribution of the detector response. Some approximations would be necessary when interpreting the data to decrease the degrees of freedom of this distribution (we would have to pick a~set of parameters and assume that some of them are independent). This could give us an idea about the best achievable resolution (how significantly will the detector response differ for a~given change in energy). If the difference is significant, we could try to further improve the likelihood fit. In reality, this approach is probably not practical.
+			and using it for a~likelihood fit instead of using least squares. This still assumes that all initial coordinates are equally likely which is clearly not the case for a~primary particle track. In the future, we could even use the fast track simulation with the map (it should be possible to make around 1000 tracks or more per minute per core with current settings), create a~big set of tracks with reasonable parameters and use these to get an approximation of the probability distribution of the detector response. Some approximations would be necessary when interpreting the data to decrease the degrees of freedom of this distribution (we would have to pick a~set of parameters and assume that some of them are independent). This could give us an idea about the best achievable resolution (how significantly will the detector response differ for a~given change in energy). If the difference is significant, we could try to further improve the likelihood fit.
 		\end{itemize}
-			
-			\red{\section*{Notes}}
-			\red{General notes about the thesis:
-			\begin{itemize}
-				\item Check nobreakdash usage (is it always necessary)
-				\item Use siunitx package to ensure correct formatting, physics package for derivatives.
-				\item Consistent bold marking of points/vectors
-				\item Correct footnotes (capital letters, etc.).
-				\item Maybe make some section outside of References specifically for literature? (such as the old CERN TPC review, ATOMKI review is currently not mentioned, not sure if some Wikipedia articles should get a~mention or how do these things work)
-				\item Consistent use of bm vs mathbf
-				\item Consistent use of $\overbar{\mathcal{M}}$ instead of $\mathcal{M}$ when talking about the map of the means (so most of the time)
-				\item Proper equation numbering when deriving a~relation
-				\item Hugo should be mentioned somewhere in the title pages probably?
-				\item Consistent itemize/enumerate style (namely spacing) that looks good (ideally set by some macro? maybe the new MFF UK template will solve this?)
-				\item Switch to cleveref.
-				\item Correct em dash?
-				\item Should list of figures/tables be in the thesis? Also, it is currently not in TOC.
-			\end{itemize}
-			Random notes:
-			\begin{itemize}[topsep=4pt,itemsep=2pt]
-				\item Only electrons that start and end in the sector closer than 0.5~cm are used for reconstruction (newest version).
-				\item Profiling of the reconstruction!!!! Find out what's taking the most time (probably Runge-Kutta integration which the fit calls a~lot). Could gradually decrease the step size to refine the fit instead of making it small right away (arbitrarily small -- the effect of this was never tested). This could take some time to do properly (find a~profiler or make profiling macros).
-				\item Slow drift velocity good for $z$ reconstruction, too low leads to recombination
-				\item Could add link to the GitHub repository, mention CMake? Details about simulating on MetaCentrum?
-				\item The first used track had 8~MeV momentum $p = \gamma m v$ (not kinetic energy $E_\text{kin} = (\gamma-1) m c^2 = \sqrt{p^2c^2+m^2c^4}-mc^2 \approx 7.5$~MeV)
-				\item Maybe cite \garfieldpp user manual instead?
-				\item Does the RK fit error correlate with the actual error?
-				\item Some Garfield settings in micro track generation probably not mentioned
-				\item one-to-one only means injection (not bijection)? Make sure correct terminology is used.
-				\item circle-and-lines dashes?
-			\end{itemize}
-			}

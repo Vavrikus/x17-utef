@@ -237,20 +237,20 @@
 	
 	\section{Orthogonal Fields TPC at IEAP CTU}
 	\label{sec:oftpc}
-		At \ac{IEAPCTU}, we are going to use six identical atypical \acp{TPC} with inhomogeneous toroidal magnetic field \textbf{orthogonal} to the electric field, hereafter referred to as \acf{OFTPC}. It has the shape of isosceles trapezoidal prism 16~centimeters high with triple\nobreakdash-\ac{GEM} readout on one of its bases. Dimensions of the \ac{OFTPC} are discussed in detail in section~\ref{sec:coor} below. Throughout this thesis, we assume a~uniform electric field along the $z$~axis with $E_z = -400$~V/cm. Measured particles enter the \ac{OFTPC} through a~window after crossing the \ac{MWPC}.
+		At \ac{IEAPCTU}, we are going to use six identical atypical \acp{TPC} with inhomogeneous toroidal magnetic field \textbf{orthogonal} to the electric field, hereafter referred to as \acf{OFTPC}. It has the shape of isosceles trapezoidal prism with a~height of \qty{16}{\cm} with triple\nobreakdash-\ac{GEM} readout on one of its bases. Dimensions of the \ac{OFTPC} are discussed in detail in \cref{sec:coor} below. Throughout this thesis, we assume a~uniform electric field along the $z$~axis with $E_z = -\qty{400}{\V\per\cm}$. Measured particles enter the \ac{OFTPC} through a~window after crossing the \ac{MWPC}.
 		
 		
 		\subsection{Motivation and Associated Challenges}
-			The reasons for the unusual field layout are mostly cost related:
+			The reasons for the unusual field layout are mostly related to construction feasibility:
 				\begin{enumerate}[nosep,label=\alph*)]
 					\item we use permanent magnets instead of a~solenoid and parallel fields are difficult to accomplish this way,
 					\item granularity of the \ac{TPC} readout is limited in order to fit one SAMPA/SRS hybrid in each sector -- parallel fields would bend the trajectories parallel to the readout requiring more pads and different architecture.
 				\end{enumerate}
 			In this thesis, we will show that such a~setup can reach a~similar energy resolution as common cylindrical \acp{TPC} while reducing the overall cost.
 			
-			The layout introduces two complications to the track reconstruction -- the trajectory in inhomogeneous field is not circular and the drift is distorted by the magnetic field as shown in the Equation~\ref{eq:drift}(in our case $\omega\tau \approx 0.08$\footnote{This is the approximate value in the strongest field based on charged mobility computed from the fitted drift velocity in \cref{sec:rasd}.}). We will deal with these effects in the upcoming chapters.
+			The layout introduces two complications to the track reconstruction -- the trajectory in inhomogeneous field is not circular and the drift is distorted by the magnetic field as shown in \cref{eq:drift}(in our case $\omega\tau \approx 0.08$\footnote{This is the approximate value in the strongest field based on charged mobility computed from the fitted drift velocity in \cref{sec:rasd}.}). We will deal with these effects in the upcoming chapters.
 			
-			The diffusion in such setup is larger since parallel orientation reduces diffusion by curling the electrons in the $x$\nobreakdash-$y$ direction (see Equation~\ref{eq:difmag}), but for our relatively weak magnetic field and short drift distance, the difference is negligible.
+			The diffusion in such setup is larger since parallel orientation reduces diffusion by curling the electrons in the $x$\nobreakdash-$y$ direction (see \cref{eq:difmag}), but for our relatively weak magnetic field and short drift distance, the difference is negligible.
 	
 		\subsection{Coordinate Systems and Dimensions}
 		\label{sec:coor}
@@ -265,14 +265,14 @@
 					\end{equation}
 				Simulations in this sector can be applied to all sectors by rotating the coordinates accordingly. The volume of the \ac{OFTPC} in this sector, which has the shape of a~trapezoidal prism, has these boundaries:
 					\begin{align}
-						x \in [x_\text{min},x_\text{max}] &= [6.51, 14.61] \;\text{cm},\\
-						z \in [z_\text{min},z_\text{max}] &= [-8,8] \;\text{cm},\\
-						y_\text{max}(x_\text{min}) = -y_\text{min}(x_\text{min}) &=  2.75\;\text{cm},\\
-						y_\text{max}(x_\text{max}) = -y_\text{min}(x_\text{max}) &=  7.45\;\text{cm},
+						x \in [x_\text{min},x_\text{max}] &= [\qty{6.51}{\cm},\qty{14.61}{\cm}],\\
+						z \in [z_\text{min},z_\text{max}] &= [\qty{-8}{\cm},\qty{8}{\cm}],\\
+						y_\text{max}(x_\text{min}) = -y_\text{min}(x_\text{min}) &= \qty{2.75}{\cm},\\
+						y_\text{max}(x_\text{max}) = -y_\text{min}(x_\text{max}) &= \qty{7.45}{\cm},
 					\end{align}
-				where $y_\text{max}(x)$ is the maximal value of the $y$-coordinate for a~given $x$. The readout is located at $z = 8$~cm; for some purposes, we also define the distance to the readout $d_\text{r} = 8\;\text{cm}-z$ as an alternative to the $z$-coordinate.The \ac{OFTPC} window has width 3.8~cm and height 4.0~cm.
+				where $y_\text{max}(x)$ is the maximal value of the $y$-coordinate for a~given $x$. The readout is located at $z = \qty{8}{\cm}$; for some purposes, we also define the distance to the readout $d_\text{r} = \qty{8}{\cm}-z$ as an alternative to the $z$-coordinate.The \ac{OFTPC} window has width \qty{3.8}{\cm} and height \qty{4.0}{\cm}.
 				
-				We also use spherical coordinates $(r,\theta,\varphi)$ with the elevation angle~$\theta$ measured relative to the $xy$ plane. Angles~$\theta$ and~$\varphi$ are useful when describing the direction of $e^+/e^-$~tracks. Their maximal values considered for the initial direction in simulations are $\theta_\text{max} \approx 17.1^\circ$ and $\varphi_\text{max} \approx 16.3^\circ$ as shown in \cref{fig:oftpc}.
+				We also use spherical coordinates $(r,\theta,\varphi)$ with the elevation angle~$\theta$ measured relative to the $xy$ plane. Angles~$\theta$ and~$\varphi$ are useful when describing the direction of $e^+/e^-$~tracks. Their maximal values considered for the initial direction in simulations are $\theta_\text{max} \approx \qty{17.1}{\degree}$ and $\varphi_\text{max} \approx \qty{16.3}{\degree}$ as shown in \cref{fig:oftpc}.
 				
 				\begin{figure}
 					\centering
@@ -291,7 +291,7 @@
 					\end{equation}
 				It is a~discretization of a~certain volume in $\mathcal{R}$ that can be obtained from simulations.
 				
-				The readout of the \ac{OFTPC} will consist\red{~(is the design final?)} of 128~rectangular pads arranged in a~staggered pattern. Parameters of the pad layout are shown in \cref{fig:padlayout}. The bottom left corner of $n$\nobreakdash-th pad has coordinates $(x_{1,n},y_{1,n})$, the  top right $(x_{2,n},y_{2,n})$ and its center has coordinates $(x_{c,n},y_{c,n})$. The gap between neighboring pads is $g=0.08$~cm, we consider it being shared equally between the neighboring pads. Time will be read out in discrete bins of size $t_\text{bin}=100$~ns.
+				The readout of the \ac{OFTPC} will consist\red{~(is the design final?)} of 128~rectangular pads arranged in a~staggered pattern. Parameters of the pad layout are shown in \cref{fig:padlayout}. The bottom left corner of $n$\nobreakdash-th pad has coordinates $(x_{1,n},y_{1,n})$, the top right $(x_{2,n},y_{2,n})$ and its center has coordinates $(x_{c,n},y_{c,n})$. The gap between neighboring pads is $g=\qty{0.08}{\cm}$, we consider it being shared equally between the neighboring pads. Time will be read out in discrete bins of size $t_\text{bin}=\qty{100}{\ns}$.
 			
 				\begin{figure}[H]
 					\centering
@@ -324,7 +324,7 @@
 		
 			\subsubsection{Trilinear Interpolation}
 			\label{sec:trilin}
-				Trilinear interpolation is a~3D generalization of linear interpolation\footnote{Linear interpolation in point $x\in(x_1,x_2)$ of a~function $f\colon\mathbb{R}\to\mathbb{R}$ known in points $x_1 < x_2$ is the convex combination $\widehat{f}(x) = (1-x_d)f(x_1)+x_d f(x_2)$, where $x_d = \frac{x-x_1}{x_2-x_1} \in (0,1)$.}. It can be used to interpolate a~function whose values are known on a~regular grid with rectangular prism cells. We use this simple method for interpolating the magnetic field, and it is later used in Section~\ref{sec:grad} to interpolate the Ionization Electron Map, a~key component of our track reconstruction algorithm. In both cases, we use a~regular cubic grid (also known as a~Cartesian grid).
+				Trilinear interpolation is a~3D generalization of linear interpolation\footnote{Linear interpolation in point $x\in(x_1,x_2)$ of a~function $f\colon\mathbb{R}\to\mathbb{R}$ known in points $x_1 < x_2$ is the convex combination $\widehat{f}(x) = (1-x_d)f(x_1)+x_d f(x_2)$, where $x_d = \frac{x-x_1}{x_2-x_1} \in (0,1)$.}. It can be used to interpolate a~function whose values are known on a~regular grid with rectangular prism cells. We use this simple method for interpolating the magnetic field, and it is later used in \cref{sec:grad} to interpolate the Ionization Electron Map, a~key component of our track reconstruction algorithm. In both cases, we use a~regular cubic grid (also known as a~Cartesian grid).
 				
 				Let us consider a~cell of our regular grid (a~cube) with an edge of length~$a$ containing the point $\mathbf{C} = (x,y,z)$ where we want to interpolate a~function $f\colon\mathbb{R}^3\to\mathbb{R}$. We know the values of this function at the vertices of the cell $\mathbf{C}_{ijk} = (x_0+ia,y_0+ja,z_0+ka)$, where $\mathbf{C}_{000} = (x_0,y_0,z_0)$ is the origin of the cell, and $i,j,k \in \{0,1\}$ are indices. We also define the points $\mathbf{C}_{ij} = (x,y_0+ia,z_0+ja)$ and $\mathbf{C}_i=(x,y,z_0+ia)$. Then the interpolated value $\widehat{f}(\mathbf{C})$ can be calculated as a~composition of three linear interpolations (see \cref{fig:trilin}):
 					\begin{alignat}{3}
@@ -343,7 +343,7 @@
 				\begin{figure}
 					\centering
 					\includegraphics[width=0.5\textwidth]{trilinear.png}
-					\caption{Visualization of trilinear interpolation as a~composition of linear interpolations (inspired by~\cite{trilinear1}). We want to interpolate the value in the red point~$\mathbf{C}$. First we interpolate between the four pairs of blue points sharing the last two indices along the $x$\protect\nobreakdash-axis (Eq.~\ref{eq:linterpol}), then between the two pairs of the resulting green points along the $y$\protect\nobreakdash-axis (Eq.~\ref{eq:linterpol2}) and finally between the two resulting orange points along the $z$\protect\nobreakdash-axis to get the final red value (Eq.~\ref{eq:linterpol3}). Made with GeoGebra®.}
+					\caption{Visualization of trilinear interpolation as a~composition of linear interpolations (inspired by~\cite{trilinear1}). We want to interpolate the value in the red point~$\mathbf{C}$. First we interpolate between the four pairs of blue points sharing the last two indices along the $x$\protect\nobreakdash-axis (\cref{eq:linterpol}), then between the two pairs of the resulting green points along the $y$\protect\nobreakdash-axis (\cref{eq:linterpol2}) and finally between the two resulting orange points along the $z$\protect\nobreakdash-axis to get the final red value (\cref{eq:linterpol3}). Made with GeoGebra®.}
 					\label{fig:trilin}
 				\end{figure}
 					
@@ -361,7 +361,7 @@
 						\label{eq:trilinpoly}
 						\widehat{f}(\mathbf{C}) = \sum_{\alpha,\beta,\gamma \in \{0,1\}}\sum^{\alpha}_{i=0}\sum^{\beta}_{j=0}\sum^{\gamma}_{k=0} 	(-1)^{(\alpha-i)+(\beta-j)+(\gamma-k)} f(\mathbf{C}_{ijk}) x_d^\alpha y_d^\beta z_d^\gamma.
 					\end{equation}
-				We take advantage of this form when generalizing trilinear interpolation to irregular grid in section~\ref{sec:interpol}.
+				We take advantage of this form when generalizing trilinear interpolation to irregular grid in \cref{sec:interpol}.
 					%\begin{equation}
 					%	\widehat{f}(C) = (1-x_d) (1-y_d) (1-z_d) f(C_{000}) + (1-x_d) (1-y_d) z_d f(C_{001}) + (1-x_d) y_d (1-z_d) f(C_{010}) + (1-x_d) y_d z_d f(C_{011}) + x_d (1-y_d) (1-z_d) f(C_{100}) + x_d (1-y_d) z_d f(C_{101}) + x_d y_d (1-z_d) f(C_{110}) + x_d y_d z_d f(C_{111})
 					%\end{equation}
@@ -369,6 +369,6 @@
 				\begin{figure}
 					\centering
 					\includegraphics[width=\textwidth]{trilinear2.png}
-					\caption{Geometric interpretation of trilinear interpolation as expressed in Equation~\ref{eq:trilingeo}. The colored dots represent the values in given points and the colored boxes represent the volume in the opposite corner by which the corresponding values are multiplied. The black dot represents the interpolated value which is multiplied by the entire volume~\cite{trilinear}.}
+					\caption{Geometric interpretation of trilinear interpolation as expressed in \cref{eq:trilingeo}. The colored dots represent the values in given points and the colored boxes represent the volume in the opposite corner by which the corresponding values are multiplied. The black dot represents the interpolated value which is multiplied by the entire volume~\cite{trilinear}.}
 					\label{fig:trilin2}
 				\end{figure}

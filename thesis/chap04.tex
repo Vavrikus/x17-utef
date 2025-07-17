@@ -1,16 +1,16 @@
 \chapter{Energy Reconstruction}
 \label{sec:energy}
-	The second stage is the reconstruction of the particle's energy using a~fit of its reconstructed track (see Section~\ref{sec:track}). We have tested three ways of reconstructing the energy. Fitting is done using the MINUIT algorithm implemented in ROOT~\cite{ROOT}.
+	The second stage is the reconstruction of the particle's energy using a~fit of its reconstructed track (see \cref{sec:track}). We have tested three ways of reconstructing the energy. Fitting is done using the MINUIT algorithm implemented in ROOT~\cite{ROOT}.
 	
 	The \textbf{Cubic Spline Fit} was a~tested and later rejected method of energy reconstruction. It uses smoothly connected piecewise cubic polynomials between uniformly spaced nodes. The reconstructed energy is calculated using the fit parameters by computing the radius of curvature in different points of the fitted curve using the known magnitude of the magnetic field perpendicular to the trajectory. We rejected this method because the tuning of the fit turned out to be unpractical compared to the other used methods.
 	
 	The \textbf{Circle and Lines Fit} was chosen as an alternative since this corresponds to the shape of a~trajectory of a~charged particle crossing a~finite volume with a~homogeneous magnetic field. The energy of the particle can be estimated using the fitted radius and the magnitude of the perpendicular magnetic field in the middle of the \ac{OFTPC}.
 	
-	The \textbf{Runge-Kutta Fit} uses the 4th order Runge-Kutta numerical integration described in Section~\ref{sec:rks}. Initial parameters of the track (including the particle's energy) are optimized so that the integrated trajectory fits to the reconstructed one. This fit can also be performed as a~single parameter (i.e., energy) fit if we get the initial position and orientation of the particle on the entrance to the \ac{OFTPC} from previous detectors (\ac{TPX3} and \ac{MWPC}, see Section~\ref{sec:IEAP}).
+	The \textbf{Runge-Kutta Fit} uses the 4th order Runge-Kutta numerical integration described in \cref{sec:rks}. Initial parameters of the track (including the particle's energy) are optimized so that the integrated trajectory fits to the reconstructed one. This fit can also be performed as a~single parameter (i.e., energy) fit if we get the initial position and orientation of the particle on the entrance to the \ac{OFTPC} from previous detectors (\ac{TPX3} and \ac{MWPC}, see \cref{sec:IEAP}).
 	
 	\section{Cubic Spline Fit}
 	\label{sec:cspline}
-		The first method for the estimation of the kinetic energy of the particle uses a~cubic spline fit. We use an electron track simulated using the microscopic simulation, described in detail in Section~\ref{sec:microfirst}. The track was reconstructed using the map described in Section~\ref{sec:map}.
+		The first method for the estimation of the kinetic energy of the particle uses a~cubic spline fit. We use an electron track simulated using the microscopic simulation, described in detail in \cref{sec:microfirst}. The track was reconstructed using the map described in \cref{sec:map}.
 				
 		In order to calculate the spline, we use the class \texttt{TSpline3} from ROOT. This allows us to evaluate the spline using the coordinates $(x_n,z_n)$ of each node and the derivatives $d_1,d_2$ in the first and the last node. We can fit these parameters of a~fixed amount of nodes to the simulated trajectory. We use the IMPROVE algorithm provided by the \texttt{TMinuit} class in ROOT. This algorithm attempts to find a~better local minimum of the minimized function after converging.
 		
@@ -71,10 +71,10 @@
 	\label{sec:clines}
 		Another way to estimate the particle's kinetic energy is to~fit its trajectory with a~circular arc with lines attached smoothly. This shape of trajectory corresponds to a~movement of a~charged particle through a~homogeneous magnetic field perpendicular to the particle's momentum and limited to a~certain volume. In general, the shape of such a~trajectory with a~non-perpendicularly oriented momentum is a~spiral. In our case, the magnetic field is approximately toroidal and the particle motion is nearly perpendicular to it. At first, we tested a~2D version of this fit, then we adapted it to 3D.
 		
-		The field in our detector is not homogeneous, it is therefore not entirely clear what value of magnetic field should be used along with the fitted radius (using equations~\ref{eq:ekin1} and~\ref{eq:ekin2}) to get the best estimate for the kinetic energy. Since we only use this method as the first iteration of the particle's energy that we later refine, an optimal solution of this problem is not required. Instead, we tested two options: taking the value of the field in the point, where the track crosses the middle $x$\nobreakdash-coordinate of the \ac{OFTPC}, and taking the average field along it.
+		The field in our detector is not homogeneous, it is therefore not entirely clear what value of magnetic field should be used along with the fitted radius (using \cref{eq:ekin1,eq:ekin2}) to get the best estimate for the kinetic energy. Since we only use this method as the first iteration of the particle's energy that we later refine, an optimal solution of this problem is not required. Instead, we tested two options: taking the value of the field in the point, where the track crosses the middle $x$\nobreakdash-coordinate of the \ac{OFTPC}, and taking the average field along it.
 		
 		\subsection{Two-dimensional fit}
-			In the 2D case, the fitted function used for the electron track\footnote{Electron tracks bend towards negative~$z$, we need to use the upper part of the circle.} described in Section~\ref{sec:microfirst} is defined as follows:
+			In the 2D case, the fitted function used for the electron track\footnote{Electron tracks bend towards negative~$z$, we need to use the upper part of the circle.} described in \cref{sec:microfirst} is defined as follows:
 				\begin{equation}
 					\label{eq:clines2d}
 					z(x) = \begin{cases}
@@ -93,7 +93,7 @@
 					\label{eq:a12}
 					a_{1,2} = \frac{x_0-x_{1,2}}{\sqrt{r^2-(x_{1,2}-x_0)^2}}.
 				\end{equation}
-			Together with the Equation~\ref{eq:ccont} we get the values of $b_{1,2}$
+			Together with \cref{eq:ccont} we get the values of $b_{1,2}$
 				\begin{equation}
 					\label{eq:b12}
 					b_{1,2} = z_{1,2} - a_{1,2} x_{1,2}.
@@ -116,7 +116,7 @@
 						z_0 = \frac{z_1+z_2}{2} - \frac{x_2-x_1}{2} \sqrt{\frac{r^2}{\left(\frac{x_2-x_1}{2}\right)^2+\left(\frac{z_2-z_1}{2}\right)^2}-1}.
 					\end{aligned}
 				\end{gather}
-			The function defined in Equation~\ref{eq:clines2d} along with equations~\ref{eq:a12}, \ref{eq:b12}, and \ref{eq:xz0} derived using the continuity and smoothness conditions (combined with the relations for $z_{1,2}$) fully define our fitted function with parameters $r,x_{1,2},z_{1,2}$.
+			The function defined in \cref{eq:clines2d} along with \cref{eq:a12,eq:b12,eq:xz0} derived using the continuity and smoothness conditions (combined with the relations for $z_{1,2}$) fully define our fitted function with parameters $r,x_{1,2},z_{1,2}$.
 			
 			For the calculation of kinetic energy from the radius of the circle, we use the value of the magnetic field in the middle of the \ac{OFTPC}. An example of a~fit of vertices reconstructed with the map is shown in \cref{fig:circle2d}.
 			
@@ -125,7 +125,7 @@
 				\includegraphics[width=0.48\textwidth]{circ2d_fit.png}
 				\hfill
 				\includegraphics[width=0.48\textwidth]{circ2d_mag.png}
-				\caption{Circle and lines 2D energy reconstruction of a~\qty{7.51}{\MeV} track in a~70:30 Ar:CO$_2$ gas mixture (described in detail in \cref{sec:microfirst}) reconstructed with the map. The fitted position of the nodes is $(x_1,z_1) = (5.20,-0.07)\,\unit{\cm}$ and $(x_2,z_2) = (14.43,-1.93)\,\unit{\cm}$, the radius is $r = \qty{20.79}{\cm}$. The resulting energy is \qty{7.70}{\MeV}, the magnetic field along the track is shown on the right.}
+				\caption{Circle-and-lines 2D energy reconstruction of a~\qty{7.51}{\MeV} track in a~70:30 Ar:CO$_2$ gas mixture (described in detail in \cref{sec:microfirst}) reconstructed with the map. The fitted position of the nodes is $(x_1,z_1) = (5.20,-0.07)\,\unit{\cm}$ and $(x_2,z_2) = (14.43,-1.93)\,\unit{\cm}$, the radius is $r = \qty{20.79}{\cm}$. The resulting energy is \qty{7.70}{\MeV}, the magnetic field along the track is shown on the right.}
 				\label{fig:circle2d}
 			\end{figure}
 		
@@ -142,7 +142,7 @@
 			\begin{figure}
 				\centering
 				\includegraphics[width=\textwidth]{circle3d.png}
-				\caption{Visualization of the 3D geometry of the Circle and Lines Fit and its parameters. Projection of some points on the XY plane is shown to better display the spatial arrangement. Made with GeoGebra®.}
+				\caption{Visualization of the 3D geometry of the circle-and-lines fit and its parameters. Projection of some points on the XY plane is shown to better display the spatial arrangement. Made with GeoGebra®.}
 				\label{fig:circle3d}
 			\end{figure}
 			Using these parameters, we can derive a~parametrization of the whole curve. Let $\mathbf{v}$ be the initial unit direction vector, i.e., using the spherical angles
@@ -267,7 +267,7 @@
 			\end{figure}			
 			
 			\subsection{Testing on a~Runge-Kutta sample}
-				The three dimensional circle and lines fit was tested on a~sample of Runge-Kutta tracks with randomized parameters described in Section~\ref{sec:rktest}. These tracks of primary electrons and positrons consist of points calculated with the \ac{RK4} algorithm for a~given time step. The parameter ranges in the MIGRAD minimizer have to be carefully tuned, simple exclusion of pathologic values can lead to convergence towards an edge value. After the tuning, only \num{4163} out of \num{1000000} tracks failed to converge to energy within \qty{2}{\MeV} from the simulation. We compared the two methods of choosing the magnetic fields. The resulting relative errors of reconstructed energy are shown in \cref{fig:cfit_rk}. When appropriate, we use the Freedman-Diaconis rule\footnote{The Freedman-Diaconis rule is equivalent to the Scott's rule for normally distributed data, but it uses the interquartile range instead of the sample standard deviation, which makes it less sensitive to outliers.} for bin width selection~\cite{FreedmanDiac}.
+				The three dimensional circle-and-lines fit was tested on a~sample of Runge-Kutta tracks with randomized parameters described in \cref{sec:rktest}. These tracks of primary electrons and positrons consist of points calculated with the \ac{RK4} algorithm for a~given time step. The parameter ranges in the MIGRAD minimizer have to be carefully tuned, simple exclusion of pathologic values can lead to convergence towards an edge value. After the tuning, only \num{4163} out of \num{1000000} tracks failed to converge to energy within \qty{2}{\MeV} from the simulation. We compared the two methods of choosing the magnetic fields. The resulting relative errors of reconstructed energy are shown in \cref{fig:cfit_rk}. When appropriate, we use the Freedman-Diaconis rule\footnote{The Freedman-Diaconis rule is equivalent to the Scott's rule for normally distributed data, but it uses the interquartile range instead of the sample standard deviation, which makes it less sensitive to outliers.} for bin width selection~\cite{FreedmanDiac}.
 
 				We see that the average field method systematically underestimates the particle's energy, but has \textapprox25 times lower \acs{FWHM} (only \qty{0.77}{\percent}) than the average field method. This shows that, when corrected, this method can serve as a~good initial estimate of the particle's energy, before it gets refined by the Runge-Kutta fit.
 				
@@ -287,15 +287,15 @@
 						\includegraphics[width=0.48\textwidth]{cfit_diff_avg.png}
 						\caption{Overall relative error for both magnetic field selection methods. Freedman-Diaconis rule was used for bin width selection.}
 					\end{subfigure}
-					\caption{Relative error of the energy of Runge-Kutta tracks reconstructed with the 3D circle and lines fit. The middle (left) and the average field (right) methods are compared. Dependence on the initial direction angles $\theta$ and $\varphi$ is small in comparison (for this reason, the plots are not shown).}
+					\caption{Relative error of the energy of Runge-Kutta tracks reconstructed with the 3D circle-and-lines fit. The middle (left) and the average field (right) methods are compared. Dependence on the initial direction angles $\theta$ and $\varphi$ is small in comparison (for this reason, the plots are not shown).}
 					\label{fig:cfit_rk}
 				\end{figure}
 	
 	\section{Runge-Kutta Fit}
 	\label{sec:rkfit}
-		The Runge-Kutta fit uses the \acf{RK4} numerical integration of the equation of motion (see Section~\ref{sec:rks}) to find the best values of the track parameters -- the track origin, initial velocity direction and the kinetic energy. In order to speed up the energy reconstruction, an initial guess of these parameters can be obtained from the 3D circle fit described in the previous section. Furthermore, assuming we know the track origin and orientation, we can perform a~single parameter fit of the kinetic energy.
+		The Runge-Kutta fit uses the \acf{RK4} numerical integration of the equation of motion (see \cref{sec:rks}) to find the best values of the track parameters -- the track origin, initial velocity direction and the kinetic energy. In order to speed up the energy reconstruction, an initial guess of these parameters can be obtained from the 3D circle fit described in the previous section. Furthermore, assuming we know the track origin and orientation, we can perform a~single parameter fit of the kinetic energy.
 		
-		The fit is performed as a~least square minimization of the (weighted) distances of the track points (true ionization vertices from the simulation or reconstructed points). The simulated \ac{RK4}~track consists of line segments with known endpoints, therefore we can calculate the distance of a~point from this segment analogically to Equation~\ref{eq:segdist} with $\mathbf{v}$ given as a~unit vector in the direction of the segment.
+		The fit is performed as a~least square minimization of the (weighted) distances of the track points (true ionization vertices from the simulation or reconstructed points). The simulated \ac{RK4}~track consists of line segments with known endpoints, therefore we can calculate the distance of a~point from this segment analogically to \cref{eq:segdist} with $\mathbf{v}$ given as a~unit vector in the direction of the segment.
 		
 		We need to find the segment with the lowest distance. We assume, that the distance $d_\mathbf{P}(\tau)$ of a~point $\mathbf{P}$ to the point on the track (a~curve parameterized by the proper time $\tau$) $\mathbf{X}(\tau)$ has a~single minimum (local and global), no local maximum (except the interval endpoints) and no~saddle point
 			\begin{equation}
@@ -320,7 +320,7 @@
 				\centering
 				\includegraphics[width=\textwidth]{rk_circle_demo2.png}
 			\end{subfigure}
-			\caption{Demonstration of the convexity of the distance function $d(\alpha)$ for a~circular track (see Equation~\ref{eq:rkdemo}). Made with GeoGebra®.}
+			\caption{Demonstration of the convexity of the distance function $d(\alpha)$ for a~circular track (see \cref{eq:rkdemo}). Made with GeoGebra®.}
 			\label{fig:rkdemo}
 		\end{figure}
 		
@@ -368,7 +368,7 @@
 		Therefore, we can search for the segment containing $d_{\textbf{P},\text{min}} = d_{\mathbf{P}}(\tau_\text{min})$ with binary search starting with $\Delta d_{\mathbf{P},1}$ and $\Delta d_{\mathbf{P},N}$, then calculate the difference $\Delta d_{\mathbf{P},m}$ for the middle index $m = \left\lfloor\frac{N+1}{2}\right\rfloor$. If $\Delta d_{\mathbf{P},m} > 0$, we can replace the higher index with~$m$, otherwise we replace the lower index. The search stops when the difference between the minimal and maximal index is one. The Fit itself is done using the MIGRAD algorithm implemented for the \texttt{TVirtualFitter} class in ROOT.
 		
 		\subsection{Testing on a~microscopic sample}
-			The Runge-Kutta fit together with the 3D circle-and-lines pre-fit was tested on a~sample of tracks simulated using the microscopic simulation described in Section~\ref{sec:microsim}. At first, few tracks with randomized initial parameters (same as the Runge-Kutta sample in Section~\ref{sec:rktest}) were generated for preliminary testing. Later, a~sample with a~grid-like distribution of track parameters was generated (see Section~\ref{sec:microgrid} for details). This allows us to test the performance of energy reconstruction from the microscopic tracks reconstructed with the discrete map inversion reconstruction.
+			The Runge-Kutta fit together with the 3D circle-and-lines pre-fit was tested on a~sample of tracks simulated using the microscopic simulation described in \cref{sec:microsim}. At first, few tracks with randomized initial parameters (same as the Runge-Kutta sample in \cref{sec:rktest}) were generated for preliminary testing. Later, a~sample with a~grid-like distribution of track parameters was generated (see \cref{sec:microgrid} for details). This allows us to test the performance of energy reconstruction from the microscopic tracks reconstructed with the discrete map inversion reconstruction.
 			
 			The dependence of the resulting relative differences of reconstructed Runge-Kutta versus simulated energy for electron and positron tracks are shown in \cref{fig:rk_dE_theta,fig:rk_dE_phi,fig:rk_dE_energy}, the overall resolution without corrections is shown in \cref{fig:rk_dE}. We can see that electrons, as well as tracks with high values of $\theta$, are reconstructed with a~higher precision thanks to the larger drift distance of ionization electrons, which results in their spreading across more readout channels (pads and time bins). The energy of electron tracks, especially for high energies, tends to be overestimated (and vice versa for positrons). This is related to the uncorrected shift in the map inversion $z$\nobreakdash-coordinate reconstruction as seen from the residuals in \cref{fig:7030_map_res}. This shift is caused by non-zero initial velocities of ionization electrons that is not accounted for by the map. It has opposite directions for electrons and positrons, because the ionization electrons are more likely to follow the direction of the ionizing particle, and it deforms the track, since it strengthens as the track curves. The effect is more pronounced for higher energies, where the curve is more sensitive to slight changes, as shown in \cref{fig:rk_forward}.
 
@@ -409,7 +409,7 @@
 				\label{fig:rk_dE}
 			\end{figure}
 			
-			Since the Runge-Kutta fit is quite slow (each step of the MIGRAD algorithm has to simulate a~new track), we use the circle and lines fit to provide a~fast estimate, and to ensure the fit convergence. From \cref{fig:cfit_rk}, we see that the average field method offers the best estimate when corrected. We can again save both estimates from the circle and lines fit, this time measuring its performance on a~track reconstructed with discrete map inversion. The resulting histograms for electron and positron tracks are shown in \cref{fig:cfit_avg,fig:cfit_mid}. We again find that the average field method performs much better.
+			Since the Runge-Kutta fit is quite slow (each step of the MIGRAD algorithm has to simulate a~new track), we use the circle-and-lines fit to provide a~fast estimate, and to ensure the fit convergence. From \cref{fig:cfit_rk}, we see that the average field method offers the best estimate when corrected. We can again save both estimates from the circle-and-lines fit, this time measuring its performance on a~track reconstructed with discrete map inversion. The resulting histograms for electron and positron tracks are shown in \cref{fig:cfit_avg,fig:cfit_mid}. We again find that the average field method performs much better.
 			
 			\begin{figure}
 				\centering
