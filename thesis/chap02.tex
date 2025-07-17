@@ -9,7 +9,7 @@
 		\end{enumerate}
 	This is the most precise and time-consuming simulation used; our current goal is to be able to successfully reconstruct its results and determine our best-case energy resolution.
 	
-	The \textbf{Runge-Kutta Simulation} uses the 4th order Runge-Kutta numerical integration\blue{~(some citation for Runge-Kutta? developed around year 1900)} to simulate the trajectory of the primary particle in the electromagnetic field inside the detector. It is relatively fast since it does not simulate the secondary particles. It is used as part of our reconstruction algorithm and for testing some parts of the reconstruction.
+	The \textbf{Runge-Kutta Simulation} uses the 4th order Runge-Kutta numerical integration to simulate the trajectory of the primary particle in the electromagnetic field inside the detector. It is relatively fast since it does not simulate the secondary particles. It is used as part of our reconstruction algorithm and for testing some parts of the reconstruction.
 	
 	All of these simulations require the knowledge of the electromagnetic field (both $\mathbf{E}$~and~$\mathbf{B}$) inside the detector. A~uniform electric field of 400~V$\cdot$cm$^{-1}$ is assumed. The magnetic field was simulated in Maxwell (see Section~\ref{sec:mag}).
 	
@@ -17,11 +17,11 @@
 	\label{sec:microsim}
 		The microscopic simulation, the most detailed simulation used in this work, is performed using the \garfieldpp toolkit~\cite{Garfield++}.
 		
-		The electron transport properties are simulated using the program Magboltz. Two different gas mixtures were compared -- 90:10 and 70:30 Ar:CO$_2$. The second mixture will be used in our detector\blue{~(this was probably known a~priori, but the first tests that I started with used 90/10, so maybe just note that the results justify the fact so far?)}. The temperature is set to 20~$^\circ$C, the pressure is atmospheric.
+		The electron transport properties are simulated using the program Magboltz. Two different gas mixtures were compared -- 90:10 and 70:30 Ar:CO$_2$. The second mixture will be used in our detector. The temperature is set to 20~$^\circ$C, the pressure is atmospheric.
 		
-		The primary track is simulated using the program~\ac{HEED}, which is an implementation of the photo-absorption ionization model~\cite{HEED}. This program provides the parameters of ionizing collisions. \ac{HEED} can also be used to simulate the transport of delta electrons; we do not account for these in the current simulation. The photons created in the atomic relaxation cascade\blue{~(fluorescence reabsorption, related to the spread of avalanches in GM det.?)} are also not simulated.
+		The primary track is simulated using the program~\ac{HEED}, which is an implementation of the photo-absorption ionization model~\cite{HEED}. This program provides the parameters of ionizing collisions. \ac{HEED} can also be used to simulate the transport of delta electrons; we do not account for them in the current simulation. The photons created in the atomic relaxation cascade\blue{~(fluorescence reabsorption, related to the spread of avalanches in GM det.?)} are also not simulated.
 		
-		Finally, we use the microscopic tracking provided by the class \textit{AvalancheMicroscopic} in \garfieldpp to simulate the drift of the ionization electrons. Each electron is followed from collision to collision using the equation of motion and the collision rates calculated by Magboltz\red{~(how fast is this? maybe it slows down the simulation when spreading it across multiple jobs?)}.
+		Finally, we use the microscopic tracking provided by the class \textit{AvalancheMicroscopic} in \garfieldpp to simulate the drift of the ionization electrons. Each electron is followed from collision to collision using the equation of motion and the collision rates calculated by Magboltz\red{~(how fast is this? maybe it slows down the simulation when spreading it across multiple jobs? --- remarks)}.
 		
 		\garfieldpp also contains two other classes for simulation of the drift. \texttt{AvalancheMC} uses Monte Carlo integration that requires generation of a gas file to approximate the transport parameters (we briefly considered this method, but decided that the relatively small speed wasn't worth the loss of precision in this case, especially since the gas file generation for different angles between the field vectors is also computationally expensive). \texttt{DriftlineRKF} uses Runge-Kutta-Fehlberg integration of a~phenomenological relation $\mathbf{v}_\text{d} = \mathbf{v}_\text{d}(\mathbf{E},\mathbf{B})$, and therefore cannot account for diffusion.
 		
@@ -72,7 +72,7 @@
 					\includegraphics[width=\textwidth]{7030_xy.png}
 					\caption{70:30 Ar:CO$_2$ drift lines XY projection}
 				\end{subfigure}
-				\caption{Comparison of drift lines for two different gas mixtures 90:10 and 70:30 Ar:CO$_2$. The electron track is marked in black, the drift lines of the ionization electrons are marked in orange. In this example, we assume a~larger \ac{OFTPC} volume with readout at $z = 8$~cm.}
+				\caption{Comparison of drift lines for two different gas mixtures 90:10 and 70:30 Ar:CO$_2$. The electron track is marked in black, the drift lines of the ionization electrons are marked in orange. In this example, we assume a~larger \ac{OFTPC} volume with readout at $z = 8$~cm. Small curvature of the track in the YZ projection is caused by the tilt of the magnetic field in the bottom half of the \acf{OFTPC}.}
 				\label{fig:microfirst}
 			\end{figure}
 			
@@ -104,7 +104,7 @@
 			\begin{equation}
 				\mathbf{y}(t_0) = \mathbf{y}_0,
 			\end{equation}
-		we iteratively compute the estimate $\mathbf{y}_n = \mathbf{y}(t_n) = \mathbf{y}(t_0+nh)$ as follows\blue{~(citation? common knowledge (1900s)?)}:
+		we iteratively compute the estimate $\mathbf{y}_n = \mathbf{y}(t_n) = \mathbf{y}(t_0+nh)$ as follows:
 			\begin{align}
 				\mathbf{k}_1 &= \mathbf{f}(t_n,\mathbf{y}_n),\\
 				\mathbf{k}_2 &= \mathbf{f}\left(t_n+\frac{h}{2},\, \mathbf{y}_n+\frac{h\mathbf{k}_1}{2}\right),\\
@@ -163,7 +163,7 @@
 					
 		\subsection{Testing sample}
 		\label{sec:rktest}		
-		In order to test the simulation and reconstruction, a~sample of \num{1000000} tracks with randomized parameters was generated:
+		In order to test the simulation and reconstruction, a~sample of \num{1000000} tracks with randomized parameters (using \texttt{TRandom3} from ROOT) was generated:
 		\begin{itemize}[topsep=4pt,itemsep=2pt]
 			\item the Runge-Kutta step was set to \qty{1.67}{\ps} (coordinate time, each proper time step is adjusted by the gamma factor once at the beginning; for an \qty{8}{\MeV} track, $\tau_\text{step} = \qty{0.1}{\ps}$),
 			\item the kinetic energy of the particle $E_\text{kin} = \qtyrange{3}{13}{\MeV}$,

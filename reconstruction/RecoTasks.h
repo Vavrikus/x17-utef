@@ -1137,7 +1137,7 @@ class PlotForwardTask : public RecoTask
     {
         using namespace X17::constants;
 
-        TCanvas* c = new TCanvas("c_forward","Forward tracks with different energies",500/0.72,500/7*8.5/0.8);
+        TCanvas* c = new TCanvas("c_forward","Forward tracks with different energies",1.5*500/0.72,1.5*500/7*8.5/0.8);
         c->SetTopMargin(0.07);
         c->SetBottomMargin(0.13);
         c->SetRightMargin(0.2);
@@ -1146,18 +1146,22 @@ class PlotForwardTask : public RecoTask
         scale->SetBinContent(1,3);
         scale->SetMinimum(3);
         scale->SetMaximum(13);
-        scale->GetXaxis()->SetLabelSize(0.055);
-        scale->GetXaxis()->SetTitleSize(0.06);
-        scale->GetYaxis()->SetLabelSize(0.055);
-        scale->GetYaxis()->SetTitleSize(0.06);
-        scale->GetZaxis()->SetLabelSize(0.055);
-        scale->GetZaxis()->SetTitleSize(0.06);
+        scale->GetXaxis()->SetLabelSize(0.04);
+        scale->GetXaxis()->SetTitleSize(0.05);
+        scale->GetYaxis()->SetLabelSize(0.04);
+        scale->GetYaxis()->SetTitleSize(0.05);
+        scale->GetZaxis()->SetLabelSize(0.04);
+        scale->GetZaxis()->SetTitleSize(0.05);
         scale->GetXaxis()->SetTitleOffset(0.9);
         scale->GetYaxis()->SetTitleOffset(0.7); 
-        scale->GetZaxis()->SetTitleOffset(1);
+        scale->GetZaxis()->SetTitleOffset(1.1);
         scale->Draw("colz");
 
-        for (TLine* l : track_segments) l->Draw("same");
+        for (TLine* l : track_segments)
+        {
+            l->SetLineWidth(2);
+            l->Draw("same");
+        }
         c->Write();
     }
 };

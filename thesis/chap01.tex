@@ -5,13 +5,13 @@
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.6\textwidth]{particle_id.png}
-		\caption{Particle identification in the PEP-4 \ac{TPC} at SLAC based on the energy loss per distance $\dv{E}{x}$ in the 80:20 Ar:CH$_4$ filling at \qty{8.5}{atm} pressure~\cite{particleid}.\blue{~The reference doesn't point to the original PEP-4 article because this adapted version of the original picture that they used in the DUNE article looks better. \textbf{Should I cite both?}}}
+		\caption{Particle identification in the PEP-4 \ac{TPC} at SLAC based on the energy loss per distance $\dv{E}{x}$ in the 80:20 Ar:CH$_4$ filling at \qty{8.5}{atm} pressure~\cite{pid_og,particleid}.}
 		\label{fig:particleid}
 	\end{figure}
 	
 	Large \acp{TPC} are sensitive to small distortions in the electric field (imperfections in the field cage, accumulation of positive ions in the gas volume) and to $\mathbf{E}\cross\mathbf{B}$ effects on the drift velocity (see \cref{eq:drift} below). Diffusion of the drifting electrons deteriorates the spacial resolution significantly, but it can be reduced up to \textapprox10~times by a~strong $\mathbf{B}\parallel\mathbf{E}$ field (see \cref{eq:difmag}).
 	
-	In neutrino and other rare-event experiments, large (up to 600 tons) \acp{LArTPC} are used for particle identification and calorimetry. The ionization electrons can be drifted for many meters with a~small diffusion. Scintillation photons are also measured.\red{~Negative ions?}
+	In neutrino and other rare-event experiments, large (up to 600 tons) \acp{LArTPC} are used for particle identification and calorimetry. The ionization electrons can be drifted for many meters with a~small diffusion. Scintillation photons are also measured.\red{~Negative ions --- remarks?}
 	
 	\section{Charge transport in gases}
 	\label{sec:transport}
@@ -237,7 +237,7 @@
 	
 	\section{Orthogonal Fields TPC at IEAP CTU}
 	\label{sec:oftpc}
-		At \ac{IEAPCTU}, we are going to use six identical atypical \acp{TPC} with inhomogeneous toroidal magnetic field \textbf{orthogonal} to the electric field, hereafter referred to as \acf{OFTPC}. It has the shape of isosceles trapezoidal prism 16~centimeters high with triple\nobreakdash-\ac{GEM} readout on one of its bases. Dimensions of the \ac{OFTPC} are discussed in detail in section~\ref{sec:coor} below. Throughout this thesis, we assume a~uniform electric field along the $z$~axis with $E_z = -400$~V/cm. Measured particles enter the \ac{OFTPC} through a~window after crossing the \ac{MWPC}.\blue{~Gas mixture used in the detector (70/30) and its effect -- some graph with the mixture, reasons for the choice (z-resolution, ...). Add a~figure of the real TPC? More about the design choices?}
+		At \ac{IEAPCTU}, we are going to use six identical atypical \acp{TPC} with inhomogeneous toroidal magnetic field \textbf{orthogonal} to the electric field, hereafter referred to as \acf{OFTPC}. It has the shape of isosceles trapezoidal prism 16~centimeters high with triple\nobreakdash-\ac{GEM} readout on one of its bases. Dimensions of the \ac{OFTPC} are discussed in detail in section~\ref{sec:coor} below. Throughout this thesis, we assume a~uniform electric field along the $z$~axis with $E_z = -400$~V/cm. Measured particles enter the \ac{OFTPC} through a~window after crossing the \ac{MWPC}.
 		
 		
 		\subsection{Motivation and Associated Challenges}
@@ -254,7 +254,7 @@
 	
 		\subsection{Coordinate Systems and Dimensions}
 		\label{sec:coor}
-			In order to describe events in our detector, we use three distinct spaces: the detector space $\mathcal{D}$, the readout space $\mathcal{R}$ and the pad space $\mathcal{P}$\blue{~(different spaces that describe different things and each has their own coordinate system, so maybe rename the section somehow?)}. Each space is later used to represent ionization electrons at different stages of the detection process: their creation in the gas, their final position when hitting the readout plane, and finally their representation in the discrete pad space.
+			In order to describe events in our detector, we use three distinct spaces: the detector space $\mathcal{D}$, the readout space $\mathcal{R}$ and the pad space $\mathcal{P}$. Each space is later used to represent ionization electrons at different stages of the detection process: their creation in the gas, their final position when hitting the readout plane, and finally their representation in the discrete pad space.
 		
 			\subsubsection{Detector Space}
 				The detector space $\mathcal{D}$ represents the physical space of our detector. We describe it using Cartesian coordinates $(x,y,z)$. The $z$-axis is the detector's axis of symmetry, with its negative direction aligned with the proton beam. The origin $(0,0,0)$ is located at the center of the irradiated target. The positive $x$\nobreakdash-axis passes through the center of one the \acp{OFTPC} along the intersection of its two planes of symmetry. The $y$\nobreakdash-axis is then chosen to maintain a~right-handed coordinate system.
@@ -302,7 +302,7 @@
 		
 		\subsection{Magnetic Field Simulation}
 		\label{sec:mag}
-			The magnetic field inside our detector is produced by six permanent magnets. It was simulated using Ansys Maxwell\blue{~(citation -- webpage?)} which gives us values on a~regular grid. Visualization of the magnetic field is shown in \cref{fig:mag}. Whenever we need to work with values outside this grid, we use trilinear interpolation described below.
+			The magnetic field inside our detector is produced by six permanent magnets. It was simulated using Ansys Maxwell~\cite{ansys_maxwell} which gives us values on a~regular grid. Visualization of the magnetic field is shown in \cref{fig:mag}. Whenever we need to work with values outside this grid, we use trilinear interpolation described below.
 			
 			\begin{figure}
 				\centering
@@ -348,11 +348,14 @@
 				\end{figure}
 					
 				\noindent We can also write
-					\begin{eqnarray}
+					\begin{equation}
 						\label{eq:trilingeo}
-						\widehat{f}(\mathbf{C}) = \sum_{i,j,k \in \{0,1\}} t_x^i t_y^j t_z^k f(\mathbf{C}_{ijk}),\\
+						\widehat{f}(\mathbf{C}) = \sum_{i,j,k \in \{0,1\}} t_x^i t_y^j t_z^k f(\mathbf{C}_{ijk}),
+					\end{equation}
+				using a~vector
+					\begin{equation}
 						t_\alpha \stackrel{\text{def}}{=} \begin{pmatrix}t_\alpha^0\\ t_\alpha^1\end{pmatrix} = \begin{pmatrix}1-\alpha_d\\ \alpha_d\end{pmatrix},
-					\end{eqnarray}
+					\end{equation}
 				where $\alpha \in \{x,y,z\}$ is an index. This gives a~nice geometric interpretation to the trilinear interpolation as shown in \cref{fig:trilin2}. From this form and the figure, it is apparent that the final interpolated value does not depend on the order of axes along which we perform linear interpolations (see \cref{fig:trilin}). Furthermore, we can write $\widehat{f}(\mathbf{C})$ as a~polynomial:
 					\begin{equation}
 						\label{eq:trilinpoly}
@@ -369,5 +372,3 @@
 					\caption{Geometric interpretation of trilinear interpolation as expressed in Equation~\ref{eq:trilingeo}. The colored dots represent the values in given points and the colored boxes represent the volume in the opposite corner by which the corresponding values are multiplied. The black dot represents the interpolated value which is multiplied by the entire volume~\cite{trilinear}.}
 					\label{fig:trilin2}
 				\end{figure}
-				
-				\blue{Maybe a~citation here, although I am not sure it is necessary since it could be considered common knowledge. The last two equations are my own (but I'm not sure that's worth mentioning unless there's a citation).}

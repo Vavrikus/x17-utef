@@ -184,7 +184,7 @@
 		
 		When evaluating the map inside the grid, we use trilinear interpolation (see Section~\ref{sec:trilin}). From now on, we will use the same symbol $\mathcal{M}$ for this interpolated simulation.
 		
-		Finally, we need to invert the map to get the original detector coordinates $(x,y,z)$ from the given readout coordinates $(x',y',t)$. In our case, it is reasonable to assume that the mapping $\overline{\mathcal{M}}$\red{~(we lose the information about the distribution (a~wild idea how to recover this is in the Future section but it will only make sense if the GEM is already accounted for and is very preliminary as there are many factors to consider))} is one-to-one (as seen in the simulations). We implemented two methods for this purpose: the gradient descent search (Section~\ref{sec:grad}) and interpolation on the inverse grid (Section~\ref{sec:interpol}).
+		Finally, we need to invert the map to get the original detector coordinates $(x,y,z)$ from the given readout coordinates $(x',y',t)$. In our case, it is reasonable to assume that the mapping $\overline{\mathcal{M}}$ (we lose the information about the distribution, although it might be possible to recover through complex techniques). We implemented two methods for this purpose: the gradient descent search (Section~\ref{sec:grad}) and interpolation on the inverse grid (Section~\ref{sec:interpol}).
 		
 		\subsection{Map Simulation}
 			Simulation of the map is a~computationally heavy task. For this reason, we use the MetaCentrum grid~\cite{metacentrum} to parallelize needed calculations. At first, this was done by evenly distributing the simulated electrons across the individual jobs in a~simulation with only one electron per vertex in the regular grid~$\mathbb{G}$ with a~spacing of one centimeter. Later, a~more efficient approach was implemented, accounting for the varying lengths of the drift of individual electrons. If we index the vertices of~$\mathbb{G}$ in the order of increasing coordinates $y,x,z$, we can express the number~$n_l$ of full XY~layers (i.e., electrons with the same $z$~coordinate, the mapping of one such layer is shown in \cref{fig:map_xyt}) with index less than or equal to $i$
@@ -199,9 +199,7 @@
 				\begin{equation}
 					d_\text{sum} = (z_\text{max}-z_\text{min})n_{xy}n_l-\frac{n_l(n_l-1)}{2}n_{xy}l+n_r(z_\text{max}-z_\text{min}-n_l l).
 				\end{equation}
-			We then use a~binary search algorithm to find the maximum index $i$ such that the value of this sum is less than the fraction $\frac{\text{job id}}{\text{max job id}}$ of the total sum. This way we obtain the minimal and the maximal index of electrons simulated in the given job.
-			
-			\red{The obtained map is then stored in a~custom class template \textit{Field}, could expand on that. Maybe earlier, since the same template is used for the magnetic field. Extra space on the sensor. Using qsub (not sure if important).\\}
+			We then use a~binary search algorithm to find the maximum index $i$ such that the value of this sum is less than the fraction $\frac{\text{job id}}{\text{max job id}}$ of the total sum. This way we obtain the minimal and the maximal index of electrons simulated in the given job. The obtained map is then stored in a~custom class template \texttt{Field<MapPoint>} (used also for the magnetic field --- \texttt{Field<Vector>}).
 		
 		\subsection{Gradient Descent Algorithm}
 		\label{sec:grad}			
@@ -273,7 +271,7 @@
 		\section{Reconstruction testing}
 			The continuous reconstruction using the map was tested on microscopic tracks with parameters described in \cref{sec:microfirst}. The difference between the reconstructed positions obtained using the two map inversion algorithms was found to be smaller than the uncertainty from diffusion by several orders of magnitude. In its unoptimized state, the gradient descent search was significantly slower (at least ten times) than the interpolation on the inverse grid.
 			
-			An example of reconstruction of tracks in 90:10 and 70:30 Ar:CO$_2$ gas mixture is shown in \cref{fig:reco_map}. We can clearly see that the results have improved compare to the \acf{RASD} (shown in \cref{fig:rasd_xz}). A~comparison of the residuals of reconstructed positions (i.e., their distances to the real starting positions) is shown in \cref{fig:rasd_map}. The histograms of residuals, as well as residuals of individual coordinates, are shown in \cref{fig:9010_map_res,fig:7030_map_res}. The bin width for the histograms was chosen using the Scott's rule\footnote{The optimal bin width for normally distributed data of size~$N$ with sample standard deviation $\hat{\sigma}$ is $\hat{\sigma}\sqrt[3]{\frac{24\sqrt{\pi}}{N}}$~\cite{scott}.}. As expected, the mean values of the coordinate residuals is zero. The only exception is the $z$\nobreakdash-coordinate in the 70:30 Ar:CO$_2$ track, where the mean is \qty{-0.064}{\cm} (further than one standard deviation \qty{0.051}{\cm} from zero). This is caused by the non-zero initial energy of the ionization electrons (neglected in the other track) which is unaccounted for in the map simulation. Since the primary electron bends towards negative~$z$, the ionization electrons are more likely to be released in this direction (and also bend in the magnetic field towards this direction).
+			An example of reconstruction of tracks in 90:10 and 70:30 Ar:CO$_2$ gas mixture is shown in \cref{fig:reco_map}. We can clearly see that the results have improved compare to the \acf{RASD} (shown in \cref{fig:rasd_xz}). A~comparison of the residuals of reconstructed positions (i.e., their distances to the real starting positions)\blue{\textbf{~$\leftarrow$ mentioned here}} is shown in \cref{fig:rasd_map}. The histograms of residuals, as well as residuals of individual coordinates, are shown in \cref{fig:9010_map_res,fig:7030_map_res}. The bin width for the histograms was chosen using the Scott's rule\footnote{The optimal bin width for normally distributed data of size~$N$ with sample standard deviation $\hat{\sigma}$ is $\hat{\sigma}\sqrt[3]{\frac{24\sqrt{\pi}}{N}}$~\cite{scott}.}. As expected, the mean values of the coordinate residuals is zero. The only exception is the $z$\nobreakdash-coordinate in the 70:30 Ar:CO$_2$ track, where the mean is \qty{-0.064}{\cm} (further than one standard deviation \qty{0.051}{\cm} from zero). This is caused by the non-zero initial energy of the ionization electrons (neglected in the other track) which is unaccounted for in the map simulation. Since the primary electron bends towards negative~$z$, the ionization electrons are more likely to be released in this direction (and also bend in the magnetic field towards this direction).
 			
 			\begin{figure}
 				\centering
@@ -289,7 +287,7 @@
 				\includegraphics[width=0.48\textwidth]{9010_rasd_map.png}
 				\hfill
 				\includegraphics[width=0.48\textwidth]{7030_rasd_map.png}
-				\caption{Comparison of residuals from the \ac{RASD} (black) and map inversion (red) reconstruction methods. Tracks in two different gas compositions 90:10 (left) and 70:30 Ar:CO$_2$ (right) are compared.}
+				\caption{Comparison of residuals from the \ac{RASD} (black) and map inversion (red) reconstruction methods. Tracks in two different gas compositions 90:10 (left) and 70:30 Ar:CO$_2$ (right) are compared (in the former gas mixture, the drift velocity is higher, therefore the distortion effects are more significant).}
 				\label{fig:rasd_map}
 			\end{figure}
 			
@@ -363,6 +361,6 @@
 		\begin{figure}
 			\centering
 			\includegraphics[width=\textwidth]{pads_track.png}
-			\caption{Discrete reconstruction of an~\qty{8}{\MeV} track from the grid-like testing sample (described in \cref{sec:microgrid}) with minimal values of $\theta$ and $\phi$ initial direction angles. The simulated ionization vertices are shown in red, the reconstructed track is shown with the colored boxes. The number of electrons in each pad/time bin is denoted with the size of the boxes and their color.}
+			\caption{Discrete reconstruction of an~\qty{8}{\MeV} track from the grid-like testing sample (described in \cref{sec:microgrid}) with minimal values of $\theta$ and $\phi$ initial direction angles. The simulated ionization vertices are shown in red, the reconstructed track is shown with the colored boxes. The number of electrons in each pad/time bin is denoted with the size of the boxes and their color.\blue{~No discontinuity, just charge spreading between two pad "columns".}}
 			\label{fig:pad_track}
 		\end{figure}

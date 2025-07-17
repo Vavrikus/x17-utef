@@ -1,15 +1,13 @@
-\chapwithtoc{Motivation}
-\setcounter{equation}{0}
-\setcounter{figure}{0}
-\renewcommand{\theequation}{\thechapter.\arabic{equation}}
-\renewcommand{\thefigure}{\thechapter.\arabic{figure}}
-	\blue{Je číslování od titulní strany správně?}
-
-	\blue{Or chapter 1? Separate small part as motivation?~}A~\acf{TPC}\blue{~[refs], but what to cite here? D. Nygren (1974)?} is a~gaseous detector that reconstructs charged particle trajectories by measuring the positions and drift times of ionization electrons (and sometimes also ions) created in the gas. The energies of these particles can be inferred from the curvatures of their trajectories in a~magnetic field.
+\chapter{Motivation}
+%\setcounter{equation}{0}
+%\setcounter{figure}{0}
+%\renewcommand{\theequation}{\thechapter.\arabic{equation}}
+%\renewcommand{\thefigure}{\thechapter.\arabic{figure}}
+	A~\acf{TPC}\cite{nygren} is a~gaseous detector that reconstructs charged particle trajectories by measuring the positions and drift times of ionization electrons (and sometimes also ions) created in the gas. The energies of these particles can be inferred from the curvatures of their trajectories in a~magnetic field.
 	
-	The goal of this thesis is to develop an algorithm for the reconstruction of charged particle trajectories and energy in an \emph{atypic} \ac{TPC} with orthogonal electric and magnetic fields, hereafter referred to as the \ac{OFTPC}, used in the X17 project at the \ac{IEAPCTU}. Furthermore, we present the results of testing of several (gradually improving) developed algorithms with different samples of simulated data.\blue{~Put this somewhere, (maybe it should be mentioned in the abstract?). We use the \garfieldpp toolkit~\cite{Garfield++} for simulations in combination with the ROOT~framework~\cite{ROOT} for data analysis and visualization. Some of our more demanding simulations are run on the MetaCentrum grid~\cite{metacentrum}.}
+	The goal of this thesis is to develop an algorithm for the reconstruction of charged particle trajectories and energy in an \emph{atypic} \ac{TPC} with orthogonal electric and magnetic fields, hereafter referred to as the \ac{OFTPC}, used in the X17 project at the \ac{IEAPCTU}. Furthermore, we present the results of testing of several (gradually improving) developed algorithms with different samples of simulated data.\blue{~Some of our more demanding simulations are run on the MetaCentrum grid~\cite{metacentrum}.}
 	
-	The X17 project in \ac{IEAPCTU} aims to reproduce measurements of anomalous behavior in the angular correlation distribution of pairs produced by the \ac{IPC} mechanism~\cite{IPC} during the decay of certain excited nuclei (\iso{Be}{8}, \iso{C}{12}, and~\iso{He}{4}) observed by a~team at ATOMKI in Hungary.
+	The X17 project in \ac{IEAPCTU} aims to reproduce measurements of anomalous behavior in the angular correlation distribution of pairs produced by the \ac{IPC} mechanism~\cite{IPC} during the decay of certain excited nuclei (\iso{Be}{8}, \iso{C}{12}, and~\iso{He}{4}) observed by a~team at ATOMKI in Hungary.\orange{~ATOMKI refs?}
 	
 	\blue{Add citations: X17 project, VdG, but what? Could just cite the webpage, but are there some articles?}
 	
@@ -69,9 +67,9 @@
 					\label{fig:atomki}
 				\end{figure}
 			
-				Possible explanations of the anomaly include experimental effects, higher order processes in the Standard Model~\cite{kalman,aleksejevs} or even a~protophobic fifth force mediated by a~new 17~MeV boson X17~\cite{feng}.\blue{~Zhang and Miller: \url{https://www.sciencedirect.com/science/article/pii/S0370269321000010} Paper from \ac{IEAPCTU}: \url{https://arxiv.org/pdf/2309.12469}?}
+				Possible explanations of the anomaly include experimental effects, higher order processes in the Standard Model~\cite{kalman,aleksejevs} or even a~protophobic fifth force mediated by a~new 17~MeV boson X17~\cite{feng}.
 		\subsection{Other Experiments}
-			Since the ATOMKI measurements, several experiments have been initiated to attempt to replicate the results and search for the hypothetical X17 particle. The following experiments have already produced results.\blue{~Could cite the ATOMKI review paper here.}
+			Since the ATOMKI measurements, several experiments have been initiated to attempt to replicate the results and search for the hypothetical X17 particle. The following experiments have already produced results~\cite{atomki_review}.
 			
 			\subsubsection{Two-arm $e^+e^-$ spectrometer in Hanoi}
 				The anomaly in \iso{Be}{8} has been observed with a~high ($>4\sigma$) confidence by a team at the Hanoi University of Sciences for $E_p = 1225$~keV~\cite{hanoi}. They built a two\nobreakdash-arm spectrometer in collaboration with ATOMKI and calibrated it using the 17.6~MeV M1 transition. The results are shown in \cref{fig:hanoi}.
@@ -104,7 +102,7 @@
 			\begin{figure}
 				\centering
 				\includegraphics[width=\textwidth]{ieap_x17.png}
-				\caption{Schematics of the detector at the Van der Graaff facility at~\ac{IEAPCTU}\blue{~\textbf{(ref?????????????????????????)}}.}
+				\caption{Schematics of the detector at the Van der Graaff facility at~\ac{IEAPCTU}\blue{~\textbf{(ref?????????????????????????)}}.}\orange{~webpage as done where?}
 				\label{fig:ieap}
 			\end{figure}
 		
