@@ -1,5 +1,5 @@
 \chapter{Track Simulation}
-	In order to develop and test the reconstruction algorithm, electron and positron tracks are simulated inside the first detector sector $\mathcal{D}_1$ (see \cref{sec:coor}) with different initial parameters (origin, initial direction and kinetic energy). Two approaches are currently used to simulate tracks, each of them for different purpose.
+	In order to develop and test the reconstruction algorithm, electron and positron tracks are simulated inside the first detector sector $\mathcal{D}_1$ (see \cref{sec:coor}) with varying initial parameters (origin, initial direction and kinetic energy). Two approaches are currently used to simulate tracks, each of them for different purpose.
 	
 	The \textbf{Microscopic Simulation} uses the \garfieldpp toolkit~\cite{Garfield++}. Within this toolkit:
 		\begin{enumerate}[nosep,label=\alph*)]
@@ -11,7 +11,7 @@
 	
 	The \textbf{Runge-Kutta Simulation} uses the 4th order Runge-Kutta numerical integration to simulate the trajectory of the primary particle in the electromagnetic field inside the detector. It is relatively fast since it does not simulate the secondary particles. It is used as part of our reconstruction algorithm and for testing some parts of the reconstruction.
 	
-	All of these simulations require the knowledge of the electromagnetic field (both $\mathbf{E}$~and~$\mathbf{B}$) inside the detector. A~uniform electric field of 400~V$\cdot$cm$^{-1}$ is assumed. The magnetic field was simulated in Ansys Maxwell~\cite{ansys_maxwell} (see \cref{sec:mag}).
+	Both simulations require the knowledge of the electromagnetic field (both $\mathbf{E}$~and~$\mathbf{B}$) inside the detector. A~uniform electric field of \qty{400}{\V\per\cm} is assumed. The magnetic field was simulated in Ansys Maxwell~\cite{ansys_maxwell} (see \cref{sec:mag}).
 	
 	\section{Microscopic Simulation}
 	\label{sec:microsim}
@@ -21,9 +21,9 @@
 		
 		The primary track is simulated using the program~\ac{HEED}, which is an implementation of the photo-absorption ionization model~\cite{HEED}. This program provides the parameters of ionizing collisions. \ac{HEED} can also be used to simulate the transport of delta electrons; we do not account for them in the current simulation. The photons created in the atomic relaxation cascade are also not simulated (possibly causing fluorescence reabsorption, related to the spread of avalanches in Geiger-Muller detectors).
 		
-		Finally, we use the microscopic tracking provided by the class \texttt{AvalancheMicroscopic} in \garfieldpp to simulate the drift of the ionization electrons. Each electron is followed from collision to collision using the equation of motion and the collision rates calculated by Magboltz.
+		Finally, we use the microscopic tracking provided by the class \texttt{Avalanche\-Microscopic} in \garfieldpp to simulate the drift of the ionization electrons. Each electron is followed from collision to collision using the equation of motion and the collision rates calculated by Magboltz.
 		
-		\garfieldpp also contains two other classes for simulation of the drift. \texttt{AvalancheMC} uses Monte Carlo integration that requires generation of a~gas file to approximate the transport parameters (we briefly considered this method, but decided that the relatively small speed wasn't worth the loss of precision in this case, especially since the gas file generation for different angles between the field vectors is also computationally expensive). \texttt{DriftlineRKF} uses Runge-Kutta-Fehlberg integration of a~phenomenological relation $\mathbf{v}_\text{d} = \mathbf{v}_\text{d}(\mathbf{E},\mathbf{B})$, and therefore cannot account for diffusion.
+		\garfieldpp also contains two other classes for simulation of the drift. \texttt{Ava\-lancheMC} uses Monte Carlo integration that requires generation of a~gas file to approximate the transport parameters (we briefly considered this method, but decided that the relatively small speed wasn't worth the loss of precision in this case, especially since the gas file generation for different angles between the field vectors is also computationally expensive). \texttt{DriftlineRKF} uses Runge-Kutta-Fehlberg integration of a~phenomenological relation $\mathbf{v}_\text{d} = \mathbf{v}_\text{d}(\mathbf{E},\mathbf{B})$, and therefore cannot account for diffusion.
 		
 		\subsection{First testing track}
 		\label{sec:microfirst}

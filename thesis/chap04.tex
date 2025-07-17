@@ -2,11 +2,11 @@
 \label{sec:energy}
 	The second stage is the reconstruction of the particle's energy using a~fit of its reconstructed track (see \cref{sec:track}). We have tested three ways of reconstructing the energy. Fitting is done using the MINUIT algorithm implemented in ROOT~\cite{ROOT}.
 	
-	The \textbf{Cubic Spline Fit} was a~tested and later rejected method of energy reconstruction. It uses smoothly connected piecewise cubic polynomials between uniformly spaced nodes. The reconstructed energy is calculated using the fit parameters by computing the radius of curvature in different points of the fitted curve using the known magnitude of the magnetic field perpendicular to the trajectory. We rejected this method because the tuning of the fit turned out to be unpractical compared to the other used methods.
+	The \textbf{Cubic Spline Fit} was a~tested and later rejected method of energy reconstruction. It uses smoothly connected piecewise cubic polynomials between uniformly spaced nodes. The reconstructed energy is calculated from the fit parameters by computing the radius of curvature at different points of the fitted curve using the known magnitude of the magnetic field perpendicular to the trajectory. We rejected this method because the tuning of the fit turned out to be unpractical compared to the other used methods.
 	
 	The \textbf{Circle and Lines Fit} was chosen as an alternative since this corresponds to the shape of a~trajectory of a~charged particle crossing a~finite volume with a~homogeneous magnetic field. The energy of the particle can be estimated using the fitted radius and the magnitude of the perpendicular magnetic field in the middle of the \ac{OFTPC}.
 	
-	The \textbf{Runge-Kutta Fit} uses the 4th order Runge-Kutta numerical integration described in \cref{sec:rks}. Initial parameters of the track (including the particle's energy) are optimized so that the integrated trajectory fits to the reconstructed one. This fit can also be performed as a~single parameter (i.e., energy) fit if we get the initial position and orientation of the particle on the entrance to the \ac{OFTPC} from previous detectors (\ac{TPX3} and \ac{MWPC}, see \cref{sec:IEAP}).
+	The \textbf{Runge-Kutta Fit} uses the 4th order Runge-Kutta numerical integration described in \cref{sec:rks}. Initial parameters of the track (including the particle's energy) are optimized so that the integrated trajectory fits to the reconstructed one. This fit can also be performed as a~single parameter (energy) fit if we get the initial position and orientation of the particle on the entrance to the \ac{OFTPC} from previous detectors (\ac{TPX3} and \ac{MWPC}, see \cref{sec:IEAP}).
 	
 	\section{Cubic Spline Fit}
 	\label{sec:cspline}

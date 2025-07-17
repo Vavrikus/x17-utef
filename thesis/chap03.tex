@@ -2,13 +2,13 @@
 \label{sec:track}
 	As the first step of the reconstruction algorithm, we reconstruct the track of a~primary particle -- either an electron or a~positron. Then, using this information, we determine the energy of the particle (\cref{sec:energy}).
 	
-	The \textbf{\acf{RASD}} uses the standard \ac{TPC} approach. With parallel fields, the drift inside a~uniform electric field remains undistorted (as shown in \cref{eq:drift}). Therefore, we only need to reconstruct the $z$\nobreakdash-coordinate from the drift time using the known drift velocity. We also assume that the readout coordinates ($x'$,~$y'$,~$t$) are known exactly, neglecting the pads and time binning.
+	The \textbf{\acf{RASD}} uses the standard \ac{TPC} approach. With parallel fields, the drift in a~uniform electric field remains undistorted (as shown in \cref{eq:drift}). Therefore, we only need to reconstruct the $z$\nobreakdash-coordinate from the drift time using the known drift velocity. We also assume that the readout coordinates ($x'$,~$y'$,~$t$) are known exactly, neglecting the pad segmentation and time binning.
 	
-	Reconstruction using an \textbf{Ionization Electron Map} (from now on referred to as \emph{the map}) uses a~simulation of the drift of secondary (ionization) electrons within the detector volume. This simulation can then be used to interpolate the initial position of the secondary electrons. In the first iteration of this method the readout is assumed to be continuous.
+	Reconstruction using an \textbf{Ionization Electron Map} (from now on referred to as \emph{the map}) relies on a~simulation of the drift of secondary (ionization) electrons within the detector volume. This simulation can then be used to interpolate the initial position of the secondary electrons. In the first iteration of this method the readout is assumed to be continuous.
 	
-	We present two algorithms using the map for reconstruction. The first one uses a~gradient descent algorithm along with trilinear interpolation (see \cref{sec:trilin}) of the map. The second method uses interpolation on the irregular inverse grid with a~polynomial.
+	We present two algorithms using the map for reconstruction. The first one uses a~gradient descent algorithm along with trilinear interpolation (see \cref{sec:trilin}) of the map. The second method uses polynomial interpolation on the irregular inverse grid.
 	
-	The \textbf{Discrete Reconstruction} uses the map; instead of reconstructing the exact position of each electron, we reconstruct the center of each hit pad together with the time corresponding to the midpoint of the time bin. The electron count in each \ac{OFTPC}~bin (consisting of the pad and the time bin) serves as an idealized collected charge, which is then used as a~weight in the energy reconstruction fit.
+	The \textbf{Discrete Reconstruction} uses the map; instead of reconstructing the exact position of each electron, we reconstruct the center of each hit pad together with the time corresponding to the midpoint of the time bin. The electron count in each \ac{OFTPC} bin (consisting of a~pad and a~time bin) serves as an idealized collected charge, which is then used as a~weight in the energy reconstruction fit.
 	
 	\section{Reconstruction Assuming Steady Drift}
 	\label{sec:rasd}
