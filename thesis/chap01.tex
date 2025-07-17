@@ -11,22 +11,22 @@
 	
 	Large \acp{TPC} are sensitive to small distortions in the electric field (imperfections in the field cage, accumulation of positive ions in the gas volume) and to $\mathbf{E}\cross\mathbf{B}$ effects on the drift velocity (see \cref{eq:drift} below). Diffusion of the drifting electrons deteriorates the spacial resolution significantly, but it can be reduced up to \textapprox10~times by a~strong $\mathbf{B}\parallel\mathbf{E}$ field (see \cref{eq:difmag}).
 	
-	In neutrino and other rare-event experiments, large (up to 600 tons) \acp{LArTPC} are used for particle identification and calorimetry. The ionization electrons can be drifted for many meters with a~small diffusion. Scintillation photons are also measured.\red{~Negative ions --- remarks?}
+	In neutrino and other rare-event experiments, large (up to 600 tons) \acp{LArTPC} are used for particle identification and calorimetry. The ionization electrons can be drifted for many meters with a~small diffusion. Scintillation photons are also measured.
 	
 	\section{Charge transport in gases}
 	\label{sec:transport}
-		When a~charged particle crosses the volume of a~\ac{TPC}, it loses energy by excitation and ionization of the detector gas\footnote{A minimum ionizing particle loses in the order of \unit{\keV} per centimeter traveled at \qty{1}{atm} pressure.}. Most ionizing collision produce a~single ionization electron, sometimes a~few electrons of secondary ionization are produced near the collision vertex, creating a~cluster. In rare cases, the ionization electron has energy large enough to create a measurable track, such an electron is called a~$\delta$\nobreakdash-electron.
+		When a~charged particle crosses the volume of a~\ac{TPC}, it loses energy by excitation and ionization of the detector gas\footnote{A minimum ionizing particle loses in the order of \unit{\keV} per centimeter traveled at \qty{1}{atm} pressure.}. Most ionizing collision produce a~single ionization electron, sometimes a~few electrons of secondary ionization are produced near the collision vertex, creating a~cluster. In rare cases, the ionization electron has energy large enough to create a~measurable track, such an electron is called a~$\delta$\nobreakdash-electron.
 		
 		After their release, the ionization electrons are separated from positive ions by the electric field and they both drift and diffuse in opposite directions towards the electrodes. The charges are accelerated by the electric field inside the chamber, and they lose speed by colliding with the gas particles, quickly reaching a~constant (for a~given field $\mathbf{E}, \mathbf{B}$) mean drift velocity. The electrons can be absorbed by electronegative impurities, such as halides, O$_2$, and H$_2$O.
 		
 		In mixtures with a~noble gas component, if the excitation energy of the noble gas is higher then the ionization potential of an admixture, more free electrons can be produced through collisions of the gas particles (so\nobreakdash-called Penning transfer) and through absorption of emitted photons.
 		
-		If the electric field is strong enough, the electrons can cause further ionization and excitation of the gas, leading to the development of a~Townsend avalanche\blue{~(ref)???}.
+		If the electric field is strong enough, the electrons can cause further ionization and excitation of the gas, leading to the development of a~Townsend avalanche~\cite{Townsend1900}.
 	
 		\subsection{Drift}			
-			In many gases (called "hot", e.g., Ar or CH$_4$), the drift velocity is much greater than that of their thermal motion thanks to a~high proportion of elastic collisions. On the other hand, "cold" gases like CO$_2$ have a higher proportion of inelastic collisions (e.g., thanks to the excitation of rotational and vibrational states) and therefore much lower drift velocity.\red{~Or maybe it is not so simple, because slowing down the electrons inelastically into a certain minimum of elastic scattering cross-section increases drift velocity? In case of Ar+CO$_2$ this is clearly not the case for low electric fields, so maybe irrelevant here (or is the effect opposite for small additions?). }\blue{Taking some plot of mixing the two together would be interesting.}
+			In many gases (called "hot", e.g., Ar or CH$_4$), the drift velocity is much greater than that of their thermal motion thanks to a~high proportion of elastic collisions. On the other hand, "cold" gases like CO$_2$ have a~higher proportion of inelastic collisions (e.g., thanks to the excitation of rotational and vibrational states) and therefore much lower drift velocity\footnote{It is not always so simple, sometimes, when the electrons are slowed down by inelastic collisions, they reach a~minimal cross-section for elastic collisions (so-called Ramsauer-Townsend effect), making them drift faster, due to a~less chaotic motion.}.
 			
-			The ions produced by the ionization lose a significant portion of their energy during each collision since their mass is close to the mass of the gas particles\footnote{Average energy loss of ions with mass $m_i$ during collision with mass $M$ is $\Delta E = \frac{2m_i M}{(m_i+M)^2}$.}. This, together with their large collision cross section, makes their drift velocity much smaller (about three orders of magnitude) and their energy is close to thermal.
+			The ions produced by the ionization lose a~significant portion of their energy during each collision since their mass is close to the mass of the gas particles\footnote{Average energy loss of ions with mass $m_i$ during collision with mass $M$ is $\Delta E = \frac{2m_i M}{(m_i+M)^2}$.}. This, together with their large collision cross section, makes their drift velocity much smaller (about three orders of magnitude) and their energy is close to thermal.
 			
 			The drift is also influenced by the magnetic field. Langevin derived a~good approximation for the drift velocity vector:
 				\begin{equation}
@@ -47,13 +47,13 @@
 		\subsection{Diffusion}
 			Due to collisions, a~cloud of electrons or ions originating from the same point will show a~Gaussian density distribution at time $t$ while drifting in the electric field $\mathbf{E} = (0,0,E_z)$ along the $z$\nobreakdash-coordinate:
 				\begin{equation}
-					\rho(x,y,z,t) = (4\pi Dt)^{-\frac{3}{2}} \exp\left(-\frac{x^2+y^2+(z-v_dt)^2}{4Dt}\right),
+					\rho(x,y,z,t) = (4\pi Dt)^{-\frac{3}{2}} \exp\left(-\frac{x^2+y^2+(z-v_\text{d}t)^2}{4Dt}\right),
 				\end{equation}
 			where the diffusion coefficient $D$ can be expressed as
 				\begin{equation}
 					D = \frac{\lambda^2}{3\tau} = \frac{\lambda v_\text{d}}{3} = \frac{v_\text{d}^2\tau}{3} = \frac{2\varepsilon\tau}{3m},
 				\end{equation}
-			where $\lambda$ is the mean free path and $\varepsilon$ the mean kinetic energy. The lateral diffusion width~$\sigma_x$ after a drift distance~$L$ can be expressed as
+			where $\lambda$ is the mean free path and $\varepsilon$ the mean kinetic energy. The lateral diffusion width~$\sigma_x$ after a~drift distance~$L$ can be expressed as
 				\begin{equation}
 					\sigma_x^2 = 2Dt = \frac{4\varepsilon L}{3qE_z}.
 				\end{equation}
@@ -72,7 +72,7 @@
 			
 	\section{Examples of TPCs}
 		\subsection{The original TPC at PEP-4 at SLAC}
-			The original \ac{TPC} used in the PEP-4 experiment at SLAC in the 1980s (\cref{fig:pep4}) was a \qtyproduct[product-units=repeat]{2x2}{\m} hollow cylinder with a~central cathode that produced a~strong electric field \qty{750}{\V\per\cm}, making the ionization electrons drift towards one of the endcaps~\cite{pep4-2}. It was filled with a~80:20 Ar:CH$_4$ mixture at \qty{8.5}{atm} pressure and placed inside a~\qty{0.4}{\tesla} solenoidal magnetic field. The readout consisted of \acp{MWPC}, where electrons are accelerated towards the anode wires fast enough to further ionize the gas and cause an avalanche (details are provided in \cref{sec:MWPC}). The wires had radial spacing \qty{4}{\mm}, fifteen of the sense wires had the cathode segmented into \qtyproduct{7.0x7.5}{\mm} pads \qty{4}{\mm} under them (\cref{fig:pep4} right). When collecting electrons on the anode wire, signal is induced on the nearest \numrange{2}{3} cathode pads.
+			The original \ac{TPC} used in the PEP-4 experiment at SLAC in the 1980s (\cref{fig:pep4}) was a~\qtyproduct[product-units=repeat]{2x2}{\m} hollow cylinder with a~central cathode that produced a~strong electric field \qty{750}{\V\per\cm}, making the ionization electrons drift towards one of the endcaps~\cite{pep4-2}. It was filled with a~80:20 Ar:CH$_4$ mixture at \qty{8.5}{atm} pressure and placed inside a~\qty{0.4}{\tesla} solenoidal magnetic field. The readout consisted of \acp{MWPC}, where electrons are accelerated towards the anode wires fast enough to further ionize the gas and cause an avalanche (details are provided in \cref{sec:MWPC}). The wires had radial spacing \qty{4}{\mm}, fifteen of the sense wires had the cathode segmented into \qtyproduct{7.0x7.5}{\mm} pads \qty{4}{\mm} under them (\cref{fig:pep4} right). When collecting electrons on the anode wire, signal is induced on the nearest \numrange{2}{3} cathode pads.
 			
 			\begin{figure}
 				\centering
@@ -84,7 +84,7 @@
 			\end{figure}
 		
 		\subsection{ALICE TPC}
-			The ALICE \ac{TPC} (\cref{fig:alice}) is the main detector used for charged particle tracking and recognition in collisions at the ALICE experiment at the CERN LHC~\cite{ALICE}. Similarly to PEP\nobreakdash-4, it is a hollow cylinder with outer radius \qty{2.5}{\m} and height \qty{5}{\m}. It is placed in a~\qty{0.5}{\tesla} solenoidal magnetic field, and the central cathode generates a~\qty{400}{\V\per\cm} electric field inside the field cage. The gas mixture in the detector is 90:10:5 Ne:CO$_2$:N$_2$, mainly chosen for its higher ion mobility compared to Ar mixtures. In 2020, the readout of the \ac{TPC} was upgraded from \acp{MWPC} to stacks of four \ac{GEM} foils (principle described in \cref{sec:mpgd}). This allows reading events continuously at a~higher rate.
+			The ALICE \ac{TPC} (\cref{fig:alice}) is the main detector used for charged particle tracking and recognition in collisions at the ALICE experiment at the CERN LHC~\cite{ALICE}. Similarly to PEP\nobreakdash-4, it is a~hollow cylinder with outer radius \qty{2.5}{\m} and height \qty{5}{\m}. It is placed in a~\qty{0.5}{\tesla} solenoidal magnetic field, and the central cathode generates a~\qty{400}{\V\per\cm} electric field inside the field cage. The gas mixture in the detector is 90:10:5 Ne:CO$_2$:N$_2$ (molar fraction), mainly chosen for its higher ion mobility compared to Ar mixtures. In 2020, the readout of the \ac{TPC} was upgraded from \acp{MWPC} to stacks of four \ac{GEM} foils (principle described in \cref{sec:mpgd}). This allows reading events continuously at a~higher rate.
 			
 			\begin{figure}
 				\centering
@@ -113,10 +113,10 @@
 			
 			The field configuration in an \ac{rTPC} enables a~larger number of pads compared to a~standard \ac{TPC}, leading to improved spatial resolution and possibility of larger multiplicity rates. Since the drift time is lower, the detector is faster.
 			
-			After an algorithm described in this thesis was developed for our \acp{OFTPC} at \ac{IEAPCTU}, we noticed the similarities with the approach used by the CERES/NA45 \ac{rTPC}, when accounting for the transport process of charged clusters in the complex fields. The detector hit coordinates (pad, time, and plane) were transformed using look\nobreakdash-up tables. The tables were calculated using a~Runge-Kutta method to integrate the Langevin approximation of the drift velocity (\cref{eq:drift}). The drift velocity in the radial field was calibrated using seven parallel laser rays. This calibration was then used to make a~correction compared to the MAGBOLTZ Monte Carlo drift~\cite{magboltz}.\red{~Measured mobility differs significantly from MAGBOLTZ, but this might be improved in the newer versions?} The tracks were fitted using reference tables with hit coordinates of tracks simulated with GEANT Monte Carlo\red{~(not such a big problem for us right now, might be an idea if the reconstruction gets too slow)}.
+			After an algorithm described in this thesis was developed for our \acp{OFTPC} at \ac{IEAPCTU}, we noticed the similarities with the approach used by the CERES/NA45 \ac{rTPC}, when accounting for the transport process of charged clusters in the complex fields. The detector hit coordinates (pad, time, and plane) were transformed using look\nobreakdash-up tables. The tables were calculated using a~Runge-Kutta method to integrate the Langevin approximation of the drift velocity (\cref{eq:drift}). The drift velocity in the radial field was calibrated using seven parallel laser rays. This calibration was then used to make a~correction compared to the Magboltz Monte Carlo drift~\cite{magboltz}. Measured mobility differed significantly from a~Magboltz simulation. The tracks were fitted using reference tables with hit coordinates of tracks simulated with GEANT Monte Carlo.
 			
 		\subsection{Other interesting radial-drift TPCs}
-			\red{muEDM at PSI: \url{https://arxiv.org/pdf/2307.01535},\\ FTPC at STAR at RHIC: \url{https://arxiv.org/pdf/nucl-ex/0211014}}
+			After CERES/NA45, several experiments adopted similar field layout for their \acp{TPC}. Here, we briefly describe \acs{BONuS12} and \acs{ALPHA}\nobreakdash-g \acsp{rTPC}. Other note-worthy experiments are \ac{muEDM} at the Paul Scherrer Institute~\cite{muEDM}, and the Solenoidal Tracker (STAR) at \ac{RHIC} featuring a~\ac{FTPC}~\cite{STAR}.
 			\subsubsection{BONuS12 rTPC}
 				In 2020, the \acf{BONuS12} experiment used an \ac{rTPC} (\cref{fig:bonus}) to measure low-momentum spectator protons produced in $e^- d \rightarrow e^- p_\text{s}X$ scattering~\cite{bonus}. It was filled with a~80:20 He:CO$_2$ gas mixture and placed inside a~\qty{4}{\tesla} solenoidal magnetic field, perpendicular to the radial electric field (\qty{1100}{\V\per\cm} on average), tilting the drift (see \cref{eq:lorentz}). The amplification used cylindrical triple \ac{GEM} stacks.
 				
@@ -150,7 +150,7 @@
 					\caption{Schematic view of the \acs{ALPHA}\protect\nobreakdash-g detector~\cite{alpha_rtpc}.}
 				\end{figure}
 				
-				The $r$\nobreakdash-coordinate of the ionization cluster is reconstructed from the drift time using a~tabulated space-time relation. The 3D position of the interaction (cluster) vertex is obtained by matching the wires and pads by drift time using a k\nobreakdash-d tree algorithm. Reconstructed tracks are fitted with a~helix using the least squares method~\cite{alpha_reco}.
+				The $r$\nobreakdash-coordinate of the ionization cluster is reconstructed from the drift time using a~tabulated space-time relation. The 3D position of the interaction (cluster) vertex is obtained by matching the wires and pads by drift time using a~k\nobreakdash-d tree algorithm. Reconstructed tracks are fitted with a~helix using the least squares method~\cite{alpha_reco}.
 	
 	\section{Readout}
 	\label{sec:readout}
@@ -198,7 +198,7 @@
 				\begin{figure}
 					\centering
 					\includegraphics[width=0.8\textwidth]{gemsim.png}
-					\caption{Garfield simulation of an avalanche in a \ac{GEM} hole~\cite{gemsim}. An incoming electron (orange) is accelerated in the strong electric field of the \ac{GEM} and causes further ionization multiplying the number of free electrons (orange). Most of the produced cations (red) are captured by the \ac{GEM} cathode.}
+					\caption{Garfield simulation of an avalanche in a~\ac{GEM} hole~\cite{gemsim}. An incoming electron (orange) is accelerated in the strong electric field of the \ac{GEM} and causes further ionization multiplying the number of free electrons (orange). Most of the produced cations (red) are captured by the \ac{GEM} cathode.}
 					\label{fig:gemsim}
 				\end{figure}
 				
@@ -207,7 +207,7 @@
 				A~cheaper alternative (especially for large area coverage) is a~\ac{THGEM} with a~\textapprox10\nobreakdash-fold upscaling of geometrical parameters. It can be made by mechanically drilling holes into a~standard \ac{PCB} and creating a~circular rim around the holes by etching the metal coating.
 			
 			\subsubsection{Micromegas}
-				In a~\ac{Micromegas} electrons pass through a~fine mesh (made out of very thin wires) into a~narrow amplification gap where they are multiplied in the high field and read as a~signal on the segmented anode (\cref{fig:micromegas_schem}). Very high field (\qtyrange{30}{80}{\kV\per\cm\squared}) is necessary to achieve sufficient gain. Ion backflow is heavily suppressed by the mesh. 
+				In a~\ac{Micromegas} electrons pass through a~fine mesh (made out of very thin wires) into a~narrow amplification gap where they are multiplied in the high field and read as a~signal on the segmented anode (\cref{fig:micromegas_schem}). Very high field (\qtyrange{30}{80}{\kV\per\cm}) is necessary to achieve sufficient gain. Ion backflow is heavily suppressed by the mesh. 
 				
 				A~Timepix chip (a~high granularity pixel detector) can be used for the readout anode to achieve the best spatial resolution, making an integrated readout called GridPix (\cref{fig:micromegas_sem}). Thanks to the high spatial resolution, it is possible to distinguish individual electron clusters, which enables a~new method of particle identification.
 				
@@ -270,14 +270,14 @@
 						y_\text{max}(x_\text{min}) = -y_\text{min}(x_\text{min}) &=  2.75\;\text{cm},\\
 						y_\text{max}(x_\text{max}) = -y_\text{min}(x_\text{max}) &=  7.45\;\text{cm},
 					\end{align}
-				where $y_\text{max}(x)$ is the maximal value of the $y$-coordinate for a~given $x$. The readout is located at $z = 8$~cm; for some purposes, we also define the distance to the readout $d_r = 8\;\text{cm}-z$ as an alternative to the $z$-coordinate.The \ac{OFTPC} window has width 3.8~cm and height 4.0~cm.
+				where $y_\text{max}(x)$ is the maximal value of the $y$-coordinate for a~given $x$. The readout is located at $z = 8$~cm; for some purposes, we also define the distance to the readout $d_\text{r} = 8\;\text{cm}-z$ as an alternative to the $z$-coordinate.The \ac{OFTPC} window has width 3.8~cm and height 4.0~cm.
 				
 				We also use spherical coordinates $(r,\theta,\varphi)$ with the elevation angle~$\theta$ measured relative to the $xy$ plane. Angles~$\theta$ and~$\varphi$ are useful when describing the direction of $e^+/e^-$~tracks. Their maximal values considered for the initial direction in simulations are $\theta_\text{max} \approx 17.1^\circ$ and $\varphi_\text{max} \approx 16.3^\circ$ as shown in \cref{fig:oftpc}.
 				
 				\begin{figure}
 					\centering
 					\includegraphics[width=0.8\textwidth]{tpc_ggb.png}
-					\caption{Schematics of the first sector \ac{OFTPC} with detector space coordinates.}
+					\caption{Schematics of the first sector \ac{OFTPC} with detector space coordinates. Made with GeoGebra®.}
 					\label{fig:oftpc}
 				\end{figure}
 			
@@ -289,7 +289,7 @@
 					\begin{equation}
 						\mathcal{P} = \{(n_\text{pad},n_t)\in\mathbb{N}^2 \mid n_\text{pad}\leq128\}.
 					\end{equation}
-				It is a discretization of a~certain volume in $\mathcal{R}$ that can be obtained from simulations.
+				It is a~discretization of a~certain volume in $\mathcal{R}$ that can be obtained from simulations.
 				
 				The readout of the \ac{OFTPC} will consist\red{~(is the design final?)} of 128~rectangular pads arranged in a~staggered pattern. Parameters of the pad layout are shown in \cref{fig:padlayout}. The bottom left corner of $n$\nobreakdash-th pad has coordinates $(x_{1,n},y_{1,n})$, the  top right $(x_{2,n},y_{2,n})$ and its center has coordinates $(x_{c,n},y_{c,n})$. The gap between neighboring pads is $g=0.08$~cm, we consider it being shared equally between the neighboring pads. Time will be read out in discrete bins of size $t_\text{bin}=100$~ns.
 			
@@ -343,7 +343,7 @@
 				\begin{figure}
 					\centering
 					\includegraphics[width=0.5\textwidth]{trilinear.png}
-					\caption{Visualization of trilinear interpolation as a~composition of linear interpolations (inspired by~\cite{trilinear1}). We want to interpolate the value in the red point~$\mathbf{C}$. First we interpolate between the four pairs of blue points sharing the last two indices along the $x$\protect\nobreakdash-axis (Eq.~\ref{eq:linterpol}), then between the two pairs of the resulting green points along the $y$\protect\nobreakdash-axis (Eq.~\ref{eq:linterpol2}) and finally between the two resulting orange points along the $z$\protect\nobreakdash-axis to get the final red value (Eq.~\ref{eq:linterpol3}).}
+					\caption{Visualization of trilinear interpolation as a~composition of linear interpolations (inspired by~\cite{trilinear1}). We want to interpolate the value in the red point~$\mathbf{C}$. First we interpolate between the four pairs of blue points sharing the last two indices along the $x$\protect\nobreakdash-axis (Eq.~\ref{eq:linterpol}), then between the two pairs of the resulting green points along the $y$\protect\nobreakdash-axis (Eq.~\ref{eq:linterpol2}) and finally between the two resulting orange points along the $z$\protect\nobreakdash-axis to get the final red value (Eq.~\ref{eq:linterpol3}). Made with GeoGebra®.}
 					\label{fig:trilin}
 				\end{figure}
 					

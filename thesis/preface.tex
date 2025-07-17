@@ -5,11 +5,9 @@
 %\renewcommand{\thefigure}{\thechapter.\arabic{figure}}
 	A~\acf{TPC}\cite{nygren} is a~gaseous detector that reconstructs charged particle trajectories by measuring the positions and drift times of ionization electrons (and sometimes also ions) created in the gas. The energies of these particles can be inferred from the curvatures of their trajectories in a~magnetic field.
 	
-	The goal of this thesis is to develop an algorithm for the reconstruction of charged particle trajectories and energy in an \emph{atypic} \ac{TPC} with orthogonal electric and magnetic fields, hereafter referred to as the \ac{OFTPC}, used in the X17 project at the \ac{IEAPCTU}. Furthermore, we present the results of testing of several (gradually improving) developed algorithms with different samples of simulated data.\blue{~Some of our more demanding simulations are run on the MetaCentrum grid~\cite{metacentrum}.}
+	The goal of this thesis is to develop an algorithm for the reconstruction of charged particle trajectories and energy in an \emph{atypic} \ac{TPC} with orthogonal electric and magnetic fields, hereafter referred to as the \ac{OFTPC}, used in the X17 project at the \ac{IEAPCTU}. Furthermore, we present the results of testing of several (gradually improving) developed algorithms with different samples of simulated data.
 	
-	The X17 project in \ac{IEAPCTU} aims to reproduce measurements of anomalous behavior in the angular correlation distribution of pairs produced by the \ac{IPC} mechanism~\cite{IPC} during the decay of certain excited nuclei (\iso{Be}{8}, \iso{C}{12}, and~\iso{He}{4}) observed by a~team at ATOMKI in Hungary.\orange{~ATOMKI refs?}
-	
-	\blue{Add citations: X17 project, VdG, but what? Could just cite the webpage, but are there some articles?}
+	The X17 project in \ac{IEAPCTU}~\cite{x17_utef} aims to reproduce measurements of anomalous behavior in the angular correlation distribution of pairs produced by the \ac{IPC} mechanism~\cite{IPC} during the decay of certain excited nuclei (\iso{Be}{8}, \iso{C}{12}, and~\iso{He}{4}) observed by a~team at ATOMKI in Hungary\cite{atomki_be,atomki_be2,atomki_c,atomki_he,atomki_he2}.
 	
 	\section{ATOMKI Anomaly}
 	\label{sec:ATOMKI}
@@ -72,7 +70,7 @@
 			Since the ATOMKI measurements, several experiments have been initiated to attempt to replicate the results and search for the hypothetical X17 particle. The following experiments have already produced results~\cite{atomki_review}.
 			
 			\subsubsection{Two-arm $e^+e^-$ spectrometer in Hanoi}
-				The anomaly in \iso{Be}{8} has been observed with a~high ($>4\sigma$) confidence by a team at the Hanoi University of Sciences for $E_p = 1225$~keV~\cite{hanoi}. They built a two\nobreakdash-arm spectrometer in collaboration with ATOMKI and calibrated it using the 17.6~MeV M1 transition. The results are shown in \cref{fig:hanoi}.
+				The anomaly in \iso{Be}{8} has been observed with a~high ($>4\sigma$) confidence by a~team at the Hanoi University of Sciences for $E_p = 1225$~keV~\cite{hanoi}. They built a~two\nobreakdash-arm spectrometer in collaboration with ATOMKI and calibrated it using the 17.6~MeV M1 transition. The results are shown in \cref{fig:hanoi}.
 				
 				\begin{figure}
 					\centering
@@ -97,18 +95,18 @@
 	
 	\section{X17 Project at IEAP CTU}
 	\label{sec:IEAP}
-		The aim of the X17 project at the Van der Graaff facility of the \acl{IEAPCTU} is to reproduce the results of the original ATOMKI experiments with \iso{Li}{7} and \iso{H}{3} targets using an independent $e^+e^-$ spectrometer. In order to effectively measure the anomaly, we need to reconstruct both the energy and the angular correlation of the $e^+e^-$ pairs. The spectrometer will use three layers of detectors to achieve this -- \acf{TPX3} silicon pixel detector and \acf{MWPC} layers for the angle reconstruction and a~\acf{TPC} layer for the energy reconstruction. The schematics of the prepared detector is in \cref{fig:ieap}\blue{Again, cite some VdG paper, mention grant? Using \url{https://cernbox.cern.ch/pdf-viewer/public/rf0oU1nqVLN3acZ/LuzH_submitted.pdf}.}
+		The aim of the X17 project at the Van der Graaff facility of the \acl{IEAPCTU} is to reproduce the results of the original ATOMKI experiments with \iso{Li}{7} and \iso{H}{3} targets using an independent $e^+e^-$ spectrometer. In order to effectively measure the anomaly, we need to reconstruct both the energy and the angular correlation of the $e^+e^-$ pairs. The spectrometer will use three layers of detectors to achieve this -- \acf{TPX3} silicon pixel detector and \acf{MWPC} layers for the angle reconstruction and a~\acf{TPC} layer for the energy reconstruction. The schematics of the prepared detector is in \cref{fig:ieap}.
 			
 			\begin{figure}
 				\centering
 				\includegraphics[width=\textwidth]{ieap_x17.png}
-				\caption{Schematics of the detector at the Van der Graaff facility at~\ac{IEAPCTU}\blue{~\textbf{(ref?????????????????????????)}}.}\orange{~webpage as done where?}
+				\caption{Schematics of the detector at the Van der Graaff facility at~\ac{IEAPCTU}~\cite{x17_utef}.}
 				\label{fig:ieap}
 			\end{figure}
 		
-		The energy of $e^+e^-$ pair produced in the reaction is given by the energy available $E_\text{r}$ in the reaction and can be distributed between them arbitrarily. Nonetheless in the decay of the hypothetical X17 particle, electron and positron should have similar energy and we can therefore use a~cut $|y| \leq 0.5$ in the disparity parameter (defined in Equation~\ref{eq:dispar}). Interesting events should rarely have a~particle with an energy below $E_\text{r}/4$ (roughly 4~MeV). Electrons with such low energies are scattered significantly by even a~thin layer of relatively light material, for this reason the \ac{TPX3} layer will be inside of the vacuum tube and the tube will have a thinned aluminum segment or Kapton\texttrademark\ windows.
+		The energy of $e^+e^-$ pair produced in the reaction is given by the energy available $E_\text{r}$ in the reaction and can be distributed between them arbitrarily. Nonetheless in the decay of the hypothetical X17 particle, electron and positron should have similar energy and we can therefore use a~cut $|y| \leq 0.5$ in the disparity parameter (defined in Equation~\ref{eq:dispar}). Interesting events should rarely have a~particle with an energy below $E_\text{r}/4$ (roughly 4~MeV). Electrons with such low energies are scattered significantly by even a~thin layer of relatively light material, for this reason the \ac{TPX3} layer will be inside of the vacuum tube and the tube will have a~thinned aluminum segment or Kapton\texttrademark\ windows.
 		
-		\ac{TPX3} can measure (in each $55\times55~\mathrm{\mu m}$ pixel of its $256\times256$ grid) \ac{ToA} with 1.6~ns precision and \ac{ToT} which reflects the deposited energy. This potentially allows 3D~tracking if we increase the chip thickness at the cost of increased scattering. The layer can reconstruct the reaction vertex and the angular correlation with high precision.
+		\ac{TPX3} can measure (in each $55\times55~\mathrm{\mu m}$ pixel of its $256\times256$ grid) \ac{ToA} with 1.6~ns precision and \ac{ToT} which reflects the deposited energy. This potentially allows 3D~tracking if we increase the chip thickness at the cost of increased scattering. The layer can reconstruct the reaction vertex and the angular correlation with high precision. Preparatory studies of the angular correlation reconstruction~\cite{triangle}, and energy deposition in the sensor~\cite{tpx3_tracks} have been made.
 		
 		The layer of \acp{MWPC} with sensitive area $40\times38$~mm$^2$ will be outside of the beam pipe. It will provide an extra point on the particle trajectory which can help with the estimation of the reaction vertex and improve the \ac{TPC} performance by providing its entry point.
 		

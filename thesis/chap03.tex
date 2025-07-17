@@ -8,32 +8,32 @@
 	
 	We present two algorithms using the map for reconstruction. The first one uses a~gradient descent algorithm along with trilinear interpolation (see Section~\ref{sec:trilin}) of the map. The second method uses interpolation on the irregular inverse grid with a~polynomial.
 	
-	The \textbf{Discrete Reconstruction} uses the map; instead of reconstructing the exact position of each electron, we reconstruct the center of each hit pad together with the time corresponding to the midpoint of the time bin. The electron count in each \ac{TPC}~bin (consisting of the pad and the time bin) serves as an idealized collected charge, which is then used as a~weight in the energy reconstruction fit.
+	The \textbf{Discrete Reconstruction} uses the map; instead of reconstructing the exact position of each electron, we reconstruct the center of each hit pad together with the time corresponding to the midpoint of the time bin. The electron count in each \ac{OFTPC}~bin (consisting of the pad and the time bin) serves as an idealized collected charge, which is then used as a~weight in the energy reconstruction fit.
 	
 	\section{Reconstruction Assuming Steady Drift}
 	\label{sec:rasd}
 		As the first step, we tried to reconstruct a~simulated electron track with a~special set of initial parameters, described in detail in Section~\ref{sec:microfirst}. The starting point is given by the origin of our coordinate system and its initial direction is given by the positive $x$\nobreakdash-axis. This means the magnetic field of our detector is perpendicular to the momentum of the particle at all times, and we can reduce the problem to two-dimensional space.
 		
-		For the reconstruction, we decided to use the common method used in a~standard \ac{TPC}\blue{~(similar to?, cite some source(s)!)}. We call this method \textit{\acf{RASD}}. This will allow us to explore the significance of the atypical behavior in our \ac{OFTPC}. Additionally, we assume the readout is continuous to further simplify the problem. In this approximation, we reconstruct the initial position of each ionization electron.
+		For the reconstruction, we decided to use the common method used in a~standard \ac{TPC}\cite{TPCs}. We call this method \textit{\acf{RASD}}. This will allow us to explore the significance of the atypical behavior in our \ac{OFTPC}. Additionally, we assume the readout is continuous to further simplify the problem. In this approximation, we reconstruct the initial position of each ionization electron.
 		
 		The reconstruction is then defined by the following relations between the coordinates of the detector space and the readout space (see Section~\ref{sec:coor}):
 			\begin{align}
 				x &= x',\\
 				y &= y',\\
-				z &= 8\;\text{cm} - d_r = 8\;\text{cm} - v_d t,
+				z &= 8\;\text{cm} - d_\text{r} = 8\;\text{cm} - v_\text{d} t,
 			\end{align}
-		where $d_r$ is the distance to the readout, and $v_d$ is the drift velocity of electrons in the given gas mixture. At a~phenomenological level, this velocity can be considered as a~function of the electric field~$\bm{E}$ and the magnetic field~$\bm{B}$ as shown in Equation~\ref{eq:drift}. Since we assume a~uniform electric field in the detector and in this~approximation we want to neglect the effect of our unusual magnetic field, we consider the drift velocity constant. We can estimate the drift velocity by fitting the dependence $d_r(t)$ of ionization electrons from a~simulated track with a linear function:
+		where $d_\text{r}$ is the distance to the readout, and $v_\text{d}$ is the drift velocity of electrons in the given gas mixture. At a~phenomenological level, this velocity can be considered as a~function of the electric field~$\mathbf{E}$ and the magnetic field~$\mathbf{B}$ as shown in Equation~\ref{eq:drift}. Since we assume a~uniform electric field in the detector and in this~approximation we want to neglect the effect of our unusual magnetic field, we consider the drift velocity constant. We can estimate the drift velocity by fitting the dependence $d_\text{r}(t)$ of ionization electrons from a~simulated track with a~linear function:
 			\begin{equation}
-				d_r(t) = v_d t + d_0.
+				d_\text{r}(t) = v_\text{d} t + d_0.
 			\end{equation}
-		The fit was applied on two tracks with different gas composition, the result is in \cref{fig:zt}.\red{~Compare with real drift velocities -- a good indication of the tilt of drift lines. Or do this already in the 1st chapter and just ref here.} The obtained parameters are then used for the reconstruction shown in \cref{fig:rasd_xz}. From the residuals shown in \cref{fig:rasd_res}, we can see that this reconstruction algorithm leads to significant deviations from the simulated track (up to 1.1~cm for 90:10, and up to 0.3~cm for 70:30 Ar:CO$_2$), especially in the faster gas mixture 90:10 (as expected -- for a~higher mean time between collisions in Equation~\ref{eq:drift}, the effect of the magnetic field is bigger). These deviations are mainly caused by the shift in the $x$\nobreakdash-coordinate due to the tilt of the drift lines in magnetic field. In order to account for this, we need to develop a~better algorithm.
+		The fit was applied on two tracks with different gas composition, the result is in \cref{fig:zt}. The obtained parameters are then used for the reconstruction shown in \cref{fig:rasd_xz}. From the residuals shown in \cref{fig:rasd_res}, we can see that this reconstruction algorithm leads to significant deviations from the simulated track (up to 1.1~cm for 90:10, and up to 0.3~cm for 70:30 Ar:CO$_2$), especially in the faster gas mixture 90:10 (as expected -- for a~higher mean time between collisions in Equation~\ref{eq:drift}, the effect of the magnetic field is bigger). These deviations are mainly caused by the shift in the $x$\nobreakdash-coordinate due to the tilt of the drift lines in magnetic field. In order to account for this, we need to develop a~better algorithm.
 		
 		\begin{figure}
 			\centering
 			\includegraphics[width=0.48\textwidth]{9010_zt.png}
 			\hfill
 			\includegraphics[width=0.48\textwidth]{7030_zt.png}
-			\caption{Linear fit of the drift time $t$ dependence on the distance to the readout $d_r = 8\;\text{cm} - z$ for the ionization electrons in 90:10 (left) and 70:30 (right) Ar:CO$2$ gas composition. Only electrons inside the \ac{TPC} (red) are fitted. The parameters are $v_d = \SI{3.39}{\centi\meter\per\micro\second}$, $d_0 = -0.41$~cm for 90:10, and $v_d = \SI{0.939}{\centi\meter\per\micro\second}$, $d_0 = -0.11$~cm for 70:30 Ar:CO$_2$.}
+			\caption{Linear fit of the drift time $t$ dependence on the distance to the readout $d_r = 8\;\text{cm} - z$ for the ionization electrons in 90:10 (left) and 70:30 (right) Ar:CO$2$ gas composition. Only electrons inside the \ac{OFTPC} (red) are fitted. The parameters are $v_\text{d} = \qty{3.39}{\centi\meter\per\micro\second}$, $d_0 = -0.41$~cm for 90:10, and $v_d = \qty{0.939}{\centi\meter\per\micro\second}$, $d_0 = -0.11$~cm for 70:30 Ar:CO$_2$.}
 			\label{fig:zt}
 		\end{figure}
 		
@@ -72,14 +72,14 @@
 		\begin{figure}
 			\centering
 			\includegraphics[width=\textwidth]{map_3dvis.png}
-			\caption{A~3D visualization of the mapping of means $\overline{\mathcal{M}}$ for the 90:10 Ar:CO$_2$ gas. A regular grid $\mathbb{G}$ with $l = \SI{1}{\centi\meter}$ in the detector space is mapped to an irregular grid $\mathbb{G}^{-1} \equiv \overline{\mathcal{M}}(\mathbb{G})$ in the readout space.}
+			\caption{A~3D visualization of the mapping of means $\overline{\mathcal{M}}$ for the 90:10 Ar:CO$_2$ gas. A regular grid $\mathbb{G}$ with $l = \qty{1}{\centi\meter}$ in the detector space is mapped to an irregular grid $\mathbb{G}^{-1} \equiv \overline{\mathcal{M}}(\mathbb{G})$ in the readout space. Made with GeoGebra®.}
 			\label{fig:map_3d}
 		\end{figure}
 		
 		\begin{figure}
 			\centering
 			\includegraphics[width=0.5\textwidth]{map_lines.png}
-			\caption{A test of the 90:10 Ar:CO$_2$ map simulation with spacing $l = \SI{1.5}{cm}$. The resulting drift lines of evenly spaced electrons are displayed in orange.}
+			\caption{A test of the 90:10 Ar:CO$_2$ map simulation with spacing $l = \qty{1.5}{cm}$. The resulting drift lines of evenly spaced electrons are displayed in orange.}
 			\label{fig:maplines}
 		\end{figure}
 		
@@ -169,7 +169,7 @@
 				\caption{The full mapping $\mathcal{M}(\mathbb{G}_{-8})$, the diffusion is marked using standard error bars (black) from the diagonalized sample covariance matrices (Equations~\ref{eq:cov} and~\ref{eq:sigma}).}
 				\label{fig:map_xyt}
 			\end{subfigure}
-			\caption{The $\mathcal{M}(\mathbb{G}_{-8})$ mapping of the bottom ($z = \SI{-8}{\centi\meter}$) layer $\mathbb{G}_{-8}$ of the regular grid $\mathbb{G}\subset\mathcal{D}$. It includes both the mapping of means $\overline{\mathcal{M}}$ and of covariances $\mathcal{M}_\mathbf{\Sigma}$. Individual electrons from the map simulation are marked with red dots. Two gas mixtures 90:10 (left) and 70:30 Ar:CO$_2$ (right) are compared.}
+			\caption{The $\mathcal{M}(\mathbb{G}_{-8})$ mapping of the bottom ($z = \qty{-8}{\centi\meter}$) layer $\mathbb{G}_{-8}$ of the regular grid $\mathbb{G}\subset\mathcal{D}$. It includes both the mapping of means $\overline{\mathcal{M}}$ and of covariances $\mathcal{M}_\mathbf{\Sigma}$. Individual electrons from the map simulation are marked with red dots. Two gas mixtures 90:10 (left) and 70:30 Ar:CO$_2$ (right) are compared.}
 			\label{fig:map_bot}
 		\end{figure}
 		
@@ -184,7 +184,7 @@
 		
 		When evaluating the map inside the grid, we use trilinear interpolation (see Section~\ref{sec:trilin}). From now on, we will use the same symbol $\mathcal{M}$ for this interpolated simulation.
 		
-		Finally, we need to invert the map to get the original detector coordinates $(x,y,z)$ from the given readout coordinates $(x',y',t)$. In our case, it is reasonable to assume that the mapping $\overline{\mathcal{M}}$ (we lose the information about the distribution, although it might be possible to recover through complex techniques). We implemented two methods for this purpose: the gradient descent search (Section~\ref{sec:grad}) and interpolation on the inverse grid (Section~\ref{sec:interpol}).
+		Finally, we need to invert the map to get the original detector coordinates $(x,y,z)$ from the given readout coordinates $(x',y',t)$. In our case, it is reasonable to assume that the mapping $\overline{\mathcal{M}}$ (we lose the information about the distribution, although it might be possible to recover through complex techniques; an idea, how to do this, is posed at the end of the thesis, though likely unpractical). We implemented two methods for this purpose: the gradient descent search (Section~\ref{sec:grad}) and interpolation on the inverse grid (Section~\ref{sec:interpol}).
 		
 		\subsection{Map Simulation}
 			Simulation of the map is a~computationally heavy task. For this reason, we use the MetaCentrum grid~\cite{metacentrum} to parallelize needed calculations. At first, this was done by evenly distributing the simulated electrons across the individual jobs in a~simulation with only one electron per vertex in the regular grid~$\mathbb{G}$ with a~spacing of one centimeter. Later, a~more efficient approach was implemented, accounting for the varying lengths of the drift of individual electrons. If we index the vertices of~$\mathbb{G}$ in the order of increasing coordinates $y,x,z$, we can express the number~$n_l$ of full XY~layers (i.e., electrons with the same $z$~coordinate, the mapping of one such layer is shown in \cref{fig:map_xyt}) with index less than or equal to $i$
@@ -203,35 +203,33 @@
 		
 		\subsection{Gradient Descent Algorithm}
 		\label{sec:grad}			
-			The first implemented method of reconstruction uses a~gradient descent algorithm to calculate an inversion of the map $\overline{\mathcal{M}}$ in a~given point. Gradient descent is an iterative minimization algorithm for multivariate functions. Let $R\in\mathcal{R}$ be a~point in the readout space; we want to find a~point $D = (x,y,z) \in\mathcal{D}$ in the detector space such that 
+			The first implemented method of reconstruction uses a~gradient descent algorithm to calculate an inversion of the map $\overline{\mathcal{M}}$ in a~given point. Gradient descent is an iterative minimization algorithm for multivariate functions. Let $\mathbf{R}\in\mathcal{R}$ be a~point in the readout space; we want to find a~point $\mathbf{D} = (x,y,z) \in\mathcal{D}$ in the detector space such that 
 				\begin{equation}
-					\overline{\mathcal{M}}(D) = R = (x'_R,y'_R,t_R).
+					\overline{\mathcal{M}}(\mathbf{D}) = \mathbf{R} = (x'_\mathbf{R},y'_\mathbf{R},t_\mathbf{R}).
 				\end{equation}
-			We define a~function~$f_R$ in the readout space as a~distance in this space:
+			We define a~function~$f_\mathbf{R}$ in the readout space as a~distance in this space:
 				\begin{equation}
-					f_R(x',y',t) = \sqrt{(x'-x'_R)^2+(y'-y'_R)^2+v_d^2(t-t_R)^2},
+					f_\mathbf{R}(x',y',t) = \sqrt{(x'-x'_\mathbf{R})^2+(y'-y'_\mathbf{R})^2+v_\text{d}^2(t-t_\mathbf{R})^2},
 				\end{equation}
-			where $v_d$ is an approximation of the drift velocity in the \ac{TPC}, obtained from the reconstruction in Section~\ref{sec:rasd} (see \cref{fig:rasd_xz}). We make an initial guess:
+			where $v_d$ is an approximation of the drift velocity in the \ac{OFTPC}, obtained from the reconstruction in Section~\ref{sec:rasd} (see \cref{fig:rasd_xz}). We make an initial guess:
 				\begin{equation}
-					D_0 = (x'_R,y'_R,v_dt).
+					\mathbf{D}_0 = (x'_\mathbf{R},y'_\mathbf{R},v_\text{d}t).
 				\end{equation}
-			Assuming we have the $n$-th estimate $D_n$, we calculate the $i$-th component of the gradient of $f_R\circ\overline{\mathcal{M}}$ numerically using central differences:
+			Assuming we have the $n$-th estimate $\mathbf{D}_n$, we calculate the $i$-th component of the gradient of $f_\mathbf{R}\circ\overline{\mathcal{M}}$ numerically using central differences:
 				\begin{equation}
-					\left[\nabla(f_R\circ\overline{\mathcal{M}})\right]^i(D_n) \approx \frac{f_R(\overline{\mathcal{M}}(D_n+s\cdot e^i))-f_R(\overline{\mathcal{M}}(D_n-s\cdot e^i))}{2s},
+					\left[\nabla(f_\mathbf{R}\circ\overline{\mathcal{M}})\right]^i(\mathbf{D}_n) \approx \frac{f_\mathbf{R}(\overline{\mathcal{M}}(\mathbf{D}_n+s\cdot e^i))-f_\mathbf{R}(\overline{\mathcal{M}}(\mathbf{D}_n-s\cdot e^i))}{2s},
 				\end{equation}
-			where $e^i\in\mathcal{D}$ is the $i$-th coordinate vector and $s$ is the step size. The step size should be sufficiently small; initially, we set it as a~fraction $s = \frac{l}{10}$ of the map's grid spacing $l$. During the minimization, we check that $f_R(\overline{\mathcal{M}}(D_n))<10s$ at all times and decrease the step if needed. The next iteration can be calculated as follows:
+			where $e^i\in\mathcal{D}$ is the $i$-th coordinate vector and $s$ is the step size. The step size should be sufficiently small; initially, we set it as a~fraction $s = \frac{l}{10}$ of the map's grid spacing $l$. During the minimization, we check that $f_R(\overline{\mathcal{M}}(\mathbf{D}_n))<10s$ at all times and decrease the step if needed. The next iteration can be calculated as follows:
 				\begin{equation}
-					D_{n+1} = D_n - \gamma \nabla(f_R\circ\overline{\mathcal{M}})(D_n),
+					\mathbf{D}_{n+1} = \mathbf{D}_n - \gamma \nabla(f_\mathbf{R}\circ\overline{\mathcal{M}})(\mathbf{D}_n),
 				\end{equation}
 			where $\gamma\in\mathbb{R}^+$ is the damping coefficient. It should be set to a~small enough value to ensure convergence, but large enough for sufficient converging speed. In order to avoid oscillation around the minimum, we also check that the size of the damped gradient does not exceed (or get too close to) the current value of the non-negative function:
 				\begin{equation}
-					10 \norm{\gamma \nabla(f_R\circ\overline{\mathcal{M}})(D_n)} < f_R(D_n),
+					10 \norm{\gamma \nabla(f_\mathbf{R}\circ\overline{\mathcal{M}})(\mathbf{D}_n)} < f_\mathbf{R}(\mathbf{D}_n),
 				\end{equation}
-			and lower $\gamma$ otherwise. The minimization stops either when the error $f_R(\overline{\mathcal{M}}(D_n))$ drops below a~specified value or when the number of iterations exceeds a~certain limit (in this case, a~message is printed into the console).
+			and lower $\gamma$ otherwise. The minimization stops either when the error $f_\mathbf{R}(\overline{\mathcal{M}}(\mathbf{D}_n))$ drops below a~specified value or when the number of iterations exceeds a~certain limit (in this case, a~message is printed into the console).
 			
 			The parameters of this method can be further optimized (e.g., a~better choice of $\gamma$ and~$s$, analytical computation of the gradient\footnote{The gradient can be computed analytically when using the trilinear interpolation, see \cref{eq:trilinpoly}.}); instead, we later decided to use the interpolation on the inverse grid described in the next section.
-			
-			\blue{Typical evolution of $D_n$ during search? Not sure if this has to be cited.}
 		
 		\subsection{Interpolation on the Inverse Grid}
 		\label{sec:interpol}			
@@ -264,14 +262,14 @@
 			
 			This approach introduces a~small complication: finding the correct pseudocell (i.e., the image of eight vertices forming a~cubic cell in the regular grid) in the inverse grid. The eight irregularly spaced vertices of this pseudocell do not define a~unique volume, so there are multiple possible ways to partition $\mathcal{R}$ into pseudocells, with no obvious choice among them. This problem could be solved by determining the exact volume boundary using the gradient descent search described above. However, since the difference between the interpolation polynomials is small near the boundary of the pseudocell, we choose one of them arbitrarily.
 			
-			In the code, the map is stored in an array, and its individual points can be accessed using three indexes corresponding to the $x$, $y$, and~$z$ coordinates. Points outside of the area of the simulation are initialized with zeros. The search for the pseudocell finds the indices corresponding to the eight vertices. It starts by performing a~binary search along the $x$\nobreakdash-coordinate (comparing the $x'$\nobreakdash-coordinate of the map vertices with that of the point, whose preimage we want to find) with indices corresponding to~$y$ and~$z$ fixed to half of their maximal value. After that, we fix the $x$ and $z$ indices and perform a binary search along~$y$ (making sure to exclude the zeros from initialization outside the simulation range beforehand), and finally, we fix the $x$ and $y$ indices and perform a search along~$z$ (inverted, since higher~$z$ corresponds to lower~$t$). This procedure is then repeated until the pseudocell "contains" the preimage of the given point (meaning that for all readout coordinates $x'$, $y'$, $t$, there is a~vertex of the pseudocell with a~higher and a~vertex with a~lower value of that coordinate) or until 3 iterations are exceeded. We also attempt to fix the error by choosing a~neighboring cell.
+			In the code, the map is stored in an array, and its individual points can be accessed using three indexes corresponding to the $x$, $y$, and~$z$ coordinates. Points outside of the area of the simulation are initialized with zeros. The search for the pseudocell finds the indices corresponding to the eight vertices. It starts by performing a~binary search along the $x$\nobreakdash-coordinate (comparing the $x'$\nobreakdash-coordinate of the map vertices with that of the point, whose preimage we want to find) with indices corresponding to~$y$ and~$z$ fixed to half of their maximal value. After that, we fix the $x$ and $z$ indices and perform a~binary search along~$y$ (making sure to exclude the zeros from initialization outside the simulation range beforehand), and finally, we fix the $x$ and $y$ indices and perform a~search along~$z$ (inverted, since higher~$z$ corresponds to lower~$t$). This procedure is then repeated until the pseudocell "contains" the preimage of the given point (meaning that for all readout coordinates $x'$, $y'$, $t$, there is a~vertex of the pseudocell with a~higher and a~vertex with a~lower value of that coordinate) or until 3 iterations are exceeded. We also attempt to fix the error by choosing a~neighboring cell.
 			
 			This approach should generally be faster than the gradient descent method, since we do not need to iterate. Currently, we are calculating the coefficients of the interpolation polynomial during the reconstruction of every point. If further optimization is needed in the future, we can precalculate them for the whole map.
 			
 		\section{Reconstruction testing}
 			The continuous reconstruction using the map was tested on microscopic tracks with parameters described in \cref{sec:microfirst}. The difference between the reconstructed positions obtained using the two map inversion algorithms was found to be smaller than the uncertainty from diffusion by several orders of magnitude. In its unoptimized state, the gradient descent search was significantly slower (at least ten times) than the interpolation on the inverse grid.
 			
-			An example of reconstruction of tracks in 90:10 and 70:30 Ar:CO$_2$ gas mixture is shown in \cref{fig:reco_map}. We can clearly see that the results have improved compare to the \acf{RASD} (shown in \cref{fig:rasd_xz}). A~comparison of the residuals of reconstructed positions (i.e., their distances to the real starting positions)\blue{\textbf{~$\leftarrow$ mentioned here}} is shown in \cref{fig:rasd_map}. The histograms of residuals, as well as residuals of individual coordinates, are shown in \cref{fig:9010_map_res,fig:7030_map_res}. The bin width for the histograms was chosen using the Scott's rule\footnote{The optimal bin width for normally distributed data of size~$N$ with sample standard deviation $\hat{\sigma}$ is $\hat{\sigma}\sqrt[3]{\frac{24\sqrt{\pi}}{N}}$~\cite{scott}.}. As expected, the mean values of the coordinate residuals is zero. The only exception is the $z$\nobreakdash-coordinate in the 70:30 Ar:CO$_2$ track, where the mean is \qty{-0.064}{\cm} (further than one standard deviation \qty{0.051}{\cm} from zero). This is caused by the non-zero initial energy of the ionization electrons (neglected in the other track) which is unaccounted for in the map simulation. Since the primary electron bends towards negative~$z$, the ionization electrons are more likely to be released in this direction (and also bend in the magnetic field towards this direction).
+			An example of reconstruction of tracks in 90:10 and 70:30 Ar:CO$_2$ gas mixture is shown in \cref{fig:reco_map}. We can clearly see that the results have improved compare to the \acf{RASD} (shown in \cref{fig:rasd_xz}). A~comparison of the residuals of reconstructed positions (i.e., their distances to the real starting positions) is shown in \cref{fig:rasd_map}. The histograms of residuals, as well as residuals of individual coordinates, are shown in \cref{fig:9010_map_res,fig:7030_map_res}. The bin width for the histograms was chosen using the Scott's rule\footnote{The optimal bin width for normally distributed data of size~$N$ with sample standard deviation $\hat{\sigma}$ is $\hat{\sigma}\sqrt[3]{\frac{24\sqrt{\pi}}{N}}$~\cite{scott}.}. As expected, the mean values of the coordinate residuals is zero. The only exception is the $z$\nobreakdash-coordinate in the 70:30 Ar:CO$_2$ track, where the mean is \qty{-0.064}{\cm} (further than one standard deviation \qty{0.051}{\cm} from zero). This is caused by the non-zero initial energy of the ionization electrons (neglected in the other track) which is unaccounted for in the map simulation. Since the primary electron bends towards negative~$z$, the ionization electrons are more likely to be released in this direction (and also bend in the magnetic field towards this direction).
 			
 			\begin{figure}
 				\centering
@@ -361,6 +359,6 @@
 		\begin{figure}
 			\centering
 			\includegraphics[width=\textwidth]{pads_track.png}
-			\caption{Discrete reconstruction of an~\qty{8}{\MeV} track from the grid-like testing sample (described in \cref{sec:microgrid}) with minimal values of $\theta$ and $\phi$ initial direction angles. The simulated ionization vertices are shown in red, the reconstructed track is shown with the colored boxes. The number of electrons in each pad/time bin is denoted with the size of the boxes and their color.\blue{~No discontinuity, just charge spreading between two pad "columns".}}
+			\caption{Discrete reconstruction of an~\qty{8}{\MeV} track from the grid-like testing sample (described in \cref{sec:microgrid}) with minimal values of $\theta$ and $\phi$ initial direction angles. The simulated ionization vertices are shown in red, the reconstructed track is shown with the colored boxes. The number of electrons in each pad/time bin is denoted with the size of the boxes and their color. The apparent discontinuity is caused by the charge spreading between two pad "columns".}
 			\label{fig:pad_track}
 		\end{figure}
