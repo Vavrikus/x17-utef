@@ -3,24 +3,26 @@
 \setcounter{figure}{0}
 \renewcommand{\theequation}{\thechapter.\arabic{equation}}
 \renewcommand{\thefigure}{\thechapter.\arabic{figure}}
-	\orange{Or chapter 1? MFF UK thesis template uses Introduction as an unnumbered chapter, but it's not clear how they handle numbering inside the chapter.~}A~\acf{TPC}\red{~[refs], but what to cite here? D. Nygren (1974)?} is a~gaseous detector that reconstructs charged particle trajectories by measuring the positions and drift times of ionization electrons (and sometimes also ions) created in the gas. The energies of these particles can be inferred from the curvatures of their trajectories in a~magnetic field.
+	\blue{Je číslování od titulní strany správně?}
+
+	\blue{Or chapter 1? Separate small part as motivation?~}A~\acf{TPC}\blue{~[refs], but what to cite here? D. Nygren (1974)?} is a~gaseous detector that reconstructs charged particle trajectories by measuring the positions and drift times of ionization electrons (and sometimes also ions) created in the gas. The energies of these particles can be inferred from the curvatures of their trajectories in a~magnetic field.
 	
-	The goal of this thesis is to develop an algorithm for the reconstruction of charged particle trajectories and energy in an \emph{atypic} \ac{TPC} with orthogonal electric and magnetic fields, hereafter referred to as the \ac{OFTPC}, used in the X17 project at the \ac{IEAPCTU}. Furthermore, we present the results of testing of several (gradually improving) developed algorithms with different samples of simulated data.\red{~Put this somewhere, (maybe just the abstract?). We use the \garfieldpp toolkit~\cite{Garfield++} for simulations in combination with the ROOT~framework~\cite{ROOT} for data analysis and visualization. Some of our more demanding simulations are run on the MetaCentrum grid~\cite{metacentrum}.}
+	The goal of this thesis is to develop an algorithm for the reconstruction of charged particle trajectories and energy in an \emph{atypic} \ac{TPC} with orthogonal electric and magnetic fields, hereafter referred to as the \ac{OFTPC}, used in the X17 project at the \ac{IEAPCTU}. Furthermore, we present the results of testing of several (gradually improving) developed algorithms with different samples of simulated data.\blue{~Put this somewhere, (maybe it should be mentioned in the abstract?). We use the \garfieldpp toolkit~\cite{Garfield++} for simulations in combination with the ROOT~framework~\cite{ROOT} for data analysis and visualization. Some of our more demanding simulations are run on the MetaCentrum grid~\cite{metacentrum}.}
 	
-	The X17 project in \ac{IEAPCTU} aims to reproduce measurements of anomalous behavior in the angular correlation distribution of pairs produced by the \ac{IPC} mechanism~\cite{IPC} during the decay of certain excited nuclei (\iso{Be}{8}, \iso{C}{12}, and~\iso{He}{4}) observed by a~team at ATOMKI in Hungary.\orange{~I would leave this here as a short summary before I explain it in more detail in the sections below.}
+	The X17 project in \ac{IEAPCTU} aims to reproduce measurements of anomalous behavior in the angular correlation distribution of pairs produced by the \ac{IPC} mechanism~\cite{IPC} during the decay of certain excited nuclei (\iso{Be}{8}, \iso{C}{12}, and~\iso{He}{4}) observed by a~team at ATOMKI in Hungary.
 	
-	\red{Add citations: X17 project, VdG. Maybe also TPC, etc.}
+	\blue{Add citations: X17 project, VdG, but what? Could just cite the webpage, but are there some articles?}
 	
 	\section{ATOMKI Anomaly}
 	\label{sec:ATOMKI}
-		Many different theories propose the existence of \emph{new light boson(s)} that are weakly coupled to ordinary matter~\cite{dark}. These particles are potential dark matter candidates and could contribute to a~solution of other issues with the Standard Model, such as the strong CP~problem\footnote{The CP symmetry could be violated in strong interactions according to the current formulation of quantum chromodynamics, but no such violation is observed.} and the anomalous muon magnetic moment.\orange{~Mass range of axions?}
+		Many different theories propose the existence of \emph{new light boson(s)} that are weakly coupled to ordinary matter~\cite{dark}. These particles are potential dark matter candidates and could contribute to a~solution of other issues with the Standard Model, such as the strong CP~problem\footnote{The CP symmetry could be violated in strong interactions according to the current formulation of quantum chromodynamics, but no such violation is observed.} and the anomalous muon magnetic moment.
 		
-		A~possible way of detecting such bosons with a~short lifetime is to observe nuclear transitions of excited nuclei. If a~boson was emitted during the transition and subsequently decayed into an electron\nobreakdash-positron pair, we could observe this as a~peak on top of the standard $e^+e^-$\orange{~(both cursive and upright forms are used in different articles)} angular correlation from the \acf{IPC} and the \acf{EPC}.
+		A~possible way of detecting such bosons with a~short lifetime is to observe nuclear transitions of excited nuclei. If a~boson was emitted during the transition and subsequently decayed into an electron\nobreakdash-positron pair, we could observe this as a~peak on top of the standard $e^+e^-$ angular correlation from the \acf{IPC} and the \acf{EPC}.
 	
 		\subsection{ATOMKI Measurements}
 			Historically, there were several measurements of the \ac{IPC} in nuclear transitions in~\iso{Be}{8} at Institute für Kernphysik (Frankfurt)~\cite{ikf1996,ikf1997,ikf2001} and at ATOMKI (Debrecen, Hungary)~\cite{atomki2008,atomki2012} resulting in different anomalies with invariant mass in the range $5-15$~MeV. This motivated the development of a~better spectrometer at ATOMKI.
 		
-			In 2015, a~group at ATOMKI observed an anomalous~\ac{IPC} in~\iso{Be}{8}~\cite{atomki_be}. They used the \iso{Li}{7}$(p,\gamma)$\iso{Be}{8} reaction at the $E_p = 1030$~keV proton capture resonance to prepare the 18.15~MeV excited state ($J^\pi = 1^{+}$, $T=0$). This state decays predominantly through M1~transitions to the ground state ($J^\pi = 0^{+}$, $T=0$) and to the 3.03~MeV state ($J^\pi = 2^{+}$, $T=0$)~\cite{resonances}.\orange{~Transition figure -- all transitions of isotopes? \ac{IPC} figure?}
+			In 2015, a~group at ATOMKI observed an anomalous~\ac{IPC} in~\iso{Be}{8}~\cite{atomki_be}. They used the \iso{Li}{7}$(p,\gamma)$\iso{Be}{8} reaction at the $E_p = 1030$~keV proton capture resonance to prepare the 18.15~MeV excited state ($J^\pi = 1^{+}$, $T=0$). This state decays predominantly through M1~transitions to the ground state ($J^\pi = 0^{+}$, $T=0$) and to the 3.03~MeV state ($J^\pi = 2^{+}$, $T=0$)~\cite{resonances}.
 			
 			The angular correlation of the $e^+ e^-$ pairs created internally in these transitions were measured and compared to the simulation; results from a~narrow $E_\text{sum}=18$~MeV region are shown in \cref{fig:atomki_be}. The simulation includes boson decay pairs for different boson masses. The disparity parameter~$y$ is used to describe the asymmetry of energy between the two particles. It is defined as
 				\begin{equation}
@@ -67,12 +69,12 @@
 					\label{fig:atomki}
 				\end{figure}
 			
-				Possible explanations of the anomaly include experimental effects, higher order processes in the Standard Model~\cite{kalman,aleksejevs} or even a~protophobic fifth force mediated by a~new 17~MeV boson X17~\cite{feng}.\orange{~Not sure if the introduction should be referenced since even though it is related, it is an independent theory developed only~(?) to explain these measurements.}\red{~Zhang and Miller: \url{https://www.sciencedirect.com/science/article/pii/S0370269321000010} Paper from \ac{IEAPCTU}: \url{https://arxiv.org/pdf/2309.12469}?}
+				Possible explanations of the anomaly include experimental effects, higher order processes in the Standard Model~\cite{kalman,aleksejevs} or even a~protophobic fifth force mediated by a~new 17~MeV boson X17~\cite{feng}.\blue{~Zhang and Miller: \url{https://www.sciencedirect.com/science/article/pii/S0370269321000010} Paper from \ac{IEAPCTU}: \url{https://arxiv.org/pdf/2309.12469}?}
 		\subsection{Other Experiments}
-			Since the ATOMKI measurements, several experiments have been initiated to attempt to replicate the results and search for the hypothetical X17 particle. The following experiments have already produced results.\red{~Could cite the ATOMKI review paper here. NA64 at SPS: \url{https://arxiv.org/pdf/1803.07748}.}
+			Since the ATOMKI measurements, several experiments have been initiated to attempt to replicate the results and search for the hypothetical X17 particle. The following experiments have already produced results.\blue{~Could cite the ATOMKI review paper here.}
 			
 			\subsubsection{Two-arm $e^+e^-$ spectrometer in Hanoi}
-				The anomaly in \iso{Be}{8} has been observed with a~high ($>4\sigma$\orange{~That's all they write in their article.}) confidence by a team at the Hanoi University of Sciences for $E_p = 1225$~keV~\cite{hanoi}. They built a two\nobreakdash-arm spectrometer in collaboration with ATOMKI and calibrated it using the 17.6~MeV M1 transition. The results are shown in \cref{fig:hanoi}.
+				The anomaly in \iso{Be}{8} has been observed with a~high ($>4\sigma$) confidence by a team at the Hanoi University of Sciences for $E_p = 1225$~keV~\cite{hanoi}. They built a two\nobreakdash-arm spectrometer in collaboration with ATOMKI and calibrated it using the 17.6~MeV M1 transition. The results are shown in \cref{fig:hanoi}.
 				
 				\begin{figure}
 					\centering
@@ -85,7 +87,7 @@
 				At the Joint Institute for Nuclear Research in Dubna, signal in the form of enhanced structures in the $\gamma\gamma$ spectra at \textapprox17 and \textapprox38~MeV invariant masses for $p+\mathrm{C}$, $d+\mathrm{C}$ and $d+\mathrm{Cu}$ reactions at momenta 5.5, 2.75, and 3.83~GeV per nucleon~\cite{dubna}. Monte Carlo simulations support the conclusion that the signals are a~consequence of a~decay of unknown particles X17 and E38.
 				
 			\subsubsection{The MEG II (Muon Electron Gamma) experiment}
-				Experiments using the \iso{Li}{7}$(p,e^+e^-)$\iso{Be}{8} reaction were carried out at the Paul Scherrer Institute with the MEG II superconducting solenoid spectrometer~\cite{megii}. Analysis of the data with $E_p = 1080$~keV exciting both of the resonances (beam fully stopping in the target) found no significant evidence supporting the X17 hypothesis, results are shown in \cref{fig:megii}. An upper bound (at 90\% confidence) on the X17\nobreakdash-to\nobreakdash-$\gamma$ branching ratio was set at $1.2\cdot10^{-5}$ for the 18.15~MeV state (larger than the ratio $5.8\cdot10^{-6}$ obtained by ATOMKI in 2016).\red{~Could add their 90\% C.L bounds figure also.}\orange{~Insufficient statistics -- 6.2~\% ($1.5\sigma$) p\nobreakdash-value.}
+				Experiments using the \iso{Li}{7}$(p,e^+e^-)$\iso{Be}{8} reaction were carried out at the Paul Scherrer Institute with the MEG II superconducting solenoid spectrometer~\cite{megii}. Analysis of the data with $E_p = 1080$~keV exciting both of the resonances (beam fully stopping in the target) found no significant evidence supporting the X17 hypothesis, results are shown in \cref{fig:megii}. An upper bound (at 90\% confidence) on the X17\nobreakdash-to\nobreakdash-$\gamma$ branching ratio was set at $1.2\cdot10^{-5}$ for the 18.15~MeV state (larger than the ratio $5.8\cdot10^{-6}$ obtained by ATOMKI in 2016).
 				
 				\begin{figure}
 					\centering
@@ -97,16 +99,16 @@
 	
 	\section{X17 Project at IEAP CTU}
 	\label{sec:IEAP}
-		The aim of the X17 project at the Van der Graaff facility of the \acl{IEAPCTU} is to reproduce the results of the original ATOMKI experiments with \iso{Li}{7} and \iso{H}{3} targets using an independent $e^+e^-$ spectrometer. In order to effectively measure the anomaly, we need to reconstruct both the energy and the angular correlation of the $e^+e^-$ pairs. The spectrometer will use three layers of detectors to achieve this -- \acf{TPX3} silicon pixel detector and \acf{MWPC} layers for the angle reconstruction and a~\acf{TPC} layer for the energy reconstruction. The schematics of the prepared detector is in \cref{fig:ieap}\red{~Spectrometer CAD drawing (coordinates here or next chapter?). Cite some VdG paper, mention grant? Using \url{https://cernbox.cern.ch/pdf-viewer/public/rf0oU1nqVLN3acZ/LuzH_submitted.pdf}.}
+		The aim of the X17 project at the Van der Graaff facility of the \acl{IEAPCTU} is to reproduce the results of the original ATOMKI experiments with \iso{Li}{7} and \iso{H}{3} targets using an independent $e^+e^-$ spectrometer. In order to effectively measure the anomaly, we need to reconstruct both the energy and the angular correlation of the $e^+e^-$ pairs. The spectrometer will use three layers of detectors to achieve this -- \acf{TPX3} silicon pixel detector and \acf{MWPC} layers for the angle reconstruction and a~\acf{TPC} layer for the energy reconstruction. The schematics of the prepared detector is in \cref{fig:ieap}\blue{Again, cite some VdG paper, mention grant? Using \url{https://cernbox.cern.ch/pdf-viewer/public/rf0oU1nqVLN3acZ/LuzH_submitted.pdf}.}
 			
 			\begin{figure}
 				\centering
 				\includegraphics[width=\textwidth]{ieap_x17.png}
-				\caption{Schematics of the detector at the Van der Graaff facility at~\ac{IEAPCTU}\red{~(ref)}.}
+				\caption{Schematics of the detector at the Van der Graaff facility at~\ac{IEAPCTU}\blue{~\textbf{(ref?????????????????????????)}}.}
 				\label{fig:ieap}
 			\end{figure}
 		
-		The energy of $e^+e^-$ pair produced in the reaction is given by the energy available $E_\text{r}$ in the reaction and can be distributed between them arbitrarily. Nonetheless in the decay of the hypothetical X17 particle, electron and positron should have similar energy and we can therefore use a~cut $|y| \leq 0.5$ in the disparity parameter (defined in Equation~\ref{eq:dispar}\orange{~it was already used in ATOMKI figure captions, that's why it is defined prior to this}). Interesting events should rarely have a~particle with an energy below $E_\text{r}/4$ (roughly 4~MeV). Electrons with such low energies are scattered significantly by even a~thin layer of relatively light material, for this reason the \ac{TPX3} layer will be inside of the vacuum tube and the tube will have a thinned aluminum segment or Kapton\texttrademark\ windows.
+		The energy of $e^+e^-$ pair produced in the reaction is given by the energy available $E_\text{r}$ in the reaction and can be distributed between them arbitrarily. Nonetheless in the decay of the hypothetical X17 particle, electron and positron should have similar energy and we can therefore use a~cut $|y| \leq 0.5$ in the disparity parameter (defined in Equation~\ref{eq:dispar}). Interesting events should rarely have a~particle with an energy below $E_\text{r}/4$ (roughly 4~MeV). Electrons with such low energies are scattered significantly by even a~thin layer of relatively light material, for this reason the \ac{TPX3} layer will be inside of the vacuum tube and the tube will have a thinned aluminum segment or Kapton\texttrademark\ windows.
 		
 		\ac{TPX3} can measure (in each $55\times55~\mathrm{\mu m}$ pixel of its $256\times256$ grid) \ac{ToA} with 1.6~ns precision and \ac{ToT} which reflects the deposited energy. This potentially allows 3D~tracking if we increase the chip thickness at the cost of increased scattering. The layer can reconstruct the reaction vertex and the angular correlation with high precision.
 		

@@ -3,29 +3,27 @@
 	
 	The \textbf{Microscopic Simulation} uses the \garfieldpp toolkit~\cite{Garfield++}. Within this toolkit:
 		\begin{enumerate}[nosep,label=\alph*)]
-			\item \red{Magboltz, since it is mentioned later. Or maybe just class MediumMagboltz with the collision rates?}
+			\item MagBoltz~\cite{magboltz} is used to calculate the transport properties,
 			\item the \ac{HEED} program~\cite{HEED} is used to simulate the primary particle,
 			\item the class \textit{AvalancheMicroscopic} to simulate the drift of secondary electrons created by ionization in the gas.
 		\end{enumerate}
 	This is the most precise and time-consuming simulation used; our current goal is to be able to successfully reconstruct its results and determine our best-case energy resolution.
 	
-	The \textbf{Runge-Kutta Simulation} uses the 4th order Runge-Kutta numerical integration\red{~(add citation for Runge-Kutta)} to simulate the trajectory of the primary particle in the electromagnetic field inside the detector. It is relatively fast since it does not simulate the secondary particles. It is used as part of our reconstruction algorithm and for testing some parts of the reconstruction.
+	The \textbf{Runge-Kutta Simulation} uses the 4th order Runge-Kutta numerical integration\blue{~(some citation for Runge-Kutta? developed around year 1900)} to simulate the trajectory of the primary particle in the electromagnetic field inside the detector. It is relatively fast since it does not simulate the secondary particles. It is used as part of our reconstruction algorithm and for testing some parts of the reconstruction.
 	
-	All of these simulations require the knowledge of the electromagnetic field (both $\mathbf{E}$~and~$\mathbf{B}$) inside the detector. A~uniform electric field of 400~V$\cdot$cm$^{-1}$ is assumed. The magnetic field was simulated in Maxwell (see Section~\ref{sec:mag}).\red{~add citation}
-	
-	\red{Single track in positive x direction or initial parameter randomization. Importance of gas composition, used gas compositions.}
+	All of these simulations require the knowledge of the electromagnetic field (both $\mathbf{E}$~and~$\mathbf{B}$) inside the detector. A~uniform electric field of 400~V$\cdot$cm$^{-1}$ is assumed. The magnetic field was simulated in Maxwell (see Section~\ref{sec:mag}).
 	
 	\section{Microscopic Simulation}
 	\label{sec:microsim}
 		The microscopic simulation, the most detailed simulation used in this work, is performed using the \garfieldpp toolkit~\cite{Garfield++}.
 		
-		The electron transport properties are simulated using the program Magboltz\red{~(add citation),}\orange{~(details?)}. Two different gas mixtures were compared -- 90:10 and 70:30 Ar:CO$_2$. The second mixture will be used in our detector\orange{~(this was probably known a~priori, but the first tests that I started with used 90/10, so maybe just note that the results justify the fact so far)}. The temperature is set to 20~$^\circ$C, the pressure is atmospheric.
+		The electron transport properties are simulated using the program Magboltz. Two different gas mixtures were compared -- 90:10 and 70:30 Ar:CO$_2$. The second mixture will be used in our detector\blue{~(this was probably known a~priori, but the first tests that I started with used 90/10, so maybe just note that the results justify the fact so far?)}. The temperature is set to 20~$^\circ$C, the pressure is atmospheric.
 		
-		The primary track is simulated using the program~\ac{HEED}, which is an implementation of the photo-absorption ionization model~\cite{HEED}\orange{~(see the reference, moved it to the end of sentence)}. This program provides the parameters of ionizing collisions. \ac{HEED} can also be used to simulate the transport of delta electrons; we do not account for these in the current simulation\orange{~(but plan to include them in the future -- maybe mention only in the conclusion/future section)}. The photons created in the atomic relaxation cascade\red{~(fluorescence reabsorption, related to the spread of avalanches in GM det.?)} are also not simulated.
+		The primary track is simulated using the program~\ac{HEED}, which is an implementation of the photo-absorption ionization model~\cite{HEED}. This program provides the parameters of ionizing collisions. \ac{HEED} can also be used to simulate the transport of delta electrons; we do not account for these in the current simulation. The photons created in the atomic relaxation cascade\blue{~(fluorescence reabsorption, related to the spread of avalanches in GM det.?)} are also not simulated.
 		
 		Finally, we use the microscopic tracking provided by the class \textit{AvalancheMicroscopic} in \garfieldpp to simulate the drift of the ionization electrons. Each electron is followed from collision to collision using the equation of motion and the collision rates calculated by Magboltz\red{~(how fast is this? maybe it slows down the simulation when spreading it across multiple jobs?)}.
 		
-		\red{Add more detailed and better description of HEED, and microscopic tracking (each their own subsection?). Could also mention Monte Carlo (requires gas file generation - Magboltz) and Runge-Kutta simulation implemented in Garfield, why we don't use them (another subsection? rename the section to \garfieldpp simulation and mention all relevant parts?).}
+		\garfieldpp also contains two other classes for simulation of the drift. \texttt{AvalancheMC} uses Monte Carlo integration that requires generation of a gas file to approximate the transport parameters (we briefly considered this method, but decided that the relatively small speed wasn't worth the loss of precision in this case, especially since the gas file generation for different angles between the field vectors is also computationally expensive). \texttt{DriftlineRKF} uses Runge-Kutta-Fehlberg integration of a~phenomenological relation $\mathbf{v}_\text{d} = \mathbf{v}_\text{d}(\mathbf{E},\mathbf{B})$, and therefore cannot account for diffusion.
 		
 		\subsection{First testing track}
 		\label{sec:microfirst}
@@ -87,7 +85,7 @@
 					\item 21 different azimuth angles $\varphi \in [-16.3^\circ,16.3^\circ]$ and
 					\item 21 different elevation angles $\theta \in [-17.1^\circ,17.1^\circ]$.
 				\end{itemize}
-			A~visualization of a~set of $e^+/e^-$~tracks with the same kinetic energy is shown in \cref{fig:microgrid}\red{~(plotting actual HEED tracks using ROOT should be also possible (but hard to make look good?))}. In the 70:30 Ar:CO$_2$ atmosphere, each track takes 5-30~CPU hours to simulate. Every tenth point on the drift line was stored, the whole sample has 3.1~terabytes (or 1.4~gigabytes without drift lines).
+			A~visualization of a~set of $e^+/e^-$~tracks with the same kinetic energy is shown in \cref{fig:microgrid}. In the 70:30 Ar:CO$_2$ atmosphere, each track takes 5-30~CPU hours to simulate. Every tenth point on the drift line was stored, the whole sample has 3.1~terabytes (or 1.4~gigabytes without drift lines).
 			
 				\begin{figure}
 					\centering
@@ -106,7 +104,7 @@
 			\begin{equation}
 				\mathbf{y}(t_0) = \mathbf{y}_0,
 			\end{equation}
-		we iteratively compute the estimate $\mathbf{y}_n = \mathbf{y}(t_n) = \mathbf{y}(t_0+nh)$ as follows\red{~(citation? common knowledge?)}:
+		we iteratively compute the estimate $\mathbf{y}_n = \mathbf{y}(t_n) = \mathbf{y}(t_0+nh)$ as follows\blue{~(citation? common knowledge (1900s)?)}:
 			\begin{align}
 				\mathbf{k}_1 &= \mathbf{f}(t_n,\mathbf{y}_n),\\
 				\mathbf{k}_2 &= \mathbf{f}\left(t_n+\frac{h}{2},\, \mathbf{y}_n+\frac{h\mathbf{k}_1}{2}\right),\\
@@ -116,9 +114,9 @@
 			\begin{equation}
 				\mathbf{y}_{n+1} = \mathbf{y}_n + \frac{1}{6}(\mathbf{k}_1+2\mathbf{k}_2+2\mathbf{k}_3+\mathbf{k}_4).
 			\end{equation}
-		\red{Alternate forms (infinitely many) possible, accuracy vs computational cost. Runge-Kutta-Fehlberg with adaptive step size also possible, can potentially save some computation time especially in rapidly changing field (so maybe not in this case).}
+		Infinitely many alternate forms of this equation are possible, with some of them being beneficial for certain special cases (trying to reach the same accuracy with lower computational cost). In our relatively simple case, where the integrated field changes slowly, the standard form with fixed step size is appropriate.
 		
-		In our case, we want to integrate the equation of motion, given by the relativistic Lorentz force:
+		We want to integrate the equation of motion, given by the relativistic Lorentz force:
 			\begin{equation}
 				F^\mu_L = m\derivative{u^\mu}{\tau} = q F^{\mu\nu}u_{\nu},
 			\end{equation}
@@ -139,7 +137,7 @@
 			\begin{equation}
 				\derivative{}{\tau} \begin{pmatrix} ct\\ x\\ y\\ z\end{pmatrix} = \begin{pmatrix}\gamma c\\ \gamma v_x\\ \gamma v_y\\ \gamma v_z\end{pmatrix} = u^\mu,
 			\end{equation}
-		we get a~system of eight first order differential equations for~$x^\mu$ and~$u^\mu$, which we can integrate using the Runge-Kutta method described above. As a~result of this integration, we get the position~$\mathbf{x}(\tau_n)$, the velocity~$\mathbf{v}(\tau_n)$ and the detector time~$t(\tau_n)$ for every proper time $\tau_n = n \tau_\text{step}$.\red{~Integrating using the proper time means that the step size in $t$ gets larger by the gamma factor $\derivative{t}{\tau} = \gamma$ (maybe change it and integrate the detector time or adjust the step size accordingly). The only difference is in the step size (because $t$ gets also calculated as it is among the 8~variables). \textbf{It might be even better to adjust the step size using approximate distance traveled.}} As initial conditions, we use the origin of the track $(x_0,y_0,z_0)$, the initial velocity direction vector $\mathbf{n} = (\cos\varphi\cos\theta,\sin\varphi\cos\theta,\sin\theta)$ and the kinetic energy $E_\text{kin}$\orange{~(initial parameters of \textbf{the simulation} (fit is in chapter 4))}, we then compute $\gamma$ and $\norm{\mathbf{v}}$:
+		we get a~system of eight first order differential equations for~$x^\mu$ and~$u^\mu$, which we can integrate using the Runge-Kutta method described above. As a~result of this integration, we get the position~$\mathbf{x}(\tau_n)$, the velocity~$\mathbf{v}(\tau_n)$ and the detector time~$t(\tau_n)$ for every proper time $\tau_n = n \tau_\text{step}$. As initial conditions, we use the origin of the track $(x_0,y_0,z_0)$, the initial velocity direction vector $\mathbf{n} = (\cos\varphi\cos\theta,\sin\varphi\cos\theta,\sin\theta)$ and the kinetic energy $E_\text{kin}$, we then compute $\gamma$ and $\norm{\mathbf{v}}$:
 			\begin{align}
 				\gamma &= 1 + \frac{E_\text{kin}}{E_0},\\
 				\norm{\mathbf{v}} &= c\sqrt{1-\gamma^{-2}}.
@@ -159,7 +157,7 @@
 		\begin{figure}
 			\centering
 			\includegraphics[width=0.7\textwidth]{rk_forward.png}
-			\caption{Set of \num{25} Runge-Kutta tracks with initial position $(6.51,0,0) \unit{\cm}$, orientation $(1,0,0)$, and energies \qtyrange{3}{13}{\MeV}.}
+			\caption{Set of \num{25} Runge-Kutta tracks with initial position $(6.51,0,0)\,\unit{\cm}$, orientation $(1,0,0)$, and energies $\qtyrange{3}{13}{\MeV}$.}
 			\label{fig:rk_forward}
 		\end{figure}
 					

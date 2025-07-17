@@ -1,8 +1,8 @@
 \chapter{Energy Reconstruction}
 \label{sec:energy}
-	The second stage is the reconstruction of the particle's energy using a~fit of its reconstructed track (see Section~\ref{sec:track}). We have tested three ways of reconstructing the energy. Fitting is done using the MINUIT algorithm implemented in ROOT~\cite{ROOT}.\red{~Cite some CERN article directly on MINUIT, can add a~section. Or is it done using MIGRAD? The circle and RK4 probably was.}
+	The second stage is the reconstruction of the particle's energy using a~fit of its reconstructed track (see Section~\ref{sec:track}). We have tested three ways of reconstructing the energy. Fitting is done using the MINUIT algorithm implemented in ROOT~\cite{ROOT}.\blue{~Cite some CERN article directly on MINUIT, can add a~section. Or is it done using MIGRAD? The circle and RK4 were. Is it just a~part of Minuit?}
 	
-	The \textbf{Cubic Spline Fit} was a~tested and later rejected method of energy reconstruction. It uses smoothly connected piecewise cubic polynomials between uniformly spaced nodes. The reconstructed energy is calculated using the fit parameters by computing the radius of curvature in different points of the fitted curve using the known magnitude of the magnetic field perpendicular to the trajectory. We rejected this method because the tuning of the fit turned out to be unpractical compared to the other used methods.\red{~Reconstructs energy at every position (even though the actual energy doesn't change much) and it might be slower but no profiling has been done yet. Of course, it wasn't tested on the newer track reconstruction methods at all.}
+	The \textbf{Cubic Spline Fit} was a~tested and later rejected method of energy reconstruction. It uses smoothly connected piecewise cubic polynomials between uniformly spaced nodes. The reconstructed energy is calculated using the fit parameters by computing the radius of curvature in different points of the fitted curve using the known magnitude of the magnetic field perpendicular to the trajectory. We rejected this method because the tuning of the fit turned out to be unpractical compared to the other used methods.
 	
 	The \textbf{Circle and Lines Fit} was chosen as an alternative since this corresponds to the shape of a~trajectory of a~charged particle crossing a~finite volume with a~homogeneous magnetic field. The energy of the particle can be estimated using the fitted radius and the magnitude of the perpendicular magnetic field in the middle of the \ac{TPC}.
 	
@@ -12,7 +12,7 @@
 	\label{sec:cspline}
 		The first method for the estimation of the kinetic energy of the particle uses a~cubic spline fit. We use an electron track simulated using the microscopic simulation, described in detail in Section~\ref{sec:microfirst}. The track was reconstructed using the map described in Section~\ref{sec:map}.
 				
-		In order to calculate the spline, we use the class \textit{TSpline3} from ROOT. This allows us to evaluate the spline using the coordinates $(x_n,z_n)$ of each node and the derivatives $d_1,d_2$ in the first and the last node. We can fit these parameters of a~fixed amount of nodes to the simulated trajectory. We use the IMPROVE algorithm provided by the \textit{TMinuit} class in ROOT\orange{~(there are some guidelines for fonts in MFF UK template (Czech version) that I will eventually apply (see notes in the conclusion))}. This algorithm attempts to find a~better local minimum after converging\orange{~(could reformulate a~bit, taken word for word from some manual)}.
+		In order to calculate the spline, we use the class \textit{TSpline3} from ROOT. This allows us to evaluate the spline using the coordinates $(x_n,z_n)$ of each node and the derivatives $d_1,d_2$ in the first and the last node. We can fit these parameters of a~fixed amount of nodes to the simulated trajectory. We use the IMPROVE algorithm provided by the \textit{TMinuit} class in ROOT. This algorithm attempts to find a~better local minimum after converging\blue{~(could reformulate a~bit, taken word for word from some manual)}.
 		
 		After the fit converges, we calculate an energy estimate using the radius of curvature, which we can extract from the fitted spline equation at every point of the trajectory. The part of the spline corresponding to a~given node is defined as
 			\begin{equation}
@@ -22,7 +22,7 @@
 			\begin{equation}
 				r(x) = \frac{\left(1+z'^2(x)\right)^\frac{3}{2}}{z''(x)} = \frac{\left(1+\left(b+2c\Delta x+3d(\Delta x)^2\right)^2\right)^\frac{3}{2}}{2c+6d\Delta x}.
 			\end{equation}
-		Based on the geometry of our~detector, we assume that the magnetic field satisfies $\mathbf{B}(x,0,z) = (0,B(x,z),0)$ for a~track in the XZ~plane. Since the electron is relativistic, the effect of the electric field on its trajectory is negligible. The Lorentz force $\mathbf{F}_\text{L}$ is then always perpendicular to the momentum of the electron and acts as a~centripetal force $\mathbf{F}_\text{c}$\orange{~(not quite sure how to handle this then?)}:
+		Based on the geometry of our~detector, we assume that the magnetic field satisfies $\mathbf{B}(x,0,z) = (0,B(x,z),0)$ for a~track in the XZ~plane. Since the electron is relativistic, the effect of the electric field on its trajectory is negligible. The Lorentz force $\mathbf{F}_\text{L}$ is then always perpendicular to the momentum of the electron and acts as a~centripetal force $\mathbf{F}_\text{c}$:
 			\begin{gather}
 				\begin{aligned}
 					\mathbf{F}_\text{L} &= \mathbf{F}_\text{c},\\
@@ -37,7 +37,7 @@
 				\label{eq:ekin2}
 				E_\text{kin}(x) = \left(\frac{1}{\sqrt{1-\beta^2(x)}}-1\right)E_{0e}.
 			\end{equation}
-		We could then average these estimates at multiple points (\red{possibly using some weights to account for the change in accuracy}) to get a~single value. An example of the reconstruction for a~reconstructed track is shown in \cref{fig:spline}. This method was later rejected in favor of the circle and lines fit\orange{~(the name was already established at the beginning of the chapter)} described in the next section.
+		We could then average these estimates at multiple points (possibly using some weights to account for the change in accuracy) to get a~single value. An example of the reconstruction for a~reconstructed track is shown in \cref{fig:spline}. This method was later rejected in favor of the circle-and-lines fit described in the next section.
 		
 		\begin{figure}
 			\centering
@@ -69,12 +69,12 @@
 	
 	\section{Circle and Lines Fit}
 	\label{sec:clines}
-		Another way to estimate the particle's kinetic energy is to~fit its\orange{~(??)} trajectory with a~circular arc with lines attached smoothly. This shape of trajectory corresponds to a~movement of a~charged particle through a~homogeneous magnetic field perpendicular to the particle's momentum and limited to a~certain volume. In general, the shape of such a~trajectory with a~non-perpendicularly oriented momentum is a~spiral. In our case, the magnetic field is approximately toroidal and the particle motion is nearly perpendicular to it\red{~(verify, could add some magnetic field plots in different vertical planes; shouldn't have a big effect on the reconstructed radius anyway)}. At first, we tested a~2D version of this fit, then we adapted it to 3D.
+		Another way to estimate the particle's kinetic energy is to~fit its trajectory with a~circular arc with lines attached smoothly. This shape of trajectory corresponds to a~movement of a~charged particle through a~homogeneous magnetic field perpendicular to the particle's momentum and limited to a~certain volume. In general, the shape of such a~trajectory with a~non-perpendicularly oriented momentum is a~spiral. In our case, the magnetic field is approximately toroidal and the particle motion is nearly perpendicular to it\red{~(verify, could add some magnetic field plots in different vertical planes; shouldn't have a big effect on the reconstructed radius anyway, but it \textbf{might be in part responsible for the systematic underestimation of energy})}. At first, we tested a~2D version of this fit, then we adapted it to 3D.
 		
-		The field in our detector is not homogeneous, it is therefore not entirely clear what value of magnetic field should be used along with the fitted radius (using equations~\ref{eq:ekin1} and~\ref{eq:ekin2}) to get the best estimate for the kinetic energy. Since we only use this method as the first iteration of the particle's energy that we later refine, an optimal solution of this problem is not required. Instead, we tested two options: taking the value of the field in the middle of the fitted circular arc\red{~(or is it in the middle $x$ of the OFTPC?)} and taking the average field along it.\red{~We haven't really tried to plot this for multiple tracks, but these estimates are saved somewhere and could be plotted.}
+		The field in our detector is not homogeneous, it is therefore not entirely clear what value of magnetic field should be used along with the fitted radius (using equations~\ref{eq:ekin1} and~\ref{eq:ekin2}) to get the best estimate for the kinetic energy. Since we only use this method as the first iteration of the particle's energy that we later refine, an optimal solution of this problem is not required. Instead, we tested two options: taking the value of the field in the point, where the track crosses the middle $x$\nobreakdash-coordinate of the \ac{OFTPC}, and taking the average field along it.
 		
 		\subsection{Two-dimensional fit}
-			In the 2D case, the fitted function used for the electron track\footnote{Electron tracks bend towards negative~$z$, we need to use the upper part of the circle.} described in Section~\ref{sec:microfirst}\red{~(one specific track at the time, technically this function doesn't work for a curvature that gets outside of the semicircle)} is defined as follows:
+			In the 2D case, the fitted function used for the electron track\footnote{Electron tracks bend towards negative~$z$, we need to use the upper part of the circle.} described in Section~\ref{sec:microfirst} is defined as follows:
 				\begin{equation}
 					\label{eq:clines2d}
 					z(x) = \begin{cases}
@@ -83,7 +83,7 @@
 								a_2x+b_2 & x>x_2
 						   \end{cases},
 				\end{equation}
-			where $a_{1,2}$ and $b_{1,2}$ are the parameters of the lines, $(x_0,z_0)$ is the center of the circle, $r$ is its radius, and $(x_{1,2},z_{1,2})$ are the coordinates of the function's nodes. That means we have 9~parameters ($z_{1,2}$ are not used in the function) along with 2~continuity conditions and 2~smoothness conditions\orange{~(9~parameters of the described function, 5~of them independent after taking the conditions into account)}. For the fit, we use the coordinates of the nodes and the radius of the circle, which gives us 5~independent parameters (only the radius has to be larger than half of the distance between nodes). The continuity conditions (combined with the relations for $z_{1,2}$) are
+			where $a_{1,2}$ and $b_{1,2}$ are the parameters of the lines, $(x_0,z_0)$ is the center of the circle, $r$ is its radius, and $(x_{1,2},z_{1,2})$ are the coordinates of the function's nodes. That means we have 9~parameters ($z_{1,2}$ are not used in the function) along with 2~continuity conditions and 2~smoothness conditions. For the fit, we use the coordinates of the nodes and the radius of the circle, which gives us 5~\emph{independent} parameters (only the radius has to be larger than half of the distance between nodes). The continuity conditions (combined with the relations for $z_{1,2}$) are
 				\begin{equation}
 					\label{eq:ccont}
 					z_{1,2} = a_{1,2}x_{1,2}+b_{1,2} = z_0-\sqrt{r^2-(x_{1,2}-x_0)^2},
@@ -118,7 +118,7 @@
 				\end{gather}
 			The function defined in Equation~\ref{eq:clines2d} along with equations~\ref{eq:a12}, \ref{eq:b12}, and \ref{eq:xz0} derived using the continuity and smoothness conditions (combined with the relations for $z_{1,2}$) fully define our fitted function with parameters $r,x_{1,2},z_{1,2}$.
 			
-			For the calculation of kinetic energy from the radius of the circle, we use the value of the magnetic field in the middle of the \ac{OFTPC}\red{~(this could be further optimized in the future)}. An example of a~fit of vertices reconstructed with the map is shown in \cref{fig:circle2d}.\red{~Use GeoGebra schematics to generate a~picture of 2D geometry.}
+			For the calculation of kinetic energy from the radius of the circle, we use the value of the magnetic field in the middle of the \ac{OFTPC}. An example of a~fit of vertices reconstructed with the map is shown in \cref{fig:circle2d}.
 			
 			\begin{figure}
 				\centering
@@ -132,7 +132,7 @@
 		\subsection{Three-dimensional fit}
 			In three dimensions, the shape of a~trajectory of a~charged particle in a~uniform magnetic field is a~cylindrical helix. Nevertheless, since we assume that the field is approximately perpendicular to the particle's momentum at all times, we will further approximate the trajectory with a~circular arc $\mathbf{X}_\text{C}(\phi)$ (with lines $\mathbf{X}_\text{L1}(t),\mathbf{X}_\text{L2}(s)$ attached smoothly).
 			
-			We assume that the initial position $\mathbf{X}_0 = (x_0,y_0,z_0)$ and direction (given by the spherical angles $\theta,\varphi$, see \cref{sec:coor}) are known, since this information will be provided by \ac{TPX3} and \ac{MWPC} layers.\red{~We could further refine it at the end of the current algorithm with some kind of global fit (all detector layers).} The fit then has four free parameters (see \cref{fig:circle3d}):
+			We assume that the initial position $\mathbf{X}_0 = (x_0,y_0,z_0)$ and direction (given by the spherical angles $\theta,\varphi$, see \cref{sec:coor}) are known, since this information will be provided by \ac{TPX3} and \ac{MWPC} layers. The fit then has four free parameters (see \cref{fig:circle3d}):
 				\begin{itemize}[nosep]
 					\item the length of the first line $l$ (as measured from the initial position),
 					\item the radius of the circular arc $r$,
@@ -157,7 +157,7 @@
 				\begin{equation}
 					\mathbf{X}_1 = \mathbf{X}_\text{L1}(l) = \mathbf{X}_0 + l\mathbf{v}.
 				\end{equation}
-			The vector $\mathbf{c}_1$ that lies in the plane of curvature and points from $\mathbf{X}_1$ to the center of curvature can be calculated using a composition of rotations. First, we rotate $\mathbf{v}$ to point in the $\mathbf{\hat{x}}$ direction, the normal for $\alpha = 0$ than points in the $-\mathbf{\hat{z}}$ direction, we apply the $\alpha$ rotation and reverse the rotations into the $\mathbf{\hat{x}}$ direction:\orange{~(parameters are explained in the bullet points above)}
+			The vector $\mathbf{c}_1$ that lies in the plane of curvature and points from $\mathbf{X}_1$ to the center of curvature can be calculated using a composition of rotations. First, we rotate $\mathbf{v}$ to point in the $\mathbf{\hat{x}}$ direction, the normal for $\alpha = 0$ than points in the $-\mathbf{\hat{z}}$ direction, we apply the $\alpha$ rotation and reverse the rotations into the $\mathbf{\hat{x}}$ direction:
 				\begin{equation}
 					\begin{aligned}
 						\mathbf{c}_1 &= R_z(\varphi)R_y(-\theta)R_x(\alpha)R_y\left(\frac{\pi}{2}\right)R_y(\theta)R_z(-\varphi)\mathbf{v},\\
@@ -189,7 +189,7 @@
 							\end{pmatrix}.
 					\end{aligned}
 				\end{equation}
-			\orange{Signs should be correct because right-handed rotation around $y$ rotates $z$ into $x$ and this one is the opposite.}\red{~Seems like in this part of the code $\theta$ is actually taken from the pole. Instead of the equator plane.} Similarly by rotating $\mathbf{\hat{y}}$, we can get the normal vector $\mathbf{n}=\mathbf{v}\cross\mathbf{c}_1$ perpendicular to the plane of the trajectory:
+			Similarly by rotating $\mathbf{\hat{y}}$, we can get the normal vector $\mathbf{n}=\mathbf{v}\cross\mathbf{c}_1$ perpendicular to the plane of the trajectory:
 				\begin{equation}
 					\mathbf{n} = R_z(\varphi)R_y(-\theta)R_x(\alpha)\mathbf{\hat{y}}=
 									\begin{pmatrix}
@@ -202,7 +202,7 @@
 				\begin{equation}
 					\mathbf{C} = \mathbf{X}_1+r\mathbf{c}_1.
 				\end{equation}
-			We can then get the parametrization and the endpoint of the circular arc using Rodrigues' rotation formula:\orange{~(all parameters explained in the bullet points above)}
+			We can then get the parametrization and the endpoint of the circular arc using Rodrigues' rotation formula:
 				\begin{gather}
 					\begin{aligned}
 						\mathbf{c}_2 &= \mathbf{c}_1\cos\phi_\text{max} + (\mathbf{n}\cross\mathbf{c}_1)\sin\phi_\text{max} + \mathbf{n}(\mathbf{n}\cdot\mathbf{c}_1)(1-\cos\phi_\text{max}),\\
@@ -217,7 +217,7 @@
 					\mathbf{X}_\text{L2}(s) = \mathbf{X}_2 + s\mathbf{w} \quad s\in[0,\infty).
 				\end{gather}
 				
-			The fit is performed as a~(weighted) least square minimization\red{~(MIGRAD ROOT)}, therefore we need to derive the distance of any point~$\mathbf{P}$ to the fitted curve. For the first line, we simply compute the parameter value of the closest point on the line:
+			The fit is performed as a~(weighted) least square minimization using the MIGRAD algorithm provided by the \texttt{TVirtualFitter} class in ROOT. We need to derive the distance of any point~$\mathbf{P}$ to the fitted curve. For the first line, we simply compute the parameter value of the closest point on the line:
 				\begin{equation}
 					\label{eq:segdist}
 					\begin{aligned}
@@ -225,12 +225,12 @@
 						d_{P1} &= \norm{\mathbf{P}-\mathbf{X}_\text{L1}(t_P)}.
 					\end{aligned}
 				\end{equation}
-			If the parameter value is outside of its bounds defined above, we take the boundary value instead. The distance to the second line is computed likewise. For the circular arc\orange{~(specific circular arc in the fit)}, we find the closest point\orange{~(on the arc)} by projecting the center connecting line onto the arc plane:
+			If the parameter value is outside of its bounds defined above, we take the boundary value instead. The distance to the second line is computed likewise. For the circular arc, we find the closest point by projecting the center connecting line onto the arc plane:
 				\begin{gather}
 					\mathbf{X}_{PC} = \mathbf{C} + r\frac{(\mathbf{P}-\mathbf{C})-(\mathbf{n}\cdot(\mathbf{P}-\mathbf{C}))\mathbf{n}}{\norm{(\mathbf{P}-\mathbf{C})-(\mathbf{n}\cdot(\mathbf{P}-\mathbf{C}))\mathbf{n}}},\\
 					d_{PC} = \norm{\mathbf{P}-\mathbf{X}_{PC}}
 				\end{gather}
-			If the point $\mathbf{X}_{PC}$ lies outside of the arc, distance to the closest endpoint is taken instead.\red{~Sometimes (rarely?) the distance might be underestimated when the point is closer to the circle, the arc is a part of, than to the curve. I tried to fix this, but it breaks the fit and makes the results worse.} The shortest distance out of $d_{P1},d_{PC},d_{P2}$ is then taken as the distance to the curve.\red{~TVirtualFitter+MIGRAD, maximal num of iterations, toleration. Different uncertainties in $x,y,z$ not taken into account.}
+			If the point $\mathbf{X}_{PC}$ lies outside of the arc, distance to the closest endpoint is taken instead.\blue{~Sometimes (rarely?) the distance might be underestimated when the point is closer to the circle, the arc is a part of, than to the curve. I tried to fix this, but it breaks the fit and makes the results worse.} The shortest distance out of $d_{P1},d_{PC},d_{P2}$ is then taken as the distance to the curve.
 			
 			For the calculation of the kinetic energy from the radius, we implemented two variants:
 				\begin{enumerate}[nosep]
@@ -240,8 +240,6 @@
 			This way, we get two energy estimates $E_{\text{reco}}^{\text{mid}}$ and $E_{\text{reco}}^{\text{avg}}$. If needed, this choice can be further optimized, however, since this method will only provide an initial guess of the kinetic energy for the more sophisticated, and computationally heavy Runge-Kutta fit, it is not necessary to reach the best precision, and fast solutions are preferred.
 			
 			An example of a~fitted track (both the actual initial points and the discrete reconstruction of the track) from the microscopic grid-like testing sample (described in \cref{sec:microgrid}) is shown in \cref{fig:cfit3d}, the fitted parameters are given in \cref{tab:cfit3d}.
-			
-			\red{Fit details (parameter bounds, initial setting).}
 			
 			\begin{table}
 				\centering
@@ -295,7 +293,7 @@
 	
 	\section{Runge-Kutta Fit}
 	\label{sec:rkfit}
-		The Runge-Kutta fit uses the \acf{RK4} numerical integration of the equation of motion (see Section~\ref{sec:rks}) to find the best values of the track parameters -- the track origin, initial velocity direction and the kinetic energy. In order to speed up the energy reconstruction, an initial guess of these parameters can be obtained from the 3D circle fit described in the previous section. Furthermore, assuming we know the track origin and orientation, we can perform a~single parameter fit of the kinetic energy\red{~(do some profiling and show that it is faster -- below in the microscopic testing)}.
+		The Runge-Kutta fit uses the \acf{RK4} numerical integration of the equation of motion (see Section~\ref{sec:rks}) to find the best values of the track parameters -- the track origin, initial velocity direction and the kinetic energy. In order to speed up the energy reconstruction, an initial guess of these parameters can be obtained from the 3D circle fit described in the previous section. Furthermore, assuming we know the track origin and orientation, we can perform a~single parameter fit of the kinetic energy.
 		
 		The fit is performed as a~least square minimization of the (weighted) distances of the track points (true ionization vertices from the simulation or reconstructed points). The simulated \ac{RK4}~track consists of line segments with known endpoints, therefore we can calculate the distance of a~point from this segment analogically to Equation~\ref{eq:segdist} with $\mathbf{v}$ given as a~unit vector in the direction of the segment.
 		
@@ -309,7 +307,7 @@
 				\label{eq:rkdemo}
 				d^2 = a^2+b^2+r^2 - 2br\cos\alpha,
 			\end{equation}
-		where $\alpha$ is the angle between points~$\mathbf{C}$ and~$\mathbf{P}$ as seen from the center of the arc (see \cref{fig:rkdemo}). This function is strictly convex for $\alpha\in\left(-\frac{\pi}{2},\frac{\pi}{2}\right)$ and in our case, the center of the arc lies outside of the detector and $\alpha$ is restricted to a~small interval around zero\red{~(especially considering that the initial guess should make the fitted trajectory reasonably close to any relevant point, in the worst-case scenario, the distance is overestimated which should keep the fit from converging to such solutions)}.
+		where $\alpha$ is the angle between points~$\mathbf{C}$ and~$\mathbf{P}$ as seen from the center of the arc (see \cref{fig:rkdemo}). This function is strictly convex for $\alpha\in\left(-\frac{\pi}{2},\frac{\pi}{2}\right)$ and in our case, the center of the arc lies outside of the detector and $\alpha$ is restricted to a~small interval around zero (especially considering that the initial guess should make the fitted trajectory reasonably close to any relevant point, in the worst-case scenario, the distance is overestimated, which should keep the fit from converging to such solutions).
 		
 		\begin{figure}
 			\centering
@@ -367,9 +365,7 @@
 					\Delta d_{\mathbf{P},n} &> 0\quad \forall n \text{ such that } \tau_{n-1} > \tau_\text{min}.
 				\end{aligned}
 			\end{equation}
-		Therefore, we can search for the segment containing $d_{\textbf{P},\text{min}} = d_{\mathbf{P}}(\tau_\text{min})$ with binary search starting with $\Delta d_{\mathbf{P},1}$ and $\Delta d_{\mathbf{P},N}$, then calculate the difference $\Delta d_{\mathbf{P},m}$ for the middle index $m = \left\lfloor\frac{N+1}{2}\right\rfloor$. If $\Delta d_{\mathbf{P},m} > 0$\red{~(minor bug in the implementation -- if the value for the maximal index is negative, it shouldn't change anything)}, we can replace the higher index with~$m$, otherwise we replace the lower index. The search stops when the difference between the minimal and maximal index is one.\red{~Would it be better if they were the same (maybe not)? Then the minimal value is $d_{\mathbf{P},n-1}$ or $d_{\mathbf{P},N}$ and we can take the minimum of the distances from the two segments connected to $n-1$. Currently taking the maximal index (and starting at $N-2$ maximal index $\leftrightarrow$ $N-1$\nobreakdash-th point), this should be equivalent, since either $\Delta d_{\mathbf{P},\text{max}} > 0$ (in the code is equivalent to max-1 here) or we are at $N-1$. The minimum of the two distances still taken.}
-		
-		\red{Same details with MIGRAD etc. as previously.}
+		Therefore, we can search for the segment containing $d_{\textbf{P},\text{min}} = d_{\mathbf{P}}(\tau_\text{min})$ with binary search starting with $\Delta d_{\mathbf{P},1}$ and $\Delta d_{\mathbf{P},N}$, then calculate the difference $\Delta d_{\mathbf{P},m}$ for the middle index $m = \left\lfloor\frac{N+1}{2}\right\rfloor$. If $\Delta d_{\mathbf{P},m} > 0$\red{~(minor bug in the implementation -- if the value for the maximal index is negative, it shouldn't change anything)}, we can replace the higher index with~$m$, otherwise we replace the lower index. The search stops when the difference between the minimal and maximal index is one.\red{~Would it be better if they were the same (maybe not)? Then the minimal value is $d_{\mathbf{P},n-1}$ or $d_{\mathbf{P},N}$ and we can take the minimum of the distances from the two segments connected to $n-1$. Currently taking the maximal index (and starting at $N-2$ maximal index $\leftrightarrow$ $N-1$\nobreakdash-th point), this should be equivalent, since either $\Delta d_{\mathbf{P},\text{max}} > 0$ (in the code is equivalent to max-1 here) or we are at $N-1$. The minimum of the two distances still taken.} The Fit itself is done using the MIGRAD algorithm implemented for the \texttt{TVirtualFitter} class in ROOT.
 		
 		\subsection{Testing on a~microscopic sample}
 			The Runge-Kutta fit together with the 3D circle-and-lines pre-fit was tested on a~sample of tracks simulated using the microscopic simulation described in Section~\ref{sec:microsim}. At first, few tracks with randomized initial parameters (same as the Runge-Kutta sample in Section~\ref{sec:rktest}) were generated for preliminary testing. Later, a~sample with a~grid-like distribution of track parameters was generated (see Section~\ref{sec:microgrid} for details). This allows us to test the performance of energy reconstruction from the microscopic tracks reconstructed with the discrete map inversion reconstruction.

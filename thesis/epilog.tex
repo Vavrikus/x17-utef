@@ -8,7 +8,7 @@
 		
 		To use the map in reconstruction, we have to invert it. We implemented two methods -- a~gradient descent algorithm that finds a~minimum in the trilinearly interpolated map, and a~polynomial interpolation on the inverse grid in the readout space (where we know the inverse from the simulation). Both methods reach almost identical result for the testing track, while the latter is much faster, does not require optimization of parameters, and can be accelerated by precalculating the interpolation coefficients in the future if needed. The reconstruction was shown to be accurate with less than \qty{2}{\mm} \acs{FWHM}, although a~slight shift in the $z$\nobreakdash-coordinate was detected when accounting for different initial velocities of the ionization electrons (see \cref{fig:9010_map_res,fig:7030_map_res}).
 		
-		The discrete reconstruction takes into account the anode segmentation into pads and the finite size of the time bins. It neglects the gaps between the pads and assumes an ideal readout of charge, counting each individual electron hitting the pad. Charge multiplication in the triple-\ac{GEM} stack used in the \ac{OFTPC} is not taken into account. For each pad/time-bin combination, we use the map inversion to reconstruct its center. Reconstruction of detector coordinates corresponding to electrons hitting the pad 12 near the magnet pole (\cref{fig:pad_reco,fig:pad_reco_old}) show that interpolation on the inverse grid behaves pathologically for large distortions, unlike the much slower gradient descent algorithm.\red{~Or maybe there is a~problem in the algorithm??? Actually not quite sure, what causes this behavior.}
+		The discrete reconstruction takes into account the anode segmentation into pads and the finite size of the time bins. It neglects the gaps between the pads and assumes an ideal readout of charge, counting each individual electron hitting the pad. Charge multiplication in the triple-\ac{GEM} stack used in the \ac{OFTPC} is not taken into account. For each pad/time-bin combination, we use the map inversion to reconstruct its center. Reconstruction of detector coordinates corresponding to electrons hitting the pad 12 near the magnet pole (\cref{fig:pad_reco,fig:pad_reco_old}) show that interpolation on the inverse grid behaves pathologically for large distortions, unlike the much slower gradient descent algorithm, likely because of large coefficients of the quadratic and cubic terms.\red{~Not tested though.}
 		
 	\subsubsection*{Energy Reconstruction}
 		To reconstruct energy of a~particle in a~\ac{OFTPC}, we assess its curvature in the inhomogeneous magnetic field. Preliminary tests were done using tracks reconstructed with the map with no discretization. At first, we tested a~cubic spline fit, where the radius of curvature can be determined analytically. This approach turned out to be unpractical because of relatively low speed and necessity to create the energy estimate from the radius and magnetic field at different points on the track (see \cref{fig:spline}).
@@ -31,7 +31,7 @@
 				\item Check that present tense is used
 				\item Active vs passive voice usage
 				\item American English quotation marks (") instead of British English (').
-				\item Some of the overfull hbox warnings might change if duplex printing is used (they generate black rectangles on the edge of the page), leaving them be for now
+				\item Some of the overfull hbox warnings might change if duplex printing is used (they generate black rectangles on the edge of the page), leaving them be for now duplex printing recommended for longer theses - is 83p considered longer (+/- list of figures, tables)
 				\item Check nobreakdash usage (is it always necessary)
 				\item Check capitalized references (e.g., Figure, Section, Equation)
 				\item Check \textbackslash(...\textbackslash) math mode instead of \$...\$. (actually unlike \textbackslash[...\textbackslash] math mode, there is apparently no real benefit to this clumsy syntax)
@@ -40,7 +40,6 @@
 				\item Check correct subscripts in equation (italics vs no italics)
 				\item Consistent bold marking of points/vectors
 				\item Correct footnotes (capital letters, etc.).
-				\item Might have to mention GeoGebra as per the non-commercial license agreement (Made with GeoGebra®) -- maybe put it into acknowledgments next to the MetaCentrum credit? And list all of the figures where GeoGebra was used?
 				\item Maybe make some section outside of References specifically for literature? (such as the old CERN TPC review, ATOMKI review is currently not mentioned, not sure if some Wikipedia articles should get a mention or how do these things work)
 				\item Consistent use of bm vs mathbf
 				\item Consistent use of $\overbar{\mathcal{M}}$ instead of $\mathcal{M}$ when talking about the map of the means (so most of the time)
@@ -51,12 +50,13 @@
 				\item Labels of figures and tables -- maybe in bold? Abbreviated?
 				\item Check graph labels, make them bigger if needed.
 				\item "The map" can be viewed as a mapping between spaces or just as a coordinate transform.
-				\item Maybe switch to cleveref.
+				\item Switch to cleveref.
 				\item siunitx qty not SI
 				\item Correct em dash?
 				\item In the future, it might be useful to save pictures as tex files whenever possible and using siunitx for the labels
 				\item Should list of figures/tables be in the thesis? Also, it is currently not in TOC.
 				\item link to GitHub
+				\item Correct math subscripts (italics/rm)
 			\end{itemize}
 		Random notes:
 			\begin{itemize}[topsep=4pt,itemsep=2pt]
@@ -92,6 +92,10 @@
 			\item Better choice of initial velocity in the map? Maybe look at the distribution for e+e- with different energies and either use this distribution combined for all (if the dependence isn't too big) or even few different simulations? Might (?) raise the requirement of electrons simulated per position. Or maybe just make some adjustment of the $z$ coordinate in the end?
 			\item Create a pad map. Might be worth it to use gradient descent search after all.
 			\item Testing of different pad layouts possible.
+			\item Isn't the field affected by the \acp{MWPC}? Eventually a simulation will be needed.
+			\item Randomize the starting time a bit and see what it does to the reconstruction.
+			\item unhandled pad positions solved by E field sim
+			\item We could further refine origin/orientation at the end of the current algorithm with some kind of global fit (all detector layers).
 		\end{itemize}}
 		
 		\red{\subsection*{Likelihood - inverse map}}
