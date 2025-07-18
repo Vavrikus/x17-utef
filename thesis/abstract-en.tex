@@ -25,6 +25,8 @@
 \usepackage{amsthm}
 \usepackage{amsfonts}
 \usepackage{fancyvrb}
+\usepackage{jabbrv}
+\usepackage{siunitx}
 
 \pagenumbering{gobble}
 
@@ -34,6 +36,6 @@
 \begin{document}
 
 % By default, we create the abstract from the metadata
-\Abstract
+In this work, we describe the development of a~reconstruction algorithm for atypical Time Projection Chambers (TPCs) that will be used at IEAP, CTU to search for the ATOMKI anomalous internal pair creation. The chambers have an inhomogeneous toroidal magnetic field orthogonal to their electric field; hence we call them Orthogonal Fields TPCs (OFTPCs). This arrangement causes a~distortion of the drift inside the chamber and complicates the shape of electron/positron trajectories. We present a~few approaches to tackle these problems, the best of which uses a~simulated ionization electron drift map for track reconstruction, and a~Runge-Kutta fit for energy reconstruction. Finally, we show from simulations that, for an ideal charge readout with no multiplication and no noise, and with exact knowledge of initial position and direction, we can reach FWHM resolution of \qty{1.6}{\percent} for electrons and \qty{2.0}{\percent} for positrons without correcting systematic errors dependent on the track parameters.
 
 \end{document}

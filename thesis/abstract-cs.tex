@@ -26,6 +26,8 @@
 \usepackage{amsthm}
 \usepackage{amsfonts}
 \usepackage{fancyvrb}
+\usepackage{jabbrv}
+\usepackage{siunitx}
 
 \pagenumbering{gobble}
 
@@ -37,7 +39,7 @@
 \ifx\StudyLanguage\LangCS
 
 % By default, we create the abstract from the metadata
-\AbstractCS
+V této práci byl vyvinut rekonstrukční algoritmus pro atypickou časovou projekční komoru (TPC), jež bude použita na ÚTEF ČVUT k~hledání anomálie X17 ve vnitřní kreaci párů. Tyto komory mají nehomogenní toroidální magnetické pole, orientované kolmo k~elektrickému; proto je nazýváme TPC s~ortogonálními poli (OFTPC). Toto uspořádání způsobuje distorzi driftu v~komoře a~komplikuje tvar elektronových a~pozitronových tracků. Představujeme několik řešení těchto komplikací, z~nichž nejlepší využívá simulaci mapy ionizačních elektronů pro rekonstrukci tracků a~Runge-Kutta fit pro rekonstrukci energie. Na závěr pomocí simulací demonstrujeme rozlišení (FWHM) \qty{1.6}{\percent} pro elektrony a~\qty{2.0}{\percent} pro pozitrony, za předpokladu ideálního vyčítání náboje bez zesílení a~šumu, a~bez korekce systematických odchylek závislých na parametrech tracků.
 
 \else
 
