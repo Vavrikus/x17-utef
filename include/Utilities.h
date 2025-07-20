@@ -7,6 +7,7 @@
 #include <vector>
 
 // ROOT dependencies
+#include "TChain.h"
 #include "TGraph2D.h"
 #include "TH1F.h"
 #include "TPolyLine3D.h"
