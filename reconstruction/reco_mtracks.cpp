@@ -63,8 +63,8 @@ int reco_track()
 
     RecoPadsTask* t2 = new RecoPadsTask(-1.6);
     multi_loop->AddTask(t2);
-    if (allTracks) multi_loop->AddTask(new FitAndSaveTask(t2));
-    else multi_loop->AddTask(new CircleAndRKFitTask(t2));
+    if (allTracks) multi_loop->AddTask(new MicroFitAndSaveTask(t2));
+    else multi_loop->AddTask(new MicroCircleAndRKFitTask(t2));
 
     gErrorIgnoreLevel = 6001;
 

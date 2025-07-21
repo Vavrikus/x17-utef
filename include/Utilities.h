@@ -116,6 +116,11 @@ inline int GetBinsScott(double min, double max, double sigma, double N)
 /// @return The recommended number of bins.
 inline int GetBinsFreedmanDiaconis(std::vector<double>& values, double min, double max)
 {
+    if (values.size() == 0) 
+    {
+        std::cerr << "Utilities::GetBinsFreedmanDiaconis: vector is empty" << std::endl;
+        return 0;
+    }
     double IQR = GetQuantile(values, 0.75) - GetQuantile(values, 0.25);
     double bin_width = 2.0 * IQR / std::pow(values.size(), 1./3.);
     return std::round((max - min) / bin_width);

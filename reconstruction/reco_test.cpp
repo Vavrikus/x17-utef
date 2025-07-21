@@ -56,7 +56,7 @@ int main(int argc, char const *argv[])
     
     RecoPadsTask* t = new RecoPadsTask();
     loop->AddTask(t);
-    loop->AddTask(new CircleAndRKFitTask(t));
+    loop->AddTask(new MicroCircleAndRKFitTask(t));
     
     // Loading file with Runge-Kutta tracks.
     TFile* input_rk = new TFile("../../data/rk_tracks/rk_tracks_forward.root");
@@ -65,7 +65,7 @@ int main(int argc, char const *argv[])
     
     // TrackLoop for Runge-Kutta simulated tracks.
     TrackLoop* rk_loop = new TrackLoop(*map,magfield);
-    // auto t2 = new CircleFitEnergyTask();
+    // auto t2 = new RKFitCircleTask();
     // rk_loop->AddTask(t2);
     // rk_loop->AddTask(new PlotSelectionTask(t2));
     rk_loop->AddTask(new PlotForwardTask());

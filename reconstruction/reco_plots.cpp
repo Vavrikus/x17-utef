@@ -23,6 +23,7 @@
 #include "Track.h"
 #include "Utilities.h"
 #include "X17Utilities.h"
+#include "LinearFit.h"
 
 int main(int argc, char const *argv[])
 {
@@ -106,11 +107,13 @@ int main(int argc, char const *argv[])
         double value = 0; // Here sum will be computed.
         int numbers  = 0; // How many times was a number added.
         
+        void Add(double x) { value += x; numbers++; }
         double Average() { return (numbers == 0) ? 0 : value/numbers; }
     };
     
     
     // Arrays for 2D histograms.
+    AverageCounter e_all[angle_bins][angle_bins][energy_bins];
     AverageCounter e_theta_phi[angle_bins][angle_bins];
     AverageCounter e_theta_energy[angle_bins][energy_bins];
     AverageCounter e_phi_energy[angle_bins][energy_bins];
@@ -118,39 +121,38 @@ int main(int argc, char const *argv[])
     AverageCounter e_theta_energy_abs[angle_bins][energy_bins];
     AverageCounter e_phi_energy_abs[angle_bins][energy_bins];
     
+    AverageCounter p_all[angle_bins][angle_bins][energy_bins];
     AverageCounter p_theta_phi[angle_bins][angle_bins];
     AverageCounter p_theta_energy[angle_bins][energy_bins];
     AverageCounter p_phi_energy[angle_bins][energy_bins];
     AverageCounter p_theta_phi_abs[angle_bins][angle_bins];
     AverageCounter p_theta_energy_abs[angle_bins][energy_bins];
     AverageCounter p_phi_energy_abs[angle_bins][energy_bins];
-    
-    // Initialize arrays to zero.
-    for (int i = 0; i < angle_bins; i++) for (int j = 0; j < angle_bins; j++)
-    {
-        e_theta_phi[i][j] = {0,0};
-        p_theta_phi[i][j] = {0,0};
-        e_theta_phi_abs[i][j] = {0,0};
-        p_theta_phi_abs[i][j] = {0,0};
-    }
-    for (int i = 0; i < angle_bins; i++) for (int j = 0; j < energy_bins; j++)
-    {
-        e_theta_energy[i][j] = {0,0};
-        e_phi_energy[i][j]   = {0,0};
-        p_theta_energy[i][j] = {0,0};
-        p_phi_energy[i][j]   = {0,0};
-        
-        e_theta_energy_abs[i][j] = {0,0};
-        e_phi_energy_abs[i][j]   = {0,0};
-        p_theta_energy_abs[i][j] = {0,0};
-        p_phi_energy_abs[i][j]   = {0,0};
-    }
+
+    std::vector<FPoint> data;
     
     for (int i = 0; i < tracks_info->GetEntries(); i++)
     {
         tracks_info->GetEntry(i);
-        
+        double e_sim = curr_info->kin_energy;
+        double theta = curr_info->theta;
+        double phi   = curr_info->phi;
         double rk_resolution = curr_info->GetRKRelError();
+        
+        // if (!curr_info->electron) continue;
+
+        // double fit_mean = 0.595855 - 0.0703638*e_sim - 0.00889343*theta - 0.00783258*phi; // total
+        double fit_mean = curr_info->electron ? 0.705521 - 0.179129*e_sim  + 0.0195747*theta - 0.010889*phi
+                                              : 0.487641 + 0.0382395*e_sim - 0.0373979*theta - 0.00469622*phi;
+        rk_resolution -= fit_mean;
+
+        std::cout << "e_sim: " << e_sim << " theta: " << theta << " phi: " << phi << " rk_resolution: " << rk_resolution << " fit_mean: " << fit_mean << std::endl;
+        
+        if (std::abs(rk_resolution) > 20)
+        {
+            std::cout << "Error: " << std::abs(rk_resolution) << std::endl;
+        }
+        data.push_back({e_sim,theta,phi,rk_resolution});
         
         int phi_bin    = floor(angle_bins * (curr_info->phi - phi_min) / (phi_max - phi_min));
         int theta_bin  = floor(angle_bins * (curr_info->theta - theta_min) / (theta_max - theta_min));
@@ -160,43 +162,40 @@ int main(int argc, char const *argv[])
         
         if (curr_info->electron)
         {
-            he_all->Fill(curr_info->phi,curr_info->theta,curr_info->kin_energy,rk_resolution);
             ve_res_vec.push_back(rk_resolution);
             
-            e_theta_phi[phi_bin][theta_bin].value       += rk_resolution;
-            e_theta_energy[theta_bin][energy_bin].value += rk_resolution;
-            e_phi_energy[phi_bin][energy_bin].value     += rk_resolution;
-            e_theta_phi_abs[phi_bin][theta_bin].value       += abs(rk_resolution);
-            e_theta_energy_abs[theta_bin][energy_bin].value += abs(rk_resolution);
-            e_phi_energy_abs[phi_bin][energy_bin].value     += abs(rk_resolution);
-            
-            e_theta_phi[phi_bin][theta_bin].numbers++;
-            e_theta_energy[theta_bin][energy_bin].numbers++;
-            e_phi_energy[phi_bin][energy_bin].numbers++;
-            e_theta_phi_abs[phi_bin][theta_bin].numbers++;
-            e_theta_energy_abs[theta_bin][energy_bin].numbers++;
-            e_phi_energy_abs[phi_bin][energy_bin].numbers++;
+            e_all[phi_bin][theta_bin][energy_bin].Add(rk_resolution);
+            e_theta_phi[phi_bin][theta_bin].Add(rk_resolution);
+            e_theta_energy[theta_bin][energy_bin].Add(rk_resolution);
+            e_phi_energy[phi_bin][energy_bin].Add(rk_resolution);
+            e_theta_phi_abs[phi_bin][theta_bin].Add(std::abs(rk_resolution));
+            e_theta_energy_abs[theta_bin][energy_bin].Add(std::abs(rk_resolution));
+            e_phi_energy_abs[phi_bin][energy_bin].Add(std::abs(rk_resolution));
         }
         
         else
         {
-            hp_all->Fill(curr_info->phi,curr_info->theta,curr_info->kin_energy,rk_resolution);
             vp_res_vec.push_back(rk_resolution);
             
-            p_theta_phi[phi_bin][theta_bin].value       += rk_resolution;
-            p_theta_energy[theta_bin][energy_bin].value += rk_resolution;
-            p_phi_energy[phi_bin][energy_bin].value     += rk_resolution;
-            p_theta_phi_abs[phi_bin][theta_bin].value       += abs(rk_resolution);
-            p_theta_energy_abs[theta_bin][energy_bin].value += abs(rk_resolution);
-            p_phi_energy_abs[phi_bin][energy_bin].value     += abs(rk_resolution);
-            
-            p_theta_phi[phi_bin][theta_bin].numbers++;
-            p_theta_energy[theta_bin][energy_bin].numbers++;
-            p_phi_energy[phi_bin][energy_bin].numbers++;
-            p_theta_phi_abs[phi_bin][theta_bin].numbers++;
-            p_theta_energy_abs[theta_bin][energy_bin].numbers++;
-            p_phi_energy_abs[phi_bin][energy_bin].numbers++;
+            p_all[phi_bin][theta_bin][energy_bin].Add(rk_resolution);
+            p_theta_phi[phi_bin][theta_bin].Add(rk_resolution);
+            p_theta_energy[theta_bin][energy_bin].Add(rk_resolution);
+            p_phi_energy[phi_bin][energy_bin].Add(rk_resolution);
+            p_theta_phi_abs[phi_bin][theta_bin].Add(std::abs(rk_resolution));
+            p_theta_energy_abs[theta_bin][energy_bin].Add(std::abs(rk_resolution));
+            p_phi_energy_abs[phi_bin][energy_bin].Add(std::abs(rk_resolution));
         }
+    }
+
+    // Fill 3D histograms from arrays.
+    for (int i = 0; i < angle_bins; i++) for (int j = 0; j < angle_bins; j++) for (int k = 0; k < energy_bins; k++)
+    {
+        double phi   = phi_min + (phi_max - phi_min) * (i + 0.5) / angle_bins;
+        double theta = theta_min + (theta_max - theta_min) * (j + 0.5) / angle_bins;
+        double energy = E_min + (E_max - E_min) * k / energy_bins;
+        
+        he_all->Fill(phi,theta,energy,e_all[i][j][k].Average());
+        hp_all->Fill(phi,theta,energy,p_all[i][j][k].Average());
     }
 
     // Fill 2D histograms from arrays.
@@ -287,8 +286,13 @@ int main(int argc, char const *argv[])
     for (int i = 0; i < tracks_info->GetEntries(); i++)
     {
         tracks_info->GetEntry(i);
-        
+        double e_sim = curr_info->kin_energy;
+        double theta = curr_info->theta;
+        double phi   = curr_info->phi;
         double rk_resolution = curr_info->GetRKRelError();
+        double fit_mean = curr_info->electron ? 0.705521 - 0.179129*e_sim  + 0.0195747*theta - 0.010889*phi
+                                              : 0.487641 + 0.0382395*e_sim - 0.0373979*theta - 0.00469622*phi;
+        rk_resolution -= fit_mean;
         
         if (curr_info->electron)
         {
@@ -518,6 +522,8 @@ int main(int argc, char const *argv[])
     // label2->DrawLatex(0.75, 0.75, Form("Skewness: %.2f", skewness));
     // label2->DrawLatex(0.75, 0.70, Form("Kurtosis: %.2f", kurtosis));
     c_p_delta_energy->Write();
+
+    LinearFit3D(data);
 
     return 0;
 }

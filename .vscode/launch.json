@@ -170,6 +170,25 @@
             "ignoreFailures": true
           }
         ]
+      },
+
+      {
+        "name": "(gdb) Launch map_test",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/build/reconstruction/map_test",
+        "args": [],
+        "cwd": "${workspaceFolder}/build/reconstruction/",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          }
+        ]
       }
     ]
   }
