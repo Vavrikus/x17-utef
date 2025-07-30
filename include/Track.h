@@ -5,6 +5,7 @@
 
 // ROOT dependencies
 #include "Rtypes.h"
+#include "TMath.h"
 #include "TRandom3.h"
 
 // X17 dependencies
@@ -61,6 +62,14 @@ namespace X17
         TrackMicro(bool e, const std::vector<MicroPoint>& pts, Vector orig, Vector orient, double Ek, const std::vector<std::vector<DriftLinePoint>>& dlines)
             : electron(e), points(pts), origin(orig), orientation(orient), kin_energy(Ek), driftlines(dlines) { }
         
+        /// @brief Returns the angle theta of the track (from the equatorial plane).
+        /// @return Angle theta of the track [deg].
+        double theta() const { return (180/TMath::Pi())*asin(orientation.z); }
+
+        /// @brief Returns the azimuth angle phi of the track.
+        /// @return Angle phi of the track [deg].
+        double varphi() const { return (180/TMath::Pi())*acos(orientation.x/cos(asin(orientation.z)))*sign(orientation.y); }
+
         ClassDefNV(TrackMicro, 1)
     };
 

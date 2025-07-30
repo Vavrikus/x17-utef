@@ -220,13 +220,15 @@ class RecoPadsTask : public X17::RecoTask
 
             c_reco->Write();
             
-            delete c_reco;
+            // delete c_reco;
             delete scale;
             
             // DefaultLayout::GetDefaultLayout().DrawPads3D(height);
         }
 
-        for (auto line : marker_lines) delete line;
+        if (!m_loop->make_track_plots)
+            for (auto line : marker_lines)
+                delete line;
     }
 
 public:

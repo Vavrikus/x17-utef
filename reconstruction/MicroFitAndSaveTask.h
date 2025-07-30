@@ -105,8 +105,8 @@ class MicroFitAndSaveTask : public X17::RecoTask
         rkfit->PrintFitParams();
 
         double track_E      = m_loop->curr_microtrack->kin_energy;
-        double track_theta  = (180/TMath::Pi())*asin(m_loop->curr_microtrack->orientation.z);
-        double track_phi    = (180/TMath::Pi())*acos(m_loop->curr_microtrack->orientation.x/cos(asin(m_loop->curr_microtrack->orientation.z)))*sign(m_loop->curr_microtrack->orientation.y);
+        double track_theta  = m_loop->curr_microtrack->theta();
+        double track_phi    = m_loop->curr_microtrack->varphi();
         double E_resolution = 100*(rkfit->GetEnergy()-track_E)/track_E;
 
         curr_info.electron   = m_loop->curr_microtrack->electron;

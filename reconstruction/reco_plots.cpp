@@ -20,13 +20,77 @@
 #include "../build/X17_dict.cxx"
 
 // X17 dependencies
+#include "LinearFit.h"
 #include "Track.h"
 #include "Utilities.h"
 #include "X17Utilities.h"
-#include "LinearFit.h"
+
+constexpr int fit_param = 4;
+
+double Get_a0(bool electron, int p = 4, bool use_reco = false)
+{
+    if (use_reco && p == 4) return electron ? -0.143346 : -0.167961;
+    
+    return 0;
+}
+double Get_a1(bool electron, int p = 4, bool use_reco = false)
+{
+    if (use_reco && p == 4) return electron ? -0.0841256 : 0.0922397;
+    
+    return 0;
+}
+double Get_a2(bool electron, int p = 4, bool use_reco = false)
+{
+    if (use_reco && p == 4) return electron ? 0.0208461 : -0.0331023;
+    
+    return 0;
+}
+double Get_a3(bool electron, int p = 4, bool use_reco = false)
+{
+    if (use_reco && p == 4) return electron ? -0.00137187 : 0.000224353;
+    
+    return 0;
+}
+
+// double RecoCorr(bool electron, double e_sim, double e_rec, double theta, double varphi)
+// {
+//     return e_rec 
+// }
+
+double FitCorrection(bool electron, double e_sim, double e_rec, double theta, double varphi, int p = 4, bool use_reco = false)
+{
+    // return 0;
+    if (use_reco)
+    {
+        if (p == 4)
+        {
+            return electron ? -0.143346 - 0.0841256*e_rec + 0.0208461*theta - 0.00137187*varphi   // fit [-4,2]
+                            : -0.167961 + 0.0922397*e_rec - 0.0331023*theta + 0.000224353*varphi; // fit [-2,4]
+        }         
+    }
+
+    else
+    {
+        if (p == 4)
+        {
+            // return electron ? 0.705521 - 0.179129*e_sim  + 0.0195747*theta - 0.010889*varphi
+            //                 : 0.487641 + 0.0382395*e_sim - 0.0373979*theta - 0.00469622*varphi;
+            return electron ? -0.104444 - 0.088225*e_sim  + 0.0206748*theta - 0.00136367*varphi  // fit [-4,2]
+                            : -0.128394 + 0.0879214*e_sim - 0.0333912*theta - 0.00223458*varphi; // fit [-2,4]
+        }
+
+        if (p == 2)
+        {
+            return electron ? 0.705647 - 0.179144*e_sim : 0.486942 + 0.0382954*e_sim;
+        }
+    }
+
+    return 0;
+}
 
 int main(int argc, char const *argv[])
 {
+    using namespace X17::constants;
     std::string data_folder = "../../data/micro_tracks/";
 
     // Loading file with track information.
@@ -37,19 +101,7 @@ int main(int argc, char const *argv[])
     tracks_info->SetBranchAddress("track_info",&curr_info);
 
     // Output file.
-    TFile out_file((data_folder + "tracks_fit.root").c_str(),"RECREATE","Microscopic tracks reconstruction plots");
-
-    // Binning.
-    constexpr int angle_bins  = 21;
-    constexpr int energy_bins = 11;
-
-    // Ranges for simulation.
-    double theta_max = (180/TMath::Pi())*atan((X17::constants::win_height/2)/X17::constants::xmin); // The maximal simulated theta [deg].
-    double theta_min = -theta_max;                                                                  // The minimal simulated theta [deg].
-    double phi_max = (180/TMath::Pi())*atan((X17::constants::win_width/2)/X17::constants::xmin);    // The maximal simulated phi [deg].
-    double phi_min = -phi_max;                                                                      // The minimal simulated phi [deg].
-    double E_max = 13;                                                                              // The maximal simulated energy [MeV].
-    double E_min = 3;                                                                               // THe minimal simulated energy [MeV].
+    TFile out_file((data_folder + "tracks_fit.root").c_str(),"RECREATE","Microscopic tracks reconstruction plots");                                                                             // THe minimal simulated energy [MeV].
 
     // Reconstruction ranges.
     double res_min = -10;
@@ -58,27 +110,31 @@ int main(int argc, char const *argv[])
     // double res_bins_small = 51;
 
     // Adjusting boundaries for the extra bin.
-    phi_max   = phi_min   + (phi_max   - phi_min)   * angle_bins  / (angle_bins  - 1);
-    theta_max = theta_min + (theta_max - theta_min) * angle_bins  / (angle_bins  - 1);
-    E_max     = E_min     + (E_max     - E_min)     * energy_bins / (energy_bins - 1);
+    double phi_max   = X_phi_min   + (X_phi_max - X_phi_min)     * X_angle_bins  / (X_angle_bins  - 1);
+    double theta_max = X_theta_min + (X_theta_max - X_theta_min) * X_angle_bins  / (X_angle_bins  - 1);
+    double E_max     = X_E_min     + (X_E_max   - X_E_min)       * X_energy_bins / (X_energy_bins - 1);
+    double E_min     = X_E_min;
+    int angle_bins  = X_angle_bins;
+    int energy_bins = X_energy_bins;
 
     // Shifting angle bin boundaries by half a bin in order to avoid rounding error problems.
-    double phi_shift   = (phi_max - phi_min) / (2 * angle_bins);
-    double theta_shift = (theta_max - theta_min) / (2 * angle_bins);
-    phi_min   -= phi_shift;
+    double phi_shift   = (phi_max   - X_phi_min)   / (2 * X_angle_bins);
+    double theta_shift = (theta_max - X_theta_min) / (2 * X_angle_bins);
+    double phi_min   = X_phi_min   - phi_shift;
+    double theta_min = X_theta_min - theta_shift;
     phi_max   -= phi_shift;
-    theta_min -= theta_shift;
     theta_max -= theta_shift;
 
     // Histogram titles.
-    const char* h_all_title                = ";Phi [deg];Theta [deg];Simulated energy [MeV]";
-    const char* h_theta_phi_title          = ";Phi [deg];Theta [deg];#frac{E_{rec}-E}{E} [\%]";
-    const char* h_theta_energy_title       = ";Theta [deg];Simulated energy [MeV];#frac{E_{rec}-E}{E} [\%]";
-    const char* h_phi_energy_title         = ";Phi [deg];Simulated energy [MeV];#frac{E_{rec}-E}{E} [\%]";
-    const char* h_deltaenergy_energy_title = ";Simulated energy [MeV];#frac{E_{rec}-E}{E} [\%]";
-    const char* h_deltaenergy_phi_title    = ";Phi [deg];#frac{E_{rec}-E}{E} [\%]";
-    const char* h_deltaenergy_theta_title  = ";Theta [deg];#frac{E_{rec}-E}{E} [\%]";
-    const char* h_delta_energy_title       = ";#frac{E_{rec}-E}{E} [\%];# of events";
+    const char* h_all_title                 = ";Phi [deg];Theta [deg];Simulated energy [MeV]";
+    const char* h_theta_phi_title           = ";Phi [deg];Theta [deg];#frac{E_{rec}-E}{E} [\%]";
+    const char* h_theta_energy_title        = ";Theta [deg];Simulated energy [MeV];#frac{E_{rec}-E}{E} [\%]";
+    const char* h_phi_energy_title          = ";Phi [deg];Simulated energy [MeV];#frac{E_{rec}-E}{E} [\%]";
+    const char* h_deltaenergy_energy_title  = ";Simulated energy [MeV];#frac{E_{rec}-E}{E} [\%]";
+    const char* h_deltaenergy_energy_title2 = ";Reconstructed energy [MeV];#frac{E_{rec}-E}{E} [\%]";
+    const char* h_deltaenergy_phi_title     = ";#varphi [deg];#frac{E_{rec}-E}{E} [\%]";
+    const char* h_deltaenergy_theta_title   = ";#theta [deg];#frac{E_{rec}-E}{E} [\%]";
+    const char* h_delta_energy_title        = ";#frac{E_{rec}-E}{E} [\%];# of events";
 
     // Histogram initializations.
     TH3F* he_all                = new TH3F("he_all",h_all_title,angle_bins,phi_min,phi_max,angle_bins,theta_min,theta_max,energy_bins,E_min,E_max);
@@ -134,25 +190,24 @@ int main(int argc, char const *argv[])
     for (int i = 0; i < tracks_info->GetEntries(); i++)
     {
         tracks_info->GetEntry(i);
+
+        bool electron = curr_info->electron;
         double e_sim = curr_info->kin_energy;
         double theta = curr_info->theta;
         double phi   = curr_info->phi;
         double rk_resolution = curr_info->GetRKRelError();
+        double e_rec = curr_info->rkfit_energy;
         
-        // if (!curr_info->electron) continue;
-
-        // double fit_mean = 0.595855 - 0.0703638*e_sim - 0.00889343*theta - 0.00783258*phi; // total
-        double fit_mean = curr_info->electron ? 0.705521 - 0.179129*e_sim  + 0.0195747*theta - 0.010889*phi
-                                              : 0.487641 + 0.0382395*e_sim - 0.0373979*theta - 0.00469622*phi;
-        rk_resolution -= fit_mean;
-
-        std::cout << "e_sim: " << e_sim << " theta: " << theta << " phi: " << phi << " rk_resolution: " << rk_resolution << " fit_mean: " << fit_mean << std::endl;
+        // if (electron) continue;
+        rk_resolution -= FitCorrection(electron, e_sim, e_rec, theta, phi, fit_param, true);
+        e_rec = e_sim*(rk_resolution/100) + e_sim;
+        // std::cout << "e_sim: " << e_sim << " theta: " << theta << " phi: " << phi << " rk_resolution: " << rk_resolution << " fit_mean: " << fit_mean << std::endl;
         
-        if (std::abs(rk_resolution) > 20)
+        if ((rk_resolution < -2) || (rk_resolution > 4))
         {
-            std::cout << "Error: " << std::abs(rk_resolution) << std::endl;
+            // std::cout << "Error: " << std::abs(rk_resolution) << std::endl; continue;
         }
-        data.push_back({e_sim,theta,phi,rk_resolution});
+        data.push_back({electron,e_sim,e_rec,theta,phi,rk_resolution});
         
         int phi_bin    = floor(angle_bins * (curr_info->phi - phi_min) / (phi_max - phi_min));
         int theta_bin  = floor(angle_bins * (curr_info->theta - theta_min) / (theta_max - theta_min));
@@ -234,17 +289,19 @@ int main(int argc, char const *argv[])
     int p_res_bins_angle = p_res_bins / std::pow(angle_bins,1./3.);
     
     // Remaining histograms
-    TH2F* he_deltaenergy_energy = new TH2F("he_deltaenergy_energy",h_deltaenergy_energy_title,energy_bins,E_min,E_max,e_res_bins_energy,res_min,res_max);
-    TH2F* he_deltaenergy_phi    = new TH2F("he_deltaenergy_phi",h_deltaenergy_phi_title,angle_bins,phi_min,phi_max,e_res_bins_angle,res_min,res_max);
-    TH2F* he_deltaenergy_theta  = new TH2F("he_deltaenergy_theta",h_deltaenergy_theta_title,angle_bins,theta_min,theta_max,e_res_bins_angle,res_min,res_max);
-    TH1F* he_delta_energy       = new TH1F("he_delta_energy",h_delta_energy_title,e_res_bins,res_min,res_max);
+    TH2F* he_deltaenergy_energy  = new TH2F("he_deltaenergy_energy",h_deltaenergy_energy_title,energy_bins,E_min,E_max,e_res_bins_energy,res_min,res_max);
+    TH2F* he_deltaenergy_energy2 = new TH2F("he_deltaenergy_energy2",h_deltaenergy_energy_title2,energy_bins,E_min,E_max,e_res_bins_energy,res_min,res_max);
+    TH2F* he_deltaenergy_phi     = new TH2F("he_deltaenergy_phi",h_deltaenergy_phi_title,angle_bins,phi_min,phi_max,e_res_bins_angle,res_min,res_max);
+    TH2F* he_deltaenergy_theta   = new TH2F("he_deltaenergy_theta",h_deltaenergy_theta_title,angle_bins,theta_min,theta_max,e_res_bins_angle,res_min,res_max);
+    TH1F* he_delta_energy        = new TH1F("he_delta_energy",h_delta_energy_title,e_res_bins,res_min,res_max);
 
-    TH2F* hp_deltaenergy_energy = new TH2F("hp_deltaenergy_energy",h_deltaenergy_energy_title,energy_bins,E_min,E_max,p_res_bins_energy,res_min,res_max);
-    TH2F* hp_deltaenergy_phi    = new TH2F("hp_deltaenergy_phi",h_deltaenergy_phi_title,angle_bins,phi_min,phi_max,p_res_bins_angle,res_min,res_max);
-    TH2F* hp_deltaenergy_theta  = new TH2F("hp_deltaenergy_theta",h_deltaenergy_theta_title,angle_bins,theta_min,theta_max,p_res_bins_angle,res_min,res_max);
-    TH1F* hp_delta_energy       = new TH1F("hp_delta_energy",h_delta_energy_title,p_res_bins,res_min,res_max);
+    TH2F* hp_deltaenergy_energy  = new TH2F("hp_deltaenergy_energy",h_deltaenergy_energy_title,energy_bins,E_min,E_max,p_res_bins_energy,res_min,res_max);
+    TH2F* hp_deltaenergy_energy2 = new TH2F("hp_deltaenergy_energy2",h_deltaenergy_energy_title2,energy_bins,E_min,E_max,p_res_bins_energy,res_min,res_max);
+    TH2F* hp_deltaenergy_phi     = new TH2F("hp_deltaenergy_phi",h_deltaenergy_phi_title,angle_bins,phi_min,phi_max,p_res_bins_angle,res_min,res_max);
+    TH2F* hp_deltaenergy_theta   = new TH2F("hp_deltaenergy_theta",h_deltaenergy_theta_title,angle_bins,theta_min,theta_max,p_res_bins_angle,res_min,res_max);
+    TH1F* hp_delta_energy        = new TH1F("hp_delta_energy",h_delta_energy_title,p_res_bins,res_min,res_max);
 
-    for (TH2F* h : {he_deltaenergy_energy,he_deltaenergy_phi,he_deltaenergy_theta,hp_deltaenergy_energy,hp_deltaenergy_phi,hp_deltaenergy_theta})
+    for (TH2F* h : {he_deltaenergy_energy,he_deltaenergy_energy2,he_deltaenergy_phi,he_deltaenergy_theta,hp_deltaenergy_energy,hp_deltaenergy_energy2,hp_deltaenergy_phi,hp_deltaenergy_theta})
     {
         ApplyThesisStyle(h);
         h->GetXaxis()->SetTitleOffset(1);
@@ -283,31 +340,24 @@ int main(int argc, char const *argv[])
         c->SetWindowSize(wf*700,hf*500);
     };
     
-    for (int i = 0; i < tracks_info->GetEntries(); i++)
-    {
-        tracks_info->GetEntry(i);
-        double e_sim = curr_info->kin_energy;
-        double theta = curr_info->theta;
-        double phi   = curr_info->phi;
-        double rk_resolution = curr_info->GetRKRelError();
-        double fit_mean = curr_info->electron ? 0.705521 - 0.179129*e_sim  + 0.0195747*theta - 0.010889*phi
-                                              : 0.487641 + 0.0382395*e_sim - 0.0373979*theta - 0.00469622*phi;
-        rk_resolution -= fit_mean;
-        
-        if (curr_info->electron)
+    for (FPoint p : data)
+    {        
+        if (p.electron)
         {
-            he_deltaenergy_energy->Fill(curr_info->kin_energy,rk_resolution);
-            he_deltaenergy_phi->Fill(curr_info->phi,rk_resolution);
-            he_deltaenergy_theta->Fill(curr_info->theta,rk_resolution);
-            he_delta_energy->Fill(rk_resolution);
+            he_deltaenergy_energy->Fill(p.e_sim,p.dev_reco);
+            he_deltaenergy_energy2->Fill(p.e_rec,p.dev_reco);
+            he_deltaenergy_phi->Fill(p.varphi,p.dev_reco);
+            he_deltaenergy_theta->Fill(p.theta,p.dev_reco);
+            he_delta_energy->Fill(p.dev_reco);
         }
         
         else
         {
-            hp_deltaenergy_energy->Fill(curr_info->kin_energy,rk_resolution);
-            hp_deltaenergy_phi->Fill(curr_info->phi,rk_resolution);
-            hp_deltaenergy_theta->Fill(curr_info->theta,rk_resolution);
-            hp_delta_energy->Fill(rk_resolution);
+            hp_deltaenergy_energy->Fill(p.e_sim,p.dev_reco);
+            hp_deltaenergy_energy2->Fill(p.e_rec,p.dev_reco);
+            hp_deltaenergy_phi->Fill(p.varphi,p.dev_reco);
+            hp_deltaenergy_theta->Fill(p.theta,p.dev_reco);
+            hp_delta_energy->Fill(p.dev_reco);
         }
     }
 
@@ -409,6 +459,7 @@ int main(int argc, char const *argv[])
     hp_phi_energy_abs->Draw("colz");
     c_p_phi_energy_abs->Write();
 
+
     TCanvas* c_e_deltaenergy_energy = new TCanvas("c_e_deltaenergy_energy","");
     th2_c(c_e_deltaenergy_energy);
     he_deltaenergy_energy->SetStats(0);
@@ -419,6 +470,17 @@ int main(int argc, char const *argv[])
     y0_line->SetLineWidth(4);
     y0_line->Draw("same");
     c_e_deltaenergy_energy->Write();
+
+    TCanvas* c_e_deltaenergy_energy2 = new TCanvas("c_e_deltaenergy_energy2","");
+    th2_c(c_e_deltaenergy_energy2);
+    he_deltaenergy_energy2->SetStats(0);
+    he_deltaenergy_energy2->SetContour(ncont);
+    he_deltaenergy_energy2->SetMaximum(250);
+    he_deltaenergy_energy2->Draw("colz");
+    y0_line = new TLine(he_deltaenergy_energy2->GetXaxis()->GetXmin(),0,he_deltaenergy_energy2->GetXaxis()->GetXmax(),0);
+    y0_line->SetLineWidth(4);
+    y0_line->Draw("same");
+    c_e_deltaenergy_energy2->Write();
 
     TCanvas* c_e_deltaenergy_phi = new TCanvas("c_e_deltaenergy_phi","");
     th2_c(c_e_deltaenergy_phi);
@@ -454,6 +516,17 @@ int main(int argc, char const *argv[])
     y0_line->Draw("same");
     c_p_deltaenergy_energy->Write();
 
+    TCanvas* c_p_deltaenergy_energy2 = new TCanvas("c_p_deltaenergy_energy2","");
+    th2_c(c_p_deltaenergy_energy2);
+    hp_deltaenergy_energy2->SetStats(0);
+    hp_deltaenergy_energy2->SetContour(ncont);
+    hp_deltaenergy_energy2->SetMaximum(250);
+    hp_deltaenergy_energy2->Draw("colz");
+    y0_line = new TLine(hp_deltaenergy_energy2->GetXaxis()->GetXmin(),0,hp_deltaenergy_energy2->GetXaxis()->GetXmax(),0);
+    y0_line->SetLineWidth(4);
+    y0_line->Draw("same");
+    c_p_deltaenergy_energy2->Write();
+
     TCanvas* c_p_deltaenergy_phi = new TCanvas("c_p_deltaenergy_phi","");
     th2_c(c_p_deltaenergy_phi);
     hp_deltaenergy_phi->SetStats(0);
@@ -480,11 +553,18 @@ int main(int argc, char const *argv[])
     TCanvas* c_e_delta_energy = new TCanvas("c_e_delta_energy","");
     th1_c(c_e_delta_energy);
     he_delta_energy->SetStats(0);
+    he_delta_energy->Fit("gaus");
     he_delta_energy->Draw();
 
-    double fwhm = GetFWHM(he_delta_energy,true);
-    double mean = he_delta_energy->GetMean();
-    double stdev = he_delta_energy->GetStdDev();
+    TF1* fit = he_delta_energy->GetFunction("gaus");
+    fit->SetNpx(1000);
+    double mean = fit->GetParameter(1);
+    double stdev = fit->GetParameter(2);
+    double fwhm = 2.35482 * stdev;
+
+    // double fwhm = GetFWHM(he_delta_energy,false);
+    // double mean = he_delta_energy->GetMean();
+    // double stdev = he_delta_energy->GetStdDev();
     double skewness = he_delta_energy->GetSkewness();
     double kurtosis = he_delta_energy->GetKurtosis();
 
@@ -493,9 +573,9 @@ int main(int argc, char const *argv[])
     label->SetNDC();
     label->SetTextSize(0.055);
 
-    label->DrawLatex(0.68, 0.85, Form("Mean: %.2f %%", mean));
-    label->DrawLatex(0.68, 0.78, Form("FWHM: %.2f %%", fwhm));
-    label->DrawLatex(0.68, 0.71, Form("RMS: %.2f %%", stdev));
+    label->DrawLatex(0.68, 0.85, Form("Mean: %.2f%%", mean));
+    label->DrawLatex(0.68, 0.78, Form("FWHM: %.2f%%", fwhm));
+    label->DrawLatex(0.68, 0.71, Form("RMS: %.2f%%", stdev));
     // label->DrawLatex(0.75, 0.75, Form("Skewness: %.2f", skewness));
     // label->DrawLatex(0.75, 0.70, Form("Kurtosis: %.2f", kurtosis));
     c_e_delta_energy->Write();
@@ -503,11 +583,18 @@ int main(int argc, char const *argv[])
     TCanvas* c_p_delta_energy = new TCanvas("c_p_delta_energy","");
     th1_c(c_p_delta_energy);
     hp_delta_energy->SetStats(0);
+    hp_delta_energy->Fit("gaus");
     hp_delta_energy->Draw();
 
-    fwhm = GetFWHM(hp_delta_energy,true);
-    mean = hp_delta_energy->GetMean();
-    stdev = hp_delta_energy->GetStdDev();
+    fit = hp_delta_energy->GetFunction("gaus");
+    fit->SetNpx(1000);
+    mean = fit->GetParameter(1);
+    stdev = fit->GetParameter(2);
+    fwhm = 2.35482 * stdev;
+
+    // fwhm = GetFWHM(hp_delta_energy,false);
+    // mean = hp_delta_energy->GetMean();
+    // stdev = hp_delta_energy->GetStdDev();
     skewness = hp_delta_energy->GetSkewness();
     kurtosis = hp_delta_energy->GetKurtosis();
 
@@ -516,14 +603,14 @@ int main(int argc, char const *argv[])
     label2->SetNDC();
     label2->SetTextSize(0.055);
 
-    label2->DrawLatex(0.68, 0.85, Form("Mean: %.2f %%", mean));
-    label2->DrawLatex(0.68, 0.78, Form("FWHM: %.2f %%", fwhm));
-    label2->DrawLatex(0.68, 0.71, Form("RMS: %.2f %%", stdev));
+    label2->DrawLatex(0.68, 0.85, Form("Mean: %.2f%%", mean));
+    label2->DrawLatex(0.68, 0.78, Form("FWHM: %.2f%%", fwhm));
+    label2->DrawLatex(0.68, 0.71, Form("RMS: %.2f%%", stdev));
     // label2->DrawLatex(0.75, 0.75, Form("Skewness: %.2f", skewness));
     // label2->DrawLatex(0.75, 0.70, Form("Kurtosis: %.2f", kurtosis));
     c_p_delta_energy->Write();
 
-    LinearFit3D(data);
+    LinearFit3D(data, fit_param, true);
 
     return 0;
 }

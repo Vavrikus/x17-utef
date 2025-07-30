@@ -64,6 +64,16 @@ namespace X17
             constexpr int rows     = 15;  // Number of pad rows (diagonal)
             constexpr int columns  = 12;  // Number of pad columns
             constexpr int channels = 128; // Number of pads (channels)
+
+        // Microscopic simulation bounds
+            constexpr int X_angle_bins   = 21;
+            constexpr int X_energy_bins  = 11;
+            constexpr double X_theta_max = (180/M_PI)*std::atan((win_height/2)/xmin); // The maximal simulated theta [deg].
+            constexpr double X_theta_min = -X_theta_max;                              // The minimal simulated theta [deg].
+            constexpr double X_phi_max   = (180/M_PI)*std::atan((win_width/2)/xmin);  // The maximal simulated phi [deg].
+            constexpr double X_phi_min   = -X_phi_max;                                // The minimal simulated phi [deg].
+            constexpr double X_E_max     = 13;                                        // The maximal simulated energy [MeV].
+            constexpr double X_E_min     = 3;                                         // THe minimal simulated energy [MeV].
     } // namespace constants
     
     /// @brief Returns true if given point is in the first sector TPC (containing positive x-axis) of the detector (trapezoidal prism).
