@@ -103,7 +103,7 @@ namespace X17
         /// @brief Adds two endpoints component-wise and returns the result.
         /// @param p2 The second endpoint.
         /// @return The sum of the two endpoints.
-        EndPoint operator+(EndPoint p2)
+        EndPoint operator+(EndPoint p2) const
         {
             return EndPoint{point + p2.point, t + p2.t};
         }
@@ -111,7 +111,7 @@ namespace X17
         /// @brief Subtracts two endpoints component-wise.
         /// @param p2 The second endpoint.
         /// @return EndPoint The difference between the two endpoints.
-        EndPoint operator-(EndPoint p2)
+        EndPoint operator-(EndPoint p2) const
         {
             return EndPoint{point - p2.point, t - p2.t};
         }

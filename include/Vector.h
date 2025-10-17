@@ -46,7 +46,13 @@ namespace X17
         /// @brief Compute the square of the distance between this vector and another vector.
         /// @param[in] other The other vector.
         /// @return The square of the distance.
-        double SqDist(Vector other) const { return pow(x - other.x, 2) + pow(y - other.y, 2) + pow(z - other.z, 2); }
+        double SqDist(Vector other) const
+        {
+            double dx = x - other.x;
+            double dy = y - other.y;
+            double dz = z - other.z;
+            return dx * dx + dy * dy + dz * dz;
+        }
 
         /// @brief Compute the distance between this vector and another vector.
         /// @param[in] other The other vector.

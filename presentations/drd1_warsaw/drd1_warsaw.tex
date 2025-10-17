@@ -1,0 +1,302 @@
+% Unofficial University of Cambridge Poster Template
+% https://github.com/andiac/gemini-cam
+% a fork of https://github.com/anishathalye/gemini
+% also refer to https://github.com/k4rtik/uchicago-poster
+
+\documentclass[final]{beamer}
+
+% ====================
+% Packages
+% ====================
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[orientation=portrait,size=a0,scale=1.0]{beamerposter}
+\usetheme{gemini}
+\usecolortheme{nott}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.14}
+\usepackage{anyfontsize}
+
+\usepackage[labelfont=bf]{caption}
+\captionsetup[figure]{justification=justified, format=hang}
+\usepackage{relsize}
+\usepackage{xspace}
+
+% ====================
+% Lengths
+% ====================
+
+% If you have N columns, choose \sepwidth and \colwidth such that
+% (N+1)*\sepwidth + N*\colwidth = \paperwidth
+\newlength{\sepwidth}
+\newlength{\colwidth}
+\setlength{\sepwidth}{0.025\paperwidth}
+\setlength{\colwidth}{0.45\paperwidth}
+
+\newcommand{\separatorcolumn}{\begin{column}{\sepwidth}\end{column}}
+
+% ====================
+% Title
+% ====================
+
+\title{Simulation and reconstruction of e\textsuperscript{+} and e\textsuperscript{-} trajectories in an Orthogonal Fields Time Projection Chamber}
+
+\author{Martin Vavřík} %\inst{1} \and Hugo Natal da Luz \inst{1}
+
+\institute[shortinst]{Institute of Experimental and Applied Physics, Czech Technical University in Prague} %\samelineand \inst{2} Another Institute
+
+% ====================
+% Footer (optional)
+% ====================
+
+\footercontent
+{
+	\href{https://aladdin.utef.cvut.cz/projekty/vdg/x17/}{https://aladdin.utef.cvut.cz/projekty/vdg/x17/} \hfill
+	6--10 October 2025 --- 6\textsuperscript{th} DRD1 Collaboration Meeting, Warsaw \hfill
+	\href{mailto:Martin.Vavrik@utef.cvut.cz}{Martin.Vavrik@utef.cvut.cz}
+}
+% (can be left out to remove footer)
+
+
+% ====================
+% Logo (optional)
+% ====================
+
+% use this to include logos on the left and/or right side of the header:
+\logoright{\includegraphics[height=7cm]{../images/CTU_IEAP_EN_vector_full.pdf}}
+\logoleft{\includegraphics[height=7cm]{../images/logo_cvut_en.pdf}}
+
+% ====================
+% Body
+% ====================
+
+\usepackage[warnundef]{jabbrv}
+\usepackage[natbib,style=iso-numeric,sorting=none,backend=biber]{biblatex}
+\addbibresource{bibliography.bib}
+\addbibresource{bibliography2.bib}
+
+% Only author + DOI
+\AtEveryBibitem{%
+	\clearfield{title}%
+	\clearfield{journaltitle}%
+	\clearfield{booktitle}%
+	\clearfield{volume}%
+	\clearfield{number}%
+	\clearfield{pages}%
+	\clearfield{publisher}%
+	\clearlist{publisher}%
+	\clearfield{note}%
+	\clearfield{issn}
+}
+
+
+% Print format: Author — DOI
+%\DeclareFieldFormat{doi}{#1}
+\renewbibmacro*{doi+eprint+url}{%
+	\printfield{doi}%
+}
+\renewcommand*{\bibfont}{\small}
+
+%%% Detailed settings of bibliography
+\ifx\citet\undefined\else
+
+% Maximum number of authors of a single work. If exceeded, "et al." is used.
+\ExecuteBibliographyOptions{maxnames=1}
+% The same setting specific to citations using \citet{...}
+\ExecuteBibliographyOptions{maxcitenames=2}
+% The same settings specific to the list of literature
+%\ExecuteBibliographyOptions{maxbibnames=2}
+
+% Shortening first names of authors: "E. A. Poe" instead of "Edgar Allan Poe"
+%\ExecuteBibliographyOptions{giveninits}
+% The same without dots ("EA Poe")
+%\ExecuteBibliographyOptions{terseinits}
+
+% If your bibliography entries are hard to break into lines, try this mode:
+%\ExecuteBibliographyOptions{block=ragged}
+
+% Possibly reverse the names of the authors with the non-ISO styles:
+%\DeclareNameAlias{default}{family-given}
+
+% Use caps-and-small-caps for family names in ISO 690 style.
+\let\familynameformat=\textsc
+
+% We want to separate multiple authors in citations by commas
+% (while we use semicolons in the bibliography as per the ISO standard)
+\DeclareDelimFormat[textcite]{multinamedelim}{\addcomma\space}
+\DeclareDelimFormat[textcite]{finalnamedelim}{\space and~}
+
+\fi
+
+%%% Journal Abbreviations (jabbrv package) -- extra custom definitions (following ISO 4)
+\DefineJournalPartialAbbreviation{Instrument}{Instrum}
+\DefineJournalAbbreviation{Polonica}{Pol}
+\DefineJournalPartialAbbreviation{Spectrometer}{Spectrom}
+
+\newcommand{\epm}{e\textsuperscript{+}/e\textsuperscript{-}\xspace}
+\newcommand{\garfieldpp}{Garfield\texttt{++}} %\nolinebreak[4]\raisebox{.4ex}{\relsize{-3}{\textbf{++}}}\xspace}
+\newcommand{\iso}[2]{\textsuperscript{#2}#1}
+
+\setbeamertemplate{enumerate items}[default] % restores standard LaTeX enumerate
+
+\begin{document}
+	
+	% Refer to https://github.com/k4rtik/uchicago-poster
+	% logo: https://www.cam.ac.uk/brand-resources/about-the-logo/logo-downloads
+	% \addtobeamertemplate{headline}{}
+	% {
+		%     \begin{tikzpicture}[remember picture,overlay]
+			%       \node [anchor=north west, inner sep=3cm] at ([xshift=-2.5cm,yshift=1.75cm]current page.north west)
+			%       {\includegraphics[height=7cm]{logos/unott-logo.eps}}; 
+			%     \end{tikzpicture}
+		% }
+	
+	\begin{frame}[t]
+		\begin{columns}[t]
+			\separatorcolumn
+			
+			\begin{column}{\colwidth}				
+				\begin{block}{Motivation: ATOMKI anomaly}
+					In 2015, a~group at the ATOMKI Institute (Debrecen, Hungary) observed an anomaly in the angular correlation of internal \epm pairs produced in the decay of an excited state of \iso{Be}{8}~\cite{atomki_be}. Later, they observed similar anomalies in \iso{He}{4}~\cite{atomki_he2} and \iso{C}{12}~\cite{atomki_c}.
+						\vspace{-0.5em}
+						\begin{figure}
+							\centering
+							\includegraphics[width=0.3\textwidth]{../images/atomki_be_big.png}
+							\hfill
+							\includegraphics[width=0.3\textwidth]{figures/atomki_he.png}
+							\hfill
+							\includegraphics[width=0.3\textwidth]{figures/atomki_c.png}
+							\vspace{-0.25em}
+							\caption{Anomalous internal pair creation in the deexcitations of \iso{Be}{8}, \iso{He}{4}, and \iso{C}{12} measured at ATOMKI.}
+						\end{figure}
+						\vspace{-0.75em}
+					The anomaly has not yet been confirmed by independent measurements. Possible explanations include experimental effects, higher-order processes within the Standard Model~\cite{kalman,aleksejevs}, or even a~protophobic fifth force mediated by a~new 17~MeV boson X17~\cite{feng}.
+				\end{block}
+				
+				\begin{block}{X17 project at IEAP CTU}
+					At IEAP CTU, we are building a~spectrometer to test the ATOMKI anomaly. It has hexagonal symmetry and consists of 3~layers:
+						\vspace{-0.75em}
+						\begin{itemize}
+							\item \textbf{Timepix3 (TPX3)} detectors placed in the vacuum tube for correlation-angle reconstruction~\cite{triangle,tpx3_tracks},
+							\item \textbf{Multi-Wire Proportional Chambers (MWPCs)} provide an extra point on the track outside the tube,
+							\item \textbf{Orthogonal Fields Time Projection Chambers (OFTPCs)} with triple-GEM readout of 128 pads will be used for the energy reconstruction. It will use a~70:30 Ar:CO$_2$ gas mixture.
+						\end{itemize}
+						\vspace{-0.5em}
+						\begin{figure}
+							\centering
+							\includegraphics[width=0.57\textwidth]{../images/ieap_x17.png}
+							\hfill
+							\includegraphics[width=0.37\textwidth]{figures/tpc_ggb.png}
+							\caption{Schematic of the IEAP X17 spectrometer (left) and coordinate system in one of the OFTPCs (right).}
+						\end{figure}
+						\vspace{-0.75em}
+					The choice of a~toroidal magnetic field orthogonal to the electric field is mostly related to construction feasibility --- we use permanent magnets instead of a~solenoid, and the readout granularity is limited to fit one SAMPA/SRS hybrid in each sector. Our goal is to achieve a~resolution comparable to that of common cylindrical TPCs while reducing overall cost. Due to the field layout, the drift is distorted and the curvature of the primary trajectories is not constant because of the field inhomogeneity.
+						%\begin{figure}
+						%	\centering
+						%	\includegraphics[width=0.4\textwidth]{../images/mag_xy.png}
+						%	\hspace{0.067\textwidth}
+						%	\includegraphics[width=0.4\textwidth]{../images/mag_xz.png}
+						%	\caption{Magnetic field in the $xy$ plane (left) and in the $xz$ plane (right).}
+						%\end{figure}
+				\end{block}
+				
+				\begin{block}{Track simulation}
+					For testing purposes, we simulate tracks using \garfieldpp. The primary relativistic particle is simulated using the HEED program~\cite{HEED}. The ionization electrons are simulated via microscopic tracking (class \texttt{AvalancheMicroscopic}) using equations of motion to follow the electrons between collisions. This method is very precise (especially for small structures), but time-consuming (5--30 CPU hours per track in our case).
+					
+					\small{Five batches of 9702 tracks with different initial parameters were simulated on a grid (MetaCentrum~\cite{metacentrum2}) --- electrons and positrons; 11 different energies from 3~MeV to 13~MeV (covering the range for $ {}^8\text{Be} $); 21 different azimuthal angles~$|\varphi|\leq$\;16.3$^\circ$; and 21 different elevation angles~$|\theta|\leq$\;17.1$^\circ$.}
+					\vspace{-1em}
+					\begin{figure}
+						\centering
+						\includegraphics[width=0.32\textwidth]{figures/7030_xz.png}
+						\hfill
+						\includegraphics[width=0.32\textwidth]{figures/7030_xy.png}
+						\hfill
+						\includegraphics[width=0.32\textwidth]{figures/7030_yz.png}
+						\caption{Drift lines of an 8~MeV simulated track with $\theta = \varphi = 0^\circ$ ($xz$, $xy$, and $yz$ profiles).}
+					\end{figure}
+				\end{block}
+				\vspace{-1em}
+				
+				\begin{block}{Track reconstruction: Ionization electron map}
+					For the reconstruction of a~track inside an OFTPC, we want an unambiguous map of the drift of ionization electrons. For this purpose, we simulate the drift of electrons on a~Cartesian grid (current spacing 5~mm, 100 electrons per position for statistics). As a~result, we get an approximation of a~mapping from initial coordinates of the electrons $(x,y,z)$ to the average readout coordinates $(x',y',t)$. By interpolating, we can invert the map and use it for the reconstruction. Currently, we assume exact counting of electrons in each pad/time bin.
+					\vspace{-1em}
+					\begin{figure}
+						\centering
+						\includegraphics[width=0.50\textwidth]{../images/map_yx_all_7030_big.png}
+						\hfill
+						\includegraphics[width=0.24\textwidth]{figures/pad_66_7030.png}
+						\hfill
+						\includegraphics[width=0.24\textwidth]{figures/pad_12_7030_old.png}
+						\vspace{-0.75em}
+						\caption{Ionization electron map: left --- $x$ and $y$~coordinate distortion for different initial $z$~values (denoted by color); right --- example of reconstruction of pads (right panel is near the magnet pole) for different time bins.}
+					\end{figure}
+				\end{block}
+			\end{column}
+			
+			\separatorcolumn
+			
+			\begin{column}{\colwidth}				
+				\begin{block}{Energy reconstruction}
+					To reconstruct the energy, we start with a~prefit of the reconstructed track using a~circular arc with smoothly attached lines. We assume that the initial position and velocity direction of the particle are known from the previous detector layers. This leaves us four parameters --- length of the first line, length of the arc, arc radius, and curvature direction (a~single angle). We estimate the kinetic energy using the average magnetic field along the arc. The energy is then further refined using a single-parameter fourth-order Runge-Kutta fit.
+						\vspace{-1em}
+						\begin{figure}
+							\centering
+							\includegraphics[width=0.6\textwidth]{figures/cfit3d_track.png}
+							\vspace{-0.5em}
+							\caption{A fitted 8~MeV track with minimal values of $\theta$ and $\varphi$.}
+						\end{figure}
+						\vspace{-0.5em}
+				\end{block}
+				
+				\begin{alertblock}{Results}
+					The algorithm was tested on a~sample of microscopic tracks starting at the OFTPC entrance window (initial position given by angles $\theta, \varphi$ starting from the coordinate origin) with parameters described above. We assume exact triggering of time measurement. Systematic errors, depending on energy and initial direction, were corrected using a~4D linear fit.
+						\begin{figure}
+							\centering
+							\includegraphics[width=0.4\textwidth]{../images/c_e_delta_energy_new.png}
+							\hspace{0.067\textwidth}
+							\includegraphics[width=0.4\textwidth]{../images/c_p_delta_energy_new.png}
+							\caption{Reconstruction resolution of electrons (left) and positrons (right).}
+						\end{figure}
+						\begin{figure}
+							\centering
+							\includegraphics[width=0.4\textwidth]{../images/c_e_deltaenergy_energy2.png}
+							\hspace{0.067\textwidth}
+							\includegraphics[width=0.4\textwidth]{../images/c_p_deltaenergy_energy2.png}
+							\caption{Reconstruction resolution of electrons (left) and positrons (right) --- dependence on reconstructed energy.}
+						\end{figure}
+						\begin{figure}
+							\centering
+							\includegraphics[width=0.4\textwidth]{../images/c_e_deltaenergy_theta_new.png}
+							\hspace{0.067\textwidth}
+							\includegraphics[width=0.4\textwidth]{../images/c_p_deltaenergy_theta_new.png}
+							\caption{Reconstruction resolution of electrons (left) and positrons (right) --- dependence on $\theta$.}
+						\end{figure}
+						\begin{figure}
+							\centering
+							\includegraphics[width=0.4\textwidth]{../images/c_e_deltaenergy_phi_new.png}
+							\hspace{0.067\textwidth}
+							\includegraphics[width=0.4\textwidth]{../images/c_p_deltaenergy_phi_new.png}
+							\caption{Reconstruction resolution of electrons (left) and positrons (right) --- dependence on $\varphi$.}
+						\end{figure}
+				\end{alertblock}
+				
+				\begin{block}{Acknowledgments}
+					\small{This work was supported by the GAČR --- Czech Science Foundation, grant GA21-21801S. Computational resources were provided by the e-INFRA CZ project (ID:90254), supported by the Ministry of Education, Youth and Sports of the Czech Republic. The OFTPC figure was made with GeoGebra®. This work was also the subject of my bachelor thesis at MFF UK.}
+					\vspace{-1.5em}
+				\end{block}
+				
+				\begin{block}{References}
+					\printbibliography
+					%\footnotesize{\bibliographystyle{plain}\bibliography{poster}}
+				\end{block}
+				
+			\end{column}
+			\separatorcolumn
+		\end{columns}
+	\end{frame}
+	
+\end{document}

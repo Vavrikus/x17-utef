@@ -111,7 +111,7 @@ namespace X17
         /// @brief Adds two map points component-wise and returns the result.
         /// @param p2 The second map point.
         /// @return The sum of the two map points.
-        MapPoint operator+(const MapPoint& p2)
+        MapPoint operator+(const MapPoint& p2) const
         {
             if (n != p2.n)
                 std::cerr << "WARNING: Adding map points with different number of electrons!\n";
@@ -121,9 +121,8 @@ namespace X17
         /// @brief Subtracts two map points component-wise.
         /// @param p2 The second map point.
         /// @return MapPoint The difference between the two map points.
-        MapPoint operator-(const MapPoint& p2)
+        MapPoint operator-(const MapPoint& p2) const
         {
-            std::cout << "Helloooooooooooooooooooooooooooooooooooooooooooooooooooooo\n";
             if (n != p2.n)
                 std::cerr << "WARNING: Subtracting map points with different number of electrons!\n";
             return MapPoint{n, point - p2.point, cov_mat - p2.cov_mat};

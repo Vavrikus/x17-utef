@@ -1,3 +1,5 @@
+#pragma once
+
 // ROOT dependencies
 #include "TF1.h"
 #include "TGraph.h"
@@ -17,7 +19,7 @@ namespace X17
 
     /// @brief Function for circular arc (upper half) with smoothly attached lines at endpoints (nodes).
     /// @param x Variable x [cm].
-    /// @param par Set of parameters (radius of the circle, 1st and 2nd node x and y coordinates).
+    /// @param par Set of parameters (radius of the circle, 1st and 2nd node x coordinates, 1st and 2nd node y coordinates).
     /// @return Value at x.
     double circle_func(double* x, double* par);
 
