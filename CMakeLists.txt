@@ -63,6 +63,7 @@ set(SUBDIRECTORIES
     tests/magnetic_field_plot
     tests/thesis_plots
     tests/mardia_test
+    tests/driftlines
 )
 
 # Iterate over each subdirectory
@@ -80,6 +81,7 @@ set(LINK_TARGET_FOLDERS
     "${PROJECT_BUILD_DIR}/simulations/micro_tracks"
     "${PROJECT_BUILD_DIR}/tests/magnetic_field_plot"
     "${PROJECT_BUILD_DIR}/tests/thesis_plots"
+    "${PROJECT_BUILD_DIR}/tests/driftlines"
 )
 
 # Path to the source PCM file

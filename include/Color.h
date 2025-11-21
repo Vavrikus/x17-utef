@@ -125,13 +125,13 @@ namespace X17::Color
                 }
             }
             
-            std::cout << "X17::Color::RGB(): Closest color index: " << closest_index << std::endl;
+            // std::cout << "X17::Color::RGB(): Closest color index: " << closest_index << std::endl;
             return closest_index;
         }
         else
         {
             int color_index = TColor::GetColor(red_NDC, green_NDC, blue_NDC);
-            std::cout << "X17::Color::RGB(): Color index: " << color_index << std::endl;
+            // std::cout << "X17::Color::RGB(): Color index: " << color_index << std::endl;
             return color_index;
         }
     }

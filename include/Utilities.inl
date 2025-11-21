@@ -4,6 +4,7 @@
 #include "TGraphErrors.h"
 #include "TH2F.h"
 #include "TH3F.h"
+#include "TMultiGraph.h"
 
 template <typename T>
 void ApplyThesisStyle(T* obj)
@@ -28,7 +29,7 @@ void ApplyThesisStyle(T* obj)
     else
     {
         std::vector<TAxis*> axes;
-        if constexpr (is_from<T, TH1F, TGraph, TGraphErrors>)
+        if constexpr (is_from<T, TH1F, TGraph, TGraphErrors, TMultiGraph>)
             axes = { obj->GetXaxis(), obj->GetYaxis(), nullptr };
 
         else if constexpr (is_from<T, TH2F, TGraph2D, TH3F>)
