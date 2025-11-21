@@ -19,6 +19,7 @@ class RecoPadsTask : public X17::RecoTask
     int padhits[X17::constants::channels][timebins];
     std::vector<X17::RecoPoint> reco_data;
     TGraph2D *g_xyz, *g_xyz_reco;
+    TH3F* scale;
     TCanvas* c_reco;
 
     double height; // Height at which the pads will be drawn.
@@ -191,7 +192,7 @@ class RecoPadsTask : public X17::RecoTask
             c_reco->SetRightMargin(0.15);
 
             // A histogram for scalling of the axes.
-            TH3F* scale = new TH3F("scale",";x [cm];y [cm];z [cm]",1,vmin.x,vmax.x,1,vmin.y,vmax.y,1,vmin.z,vmax.z);
+            scale = new TH3F("scale",";x [cm];y [cm];z [cm]",1,vmin.x,vmax.x,1,vmin.y,vmax.y,1,vmin.z,vmax.z);
             ApplyThesisStyle(scale);
             scale->SetStats(0);
             scale->SetBinContent(1,0);
@@ -221,7 +222,7 @@ class RecoPadsTask : public X17::RecoTask
             c_reco->Write();
             
             // delete c_reco;
-            delete scale;
+            // delete scale;
             
             // DefaultLayout::GetDefaultLayout().DrawPads3D(height);
         }

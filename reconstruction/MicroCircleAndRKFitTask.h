@@ -129,7 +129,7 @@ class MicroCircleAndRKFitTask : public X17::RecoTask
             TPolyLine3D* l_cfit3d = GetLine3D(g_cfit3d);
             l_cfit3d->SetLineColor(kGreen);
             l_cfit3d->SetLineWidth(2);
-            l_cfit3d->Draw("same");
+            // l_cfit3d->Draw("same");
 
 
             TGraph2D* g_cfit3d_reco = cfit3d_reco->GetGraph(0.1,0);
@@ -144,6 +144,7 @@ class MicroCircleAndRKFitTask : public X17::RecoTask
             TPolyLine3D* l_rkfit = GetLine3D(g_rkfit);
             l_rkfit->SetLineColor(kMagenta);
             l_rkfit->SetLineWidth(2);
+            l_rkfit->Draw("same");
 
             TLegend* leg_xyz = new TLegend(0.741,0.742,0.956,0.931);
             leg_xyz->AddEntry(reco_task->g_xyz,"original trajectory","p");
