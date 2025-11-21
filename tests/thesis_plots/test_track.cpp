@@ -371,7 +371,7 @@ void PlotRASD(X17::TrackMicro track, X17::Field<X17::MapPoint>* map, bool newcoo
             {
                 orig = {point.start.x(), point.start.y(),point.start.z()};
                 reco_rasd = {point.end.x(), point.end.y(), 8-(b0+b1*point.end.t/1000)};
-                if (orig.x > x_limit && orig.x < map->GetXMax())
+                if (orig.x > x_limit && orig.x < map->GetXMax() && point.end.x() < map->GetXMax())
                 {
                     reco_map_old = X17::ReconstructOld(*map, point.end.x(),point.end.y(),point.end.t,1E-9,false);
                     reco_map = X17::Reconstruct(*map,point);
@@ -390,7 +390,7 @@ void PlotRASD(X17::TrackMicro track, X17::Field<X17::MapPoint>* map, bool newcoo
             // std::cout << "Original:            (" << orig.x << ", " << orig.y << ", " << orig.z << ")" << std::endl;
             xz_original->AddPoint(orig.x,orig.z);
             xz_reconstructed->AddPoint(reco_rasd.x,reco_rasd.z);
-            if (orig.x > x_limit && orig.x < map->GetXMax())
+            if (orig.x > x_limit && orig.x < map->GetXMax() && reco_map.x() != 0)
             {
                 xz_reco_map->AddPoint(reco_map.x(),reco_map.z());
                 g_res->AddPoint(reco_rasd.x,reco_rasd.Dist(orig));
@@ -451,10 +451,10 @@ void PlotRASD(X17::TrackMicro track, X17::Field<X17::MapPoint>* map, bool newcoo
     mg_map->GetYaxis()->SetTitle("z [cm]");
     mg_map->Draw("A");
 
-    TLegend* l_map = new TLegend(0.69,0.82,0.93,0.93);
+    TLegend* l_map = new TLegend(0.65,0.80,0.93,0.93);
     l_map->AddEntry(xz_original,"simulation","p");
     l_map->AddEntry(xz_reco_map,"reconstructed","p");
-    l_map->SetTextSize(0.043);
+    l_map->SetTextSize(0.05);
     l_map->Draw();
     
     double mag_sigma;
@@ -848,6 +848,13 @@ int main(int argc, char *argv[])
     // PlotDriftXY(track2,"drift_xy_7030.png",true);
     // PlotDriftYZ(track2,"drift_yz_7030.png",true);
 
+    // 8 MeV, zero theta, zero phi electron track
+    TFile* input = new TFile("../../../data/micro_tracks/grid_01/tracks_small1000.root");
+    TTree* t_tracks = (TTree*)input->Get("tracks_small");
+    X17::TrackMicro* track3 = 0;
+    t_tracks->SetBranchAddress("track_small",&track3);
+    t_tracks->GetEntry(4);
+
     gStyle->SetTitleSize(0.06,"XY");
     gStyle->SetLabelSize(0.06,"XY");
     gStyle->SetTitleXOffset(0.9);
@@ -863,8 +870,9 @@ int main(int argc, char *argv[])
     gStyle->SetOptStat(0);
 
     // PlotRASD(track1,map9010);
-    PlotRASD(track2,map7030,true);
+    // PlotRASD(track2,map7030,true);
     // PlotRASDres2();
+    PlotRASD(*track3,map7030,true);
     
     // PlotSpline(track2,magfield,map7030,true);
     // PlotCircle2D(track2,magfield,map7030,true);

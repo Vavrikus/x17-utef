@@ -41,7 +41,8 @@ int main(int argc, char *argv[])
     TH2F* h = new TH2F("h",";y [cm];x [cm]", 1, -yhigh-padding, yhigh+padding, 1, xmin-padding, xmax+padding);
     h->SetStats(0);
     h->Draw("");
-    h->GetYaxis()->SetTitleOffset(0.5);
+    // h->GetYaxis()->SetTitleOffset(0.5);
+    ApplyThesisStyle(h);
     layout.DrawPads(false,true,c);
 
     // PAD DIMENSIONS
@@ -180,6 +181,7 @@ int main(int argc, char *argv[])
         gap_text2->SetTextAlign(12);  // Left alignment
         gap_text2->Draw();
 
+    ApplyThesisStyle(c);
     c->Modified();
     c->Update();
 

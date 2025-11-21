@@ -290,13 +290,13 @@ int main(int argc, char const *argv[])
     
     // Remaining histograms
     TH2F* he_deltaenergy_energy  = new TH2F("he_deltaenergy_energy",h_deltaenergy_energy_title,energy_bins,E_min,E_max,e_res_bins_energy,res_min,res_max);
-    TH2F* he_deltaenergy_energy2 = new TH2F("he_deltaenergy_energy2",h_deltaenergy_energy_title2,energy_bins,E_min,E_max,e_res_bins_energy,res_min,res_max);
+    TH2F* he_deltaenergy_energy2 = new TH2F("he_deltaenergy_energy2",h_deltaenergy_energy_title2,energy_bins+1,E_min-1,E_max,e_res_bins_energy,res_min,res_max);
     TH2F* he_deltaenergy_phi     = new TH2F("he_deltaenergy_phi",h_deltaenergy_phi_title,angle_bins,phi_min,phi_max,e_res_bins_angle,res_min,res_max);
     TH2F* he_deltaenergy_theta   = new TH2F("he_deltaenergy_theta",h_deltaenergy_theta_title,angle_bins,theta_min,theta_max,e_res_bins_angle,res_min,res_max);
     TH1F* he_delta_energy        = new TH1F("he_delta_energy",h_delta_energy_title,e_res_bins,res_min,res_max);
 
     TH2F* hp_deltaenergy_energy  = new TH2F("hp_deltaenergy_energy",h_deltaenergy_energy_title,energy_bins,E_min,E_max,p_res_bins_energy,res_min,res_max);
-    TH2F* hp_deltaenergy_energy2 = new TH2F("hp_deltaenergy_energy2",h_deltaenergy_energy_title2,energy_bins,E_min,E_max,p_res_bins_energy,res_min,res_max);
+    TH2F* hp_deltaenergy_energy2 = new TH2F("hp_deltaenergy_energy2",h_deltaenergy_energy_title2,energy_bins+1,E_min-1,E_max,p_res_bins_energy,res_min,res_max);
     TH2F* hp_deltaenergy_phi     = new TH2F("hp_deltaenergy_phi",h_deltaenergy_phi_title,angle_bins,phi_min,phi_max,p_res_bins_angle,res_min,res_max);
     TH2F* hp_deltaenergy_theta   = new TH2F("hp_deltaenergy_theta",h_deltaenergy_theta_title,angle_bins,theta_min,theta_max,p_res_bins_angle,res_min,res_max);
     TH1F* hp_delta_energy        = new TH1F("hp_delta_energy",h_delta_energy_title,p_res_bins,res_min,res_max);

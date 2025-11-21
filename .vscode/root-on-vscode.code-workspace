@@ -96,7 +96,8 @@
       "any": "cpp",
       "geometry.C": "cpp",
       "graph2d_overlay_test.C": "cpp",
-      "c_track_xyz_0.C": "cpp"
+      "c_track_xyz_0.C": "cpp",
+      "*.inc": "cpp"
     },
     "C_Cpp.default.includePath": [
       "/home/vavrik/work/X17/include",

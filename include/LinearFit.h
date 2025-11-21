@@ -19,6 +19,12 @@ struct FPoint
 };
 
 
+
+/// @brief Linear fit in 3D.
+/// @param data std::vector of FPoint objects containing the reconstructed and simulated energy, theta and varphi.
+/// @param p Number of parameters to fit (1 - bias, 2 - energy, 3 - theta, 4 - phi). Default is 4.
+/// @param use_reco Use the reconstructed instead of the simulated energy for the fit if true. Default is false.
+/// @return 0 if the fit is successful, -1 if the number of parameters is invalid, -2 if the number of points is too small, -3 if the matrix is singular.
 int LinearFit3D(const std::vector<FPoint>& data, const int p = 4, bool use_reco = false)
 {
     const int n = data.size();     // number of points
@@ -51,12 +57,13 @@ int LinearFit3D(const std::vector<FPoint>& data, const int p = 4, bool use_reco 
     if (!ok)
     {
         std::cerr << "Fit failed!" << std::endl;
-        return 1;
+        return -3;
     }
 
-    std::cout << "Fit parameters:" << std::endl;
+    std::vector<std::string> param_vars = {"bias", "energy", "theta", "varphi"};
+    std::cout << "\nLinear fit parameters:\n";
     for (int i = 0; i < p; ++i)
-        std::cout << "a" << i << " = " << coeffs[i] << std::endl;
+        std::cout << "   a" << i << " (" << param_vars[i] << ") = " << coeffs[i] << std::endl;
 
     return 0;
 }
