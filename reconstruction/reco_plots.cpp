@@ -367,248 +367,95 @@ int main(int argc, char const *argv[])
     Double_t contours[ncont + 1];
     for (int i = 0; i <= ncont; ++i) contours[i] = -10 + i * (20.0 / ncont);
     
-    TCanvas* c_e_all = new TCanvas("c_e_all","");
-    gStyle->SetPalette(kLightTemperature);
-    he_all->SetStats(0);
-    he_all->SetContour(ncont);
-    he_all->Draw("box2 z");
-    c_e_all->Write();
+    std::string c_names_all[2] = {"c_e_all","c_p_all"};
+    TH3F* h_all[2] = {he_all,hp_all};
 
-    TCanvas* c_p_all = new TCanvas("c_p_all","");
-    gStyle->SetPalette(kLightTemperature);
-    hp_all->SetStats(0);
-    hp_all->SetContour(ncont);
-    hp_all->Draw("box2 z");
-    c_p_all->Write();
+    for (int i = 0; i < 2; i++)
+    {
+        TCanvas* c = new TCanvas(c_names_all[i].c_str(),"");
+        gStyle->SetPalette(kLightTemperature);
+        h_all[i]->SetStats(0);
+        h_all[i]->SetContour(ncont);
+        h_all[i]->Draw("box2 z");
+        c->Write();
+    }
 
-    TCanvas* c_e_theta_phi = new TCanvas("c_e_theta_phi","");
-    gStyle->SetPalette(kLightTemperature);
-    he_theta_phi->SetStats(0);
-    he_theta_phi->SetContour(ncont);
-    he_theta_phi->Draw("colz");
-    c_e_theta_phi->Write();
+    std::string c_names_extras[12] = {"c_e_theta_phi","c_e_theta_energy","c_e_phi_energy",
+                                      "c_p_theta_phi","c_p_theta_energy","c_p_phi_energy",
+                                      "c_e_theta_phi_abs","c_e_theta_energy_abs","c_e_phi_energy_abs",
+                                      "c_p_theta_phi_abs","c_p_theta_energy_abs","c_p_phi_energy_abs"};
+    TH2F* h_extras[12] = {he_theta_phi,he_theta_energy,he_phi_energy,
+                          hp_theta_phi,hp_theta_energy,hp_phi_energy,
+                          he_theta_phi_abs,he_theta_energy_abs,he_phi_energy_abs,
+                          hp_theta_phi_abs,hp_theta_energy_abs,hp_phi_energy_abs};
 
-    TCanvas* c_p_theta_phi = new TCanvas("c_p_theta_phi","");
-    gStyle->SetPalette(kLightTemperature);
-    hp_theta_phi->SetStats(0);
-    hp_theta_phi->SetContour(ncont);
-    hp_theta_phi->Draw("colz");
-    c_p_theta_phi->Write();
-
-    TCanvas* c_e_theta_energy = new TCanvas("c_e_theta_energy","");
-    gStyle->SetPalette(kLightTemperature);
-    he_theta_energy->SetStats(0);
-    he_theta_energy->SetContour(ncont);
-    he_theta_energy->Draw("colz");
-    c_e_theta_energy->Write();
-
-    TCanvas* c_p_theta_energy = new TCanvas("c_p_theta_energy","");
-    gStyle->SetPalette(kLightTemperature);
-    hp_theta_energy->SetStats(0);
-    hp_theta_energy->SetContour(ncont);
-    hp_theta_energy->Draw("colz");
-    c_p_theta_energy->Write();
-
-    TCanvas* c_e_phi_energy = new TCanvas("c_e_phi_energy","");
-    gStyle->SetPalette(kLightTemperature);
-    he_phi_energy->SetStats(0);
-    he_phi_energy->SetContour(ncont);
-    he_phi_energy->Draw("colz");
-    c_e_phi_energy->Write();
-
-    TCanvas* c_p_phi_energy = new TCanvas("c_p_phi_energy","");
-    gStyle->SetPalette(kLightTemperature);
-    hp_phi_energy->SetStats(0);
-    hp_phi_energy->SetContour(ncont);
-    hp_phi_energy->Draw("colz");
-    c_p_phi_energy->Write();
-
-    TCanvas* c_e_theta_phi_abs = new TCanvas("c_e_theta_phi_abs","");
-    he_theta_phi_abs->SetStats(0);
-    he_theta_phi_abs->SetContour(ncont);
-    he_theta_phi_abs->Draw("colz");
-    c_e_theta_phi_abs->Write();
-
-    TCanvas* c_p_theta_phi_abs = new TCanvas("c_p_theta_phi_abs","");
-    hp_theta_phi_abs->SetStats(0);
-    hp_theta_phi_abs->SetContour(ncont);
-    hp_theta_phi_abs->Draw("colz");
-    c_p_theta_phi_abs->Write();
-
-    TCanvas* c_e_theta_energy_abs = new TCanvas("c_e_theta_energy_abs","");
-    he_theta_energy_abs->SetStats(0);
-    he_theta_energy_abs->SetContour(ncont);
-    he_theta_energy_abs->Draw("colz");
-    c_e_theta_energy_abs->Write();
-
-    TCanvas* c_p_theta_energy_abs = new TCanvas("c_p_theta_energy_abs","");
-    hp_theta_energy_abs->SetStats(0);
-    hp_theta_energy_abs->SetContour(ncont);
-    hp_theta_energy_abs->Draw("colz");
-    c_p_theta_energy_abs->Write();
-
-    TCanvas* c_e_phi_energy_abs = new TCanvas("c_e_phi_energy_abs","");
-    he_phi_energy_abs->SetStats(0);
-    he_phi_energy_abs->SetContour(ncont);
-    he_phi_energy_abs->Draw("colz");
-    c_e_phi_energy_abs->Write();
-
-    TCanvas* c_p_phi_energy_abs = new TCanvas("c_p_phi_energy_abs","");
-    hp_phi_energy_abs->SetStats(0);
-    hp_phi_energy_abs->SetContour(ncont);
-    hp_phi_energy_abs->Draw("colz");
-    c_p_phi_energy_abs->Write();
+    for (int i = 0; i < 12; i++)
+    {
+        TCanvas* c = new TCanvas(c_names_extras[i].c_str(),"");
+        gStyle->SetPalette(kLightTemperature);
+        h_extras[i]->SetStats(0);
+        h_extras[i]->SetContour(ncont);
+        h_extras[i]->Draw("colz");
+        c->Write();
+    }
 
 
-    TCanvas* c_e_deltaenergy_energy = new TCanvas("c_e_deltaenergy_energy","");
-    th2_c(c_e_deltaenergy_energy);
-    he_deltaenergy_energy->SetStats(0);
-    he_deltaenergy_energy->SetContour(ncont);
-    he_deltaenergy_energy->SetMaximum(300);
-    he_deltaenergy_energy->Draw("colz");
-    TLine* y0_line = new TLine(he_deltaenergy_energy->GetXaxis()->GetXmin(),0,he_deltaenergy_energy->GetXaxis()->GetXmax(),0);
-    y0_line->SetLineWidth(4);
-    y0_line->Draw("same");
-    c_e_deltaenergy_energy->Write();
+    std::string c_names_2d[8] = {"c_e_deltaenergy_energy","c_e_deltaenergy_energy2","c_e_deltaenergy_theta","c_e_deltaenergy_phi",
+                                 "c_p_deltaenergy_energy","c_p_deltaenergy_energy2","c_p_deltaenergy_theta","c_p_deltaenergy_phi"};
+    TH2F* histos_2d[8] = {he_deltaenergy_energy,he_deltaenergy_energy2,he_deltaenergy_theta,he_deltaenergy_phi,
+                          hp_deltaenergy_energy,hp_deltaenergy_energy2,hp_deltaenergy_theta,hp_deltaenergy_phi};
+    int maxima[8] = {300,250,160,180,300,250,160,180};
 
-    TCanvas* c_e_deltaenergy_energy2 = new TCanvas("c_e_deltaenergy_energy2","");
-    th2_c(c_e_deltaenergy_energy2);
-    he_deltaenergy_energy2->SetStats(0);
-    he_deltaenergy_energy2->SetContour(ncont);
-    he_deltaenergy_energy2->SetMaximum(250);
-    he_deltaenergy_energy2->Draw("colz");
-    y0_line = new TLine(he_deltaenergy_energy2->GetXaxis()->GetXmin(),0,he_deltaenergy_energy2->GetXaxis()->GetXmax(),0);
-    y0_line->SetLineWidth(4);
-    y0_line->Draw("same");
-    c_e_deltaenergy_energy2->Write();
-
-    TCanvas* c_e_deltaenergy_phi = new TCanvas("c_e_deltaenergy_phi","");
-    th2_c(c_e_deltaenergy_phi);
-    he_deltaenergy_phi->SetStats(0);
-    he_deltaenergy_phi->SetContour(ncont);
-    he_deltaenergy_phi->SetMaximum(160);
-    he_deltaenergy_phi->Draw("colz");
-    y0_line = new TLine(he_deltaenergy_phi->GetXaxis()->GetXmin(),0,he_deltaenergy_phi->GetXaxis()->GetXmax(),0);
-    y0_line->SetLineWidth(4);
-    y0_line->Draw("same");
-    c_e_deltaenergy_phi->Write();
-
-    TCanvas* c_e_deltaenergy_theta = new TCanvas("c_e_deltaenergy_theta","");
-    th2_c(c_e_deltaenergy_theta);
-    he_deltaenergy_theta->SetStats(0);
-    he_deltaenergy_theta->SetContour(ncont);
-    he_deltaenergy_theta->SetMaximum(180);
-    he_deltaenergy_theta->Draw("colz");
-    y0_line = new TLine(he_deltaenergy_theta->GetXaxis()->GetXmin(),0,he_deltaenergy_theta->GetXaxis()->GetXmax(),0);
-    y0_line->SetLineWidth(4);
-    y0_line->Draw("same");
-    c_e_deltaenergy_theta->Write();
+    for (int i = 0; i < 8; i++)
+    {
+        TCanvas* c = new TCanvas(c_names_2d[i].c_str(),"");
+        th2_c(c);
+        histos_2d[i]->SetStats(0);
+        histos_2d[i]->SetContour(ncont);
+        histos_2d[i]->SetMaximum(maxima[i]);
+        histos_2d[i]->Draw("colz");
+        TLine* y0_line = new TLine(histos_2d[i]->GetXaxis()->GetXmin(),0,histos_2d[i]->GetXaxis()->GetXmax(),0);
+        y0_line->SetLineWidth(4);
+        y0_line->Draw("same");
+        c->Write();
+    }
 
 
-    TCanvas* c_p_deltaenergy_energy = new TCanvas("c_p_deltaenergy_energy","");
-    th2_c(c_p_deltaenergy_energy);
-    hp_deltaenergy_energy->SetStats(0);
-    hp_deltaenergy_energy->SetContour(ncont);
-    hp_deltaenergy_energy->SetMaximum(300);
-    hp_deltaenergy_energy->Draw("colz");
-    y0_line = new TLine(hp_deltaenergy_energy->GetXaxis()->GetXmin(),0,hp_deltaenergy_energy->GetXaxis()->GetXmax(),0);
-    y0_line->SetLineWidth(4);
-    y0_line->Draw("same");
-    c_p_deltaenergy_energy->Write();
+    std::string c_names[2] = {"c_e_delta_energy","c_p_delta_energy"};
+    TH1F* h_deltas[2] = {he_delta_energy,hp_delta_energy};
 
-    TCanvas* c_p_deltaenergy_energy2 = new TCanvas("c_p_deltaenergy_energy2","");
-    th2_c(c_p_deltaenergy_energy2);
-    hp_deltaenergy_energy2->SetStats(0);
-    hp_deltaenergy_energy2->SetContour(ncont);
-    hp_deltaenergy_energy2->SetMaximum(250);
-    hp_deltaenergy_energy2->Draw("colz");
-    y0_line = new TLine(hp_deltaenergy_energy2->GetXaxis()->GetXmin(),0,hp_deltaenergy_energy2->GetXaxis()->GetXmax(),0);
-    y0_line->SetLineWidth(4);
-    y0_line->Draw("same");
-    c_p_deltaenergy_energy2->Write();
+    for (int i = 0; i < 2; i++)
+    {
+        TCanvas* c = new TCanvas(c_names[i].c_str(),"");
+        th1_c(c);
+        h_deltas[i]->SetStats(0);
+        h_deltas[i]->Fit("gaus");
+        h_deltas[i]->Draw();
 
-    TCanvas* c_p_deltaenergy_phi = new TCanvas("c_p_deltaenergy_phi","");
-    th2_c(c_p_deltaenergy_phi);
-    hp_deltaenergy_phi->SetStats(0);
-    hp_deltaenergy_phi->SetContour(ncont);
-    hp_deltaenergy_phi->SetMaximum(160);
-    hp_deltaenergy_phi->Draw("colz");
-    y0_line = new TLine(hp_deltaenergy_phi->GetXaxis()->GetXmin(),0,hp_deltaenergy_phi->GetXaxis()->GetXmax(),0);
-    y0_line->SetLineWidth(4);
-    y0_line->Draw("same");
-    c_p_deltaenergy_phi->Write();
+        TF1* fit = h_deltas[i]->GetFunction("gaus");
+        fit->SetNpx(1000);
+        double mean = fit->GetParameter(1);
+        double stdev = fit->GetParameter(2);
+        double fwhm = 2.35482 * stdev;
 
-    TCanvas* c_p_deltaenergy_theta = new TCanvas("c_p_deltaenergy_theta","");
-    th2_c(c_p_deltaenergy_theta);
-    hp_deltaenergy_theta->SetStats(0);
-    hp_deltaenergy_theta->SetContour(ncont);
-    hp_deltaenergy_theta->SetMaximum(180);
-    hp_deltaenergy_theta->Draw("colz");
-    y0_line = new TLine(hp_deltaenergy_theta->GetXaxis()->GetXmin(),0,hp_deltaenergy_theta->GetXaxis()->GetXmax(),0);
-    y0_line->SetLineWidth(4);
-    y0_line->Draw("same");
-    c_p_deltaenergy_theta->Write();
+        // double fwhm = GetFWHM(h_deltas[i],false);
+        // double mean = h_deltas[i]->GetMean();
+        // double stdev = h_deltas[i]->GetStdDev();
+        double skewness = h_deltas[i]->GetSkewness();
+        double kurtosis = h_deltas[i]->GetKurtosis();
 
+        // Add text labels with information
+        TLatex* label = new TLatex();
+        label->SetNDC();
+        label->SetTextSize(0.055);
 
-    TCanvas* c_e_delta_energy = new TCanvas("c_e_delta_energy","");
-    th1_c(c_e_delta_energy);
-    he_delta_energy->SetStats(0);
-    he_delta_energy->Fit("gaus");
-    he_delta_energy->Draw();
-
-    TF1* fit = he_delta_energy->GetFunction("gaus");
-    fit->SetNpx(1000);
-    double mean = fit->GetParameter(1);
-    double stdev = fit->GetParameter(2);
-    double fwhm = 2.35482 * stdev;
-
-    // double fwhm = GetFWHM(he_delta_energy,false);
-    // double mean = he_delta_energy->GetMean();
-    // double stdev = he_delta_energy->GetStdDev();
-    double skewness = he_delta_energy->GetSkewness();
-    double kurtosis = he_delta_energy->GetKurtosis();
-
-    // Add text labels with information
-    TLatex* label = new TLatex();
-    label->SetNDC();
-    label->SetTextSize(0.055);
-
-    label->DrawLatex(0.68, 0.85, Form("Mean: %.2f%%", mean));
-    label->DrawLatex(0.68, 0.78, Form("FWHM: %.2f%%", fwhm));
-    label->DrawLatex(0.68, 0.71, Form("RMS: %.2f%%", stdev));
-    // label->DrawLatex(0.75, 0.75, Form("Skewness: %.2f", skewness));
-    // label->DrawLatex(0.75, 0.70, Form("Kurtosis: %.2f", kurtosis));
-    c_e_delta_energy->Write();
-    
-    TCanvas* c_p_delta_energy = new TCanvas("c_p_delta_energy","");
-    th1_c(c_p_delta_energy);
-    hp_delta_energy->SetStats(0);
-    hp_delta_energy->Fit("gaus");
-    hp_delta_energy->Draw();
-
-    fit = hp_delta_energy->GetFunction("gaus");
-    fit->SetNpx(1000);
-    mean = fit->GetParameter(1);
-    stdev = fit->GetParameter(2);
-    fwhm = 2.35482 * stdev;
-
-    // fwhm = GetFWHM(hp_delta_energy,false);
-    // mean = hp_delta_energy->GetMean();
-    // stdev = hp_delta_energy->GetStdDev();
-    skewness = hp_delta_energy->GetSkewness();
-    kurtosis = hp_delta_energy->GetKurtosis();
-
-    // Add text labels with information
-    TLatex* label2 = new TLatex();
-    label2->SetNDC();
-    label2->SetTextSize(0.055);
-
-    label2->DrawLatex(0.68, 0.85, Form("Mean: %.2f%%", mean));
-    label2->DrawLatex(0.68, 0.78, Form("FWHM: %.2f%%", fwhm));
-    label2->DrawLatex(0.68, 0.71, Form("RMS: %.2f%%", stdev));
-    // label2->DrawLatex(0.75, 0.75, Form("Skewness: %.2f", skewness));
-    // label2->DrawLatex(0.75, 0.70, Form("Kurtosis: %.2f", kurtosis));
-    c_p_delta_energy->Write();
+        label->DrawLatex(0.68, 0.85, Form("Mean: %.2f%%", mean));
+        label->DrawLatex(0.68, 0.78, Form("FWHM: %.2f%%", fwhm));
+        label->DrawLatex(0.68, 0.71, Form("RMS: %.2f%%", stdev));
+        // label->DrawLatex(0.75, 0.75, Form("Skewness: %.2f", skewness));
+        // label->DrawLatex(0.75, 0.70, Form("Kurtosis: %.2f", kurtosis));
+        c->Write();
+    }
 
     LinearFit3D(data, fit_param, true);
 
