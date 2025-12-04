@@ -8,6 +8,7 @@
 
 // ROOT dependencies
 #include "TChain.h"
+#include "TF1.h"
 #include "TGraph2D.h"
 #include "TH1F.h"
 #include "TPolyLine3D.h"
@@ -149,5 +150,22 @@ void ApplyThesisStyle(T* obj);
 /// @param graph The 2D graph to convert.
 /// @return The 3D line.
 TPolyLine3D* GetLine3D(TGraph2D* graph);
+
+/// @brief Returns a TF1 object representing a skewed Gaussian function (params: 0 = norm, 1 = mean, 2 = sigma, 3 = skew).
+/// @param min The minimal value of the function range.
+/// @param max The maximal value of the function range.
+/// @return The TF1 object representing the skewed Gaussian function.
+inline TF1* GetSkewGaus(double min, double max)
+{
+    return new TF1("f","[0]*2.*TMath::Gaus(x,[1],[2])*ROOT::Math::normal_cdf([3]*x,[2],[1])",min,max);
+}
+
+/// @brief Extracts statistical information from a skewed Gaussian distribution represented as a TF1 object.
+/// @param skew_gaus The TF1 object representing the skewed Gaussian distribution.
+/// @param mean Reference to a double to store the mean of the distribution.
+/// @param sigma Reference to a double to store the standard deviation of the distribution.
+/// @param skew Reference to a double to store the skewness of the distribution.
+/// @param fwhm Reference to a double to store the full width at half maximum of the distribution.
+void GetSkewGausStats(TF1* skew_gaus, double& mean, double& sigma, double& skew, double& fwhm);
 
 #include "Utilities.inl"

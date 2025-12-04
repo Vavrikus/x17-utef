@@ -58,12 +58,12 @@ namespace X17
 
             micro_tracks->GetEntry(i);
             // if(curr_microtrack->electron) continue; // ONLY FOR TEST!!!
-            if((100 * i) % n_tracks == 0) std::cout << "Progress: " << 100 * i / n_tracks << " \%\n";
-            std::cout << "Track " << i+1 << " out of " << n_tracks << ".\n";
-            std::cout << "   electron: " << curr_microtrack->electron << " Ek: " << curr_microtrack->kin_energy;
-            std::cout << " origin: (" << curr_microtrack->origin.x << "," << curr_microtrack->origin.y << "," << curr_microtrack->origin.z << ")\n";
-            std::cout << "   orientation: (" << curr_microtrack->orientation.x << "," << curr_microtrack->orientation.y << "," << curr_microtrack->orientation.z << ")\n";
-            std::cout << "   theta: " << std::asin(curr_microtrack->orientation.z) << " phi: " << std::acos(curr_microtrack->orientation.x/std::cos(std::asin(curr_microtrack->orientation.z)))*sign(curr_microtrack->orientation.y) << "\n";
+            ReportProgress(i,n_tracks);
+            // std::cout << "Track " << i+1 << " out of " << n_tracks << ".\n";
+            // std::cout << "   electron: " << curr_microtrack->electron << " Ek: " << curr_microtrack->kin_energy;
+            // std::cout << " origin: (" << curr_microtrack->origin.x << "," << curr_microtrack->origin.y << "," << curr_microtrack->origin.z << ")\n";
+            // std::cout << "   orientation: (" << curr_microtrack->orientation.x << "," << curr_microtrack->orientation.y << "," << curr_microtrack->orientation.z << ")\n";
+            // std::cout << "   theta: " << std::asin(curr_microtrack->orientation.z) << " phi: " << std::acos(curr_microtrack->orientation.x/std::cos(std::asin(curr_microtrack->orientation.z)))*sign(curr_microtrack->orientation.y) << "\n";
 
             for (RecoTask* t : m_tasks) t->PreElectronLoop();
 

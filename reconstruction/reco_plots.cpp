@@ -433,16 +433,23 @@ int main(int argc, char const *argv[])
         h_deltas[i]->Draw();
 
         TF1* fit = h_deltas[i]->GetFunction("gaus");
+        // TF1* fit = GetSkewGaus(-10,10);
+        // fit->SetParameters(1,0,1,(i-1)*0.5);
+        // fit->SetParLimits(2,0,20);
         fit->SetNpx(1000);
-        double mean = fit->GetParameter(1);
-        double stdev = fit->GetParameter(2);
-        double fwhm = 2.35482 * stdev;
+        // h_deltas[i]->Fit(fit,"M");
+        double mean,stdev,skewness,fwhm;
+        // GetSkewGausStats(fit,mean,stdev,skewness,fwhm);
+        mean = fit->GetParameter(1);
+        stdev = fit->GetParameter(2);
+        skewness = 0;
+        fwhm = 2.35482 * stdev;
 
         // double fwhm = GetFWHM(h_deltas[i],false);
         // double mean = h_deltas[i]->GetMean();
         // double stdev = h_deltas[i]->GetStdDev();
-        double skewness = h_deltas[i]->GetSkewness();
-        double kurtosis = h_deltas[i]->GetKurtosis();
+        // double skewness = h_deltas[i]->GetSkewness();
+        // double kurtosis = h_deltas[i]->GetKurtosis();
 
         // Add text labels with information
         TLatex* label = new TLatex();
@@ -451,8 +458,8 @@ int main(int argc, char const *argv[])
 
         label->DrawLatex(0.68, 0.85, Form("Mean: %.2f%%", mean));
         label->DrawLatex(0.68, 0.78, Form("FWHM: %.2f%%", fwhm));
-        label->DrawLatex(0.68, 0.71, Form("RMS: %.2f%%", stdev));
-        // label->DrawLatex(0.75, 0.75, Form("Skewness: %.2f", skewness));
+        label->DrawLatex(0.68, 0.71, Form("Sigma: %.2f%%", stdev));
+        // label->DrawLatex(0.68, 0.64, Form("Skew: %.2f", skewness));
         // label->DrawLatex(0.75, 0.70, Form("Kurtosis: %.2f", kurtosis));
         c->Write();
     }

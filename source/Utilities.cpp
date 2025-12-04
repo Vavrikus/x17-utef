@@ -173,3 +173,23 @@ TPolyLine3D *GetLine3D(TGraph2D *graph)
     }
     return nullptr;
 }
+
+void GetSkewGausStats(TF1* skew_gaus, double& mean, double& sigma, double& skew, double& fwhm)
+{
+    double p1 = skew_gaus->GetParameter(1);
+    double p2 = skew_gaus->GetParameter(2);
+    double p3 = skew_gaus->GetParameter(3);
+
+    // Actual moments differ: (see wikipedia Skew normal distribution)
+    double delta = p3/(std::sqrt(1 + p3*p3));
+    mean  = p1 + delta*p2*std::sqrt(2/M_PI);
+    sigma = p2 * std::sqrt(1 - delta*delta*2/M_PI);
+    skew  = (4 - M_PI)/2 * std::pow((delta * std::sqrt(2/M_PI)),3) / std::pow((1 - delta*delta*2/M_PI),1.5);
+
+    // Numerical FWHM
+    double x_max = skew_gaus->GetMaximumX();
+    double y_max = skew_gaus->GetMaximum();
+    double x1 = skew_gaus->GetX(y_max/2., skew_gaus->GetXmin(), x_max);  // left half
+    double x2 = skew_gaus->GetX(y_max/2., x_max, skew_gaus->GetXmax());  // right half
+    fwhm = x2 - x1;
+}

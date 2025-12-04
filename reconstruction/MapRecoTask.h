@@ -56,124 +56,77 @@ class MapRecoTask : public X17::RecoTask
             h->GetXaxis()->SetTitleOffset(0.98);
         };
 
-        double left = 0.15;
-        double right = 0.05;
-        double top = 0.08;
+        double left   = 0.15;
+        double right  = 0.05;
+        double top    = 0.08;
         double bottom = 0.12;
 
-        TPad* pad = (TPad*)c->cd(1);
-        TH1F* hx_res = new TH1F("","X residuals;#Deltax [cm];# of electrons",xbins,-0.4,0.4);
-        for (int i = 0; i < v_res_x.size(); i++)
-            hx_res->Fill(v_res_x[i]);
-        hist_style(hx_res);
-        pad->SetMargin(left,right,bottom,top);
-        hx_res->Draw("hist");
+        std::vector<double> vecs[4] = {v_res_x,v_res_y,v_res_z,v_res_total};
+        TH1F* hists[4];
+        std::string titles[4] = {"X residuals;#Deltax [cm];# of electrons",
+                                 "Y residuals;#Deltay [cm];# of electrons",
+                                 "Z residuals;#Deltaz [cm];# of electrons",
+                                 "Residuals;Deviation [cm];# of electrons"};
+        int bins[4] = {xbins,ybins,zbins,rbins};
 
-        pad = (TPad*)c->cd(2);
-        TH1F* hy_res = new TH1F("","Y residuals;#Deltay [cm];# of electrons",ybins,-0.4,0.4);
-        for (int i = 0; i < v_res_y.size(); i++)
-            hy_res->Fill(v_res_y[i]);
-        hist_style(hy_res);
-        pad->SetMargin(left,right,bottom,top);
-        hy_res->Draw("hist");
+        for (int i = 0; i < 4; i++)
+        {
+            TPad* pad = (TPad*)c->cd(i+1);
+            hists[i] = new TH1F("",titles[i].c_str(), bins[i],(i == 3 ? 0 : -0.4), 0.4);
+            for (int j = 0; j < vecs[i].size(); j++)
+                hists[i]->Fill(vecs[i][j]);
+            hist_style(hists[i]);
+            pad->SetMargin(left,right,bottom,top);
+            hists[i]->Draw("hist");
+        }
 
-        pad = (TPad*)c->cd(3);
-        TH1F* hz_res = new TH1F("","Z residuals;#Deltaz [cm];# of electrons",zbins,-0.4,0.4);
-        for (int i = 0; i < v_res_z.size(); i++)
-            hz_res->Fill(v_res_z[i]);
-        hist_style(hz_res);
-        pad->SetMargin(left,right,bottom,top);
-        hz_res->Draw("hist");
-
-        pad = (TPad*)c->cd(4);
-        TH1F* hr_res = new TH1F("","Residuals;Deviation [cm];# of electrons",rbins,0,0.4);
-        for (int i = 0; i < v_res_total.size(); i++)
-            hr_res->Fill(v_res_total[i]);
-        hist_style(hr_res);
-        pad->SetMargin(left,right,bottom,top);
-        hr_res->Draw("hist");
         c->Write();
         delete c;
+        for (TH1F* h : hists)
+            delete h;
 
-        TCanvas* c_x = new TCanvas((canvas_name + "_x").c_str(),"X residuals");
-        pad = (TPad*)c_x->cd();
-        TH1F* hx_res_fit = new TH1F("",";#Deltax [cm];# of electrons",xbins,-0.4,0.4);
-        for (int i = 0; i < v_res_x.size(); i++)
-            hx_res_fit->Fill(v_res_x[i]);
-        hist_style(hx_res_fit);
-        pad->SetMargin(left,right,bottom,top);
-        hx_res_fit->Draw("hist");
-        hx_res_fit->Fit("gaus");
+        std::string c_literals[3] = {"_x","_y","_z"};
+        std::string c_titles[3] = {"X residuals","Y residuals","Z residuals"};
+        std::string h_titles[3] = {";#Deltax [cm];# of electrons",";#Deltay [cm];# of electrons",";#Deltaz [cm];# of electrons"};
 
-        TF1* fit = hx_res_fit->GetFunction("gaus");
-        fit->SetNpx(1000);
-        fit->Draw("same");
-        double mean = fit->GetParameter(1);
-        double sigma = fit->GetParameter(2);
+        for (int i = 0; i < 3; i++)
+        {
+            TCanvas* c = new TCanvas((canvas_name + c_literals[i]).c_str(),c_titles[i].c_str());
+            TPad* pad = (TPad*)c->cd();
+            TH1F* h = new TH1F("",h_titles[i].c_str(),bins[i],-0.4,0.4);
+            for (int j = 0; j < vecs[i].size(); j++)
+                h->Fill(vecs[i][j]);
+            hist_style(h);
+            pad->SetMargin(left,right,bottom,top);
+            h->Draw("hist");
+            h->Fit("gaus");
 
-        TLatex* label = new TLatex();
-        label->SetNDC();
-        label->SetTextSize(0.055);
-        label->DrawLatex(0.68, 0.85, Form("Mean: %.2f mm", 10*mean));
-        label->DrawLatex(0.68, 0.78, Form("Sigma: %.2f mm", 10*sigma));
+            TF1* fit = h->GetFunction("gaus");
+            
+            // TF1* fit = GetSkewGaus(-0.4,0.4);
+            // fit->SetParLimits(2,0,1);
+            // fit->SetParameters(10000,0,0.05,0);
+            fit->SetNpx(1000);
+            // h->Fit(fit,"L");
+            fit->Draw("same");
 
-        c_x->Write();
-        delete c_x;
+            double mean, sigma, skew, fwhm;
+            // GetSkewGausStats(fit,mean,sigma,skew,fwhm);
+            mean  = fit->GetParameter(1);
+            sigma = fit->GetParameter(2);
+            skew = 0;
+            fwhm = 2*sigma*std::sqrt(2*std::log(2));
 
-        TCanvas* c_y = new TCanvas((canvas_name + "_y").c_str(),"Y residuals");
-        pad = (TPad*)c_y->cd();
-        TH1F* hy_res_fit = new TH1F("",";#Deltay [cm];# of electrons",ybins,-0.4,0.4);
-        for (int i = 0; i < v_res_y.size(); i++)
-            hy_res_fit->Fill(v_res_y[i]);
-        hist_style(hy_res_fit);
-        pad->SetMargin(left,right,bottom,top);
-        hy_res_fit->Draw("hist");
-        hy_res_fit->Fit("gaus");
+            TLatex* label = new TLatex();
+            label->SetNDC();
+            label->SetTextSize(0.055);
+            label->DrawLatex(0.68, 0.85, Form("Mean: %.2f mm", 10*mean));
+            label->DrawLatex(0.68, 0.78, Form("Sigma: %.2f mm", 10*sigma));
+            // label->DrawLatex(0.68, 0.71, Form("Skew: %.2f", skew));
 
-        fit = hy_res_fit->GetFunction("gaus");
-        fit->SetNpx(1000);
-        fit->Draw("same");
-        mean = fit->GetParameter(1);
-        sigma = fit->GetParameter(2);
-
-        label = new TLatex();
-        label->SetNDC();
-        label->SetTextSize(0.055);
-        label->DrawLatex(0.68, 0.85, Form("Mean: %.2f mm", 10*mean));
-        label->DrawLatex(0.68, 0.78, Form("Sigma: %.2f mm", 10*sigma));
-
-        c_y->Write();
-        delete c_y;
-
-        TCanvas* c_z = new TCanvas((canvas_name + "_z").c_str(),"Z residuals");
-        pad = (TPad*)c_z->cd();
-        TH1F* hz_res_fit = new TH1F("",";#Deltaz [cm];# of electrons",zbins,-0.4,0.4);
-        for (int i = 0; i < v_res_z.size(); i++)
-            hz_res_fit->Fill(v_res_z[i]);
-        hist_style(hz_res_fit);
-        pad->SetMargin(left,right,bottom,top);
-        hz_res_fit->Draw("hist");
-        hz_res_fit->Fit("gaus");
-
-        fit = hz_res_fit->GetFunction("gaus");
-        fit->SetNpx(1000);
-        fit->Draw("same");
-        mean = fit->GetParameter(1);
-        sigma = fit->GetParameter(2);
-
-        label = new TLatex();
-        label->SetNDC();
-        label->SetTextSize(0.055);
-        label->DrawLatex(0.68, 0.85, Form("Mean: %.2f mm", 10*mean));
-        label->DrawLatex(0.68, 0.78, Form("Sigma: %.2f mm", 10*sigma));
-
-        c_z->Write();
-        delete c_z;
-
-        delete hx_res;
-        delete hy_res;
-        delete hz_res;
-        delete hr_res;
+            c->Write();
+            delete c;
+        }
     }
 
 public:

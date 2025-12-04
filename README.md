@@ -13,7 +13,7 @@ make
 ./script_name
 ```
 
-All of the binaries will be saved to the newly made build folder. This might lead to errors in the scripts whenever relative paths are used.
+Alternatively, the script *rebuild_debug.sh* or *rebuild_release.sh* can be used. All of the binaries will be saved to the newly made build folder. This might lead to errors in the scripts whenever relative paths are used.
 
 ### Map simulation
 The map of the ionization electron drift can be simulated on MetaCentrum:
@@ -64,11 +64,14 @@ The project uses the following folder structure:
             - *original*, *original_v2*, *originalMC*, *track1* are tracks with 8 MeV momentum and use old coordinates
             - *new_9010*, *new_7030* are tracks with 8 MeV momentum and use new coordinates; the latter is the only track in this group with non-0.1 eV starting ionization electron energies
             - *newest_7030* is a track with 10 MeV (?) momentum and uses new coordinates and struct MicroPoint
+    - **figures**
+        - Contains the newest figures (post-thesis, to be used in the article, etc.)
     - **include**
         - Contains headers for the project with doxygen comments (and .inl files with definitions of templated functions)
     - **presentations**
         - Contains presentation from meetings and seminars (tex and pdf files)
     - **reconstruction**
+        - *map_test.cpp* -- script for plots of the map reconstruction residues of microscopic tracks
         - *reco_mtracks.cpp* -- script for reconstruction of microscopic tracks
         - *reco_plots.cpp* -- script for plots of the reconstruction (comparison of simulated and reconstructed energy)
         - *reco_test.cpp* -- script for reconstruction testing (single track plots, Runge-Kutta tracks circle fit)
@@ -102,4 +105,4 @@ The project uses the following folder structure:
     - **source**
         - Contains all .cpp files common to the reconstruction and simulation scripts.
     - **thesis**
-        - Contains the Latex and pdf files of my bachelor thesis
+        - Contains the latex and pdf files of my bachelor thesis
