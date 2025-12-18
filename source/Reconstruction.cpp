@@ -376,6 +376,14 @@ namespace X17
             // Make sure step isn't too high.
             if (offset < 10 * step) step /= 10;
 
+            // Check bounds with step.
+            if (x - step < map.GetXMin()) x = map.GetXMin() + step;
+            if (x + step > map.GetXMax()) x = map.GetXMax() - step;
+            if (y - step < map.GetYMin()) y = map.GetYMin() + step;
+            if (y + step > map.GetYMax()) y = map.GetYMax() - step;
+            if (z - step < map.GetZMin()) z = map.GetZMin() + step;
+            if (z + step > map.GetZMax()) z = map.GetZMax() - step;
+
             double damped_grad_size = damp*std::sqrt(gradx*gradx + grady*grady + gradz*gradz);
             if (damped_grad_size > 0.1 * offset) damp /= 10; 
 

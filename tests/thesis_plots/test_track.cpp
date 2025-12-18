@@ -362,7 +362,7 @@ void PlotRASD(X17::TrackMicro track, X17::Field<X17::MapPoint>* map, bool newcoo
     {
         using namespace X17::constants;
         double z_end = newcoords ? point.end.z() : point.end.y();
-        if(z_end > 7.5)
+        if (z_end > 7.5)
         {
             X17::Vector orig,reco_rasd;
             X17::RecoPoint reco_map, reco_map_old;
@@ -639,7 +639,14 @@ void PlotPadReco(const X17::Field<X17::MapPoint>& map, int pad_id, bool m7030 = 
     y_max = y_avg + (x_max-x_min)/2;
     y_min = y_avg - (x_max-x_min)/2;
 
-    TCanvas* c = new TCanvas("","Pad inversion",g_cwidth,2*g_cheight);
+    // Half-integer rounding
+    x_min = std::floor(2.0*x_min)/2.0;
+    x_max = std::ceil(2.0*x_max)/2.0;
+    y_min = std::floor(2.0*y_min)/2.0;
+    y_max = std::ceil(2.0*y_max)/2.0;
+
+    std::string c_name = "Pad " + std::to_string(pad_id) + " inversion" + (old_reco ? " (old reco)" : " (new reco)");
+    TCanvas* c = new TCanvas("",c_name.c_str(),g_cwidth,2*g_cheight);
     ApplyThesisStyle(c);
     TH3F* h = new TH3F("",";x [cm];y [cm];z [cm]", 1, x_min, x_max, 1, y_min, y_max, 1, -8, 8);
     ApplyThesisStyle(h);
@@ -872,13 +879,21 @@ int main(int argc, char *argv[])
     // PlotRASD(track1,map9010);
     // PlotRASD(track2,map7030,true);
     // PlotRASDres2();
-    PlotRASD(*track3,map7030,true);
+    // PlotRASD(*track3,map7030,true);
     
     // PlotSpline(track2,magfield,map7030,true);
     // PlotCircle2D(track2,magfield,map7030,true);
 
-    // PlotPadReco(*map9010,12,false);
-    // PlotPadReco(*map7030,12,true);
+    std::vector<int> pads_with_artifacts = {1,11,12,23,24,60,71,72,83,128};
+    for (int i : pads_with_artifacts)
+    {
+        std::cout << "\nPlotting pad " << i << std::endl;
+        PlotPadReco(*map7030,i,true,false);
+        PlotPadReco(*map7030,i,true,true);
+    }
+    
+    // PlotPadReco(*map7030,12,true,false);
+    // PlotPadReco(*map7030,12,true,true);
 
     // Reconstruct CircleFit3D + RK4
         // std::vector<X17::RecoPoint> reco_points;
