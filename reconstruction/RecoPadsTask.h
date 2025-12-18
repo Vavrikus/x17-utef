@@ -1,6 +1,7 @@
 #pragma once
 
 // ROOT dependencies
+#include "TH2Poly.h"
 #include "TStyle.h"
 
 // X17 dependencies
@@ -19,10 +20,23 @@ class RecoPadsTask : public X17::RecoTask
     int padhits[X17::constants::channels][timebins];
     std::vector<X17::RecoPoint> reco_data;
     TGraph2D *g_xyz, *g_xyz_reco;
+    TH2Poly* pads;
     TH3F* scale;
     TCanvas* c_reco;
 
     double height; // Height at which the pads will be drawn.
+
+    void PreTrackLoop() override
+    {
+        pads = new TH2Poly();   
+
+        for (int i = 1; i <= X17::constants::channels; i++)
+        {
+            double x1,y1,x2,y2;
+            X17::DefaultLayout::GetDefaultLayout().GetPadCorners(i,x1,y1,x2,y2,true);
+            pads->AddBin(y1,x1,y2,x2);
+        }
+    }
 
     void PreElectronLoop() override
     {
@@ -66,7 +80,7 @@ class RecoPadsTask : public X17::RecoTask
             for (int j = 0; j < timebins; j++)
                 if (padhits[i][j] > max_charge) max_charge = padhits[i][j];
 
-        std::cout << "Max charge: " << max_charge << std::endl;
+        // std::cout << "Max charge: " << max_charge << std::endl;
 
         for (int i = 0; i < channels; i++)
         {
@@ -230,6 +244,22 @@ class RecoPadsTask : public X17::RecoTask
         if (!m_loop->make_track_plots)
             for (auto line : marker_lines)
                 delete line;
+
+        for (int i = 1; i <= X17::constants::channels; i++)
+        for (int j = 0; j < timebins; j++)
+        {
+            int curr_electrons = pads->GetBinContent(i);
+            pads->SetBinContent(i,curr_electrons + padhits[i-1][j]);
+        }
+    }
+
+    void PostTrackLoop() override
+    {
+        TCanvas* c_pads = new TCanvas("c_pads","Pads",700,500);
+        pads->SetTitle(";y [cm];x [cm]");
+        ApplyThesisStyle(c_pads);
+        pads->Draw();
+        c_pads->Write();
     }
 
 public:

@@ -40,6 +40,9 @@ int main(int argc, char const *argv[])
 
     // TrackLoop for multiple microscopic tracks.
     TrackLoop* multi_loop = new TrackLoop(*map,magfield);
+    multi_loop->make_track_plots = false;
+    // multi_loop->AddTask(new MapRecoCompareTask("c_oldnew_res",true,true));
+    multi_loop->AddTask(new RecoPadsTask());
     multi_loop->AddTask(new MapRecoTask("c_fit_res",true,true));
     multi_loop->AddTask(new MapRecoTask("c_e_fit_res",true,false));
     multi_loop->AddTask(new MapRecoTask("c_p_fit_res",false,true));
