@@ -33,6 +33,7 @@
 // Tasks, that were moved to separate files
 #include "RecoPadsTask.h"
 #include "RKFitCircleTask.h"
+#include "MapRecoCompareTask.h"
 #include "MapRecoTask.h"
 #include "MicroCircleAndRKFitTask.h"
 #include "MicroFitAndSaveTask.h"
