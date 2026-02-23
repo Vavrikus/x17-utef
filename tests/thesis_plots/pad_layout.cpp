@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
     TApplication app("app", &argc, argv);
 
     X17::DefaultLayout& layout = X17::DefaultLayout::GetDefaultLayout();
+    bool no_pad_gaps = false;
 
     const double padding = 1;
     TCanvas* c = new TCanvas("c", "c", 600 * 2 * (yhigh + padding)/(xmax - xmin + 2 * padding), 600);
@@ -47,7 +48,7 @@ int main(int argc, char *argv[])
 
     // PAD DIMENSIONS
         double x1_1, y1_1, x1_2, y1_2;
-        layout.GetPadCorners(1, x1_1, y1_1, x1_2, y1_2, false);
+        layout.GetPadCorners(1, x1_1, y1_1, x1_2, y1_2, no_pad_gaps);
 
         DashedLine(y1_1, x1_2, y1_1, x1_2 + 0.5);
         DashedLine(y1_2, x1_2, y1_2, x1_2 + 0.5);
@@ -64,7 +65,7 @@ int main(int argc, char *argv[])
         heightText->Draw();
 
         double x4_1, y4_1, x4_2, y4_2;
-        layout.GetPadCorners(4, x4_1, y4_1, x4_2, y4_2, false);
+        layout.GetPadCorners(4, x4_1, y4_1, x4_2, y4_2, no_pad_gaps);
 
         DashedLine(y4_1 - 0.5, x4_1, y4_1, x4_1);
         DashedLine(y4_1 - 0.5, x4_2, y4_1, x4_2);
@@ -83,7 +84,7 @@ int main(int argc, char *argv[])
     // SPECIAL PADS
         for (int pad : {102, 124, 127}) {
             double x1, y1, x2, y2;
-            layout.GetPadCorners(pad, x1, y1, x2, y2, false);
+            layout.GetPadCorners(pad, x1, y1, x2, y2, no_pad_gaps);
 
             DashedLine(y1, x1, y1, x1 - 1.1);
             DashedLine(y2, x1, y2, x1 - 1.1);
@@ -106,8 +107,8 @@ int main(int argc, char *argv[])
         // Get pad coordinates for pads 6 and 7
         double x6_1, y6_1, x6_2, y6_2;
         double x7_1, y7_1, x7_2, y7_2;
-        layout.GetPadCorners(6, x6_1, y6_1, x6_2, y6_2, false);
-        layout.GetPadCorners(7, x7_1, y7_1, x7_2, y7_2, false);
+        layout.GetPadCorners(6, x6_1, y6_1, x6_2, y6_2, no_pad_gaps);
+        layout.GetPadCorners(7, x7_1, y7_1, x7_2, y7_2, no_pad_gaps);
 
         // Calculate centers
         double cx6 = (x6_1 + x6_2)/2;
@@ -138,8 +139,8 @@ int main(int argc, char *argv[])
     // GAP
         double x10_1, y10_1, x10_2, y10_2;
         double x11_1, y11_1, x11_2, y11_2;
-        layout.GetPadCorners(10, x10_1, y10_1, x10_2, y10_2, false);
-        layout.GetPadCorners(11, x11_1, y11_1, x11_2, y11_2, false);
+        layout.GetPadCorners(10, x10_1, y10_1, x10_2, y10_2, no_pad_gaps);
+        layout.GetPadCorners(11, x11_1, y11_1, x11_2, y11_2, no_pad_gaps);
 
         DashedLine(y10_1, x10_1, y7_1, x10_1);
         DashedLine(y11_1, x11_2, y7_1, x11_2);
@@ -161,8 +162,8 @@ int main(int argc, char *argv[])
 
         double x49_1, y49_1, x49_2, y49_2;
         double x61_1, y61_1, x61_2, y61_2;
-        layout.GetPadCorners(49, x49_1, y49_1, x49_2, y49_2, false);
-        layout.GetPadCorners(61, x61_1, y61_1, x61_2, y61_2, false);
+        layout.GetPadCorners(49, x49_1, y49_1, x49_2, y49_2, no_pad_gaps);
+        layout.GetPadCorners(61, x61_1, y61_1, x61_2, y61_2, no_pad_gaps);
 
         DashedLine(y49_2, x49_2, y49_2, x49_2 + 0.5);
         DashedLine(y61_1, x61_2, y61_1, x61_2 + 0.5);
@@ -180,6 +181,21 @@ int main(int argc, char *argv[])
         gap_text2->SetTextSize(0.035);
         gap_text2->SetTextAlign(12);  // Left alignment
         gap_text2->Draw();
+
+    // Phi angles
+    int angle_bins = 21;
+    double phi_max = atan((X17::constants::win_width/2)/X17::constants::xmin);    // The maximal simulated phi [rad].
+    double phi_min = -phi_max;                                                    // The minimal simulated phi [rad].
+
+    for (int i = 0; i < angle_bins; i++)
+    {
+        using namespace X17::constants;
+        double phi = phi_min + (phi_max - phi_min) * i / (angle_bins - 1);
+        TLine* line = new TLine(xmin*tan(phi),xmin,xmax*tan(phi),xmax);
+        line->SetLineColor(kBlue);
+        line->SetLineWidth(2);
+        line->Draw("same");
+    }
 
     ApplyThesisStyle(c);
     c->Modified();

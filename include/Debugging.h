@@ -1,3 +1,5 @@
+#pragma once
+
 // C++ dependencies
 #include <functional>
 #include <iostream>

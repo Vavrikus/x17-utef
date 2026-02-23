@@ -10,6 +10,8 @@
 #include "TrackLoop.h"
 #include "X17Utilities.h"
 
+#include "Debugging.h"
+
 /// @brief Class for padded reconstruction.
 class RecoPadsTask : public X17::RecoTask
 {
@@ -21,6 +23,8 @@ class RecoPadsTask : public X17::RecoTask
     std::vector<X17::RecoPoint> reco_data;
     TGraph2D *g_xyz, *g_xyz_reco;
     TH2Poly* pads;
+    TH2Poly* e_pads;
+    TH2Poly* p_pads;
     TH3F* scale;
     TCanvas* c_reco;
 
@@ -28,13 +32,16 @@ class RecoPadsTask : public X17::RecoTask
 
     void PreTrackLoop() override
     {
-        pads = new TH2Poly();   
-
-        for (int i = 1; i <= X17::constants::channels; i++)
+        for (TH2Poly** poly : {&pads,&e_pads,&p_pads})
         {
-            double x1,y1,x2,y2;
-            X17::DefaultLayout::GetDefaultLayout().GetPadCorners(i,x1,y1,x2,y2,true);
-            pads->AddBin(y1,x1,y2,x2);
+            *poly = new TH2Poly();
+    
+            for (int i = 1; i <= X17::constants::channels; i++)
+            {
+                double x1,y1,x2,y2;
+                X17::DefaultLayout::GetDefaultLayout().GetPadCorners(i,x1,y1,x2,y2,true);
+                (*poly)->AddBin(y1,x1,y2,x2);
+            }
         }
     }
 
@@ -250,16 +257,45 @@ class RecoPadsTask : public X17::RecoTask
         {
             int curr_electrons = pads->GetBinContent(i);
             pads->SetBinContent(i,curr_electrons + padhits[i-1][j]);
+            if (m_loop->curr_microtrack->electron)
+            {
+                curr_electrons = e_pads->GetBinContent(i);
+                e_pads->SetBinContent(i,curr_electrons + padhits[i-1][j]);
+            }
+            else
+            {
+                curr_electrons = p_pads->GetBinContent(i);
+                p_pads->SetBinContent(i,curr_electrons + padhits[i-1][j]);
+            }
         }
     }
 
     void PostTrackLoop() override
     {
-        TCanvas* c_pads = new TCanvas("c_pads","Pads",700,500);
-        pads->SetTitle(";y [cm];x [cm]");
-        ApplyThesisStyle(c_pads);
-        pads->Draw();
-        c_pads->Write();
+        TH2Poly* polys[3] = {pads,e_pads,p_pads};
+        std::string names[3] = {"pads","e_pads","p_pads"};
+        for (int i = 0; i < 3; i++)
+        {
+            TCanvas* c = new TCanvas(names[i].c_str(),names[i].c_str(),700,500);
+            polys[i]->SetTitle(";y [cm];x [cm]");
+            ApplyThesisStyle(c);
+            polys[i]->Draw();
+            // Phi angles
+            int angle_bins = 21;
+            double phi_max = atan((X17::constants::win_width/2)/X17::constants::xmin);    // The maximal simulated phi [rad].
+            double phi_min = -phi_max;                                                    // The minimal simulated phi [rad].
+
+            for (int i = 0; i < angle_bins; i++)
+            {
+                using namespace X17::constants;
+                double phi = phi_min + (phi_max - phi_min) * i / (angle_bins - 1);
+                TLine* line = new TLine(xmin*tan(phi),xmin,xmax*tan(phi),xmax);
+                line->SetLineColor(kRed);
+                line->SetLineWidth(2);
+                line->Draw("same");
+            }
+            c->Write();
+        }
     }
 
 public:

@@ -149,6 +149,7 @@ double GetPvalue(std::vector<double>& values, double value, bool sorted)
 
 void ReportProgress(int current, int total, int width)
 {
+    current++;
     float progress = static_cast<float>(current) / total;
     int filled = static_cast<int>(progress * width);
 

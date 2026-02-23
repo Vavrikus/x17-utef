@@ -57,6 +57,8 @@ namespace X17
             curr_track_index = i;
 
             micro_tracks->GetEntry(i);
+            // if (std::abs(curr_microtrack->varphi()) > 0.000001) continue; // ONLY FOR TEST!!!
+            // if (std::abs(curr_microtrack->theta()) > 0.000001) continue; // ONLY FOR TEST!!!
             // if(curr_microtrack->electron) continue; // ONLY FOR TEST!!!
             ReportProgress(i,n_tracks);
             // std::cout << "Track " << i+1 << " out of " << n_tracks << ".\n";
