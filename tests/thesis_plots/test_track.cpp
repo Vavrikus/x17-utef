@@ -884,16 +884,16 @@ int main(int argc, char *argv[])
     // PlotSpline(track2,magfield,map7030,true);
     // PlotCircle2D(track2,magfield,map7030,true);
 
-    std::vector<int> pads_with_artifacts = {1,11,12,23,24,60,71,72,83,128};
-    for (int i : pads_with_artifacts)
-    {
-        std::cout << "\nPlotting pad " << i << std::endl;
-        PlotPadReco(*map7030,i,true,false);
-        PlotPadReco(*map7030,i,true,true);
-    }
+    // std::vector<int> pads_with_artifacts = {1,11,12,23,24,60,71,72,83,128};
+    // for (int i : pads_with_artifacts)
+    // {
+    //     std::cout << "\nPlotting pad " << i << std::endl;
+    //     PlotPadReco(*map7030,i,true,false);
+    //     PlotPadReco(*map7030,i,true,true);
+    // }
     
-    // PlotPadReco(*map7030,12,true,false);
     // PlotPadReco(*map7030,12,true,true);
+    // PlotPadReco(*map7030,66,true,false);
 
     // Reconstruct CircleFit3D + RK4
         // std::vector<X17::RecoPoint> reco_points;

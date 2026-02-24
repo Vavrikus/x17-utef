@@ -56,7 +56,7 @@ int main(int argc, char const *argv[])
     
     RecoPadsTask* t = new RecoPadsTask();
     loop->AddTask(t);
-    loop->AddTask(new MicroCircleAndRKFitTask(t));
+    // loop->AddTask(new MicroCircleAndRKFitTask(t));
     
     // Loading file with Runge-Kutta tracks.
     TFile* input_rk = new TFile("../../data/rk_tracks/rk_tracks_forward.root");

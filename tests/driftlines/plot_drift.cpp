@@ -31,8 +31,12 @@ int main(int argc, char const *argv[])
     X17::TrackMicro* track = 0;
     tracks->SetBranchAddress("track_full",&track);
     tracks->GetEntry(4);
-
-    std::cout << "Loaded track with " << track->points.size() << " points and " << track->driftlines.size() << " driftlines.\n";
+    
+    int n_driftlines = track->driftlines.size();
+    std::cout << "Loaded track with " << track->points.size() << " points and " << n_driftlines << " driftlines.\n";
+    int drift_pts = 0;
+    for (const auto& driftline : track->driftlines) drift_pts += driftline.size();
+    std::cout << "Loaded " << drift_pts << " drift points (average " << (float)drift_pts / n_driftlines << " per driftline).\n";
 
     TMultiGraph* mg_xy = new TMultiGraph();
     TGraph* g_primary_xy = new TGraph();
@@ -69,6 +73,9 @@ int main(int argc, char const *argv[])
     g_primary_3d->SetLineWidth(3);
     ApplyThesisStyle(g_primary_3d);
     
+    int skip = 100;
+    std::cout << "Plotting every " << skip << "th driftline point.\n";
+
     for (const auto& driftline : track->driftlines)
     {
         g_driftlines_xy.push_back(new TGraph());
@@ -83,11 +90,12 @@ int main(int argc, char const *argv[])
         int i = 0;
         for (const auto& point : driftline)
         {
+            if (i % skip != 0) { i++; continue; }
             g_driftlines_xy.back()->AddPoint(point.x(),point.y());
             g_driftlines_xz.back()->AddPoint(point.x(),point.z());
             g_driftlines_yz.back()->AddPoint(point.y(),point.z());
 
-            l_driftlines_3d.back()->SetPoint(i,point.x(),point.y(),point.z());
+            l_driftlines_3d.back()->SetPoint(i/skip,point.x(),point.y(),point.z());
             i++;
         }
 
