@@ -12,6 +12,7 @@
 
 \captionsetup[figure]{font=footnotesize, justification=justified, format=hang}
 
+\usepackage{tikz}
 \usepackage[warnundef]{jabbrv}
 \usepackage[natbib,style=iso-numeric,sorting=none,backend=biber]{biblatex}
 \addbibresource{bibliography.bib}
@@ -70,6 +71,9 @@
 \newcommand{\nologo}{\setbeamertemplate{logo}{}}
 \newcommand{\nonav}{\setbeamertemplate{navigation symbols}{}}
 
+\newcommand{\white}[1]{\textcolor{white}{#1}}
+\renewcommand{\textapprox}{{\textasciitilde}}
+
 \begin{document}
 	
 	\begin{frame}
@@ -84,10 +88,12 @@
 	\end{frame}
 	
 	\section{Motivation}
+	{\nologo
 	\begin{frame}
 		\frametitle{Motivation: ATOMKI Measurements}
 		\begin{itemize}
-			\item Measurement of anomalies in the angular correlation of an~electron-positron pair internally produced in excited $ {}^8\text{Be} $ and $ {}^4\text{He} $\newline
+			\item Measurement of anomalies in the angular correlation of an~electron-positron pair internally produced in excited $ {}^8\text{Be} $~\cite{atomki_be,atomki_be2}, $ {}^4\text{He} $~\cite{atomki_he,atomki_he2} and $ {}^{12}\text{C} $~\cite{atomki_c}
+			\item Angular resolution \textapprox7$^\circ$, energy resolution 4.5\% at 17.6 MeV \newline
 			\begin{columns}
 				\column{0.33 \textwidth}
 				\centering
@@ -114,41 +120,54 @@
 			\end{columns}
 		\end{itemize}
 	\end{frame}
+	}
 	
-	\begin{frame}[noframenumbering]
+	\begin{frame}
+		\frametitle{ATOMKI Anomaly: Other Experiments, Explanations}
+		\begin{itemize}
+			\item In 2023 excesses in $\gamma\gamma$ spectra (\textapprox17 MeV and \textapprox38 MeV) in p+C, d+C and d+Cu collisions at Nuclotron in Dubna~\cite{dubna}
+			\item In 2024 ${}^8\text{Be}$ anomaly also measured using a different spectrometer in Hanoi~\cite{hanoi}
+			\item In 2024 the MEG II experiment found no significant excess in ${}^8\text{Be}$ and set a~limit for the branching ratio~\cite{megii}
+			\item In 2025 PADME observed a $2\sigma$ excess when irradiating a fixed target with a positron beam at $\sqrt{s} = 16.9$~MeV
+			\item Possible explanations include a new protophobic boson X17~\cite{feng}
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}
 		\frametitle{X17 Decay Signature in IPC}
 		\centering
 		\includegraphics[width=0.75\textwidth]{../images/X17_sim.png}\\
 		\vspace{-0.25cm}
 		\begin{minipage}[t][4cm]{0.85\textwidth}
-			Histogram of e$^+$e$^-$ pair angle and positron energy produced by standard IPC and by the decay of a hypothetical boson X17 (branching ratio $3\cdot10^{-3}$).
+			\textbf{Geant 4 simulation (ideal case):} Histogram of e$^+$e$^-$ pair angle and positron energy produced by standard IPC and by the decay of a hypothetical boson X17 (branching ratio $3\cdot10^{-3}$).
 		\end{minipage}
 	\end{frame}
 	
+	{\nologo
 	\begin{frame}
 		\frametitle{OFTPC: Detector Configuration}
 		\begin{itemize}
-			\item Time Projection Chamber with Orthogonal Fields (OFTPC) -- electric and magnetic field perpendicular (gas mixture Ar/CO$_2$~--~70/30)
+			\item Time Projection Chamber with Orthogonal Fields (OFTPC) -- electric and magnetic field perpendicular (gas mixture Ar/CO$_2$~--~70/30, \textcolor{gray}{\scriptsize 90/10})
 		\end{itemize}
 		\begin{columns}
-			\column{0.47 \textwidth}
+			\column{0.48 \textwidth}
 			\centering
 			\begin{minipage}[t][4.05cm]{\textwidth}
 				\centering
-				\textcolor{white}{a\,\,}\includegraphics[width=0.82\linewidth]{../images/diagram.png}\newline
+				\textcolor{white}{a\,\,}\includegraphics[width=0.9\linewidth]{../images/diagram.png}\newline
 			\end{minipage}
 			Two out of the six OFTPC chambers.~\cite{x17_utef}
-			\column{0.47 \textwidth}
+			\column{0.02\textwidth}
+			\column{0.48 \textwidth}
 			\centering
 			\begin{minipage}[t][4.05cm]{\textwidth}
 				\centering
-				\includegraphics[width=0.71\linewidth]{../images/diagram2.png}\newline
+				\includegraphics[width=0.8\linewidth]{../images/diagram2.png}\newline
 			\end{minipage}
 			OFTPC with a triple gas electron multiplier (GEM) readout.~\cite{x17_utef}
 		\end{columns}
 	\end{frame}
 	
-	{\nologo
 	\begin{frame}
 		\frametitle{OFTPC: Detector Configuration}
 		\centering
@@ -156,7 +175,7 @@
 	\end{frame}
 	
 	\begin{frame}
-		\frametitle{OFTPC: Pad layout}
+		\frametitle{OFTPC: GEM Readout --- Pads}
 		\centering
 		\includegraphics[width=\textwidth]{../../figures/pad_layout.pdf}
 	\end{frame}
@@ -196,8 +215,8 @@
 			\end{minipage}
 		\end{columns}
 		\begin{itemize}
-			\item The field interferes with the direction of the drift of ionization electrons
-			\item Curvature of the track is not constant in this field (deviation from a~circle)
+			\item The field interferes with the direction of the drift of ionization electrons (position dependent Lorentz angle)
+			\item Curvature of the track is not constant in this field\\ (deviation from a~circle)
 		\end{itemize}
 	\end{frame}
 	
@@ -209,7 +228,7 @@
 			\begin{itemize}
 				\item Primary relativistic particle simulated using the HEED program~\cite{HEED}
 				\item Secondary ionization electrons simulated using microscopic tracking (uses equations of motion)
-				\begin{itemize}\item Relatively slow (typically 5-30 CPU hours per track), very precise, especially for small structures.  \end{itemize}
+				\begin{itemize}\item Relatively slow (typically 5-30 CPU hours per track), very precise, especially for small structures.\end{itemize}
 			\end{itemize}
 			\item Five batches of 9702 tracks with different initial parameters simulated on a grid (MetaCentrum~\cite{metacentrum})
 			\begin{itemize}
@@ -221,7 +240,7 @@
 	\end{frame}
 	
 	\begin{frame}
-		\frametitle{Track Simulation}
+		\frametitle{Track Simulation: Parameters}
 		\centering
 		\large{Spherical angles ($\theta$,$\varphi$) with respect to~$z$}\\
 		\small{$\theta$ taken from the equatorial plane $xy$}
@@ -241,15 +260,15 @@
 		\begin{columns}
 			\column{0.33\textwidth}
 			\centering
-			\includegraphics[width = 0.95 \linewidth]{../../figures/drift_7030_yz_small.pdf}
+			\includegraphics[width = 0.97 \linewidth]{../../figures/drift_7030_yz_small.pdf}
 			Diffusion front view
 			\column{0.33\textwidth}
 			\centering
-			\includegraphics[width = 0.95 \linewidth]{../../figures/drift_7030_xz_small.pdf}
+			\includegraphics[width = 0.97 \linewidth]{../../figures/drift_7030_xz_small.pdf}
 			Electron drift
 			\column{0.33\textwidth}
 			\centering
-			\includegraphics[width = 0.95 \linewidth]{../../figures/drift_7030_xy_small.pdf}
+			\includegraphics[width = 0.97 \linewidth]{../../figures/drift_7030_xy_small.pdf}
 			Diffusion top view
 		\end{columns}
 	\end{frame}
@@ -284,7 +303,7 @@
 	\end{frame}
 	
 	\begin{frame}
-		\frametitle{Ionization Electron Map Simulation}
+		\frametitle{Ionization Electron Map Simulation: Principle}
 		\begin{itemize}
 			\item As a result we get an approximation of a mapping from initial coordinates of the electrons $(x,y,z)$ to the readout coordinates $(x',y',t)$
 			\item By interpolating we can get the inverse map
@@ -297,7 +316,7 @@
 		\end{figure}
 	\end{frame}
 	\begin{frame}
-		\frametitle{Ionization Electron Map Simulation}
+		\frametitle{Ionization Electron Map Simulation: Visualization}
 		\begin{figure}
 			\centering
 			\includegraphics[width=\textwidth]{figures/map_3dvis.png}
@@ -305,7 +324,7 @@
 		\end{figure}
 	\end{frame}
 	\begin{frame}
-		\frametitle{Ionization Electron Map Simulation}
+		\frametitle{Ionization Electron Map Simulation: Coordinate Distortion}
 		\begin{figure}
 			\centering
 			\includegraphics[height=0.68\textheight]{../../figures/map_yx_all.pdf}\\
@@ -314,7 +333,7 @@
 	\end{frame}
 
 	\begin{frame}
-		\frametitle{Ionization Electron Map Simulation}
+		\frametitle{Ionization Electron Map Simulation: Diffusion}
 		\centering
 		\begin{minipage}[c]{0.9\textwidth}
 			\begin{figure}
@@ -352,7 +371,7 @@
 	\end{frame}
 	{\nonav
 	\begin{frame}
-		\frametitle{Ionization Electron Map Reconstruction Residuals}
+		\frametitle{Ionization Electron Map Reconstruction Residuals ($x$, $y$)}
 		\footnotesize Residuals of init. positions of 14.3 M simul. track ion. $e^-$ reconstructed using the map
 		\includegraphics[width=0.45\textwidth]{../../figures/c_fit_res_x_lin.pdf}
 		\includegraphics[width=0.45\textwidth]{../../figures/c_fit_res_x_log.pdf}\\
@@ -361,34 +380,54 @@
 	\end{frame}
 	}
 	\begin{frame}
-		\frametitle{Ionization Electron Map Reconstruction Residuals}
+		\frametitle{Ionization Electron Map Reconstruction Residuals ($z$)}
 		Residuals of initial positions of 14.3 million simulated track ionization $e^-$ reconstructed using the map\\
 		\includegraphics[width=0.45\textwidth]{../../figures/c_fit_res_z_lin.pdf}
 		\includegraphics[width=0.45\textwidth]{../../figures/c_fit_res_z_log.pdf}
+		Deviations likely caused by non-zero initial velocity of electrons
 	\end{frame}
+	{\nologo\nonav
 	\begin{frame}
 		\frametitle{Inverse Mapping of Pads}
-		\begin{columns}
-			\column{0.05\textwidth}
-			\column{0.44\textwidth}
-			\centering
-			\begin{minipage}[t][4.2cm]{\textwidth}
-				\centering
-				\includegraphics[width = \textwidth]{../../figures/pad_12_grad.pdf}\\
-				\vspace{-0.5cm}
-				{Pad 12 (near the magnet pole)}
-			\end{minipage}
-			\column{0.44\textwidth}
-			\centering
-			\begin{minipage}[t][4.2cm]{\textwidth}
-				\centering
-				\includegraphics[width = \textwidth]{../../figures/pad_66_interpol.pdf}\\
-				\vspace{-0.5cm}
-				{Pad 66}
-			\end{minipage}
-			\column{0.06\textwidth}
-		\end{columns}
+		
+		\begin{tikzpicture}[remember picture,overlay]
+					
+			% bottom left
+			\node at ([xshift=-3.3cm,yshift=-0.75cm]current page.center)
+			{
+				\begin{minipage}{0.41\textwidth}
+					\centering
+					Pad 12 \white{aa} \\
+					(near magnet pole) \white{aa}\\ %\vspace{-0.5em}
+					\includegraphics[width=\linewidth]{../../figures/pad_12_grad.pdf}
+					\vspace{-1.7em}
+					
+					Inversion by gradient descent
+				\end{minipage}
+			};
+			
+			% bottom right
+			\node at ([xshift=3.3cm,yshift=-0.75cm]current page.center)
+			{
+				\begin{minipage}{0.41\textwidth}
+					\centering
+					 \white{a} Pad 66\\
+					 \white{a} (near center)
+					\includegraphics[width=\linewidth]{../../figures/pad_66_interpol.pdf}
+					\vspace{-1.7em}
+					
+					Inversion by interpolation
+				\end{minipage}
+			};
+			
+			% top image (drawn LAST → on top)
+			\node at ([yshift=2.65cm]current page.center)
+			{\includegraphics[width=0.33\textwidth]{../../figures/pad_layout_12_66.pdf}};
+			
+		\end{tikzpicture}
+		
 	\end{frame}
+	}
 	
 	\section{Energy Reconstruction}
 	{\nonav
@@ -408,7 +447,7 @@
 	}
 	{\nologo\nonav
 	\begin{frame}
-		\frametitle{Energy Reconstruction Precision}
+		\frametitle{Energy Reconstruction Precision (overall)}
 		\centering
 		\begin{columns}
 			\column{0.5\textwidth}
@@ -436,7 +475,7 @@
 	\end{frame}
 	}
 	\begin{frame}
-		\frametitle{Energy Reconstruction Precision}
+		\frametitle{Energy Reconstruction Precision (energy dependence)}
 		\centering
 		\begin{columns}
 			\column{0.5\textwidth}
@@ -458,7 +497,7 @@
 		\footnotesize{Relative reconstruction deviation of the~kinetic energy of electron and positron tracks (ca. 24\,000 of each simulated).}
 	\end{frame}
 	\begin{frame}
-		\frametitle{Energy Reconstruction Precision}
+		\frametitle{Energy Reconstruction Precision (theta dependence)}
 		\centering
 		\begin{columns}
 			\column{0.5\textwidth}
@@ -480,7 +519,7 @@
 		\footnotesize{Relative reconstruction deviation of the~kinetic energy of electron and positron tracks (ca. 24\,000 of each simulated).}
 	\end{frame}
 	\begin{frame}
-		\frametitle{Energy Reconstruction Precision}
+		\frametitle{Energy Reconstruction Precision (phi dependence)}
 		\centering
 		\begin{columns}
 			\column{0.5\textwidth}
@@ -501,12 +540,13 @@
 		\vspace{0.5cm}
 		\footnotesize{Relative reconstruction deviation of the~kinetic energy of electron and positron tracks (ca. 24\,000 of each simulated).}
 	\end{frame}
-	\begin{frame}[noframenumbering]
+	\begin{frame}
 		\frametitle{X17 Decay Signature in IPC (with preliminary errors)}
 		\centering
 		\includegraphics[width=0.75\textwidth]{../images/X17_sim_rand.png}\\
+		\vspace{-0.25cm}
 		\begin{minipage}[t][4cm]{0.85\textwidth}
-			Histogram of e$^+$e$^-$ pair angle and positron energy produced by standard IPC and by the decay of a hypothetical boson X17 (branching ratio $3\cdot10^{-3}$).
+			\textbf{Geant 4 simulation + errors:} Histogram of e$^+$e$^-$ pair angle and positron energy produced by standard IPC and by the decay of a hypothetical boson X17 (branching ratio $3\cdot10^{-3}$).
 		\end{minipage}
 	\end{frame}
 	
