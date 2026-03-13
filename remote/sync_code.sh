@@ -16,4 +16,4 @@ rsync bashrc.sh ${i}":~/.bashrc" --progress
 rsync bash_profile.sh ${i}":~/.bash_profile" --progress 
 
 cd ..
-rsync include source simulations reconstruction tests data LinkDef.h CMakeLists.txt ${i}":/storage/projects/utefx17/martin" --progress --recursive
+rsync include source simulations reconstruction tests LinkDef.h CMakeLists.txt ${i}":/storage/projects/utefx17/martin" --progress --recursive

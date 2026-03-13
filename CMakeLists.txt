@@ -2,9 +2,10 @@
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 project(X17)
 
-# Set the C++ standard
-set(CMAKE_CXX_STANDARD 23)
+# Set the C++ standard (C++23 not supported in old versions of CMake)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(ROOT_CXX_FLAGS "-std=c++20")
 
 # Set default build type to Release if not specified
 if(NOT CMAKE_BUILD_TYPE)
@@ -23,7 +24,7 @@ endif()
 
 # ---Garfield-----------------------------------------------------------------------------
 if(NOT TARGET Garfield::Garfield)
-  find_package(Garfield REQUIRED HINTS "/home/vavrik/work/source/garfield/build/CMake")
+  find_package(Garfield REQUIRED HINTS "/home/vavrik/work/source/garfield/build/CMake" "/storage/projects/utefx17/SourceCode/garfield_2603/build/CMake")
 endif()
 
 # ---Root---------------------------------------------------------------------------------

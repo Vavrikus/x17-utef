@@ -1,20 +1,26 @@
-#trying to suppress version info errors
+# trying to suppress version info errors
 export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
 
-#setting home alias for x17 directory
+# setting home alias for x17 directory
 alias home='cd /storage/projects/utefx17/martin;pwd'
 
-#garfield directory
-export GARFIELD_HOME='/storage/projects/utefx17/SourceCode/garfield'
+# garfield directory
+export GARFIELD_HOME='/storage/projects/utefx17/SourceCode/garfield_2603'
+
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
 
 # --- META SPECIFIC SETUP ---
 # run only if modules exist
-if [[ -f /etc/profile.d/20_meta_modules.sh ]]; then
+if [[ -f /etc/profile.d/30_meta_modules.sh ]]; then
     #source adding modules
-    source /etc/profile.d/20_meta_modules.sh
+    source /etc/profile.d/30_meta_modules.sh
 
     #adding cmake
-    module add cmake/cmake-3.17.3-gcc-8.3.0-z6akqlo
+    module add cmake/3.23.1-gcc-10.2.1-gxvea6z
 
     #sourcing Geant4
     source /storage/projects/utefx17/SourceCode/geant4/geant4-v11.0.3-install/bin/geant4.sh
@@ -27,20 +33,16 @@ if [[ -f /etc/profile.d/20_meta_modules.sh ]]; then
 fi
 # --- END META SPECIFIC ---
 
-# If not running interactively, don't do anything
-case $- in
-    *i*) ;;
-      *) return;;
-esac
-
-#sourcing ROOT (causes annoying version info errors)
+# sourcing ROOT (causes annoying version info errors)
 # (also only on META)
-if [[ -f /storage/projects/utefx17/SourceCode/ROOT/install/bin/thisroot.sh ]]; then
-    source /storage/projects/utefx17/SourceCode/ROOT/install/bin/thisroot.sh
+if [[ -f /storage/projects/utefx17/SourceCode/ROOT/root_v6.36/root_install/bin/thisroot.sh ]]; then
+   source /storage/projects/utefx17/SourceCode/ROOT/root_v6.36/root_install/bin/thisroot.sh
 fi
+# source old ROOT if needed
+alias oldroot="source /storage/projects/utefx17/SourceCode/ROOT/install/bin/thisroot.sh"
 
-#trimming long directory output
+# trimming long directory output
 export PROMPT_DIRTRIM=1
 
-#colorful output for better readability
+# colorful output for better readability
 PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '

@@ -1,6 +1,9 @@
 #!/bin/bash
 cd $(dirname $0) #Makes sure you are in the directory of this script.
 
+echo "ERROR: This script is currently unsafe as it may mess with permissions. Stopping..."
+exit -1
+
 [ -z $1 ] && echo "Parameter 1 (max_id) is missing." && exit 6
 
 if [ -z $2 ]; then

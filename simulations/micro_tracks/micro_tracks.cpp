@@ -18,7 +18,7 @@
 #include "Garfield/ComponentGrid.hh"
 #include "Garfield/DriftLineRKF.hh"
 #include "Garfield/MediumMagboltz.hh"
-#include "Garfield/Plotting.hh"
+// #include "Garfield/Plotting.hh"
 #include "Garfield/Sensor.hh"
 #include "Garfield/TrackHeed.hh"
 #include "Garfield/ViewDrift.hh"
