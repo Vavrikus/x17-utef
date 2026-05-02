@@ -9,4 +9,7 @@ endif()
 
 # ---Build executable------------------------------------------------------------
 add_executable(plot_drift plot_drift.cpp)
-target_link_libraries(plot_drift Garfield::Garfield ${ROOT_LIBRARIES} X17_source_lib)
+target_link_libraries(plot_drift
+  Garfield::Garfield
+  ${ROOT_LIBRARIES}
+  -Wl,--no-as-needed X17_source -Wl,--as-needed)

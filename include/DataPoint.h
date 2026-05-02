@@ -1,4 +1,5 @@
 #pragma once
+// IWYU pragma: private, include "Points.h"
 
 // ROOT dependencies
 #include "Rtypes.h"
@@ -8,12 +9,12 @@
 
 namespace X17
 {
-    /// @brief A struct for storing the simulated (later maybe also real) data from the TPC readout.
-    struct DataPoint
-    {
-        EndPointDiscrete point; // The binned time and position information.
-        double count;           // The number of electrons or charge.
+  /// @brief A struct for storing the simulated (later maybe also real) data from the TPC readout.
+  struct DataPoint
+  {
+    EndPointDiscrete point; // The binned time and position information.
+    double count;           // The number of electrons or charge.
 
-        ClassDefNV(DataPoint, 1)
-    };
+    ClassDefNV(DataPoint, 1)
+  };
 } // namespace X17

@@ -1,125 +1,150 @@
 // C++ dependencies
 #include <iostream>
 
+// ROOT dependencies
+#include "TTree.h"
+
 // X17 dependencies
 #include "Points.h"
 #include "Reconstruction.h"
 #include "TrackLoop.h"
+#include "Utilities.h"
 #include "X17Utilities.h"
 
 namespace X17
 {
-    //// Public methods.
+  //// Public methods.
 
-    void TrackLoop::AddTask(RecoTask* task)
+  void TrackLoop::AddTask(RecoTask* task)
+  {
+    task->m_loop = this;
+    m_tasks.push_back(task);
+  }
+
+  void TrackLoop::ProcessSingle(TTree* single_track)
+  {
+    curr_loop = SINGLE;
+
+    curr_micro_tree = single_track;
+
+    curr_micro.SetTTreeBranches(single_track);
+    for (RecoTask* t : m_tasks)
+      t->PreElectronLoop();
+
+    // Looping through all ionization electrons.
+    int n_electrons = 0;
+    for (int i = 0; i < single_track->GetEntries(); i++)
     {
-        task->m_loop = this;
-        m_tasks.push_back(task);
+      single_track->GetEntry(i);
+      if (IsInTPC(curr_micro.x1(), curr_micro.y1(), 0) && IsInTPC(curr_micro.GetInitPos(), -0.01))
+      {
+        n_electrons++;
+        curr_reco = Reconstruct(map, curr_micro);
+        for (RecoTask* t : m_tasks)
+          t->ElectronLoop();
+      }
     }
 
-    void TrackLoop::ProcessSingle(TTree* single_track)
+    std::cout << "\nNumber of electrons in the TPC region: " << n_electrons << "\n";
+
+    for (RecoTask* t : m_tasks)
+      t->PostElectronLoop();
+  }
+
+  void TrackLoop::ProcessMulti(TTree* micro_tracks, int n_process)
+  {
+    curr_loop = MULTI;
+
+    micro_tracks->SetBranchAddress("track_small", &curr_microtrack);
+    for (RecoTask* t : m_tasks)
+      t->PreTrackLoop();
+
+    int n_tracks = static_cast<int>(micro_tracks->GetEntries());
+    for (int i = 0; i < n_tracks; i++)
     {
-        curr_loop = SINGLE;
+      curr_track_index = i;
 
-        curr_micro_tree = single_track;
+      micro_tracks->GetEntry(i);
+      // if (std::abs(curr_microtrack->varphi()) > 0.000001) continue; // ONLY FOR TEST!!!
+      // if (std::abs(curr_microtrack->theta()) > 0.000001) continue; // ONLY FOR TEST!!!
+      // if(curr_microtrack->electron) continue; // ONLY FOR TEST!!!
+      ReportProgress(i, n_tracks);
+      // std::cout << "Track " << i+1 << " out of " << n_tracks << ".\n";
+      // std::cout << "   electron: " << curr_microtrack->electron << " Ek: " << curr_microtrack->kin_energy;
+      // std::cout << " origin: (" << curr_microtrack->origin.x << "," << curr_microtrack->origin.y << "," <<
+      // curr_microtrack->origin.z << ")\n"; std::cout << "   orientation: (" << curr_microtrack->orientation.x << ","
+      // << curr_microtrack->orientation.y << "," << curr_microtrack->orientation.z << ")\n"; std::cout << "   theta: "
+      // << std::asin(curr_microtrack->orientation.z) << " phi: " <<
+      // std::acos(curr_microtrack->orientation.x/std::cos(std::asin(curr_microtrack->orientation.z)))*sign(curr_microtrack->orientation.y)
+      // << "\n";
 
-        curr_micro.SetTTreeBranches(single_track);
-        for (RecoTask* t : m_tasks) t->PreElectronLoop();
+      for (RecoTask* t : m_tasks)
+        t->PreElectronLoop();
 
-        // Looping through all ionization electrons.
-        int n_electrons = 0;
-        for (int i = 0; i < single_track->GetEntries(); i++)
+      int n_electrons = 0;
+      for (MicroPoint p : curr_microtrack->points)
+      {
+        curr_micro = p;
+
+        // Use only electrons that started and ended in the sector, endpoint not further than 0.5 cm from readout
+        if (IsInTPC(curr_micro.x1(), curr_micro.y1(), 0) && IsInTPC(curr_micro.GetInitPos(), -0.01)
+            && curr_micro.z1() > 7.5)
         {
-            single_track->GetEntry(i);
-            if (IsInTPC(curr_micro.x1(),curr_micro.y1(),0) && IsInTPC(curr_micro.GetInitPos(),-0.01))
-            {
-                n_electrons++;
-                curr_reco = Reconstruct(map,curr_micro);
-                for (RecoTask* t : m_tasks) t->ElectronLoop();
-            }
+          n_electrons++;
+          curr_reco = Reconstruct(map, curr_micro);
+          for (RecoTask* t : m_tasks)
+            t->ElectronLoop();
         }
+      }
 
-        std::cout << "\nNumber of electrons in the TPC region: " << n_electrons << "\n";
+      for (RecoTask* t : m_tasks)
+        t->PostElectronLoop();
 
-        for (RecoTask* t : m_tasks) t->PostElectronLoop();
+      if (i == n_process - 1)
+        break;
     }
 
-    void TrackLoop::ProcessMulti(TTree* micro_tracks, int n_process)
+    for (RecoTask* t : m_tasks)
+      t->PostTrackLoop();
+  }
+
+  void TrackLoop::ProcessRK(TTree* rk_tracks, int n_process)
+  {
+    curr_loop = RK;
+
+    curr_rk = nullptr;
+    rk_tracks->SetBranchAddress("track", &curr_rk);
+    for (RecoTask* t : m_tasks)
+      t->PreTrackLoop();
+
+    int n_tracks = static_cast<int>(rk_tracks->GetEntries());
+    for (int i = 0; i < n_tracks; i++)
     {
-        curr_loop = MULTI;
+      rk_tracks->GetEntry(i);
+      if ((100 * i) % n_tracks == 0)
+        std::cout << "Progress: " << 100 * i / n_tracks << " \%\n";
+      std::cout << "\nTrack " << i + 1 << " out of " << n_tracks << ".\n";
+      if (!curr_rk)
+        std::cout << "Track " << i + 1 << " not found.\n";
 
-        micro_tracks->SetBranchAddress("track_small",&curr_microtrack);
-        for (RecoTask* t : m_tasks) t->PreTrackLoop();
+      for (RecoTask* t : m_tasks)
+        t->PreElectronLoop();
 
-        int n_tracks = micro_tracks->GetEntries();
-        for (int i = 0; i < n_tracks; i++)
-        {
-            curr_track_index = i;
+      for (RKPoint p : curr_rk->points)
+      {
+        curr_rkpoint = p;
+        for (RecoTask* t : m_tasks)
+          t->ElectronLoop();
+      }
 
-            micro_tracks->GetEntry(i);
-            // if (std::abs(curr_microtrack->varphi()) > 0.000001) continue; // ONLY FOR TEST!!!
-            // if (std::abs(curr_microtrack->theta()) > 0.000001) continue; // ONLY FOR TEST!!!
-            // if(curr_microtrack->electron) continue; // ONLY FOR TEST!!!
-            ReportProgress(i,n_tracks);
-            // std::cout << "Track " << i+1 << " out of " << n_tracks << ".\n";
-            // std::cout << "   electron: " << curr_microtrack->electron << " Ek: " << curr_microtrack->kin_energy;
-            // std::cout << " origin: (" << curr_microtrack->origin.x << "," << curr_microtrack->origin.y << "," << curr_microtrack->origin.z << ")\n";
-            // std::cout << "   orientation: (" << curr_microtrack->orientation.x << "," << curr_microtrack->orientation.y << "," << curr_microtrack->orientation.z << ")\n";
-            // std::cout << "   theta: " << std::asin(curr_microtrack->orientation.z) << " phi: " << std::acos(curr_microtrack->orientation.x/std::cos(std::asin(curr_microtrack->orientation.z)))*sign(curr_microtrack->orientation.y) << "\n";
+      for (RecoTask* t : m_tasks)
+        t->PostElectronLoop();
 
-            for (RecoTask* t : m_tasks) t->PreElectronLoop();
-
-            int n_electrons = 0;
-            for (MicroPoint p : curr_microtrack->points) 
-            {
-                curr_micro = p;
-
-                // Use only electrons that started and ended in the sector, endpoint not further than 0.5 cm from readout
-                if (IsInTPC(curr_micro.x1(), curr_micro.y1(), 0) && IsInTPC(curr_micro.GetInitPos(), -0.01) && curr_micro.z1() > 7.5)
-                {
-                    n_electrons++;
-                    curr_reco = Reconstruct(map,curr_micro);
-                    for (RecoTask* t : m_tasks) t->ElectronLoop();
-                }
-            }
-
-            for (RecoTask* t : m_tasks) t->PostElectronLoop();
-
-            if (i == n_process - 1) break;
-        }
-        
-        for (RecoTask* t : m_tasks) t->PostTrackLoop();
+      if (i == n_process - 1)
+        break;
     }
 
-    void TrackLoop::ProcessRK(TTree* rk_tracks, int n_process)
-    {
-        curr_loop = RK;
-
-        curr_rk = nullptr;
-        rk_tracks->SetBranchAddress("track",&curr_rk);
-        for (RecoTask* t : m_tasks) t->PreTrackLoop();
-
-        int n_tracks = rk_tracks->GetEntries();
-        for (int i = 0; i < n_tracks; i++)
-        {
-            rk_tracks->GetEntry(i);
-            if((100 * i) % n_tracks == 0) std::cout << "Progress: " << 100 * i / n_tracks << " \%\n";
-            std::cout << "\nTrack " << i+1 << " out of " << n_tracks << ".\n";
-            if (!curr_rk) std::cout << "Track " << i+1 << " not found.\n";
-
-            for (RecoTask* t : m_tasks) t->PreElectronLoop();
-
-            for (RKPoint p : curr_rk->points) 
-            {
-                curr_rkpoint = p;
-                for (RecoTask* t : m_tasks) t->ElectronLoop();
-            }
-
-            for (RecoTask* t : m_tasks) t->PostElectronLoop();
-
-            if (i == n_process - 1) break;
-        }
-        
-        for (RecoTask* t : m_tasks) t->PostTrackLoop();
-    }
+    for (RecoTask* t : m_tasks)
+      t->PostTrackLoop();
+  }
 } // namespace X17

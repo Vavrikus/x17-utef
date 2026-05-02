@@ -16,5 +16,5 @@ cd build || exit 1
 # Run CMake with Debug build type
 cmake -DCMAKE_BUILD_TYPE=Release ..
 
-# Build with 12 threads
-make -j12
+# Build all threads
+make -j$(nproc)

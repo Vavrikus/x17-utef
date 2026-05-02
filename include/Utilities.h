@@ -2,7 +2,6 @@
 
 // C++ dependencies
 #include <cmath>
-#include <iomanip>
 #include <string>
 #include <vector>
 
@@ -10,7 +9,7 @@
 #include "TChain.h"
 #include "TF1.h"
 #include "TGraph2D.h"
-#include "TH1F.h"
+#include "TH1.h"
 #include "TPolyLine3D.h"
 #include "TRandom3.h"
 
@@ -21,11 +20,26 @@
 /// @tparam T The type of the parameters, must be a numeric type.
 /// @param args The parameters to find the minimum value from.
 /// @return The minimum value among the parameters.
-template<typename... T>
-double find_min(T... args) 
+template <typename... T>
+double find_min(T... args)
 {
-    double values[] = { args... };
-    return *std::min_element(std::begin(values), std::end(values));
+  double values[] = { args... };
+  return *std::min_element(std::begin(values), std::end(values));
+}
+/// @brief Calculates floor of a double.
+/// @param d Double to calculate floor of.
+/// @returns The resulting floor as integer.
+inline int ifloor(double d)
+{
+  return static_cast<int>(std::floor(d));
+}
+
+/// @brief Rounds double to integer.
+/// @param d Double to round.
+/// @returns The rounded integer.
+inline int iround(double d)
+{
+  return static_cast<int>(std::lround(d));
 }
 
 /// @brief Returns random number between given minimal and maximal value.
@@ -33,14 +47,18 @@ double find_min(T... args)
 /// @param min The minimal value.
 /// @param max The maximal value.
 /// @return A random number between given minimal and maximal value.
-inline double RandomMinMax(TRandom3* rand, double min, double max) { return min + (max - min) * rand->Rndm(); }
+inline double RandomMinMax(TRandom3* rand, double min, double max)
+{
+  return min + (max - min) * rand->Rndm();
+}
 
 /// @brief Function for finding next available filename in given folder (such as name1.root).
 /// @param folder_path Folder where the search should happen.
 /// @param prefix Name prefix of the files.
 /// @param suffix Suffix of the file (default is .root).
 /// @return Next available filename with given patern.
-std::string GetNextFilePath(std::string folder_path, std::string prefix, std::string suffix = ".root");
+std::string GetNextFilePath(const std::string& folder_path, const std::string& prefix,
+                            const std::string& suffix = ".root");
 
 /// @brief Function for determining the sign of a number.
 /// @param x The number sign of which will be determined.
@@ -53,7 +71,7 @@ int sign(double x);
 /// @param suffix The suffix part of the filename (file1.root --> .root).
 /// @param start The first index of the filename.
 /// @param end The last index of the filename.
-void AddFilesToTChain(TChain* chain, std::string prefix, std::string suffix, int start, int end);
+void AddFilesToTChain(TChain* chain, const std::string& prefix, const std::string& suffix, int start, int end);
 
 /// @brief Uses the histogram maximum and linear interpolation to approximate FWHM.
 /// @param histogram The histogram to be used.
@@ -73,9 +91,10 @@ double StdevBiasFactor(int N);
 template <typename T>
 T GetAverage(const std::vector<T>& values)
 {
-    T sum = T();
-    for (T value : values) sum += value;
-    return sum/values.size();
+  T sum = T();
+  for (T value : values)
+    sum += value;
+  return sum / values.size();
 }
 
 /// @brief Calculates the standard deviation of a vector of X17::Vector values taking each component separately.
@@ -104,10 +123,10 @@ double GetPvalue(std::vector<double>& values, double value, bool sorted = false)
 /// @param sigma The standard deviation of the data.
 /// @param N The number of samples.
 /// @return The recommended number of bins.
-inline int GetBinsScott(double min, double max, double sigma, double N)
+inline int GetBinsScott(double min, double max, double sigma, int N)
 {
-    double bin_width = sigma * std::pow(24*std::sqrt(M_PI) / N, 1./3.);
-    return std::round((max-min) / bin_width);
+  double bin_width = sigma * std::pow(24 * std::sqrt(M_PI) / N, 1. / 3.);
+  return iround((max - min) / bin_width);
 }
 
 /// @brief Calculates the optimal number of histogram bins according to Freedman-Diaconis' rule.
@@ -117,14 +136,14 @@ inline int GetBinsScott(double min, double max, double sigma, double N)
 /// @return The recommended number of bins.
 inline int GetBinsFreedmanDiaconis(std::vector<double>& values, double min, double max)
 {
-    if (values.size() == 0) 
-    {
-        std::cerr << "Utilities::GetBinsFreedmanDiaconis: vector is empty" << std::endl;
-        return 0;
-    }
-    double IQR = GetQuantile(values, 0.75) - GetQuantile(values, 0.25);
-    double bin_width = 2.0 * IQR / std::pow(values.size(), 1./3.);
-    return std::round((max - min) / bin_width);
+  if (values.empty())
+  {
+    std::cerr << "Utilities::GetBinsFreedmanDiaconis: vector is empty" << '\n';
+    return 0;
+  }
+  double IQR       = GetQuantile(values, 0.75) - GetQuantile(values, 0.25);
+  double bin_width = 2.0 * IQR / std::pow(values.size(), 1. / 3.);
+  return iround((max - min) / bin_width);
 }
 
 /// @brief Prints a progress bar to the console.
@@ -141,7 +160,8 @@ constexpr bool is_from = (std::is_same_v<T, Ts> || ...);
 
 /// @brief Applies a common style for plots in the thesis.
 /// @param obj The ROOT object to which the style should be applied.
-/// @details Currently, it sets the margins and title/label sizes for TCanvas, TH1F, TH2F, TGraph, TGraphErrors and TGraph2D.
+/// @details Currently, it sets the margins and title/label sizes for TCanvas, TH1F, TH2F, TGraph, TGraphErrors and
+/// TGraph2D.
 /// @note The style is designed for plots with a width of 800 pixels or higher.
 template <typename T>
 void ApplyThesisStyle(T* obj);
@@ -151,13 +171,14 @@ void ApplyThesisStyle(T* obj);
 /// @return The 3D line.
 TPolyLine3D* GetLine3D(TGraph2D* graph);
 
-/// @brief Returns a TF1 object representing a skewed Gaussian function (params: 0 = norm, 1 = mean, 2 = sigma, 3 = skew).
+/// @brief Returns a TF1 object representing a skewed Gaussian function (params: 0 = norm, 1 = mean, 2 = sigma, 3 =
+/// skew).
 /// @param min The minimal value of the function range.
 /// @param max The maximal value of the function range.
 /// @return The TF1 object representing the skewed Gaussian function.
 inline TF1* GetSkewGaus(double min, double max)
 {
-    return new TF1("f","[0]*2.*TMath::Gaus(x,[1],[2])*ROOT::Math::normal_cdf([3]*x,[2],[1])",min,max);
+  return new TF1("f", "[0]*2.*TMath::Gaus(x,[1],[2])*ROOT::Math::normal_cdf([3]*x,[2],[1])", min, max);
 }
 
 /// @brief Extracts statistical information from a skewed Gaussian distribution represented as a TF1 object.
@@ -168,4 +189,6 @@ inline TF1* GetSkewGaus(double min, double max)
 /// @param fwhm Reference to a double to store the full width at half maximum of the distribution.
 void GetSkewGausStats(TF1* skew_gaus, double& mean, double& sigma, double& skew, double& fwhm);
 
+#ifndef UTILITIES_INL
 #include "Utilities.inl"
+#endif

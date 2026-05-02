@@ -1,6 +1,11 @@
 // C++ dependencies
+#include <exception>
 #include <fstream>
 #include <iostream>
+#include <string>
+
+// ROOT dependencies
+#include "Rtypes.h"
 
 // X17 dependencies
 #include "Field.h"
@@ -9,85 +14,87 @@
 #include "X17Utilities.h"
 
 template class X17::Field<X17::Vector>;
-ClassImp(X17::Field<X17::Vector>)
+ClassImp(X17::Field<X17::Vector>);
 
 template class X17::Field<X17::MapPoint>;
-ClassImp(X17::Field<X17::MapPoint>)
+ClassImp(X17::Field<X17::MapPoint>);
 
 namespace X17
 {
-    //// Functions related to the Field class.
+  //// Functions related to the Field class.
 
-    Field<Vector>* LoadField(const char* filename, Vector min_corner, Vector max_corner, double step, bool printInfo)
+  Field<Vector>* LoadField(const char* filename, Vector min_corner, Vector max_corner, double step, bool printInfo)
+  {
+    Field<Vector>* field = new Field<Vector>(min_corner, max_corner, step, { 0, 0, 0 });
+
+    std::ifstream inf{ filename };
+    std::cout << "\nLoading field from " << filename << "\n";
+
+    int lines_read      = 0;
+    int lines_processed = 0;
+    int lines_expected  = field->GetNCells();
+
+    while (inf)
     {
-        Field<Vector>* field = new Field<Vector>(min_corner,max_corner,step,{0,0,0});
+      std::string X, Y, Z, VX, VY, VZ;
+      inf >> X;
+      inf >> Y;
+      inf >> Z;
+      inf >> VX;
+      inf >> VY;
+      inf >> VZ;
+      lines_read++;
 
-        std::ifstream inf {filename};
-        std::cout << "\nLoading field from " << filename << "\n";
-
-        int lines_read = 0;
-        int lines_processed = 0;
-        int lines_expected = field->GetNCells();
-
-        while (inf)
+      try
+      {
+        if (X.empty())
         {
-            std::string X,Y,Z,VX,VY,VZ;
-            inf >> X;
-            inf >> Y;
-            inf >> Z;
-            inf >> VX;
-            inf >> VY;
-            inf >> VZ;
-            lines_read++;
+          using namespace constants;
 
-            try
-            {                
-                if (X != "")
-                {
-                    using namespace constants;
+          double x, y, z;    // Coordinates of the point in space [cm].
+          double vx, vy, vz; // Components of the vector in given point.
 
-                    double x,y,z;    // Coordinates of the point in space [cm].
-                    double vx,vy,vz; // Components of the vector in given point.
-                    
-                    // Magnetic and electric field data files contain coordinates in meters.
-                    x = m2cm*stod(X);
-                    y = m2cm*stod(Y);
-                    z = m2cm*stod(Z);
-                    vx = stod(VX);
-                    vy = stod(VY);
-                    vz = stod(VZ);
+          // Magnetic and electric field data files contain coordinates in meters.
+          x  = m2cm * stod(X);
+          y  = m2cm * stod(Y);
+          z  = m2cm * stod(Z);
+          vx = stod(VX);
+          vy = stod(VY);
+          vz = stod(VZ);
 
-                    *(field->GetPoint(x,y,z)) = Vector{vx,vy,vz};
-                    lines_processed++;
-                }
-            }
-
-            catch (const std::exception& e)
-            {
-                std::cerr << e.what() << '\n';
-                std::cout << "X: " << X << " Y: " << Y << " Z: " << Z << " VX: " << VX << " VY: " << VY << " VZ: " << VZ << "\n";
-            }
+          *(field->GetPoint(x, y, z)) = Vector{ vx, vy, vz };
+          lines_processed++;
         }
+      }
 
-        std::cout << "Lines read: " << lines_read << " processed: " << lines_processed << " expected: " << lines_expected << "\n\n";
-
-        if (printInfo)
-        {
-            double minfield,maxfield,minangle,maxangle;
-            GetMinMaxField(*field,minfield,maxfield,0);
-            GetMinMaxFieldAngle(*field,minangle,maxangle,0);
-            std::cout << "At least 0.0 cm from TPC walls: minimal magnetic field: " << minfield << " maximal: " << maxfield;
-            std::cout << " minimal angle to electric field: " << minangle << " maximal: " << maxangle << "\n";
-            GetMinMaxField(*field,minfield,maxfield,0.5);
-            GetMinMaxFieldAngle(*field,minangle,maxangle,0.5);
-            std::cout << "At least 0.5 cm from TPC walls: Minimal magnetic field: " << minfield << " maximal: " << maxfield;
-            std::cout << " minimal angle to electric field: " << minangle << " maximal: " << maxangle << "\n";
-            GetMinMaxField(*field,minfield,maxfield,1);
-            GetMinMaxFieldAngle(*field,minangle,maxangle,1);
-            std::cout << "At least 1.0 cm from TPC walls: Minimal magnetic field: " << minfield << " maximal: " << maxfield;
-            std::cout << " minimal angle to electric field: " << minangle << " maximal: " << maxangle << "\n";
-        }
-
-        return field;
+      catch (const std::exception& e)
+      {
+        std::cerr << e.what() << '\n';
+        std::cout << "X: " << X << " Y: " << Y << " Z: " << Z << " VX: " << VX << " VY: " << VY << " VZ: " << VZ
+                  << "\n";
+      }
     }
+
+    std::cout << "Lines read: " << lines_read << " processed: " << lines_processed << " expected: " << lines_expected
+              << "\n\n";
+
+    if (printInfo)
+    {
+      double minfield, maxfield, minangle, maxangle;
+      GetMinMaxField(*field, minfield, maxfield, 0);
+      GetMinMaxFieldAngle(*field, minangle, maxangle, 0);
+      std::cout << "At least 0.0 cm from TPC walls: minimal magnetic field: " << minfield << " maximal: " << maxfield;
+      std::cout << " minimal angle to electric field: " << minangle << " maximal: " << maxangle << "\n";
+      GetMinMaxField(*field, minfield, maxfield, 0.5);
+      GetMinMaxFieldAngle(*field, minangle, maxangle, 0.5);
+      std::cout << "At least 0.5 cm from TPC walls: Minimal magnetic field: " << minfield << " maximal: " << maxfield;
+      std::cout << " minimal angle to electric field: " << minangle << " maximal: " << maxangle << "\n";
+      GetMinMaxField(*field, minfield, maxfield, 1);
+      GetMinMaxFieldAngle(*field, minangle, maxangle, 1);
+      std::cout << "At least 1.0 cm from TPC walls: Minimal magnetic field: " << minfield << " maximal: " << maxfield;
+      std::cout << " minimal angle to electric field: " << minangle << " maximal: " << maxangle << "\n";
+    }
+
+    return field;
+  }
 } // namespace X17

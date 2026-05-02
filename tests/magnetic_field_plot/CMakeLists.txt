@@ -9,4 +9,4 @@ endif()
 
 # ---Build executable------------------------------------------------------------
 add_executable(bfield bfield.C)
-target_link_libraries(bfield Garfield::Garfield ${ROOT_LIBRARIES} X17_source_lib)
+target_link_libraries(bfield Garfield::Garfield ${ROOT_LIBRARIES} -Wl,--no-as-needed X17_source -Wl,--as-needed)

@@ -1,4 +1,28 @@
 {
-  "cmake.configureOnOpen": false,
-  "C_Cpp.errorSquiggles": "enabled"
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "C_Cpp.intelliSenseEngine": "disabled",
+  
+  // Attempts to source ROOT from .bashrc
+  // Running CMake in the ROOT build folder to generate full 
+  // compile_commands.json might be necessary
+  "cmake.cmakePath": "${workspaceFolder}/.vscode/cmake_wrapper.sh",
+  "cmake.generator": "Ninja",
+
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
+  "editor.inlayHints.enabled": "offUnlessPressed",
+  "editor.stickyScroll.defaultModel": "outlineModel",
+  "editor.stickyScroll.maxLineCount": 5,
+
+  "[c]": {
+    "editor.stickyScroll.defaultModel": "outlineModel",
+    "editor.stickyScroll.maxLineCount": 5
+  },
+  "[cpp]": {
+    "editor.wordBasedSuggestions": "off",
+    "editor.semanticHighlighting.enabled": true,
+    "editor.suggest.insertMode": "insert",
+    "editor.stickyScroll.defaultModel": "outlineModel",
+    "editor.stickyScroll.maxLineCount": 5
+  }
 }

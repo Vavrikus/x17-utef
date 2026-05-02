@@ -1,89 +1,106 @@
 #pragma once
 
 // C++ dependencies
+#include <cstdint>
 #include <vector>
 
 // ROOT dependencies
 #include "TTree.h"
 
 // X17 dependencies
+#include "Field.h"
 #include "Track.h"
 
 namespace X17
 {
-    class TrackLoop;
+  class TrackLoop;
 
-    /// @brief An abstract class for tasks for TrackLoop.
-    class RecoTask
+  /// @brief An abstract class for tasks for TrackLoop.
+  class RecoTask
+  {
+    friend class TrackLoop;
+
+  private:
+    TrackLoop* m_loop = nullptr; // The loop that will run this task.
+  public:
+    /// @brief To be run before any loops.
+    virtual void PreTrackLoop() {}
+
+    /// @brief To be run inside the track loop before the electron loop.
+    virtual void PreElectronLoop() {}
+
+    /// @brief To be run during the electron loop on each track.
+    virtual void ElectronLoop() {}
+
+    /// @brief To be run inside the track loop.
+    virtual void PostElectronLoop() {}
+
+    /// @brief To be run after all loops.
+    virtual void PostTrackLoop() {}
+
+  protected:
+    [[nodiscard]] TrackLoop* GetLoop_() const { return m_loop; }
+  };
+
+  class TrackLoop
+  {
+  public:
+    // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+    const DriftMap& map;     // The ionization electron drift map.
+    Field<Vector>* magfield; // The magnetic field simulated data.
+
+    TTree* curr_micro_tree; // Current tree with microscopic simulation result.
+    MicroPoint curr_micro;  // Current microscopic simulation point.
+    RecoPoint curr_reco;    // Current reconstructed point.
+
+    const TrackRK* curr_rk = nullptr; // Current Runge-Kutta simulated track.
+    RKPoint curr_rkpoint;             // Current point on the current Runge-Kutta track.
+
+    const TrackMicro* curr_microtrack = nullptr; // Current microscopically simulated track.
+    int curr_track_index;                        // Index of the current track in the file(s).
+
+    /// @brief Enumeration of the type of the loop currently running.
+    enum LoopType : std::uint8_t
     {
-        friend class TrackLoop;
-    protected:
-        TrackLoop* m_loop = nullptr; // The loop that will run this task.
-    public:
-        /// @brief To be run before any loops.
-        virtual void PreTrackLoop() { }
-
-        /// @brief To be run inside the track loop before the electron loop.
-        virtual void PreElectronLoop() { }
-
-        /// @brief To be run during the electron loop on each track.
-        virtual void ElectronLoop() { }
-
-        /// @brief To be run inside the track loop.
-        virtual void PostElectronLoop() { }
-
-        /// @brief To be run after all loops.
-        virtual void PostTrackLoop() { }
+      NONE,
+      SINGLE,
+      MULTI,
+      RK,
     };
 
-    class TrackLoop
+    LoopType curr_loop = NONE; // Type of the current loop.
+
+    bool make_track_plots = true; // Should the tracks be ploted?
+    // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+  private:
+    std::vector<RecoTask*> m_tasks; // Vector of all tasks to be run.
+
+  public:
+    /// @brief Constructor of TrackLoop.
+    /// @param map Pointer to the ionization electron drift map.
+    /// @param magfield Pointer to magnetic field data.
+    TrackLoop(const Field<MapPoint>& map, Field<Vector>* magfield)
+      : map(map), magfield(magfield)
     {
-    public:
-        const Field<MapPoint>& map;            // The ionization electron drift map.
-        Field<Vector>* magfield;         // The magnetic field simulated data.
+    }
 
-        TTree* curr_micro_tree;          // Current tree with microscopic simulation result.
-        MicroPoint curr_micro;           // Current microscopic simulation point.
-        RecoPoint curr_reco;             // Current reconstructed point.
+    /// @brief Adds a task to TrackLoop task list.
+    /// @param task The task to be added.
+    void AddTask(RecoTask* task);
 
-        const TrackRK* curr_rk = 0;      // Current Runge-Kutta simulated track.
-        RKPoint curr_rkpoint;            // Current point on the current Runge-Kutta track.
+    /// @brief Runs all of the tasks for the single track.
+    /// @param single_track TTree with the simulated ionization electrons.
+    void ProcessSingle(TTree* single_track);
 
-        const TrackMicro* curr_microtrack = 0; // Current microscopically simulated track.
-        int curr_track_index;                  // Index of the current track in the file(s).
+    /// @brief Runs all of the tasks for tracks simulated by microscopic simulation.
+    /// @param micro_tracks TTree with the simulated tracks.
+    /// @param n_process The number of tracks to process. Default value is -1, which processes all tracks.
+    void ProcessMulti(TTree* micro_tracks, int n_process = -1);
 
-        /// @brief Enumeration of the type of the loop currently running.
-        enum LoopType { NONE, SINGLE, MULTI, RK };
-
-        LoopType curr_loop = NONE;    // Type of the current loop.
-
-        bool make_track_plots = true; // Should the tracks be ploted?
-        
-    private:
-        std::vector<RecoTask*> m_tasks; // Vector of all tasks to be run.
-
-    public:
-        /// @brief Constructor of TrackLoop.
-        /// @param map Pointer to the ionization electron drift map.
-        /// @param magfield Pointer to magnetic field data.
-        TrackLoop(const Field<MapPoint>& map, Field<Vector>* magfield) : map(map), magfield(magfield) { }
-
-        /// @brief Adds a task to TrackLoop task list.
-        /// @param task The task to be added.
-        void AddTask(RecoTask* task);
-
-        /// @brief Runs all of the tasks for the single track.
-        /// @param single_track TTree with the simulated ionization electrons.
-        void ProcessSingle(TTree* single_track);
-
-        /// @brief Runs all of the tasks for tracks simulated by microscopic simulation.
-        /// @param micro_tracks TTree with the simulated tracks.
-        /// @param n_process The number of tracks to process. Default value is -1, which processes all tracks.
-        void ProcessMulti(TTree* micro_tracks, int n_process = -1);
-
-        /// @brief Runs all of the tasks for tracks simulated by Runge-Kutta.
-        /// @param rk_tracks TTree with the simulated tracks.
-        /// @param n_process The number of tracks to process. Default value is -1, which processes all tracks.
-        void ProcessRK(TTree* rk_tracks, int n_process = -1);
-    };
+    /// @brief Runs all of the tasks for tracks simulated by Runge-Kutta.
+    /// @param rk_tracks TTree with the simulated tracks.
+    /// @param n_process The number of tracks to process. Default value is -1, which processes all tracks.
+    void ProcessRK(TTree* rk_tracks, int n_process = -1);
+  };
 } // namespace X17

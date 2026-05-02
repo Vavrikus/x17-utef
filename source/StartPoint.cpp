@@ -1,4 +1,7 @@
-// X17 dependencies
-#include "StartPoint.h"
+// ROOT dependencies
+#include "Rtypes.h"
 
-ClassImp(X17::StartPoint)
+// X17 dependencies
+#include "StartPoint.h" // IWYU pragma: keep
+
+ClassImp(X17::StartPoint);

@@ -1,79 +1,99 @@
 #pragma once
 
+// C++ dependencies
+#include <functional>
+
 // ROOT dependencies
 #include "TSpline.h"
 
+// X17 dependencies
+#include "Field.h"
+
 namespace X17
 {
-	/// @brief Represents a cubic spline that interpolates a set of N nodes. Defined by the positions of the nodes, derivatives at the start and end of the spline.
-	/// @tparam N The number of nodes.
-	template<int N>
-	class NSpline 
-	{
-		typedef std::function<double(double*,double*)> EvalFn;
+  /// @brief Represents a cubic spline that interpolates a set of N nodes. Defined by the positions of the nodes,
+  /// derivatives at the start and end of the spline.
+  /// @tparam N The number of nodes.
+  template <int N>
+  class NSpline
+  {
+    using EvalFn = std::function<double(double*, double*)>;
 
-	private:
-		double m_nodes_x[N];          // The x-coordinates of spline nodes.
-		bool m_fix_der_start = false; // Is the derivative at the start fixed in fit?
-		bool m_fix_der_end   = false; // Is the derivative at the end fixed in fit?
-		double m_der_start;           // Derivative at the start of the spline.
-		double m_der_end;             // Derivative at the end of the spline.
+  private:
+    double m_nodes_x[N];          // The x-coordinates of spline nodes.
+    bool m_fix_der_start = false; // Is the derivative at the start fixed in fit?
+    bool m_fix_der_end   = false; // Is the derivative at the end fixed in fit?
+    double m_der_start;           // Derivative at the start of the spline.
+    double m_der_end;             // Derivative at the end of the spline.
 
-	public:
-		/// @brief Constructor for NSpline.
-		/// @param nodes_x An array of N doubles representing the x-coordinates of the nodes.
-		NSpline(const double nodes_x[N])
-		{
-			for (int i = 0; i < N; ++i) this->m_nodes_x[i] = nodes_x[i];
-		}
+  public:
+    /// @brief Constructor for NSpline.
+    /// @param nodes_x An array of N doubles representing the x-coordinates of the nodes.
+    NSpline(const double nodes_x[N])
+    {
+      for (int i = 0; i < N; ++i)
+        this->m_nodes_x[i] = nodes_x[i];
+    }
 
-		/// @brief Constructor for NSpline that generates a set of evenly spaced nodes between min and max.
-		/// @param min The minimum x-value of the spline.
-		/// @param max The maximum x-value of the spline.
-		NSpline(double min, double max)
-		{
-			for (int i = 0; i < N; i++) this->m_nodes_x[i] = min + (i / (N - 1.0)) * (max - min);
-		}
-		
-		/// @brief Set the starting derivative for the spline and fix it in fit.
-		/// @param der_start The value of the starting derivative.
-		void SetDerStart(double der_start) {this->m_der_start = der_start; m_fix_der_start = true;}
+    /// @brief Constructor for NSpline that generates a set of evenly spaced nodes between min and max.
+    /// @param min The minimum x-value of the spline.
+    /// @param max The maximum x-value of the spline.
+    NSpline(double min, double max)
+    {
+      for (int i = 0; i < N; i++)
+        this->m_nodes_x[i] = min + (i / (N - 1.0)) * (max - min);
+    }
 
-		/// @brief Set the ending derivative for the spline and fix it in fit.
-		/// @param der_start The value of the ending derivative.
-		void SetDerEnd(double der_end) {this->m_der_end = der_end; m_fix_der_end = true;}
+    /// @brief Set the starting derivative for the spline and fix it in fit.
+    /// @param der_start The value of the starting derivative.
+    void SetDerStart(double der_start)
+    {
+      this->m_der_start = der_start;
+      m_fix_der_start   = true;
+    }
 
-		/// @brief Evaluates the NSpline at a given x-value.
-		/// @param x A pointer to an array of doubles representing the x-value at which to evaluate the spline.
-		/// @param par A pointer to an array of doubles representing the parameters of the spline.
-		/// @return The value of the NSpline at the given x-value.
-		double Eval(double* x, double* par) const;
+    /// @brief Set the ending derivative for the spline and fix it in fit.
+    /// @param der_start The value of the ending derivative.
+    void SetDerEnd(double der_end)
+    {
+      this->m_der_end = der_end;
+      m_fix_der_end   = true;
+    }
 
-		/// @brief Returns a std::function object that can be used to evaluate the NSpline.
-		/// @return A std::function object that takes two pointers to arrays of doubles and returns a double.
-		EvalFn GetEval() const;
-	};
+    /// @brief Evaluates the NSpline at a given x-value.
+    /// @param x A pointer to an array of doubles representing the x-value at which to evaluate the spline.
+    /// @param par A pointer to an array of doubles representing the parameters of the spline.
+    /// @return The value of the NSpline at the given x-value.
+    double Eval(double* x, double* par) const;
 
-	/// @brief Fits cubic splines to a TGraph object.
-	/// @tparam nodes The number of nodes for the spline interpolation.
-	/// @param graph The TGraph object to fit splines to.
-	/// @param min The minimum x-coordinate value for the spline.
-	/// @param max The maximum x-coordinate value for the spline.
-	/// @return A pointer to the TSpline3 object representing the fitted spline.
-	template<int nodes>
-	TSpline3* FitSplines(TGraph* graph, double min, double max);
+    /// @brief Returns a std::function object that can be used to evaluate the NSpline.
+    /// @return A std::function object that takes two pointers to arrays of doubles and returns a double.
+    [[nodiscard]] EvalFn GetEval() const;
+  };
 
-    /// @brief Function for energy reconstruction from spline fit.
-    /// @param sp_fit Fitted splines.
-    /// @param magfield Magnetic data.
-    /// @param energy Output graph for reconstructed energy as function of coordinate.
-    /// @param radius Output graph for reconstructed radius as function of coordinate.
-    /// @param magnetic Output graph for magnetic field along fitted trajectory.
-    /// @param min Lower bound [cm].
-    /// @param max Upper bound [cm].
-    /// @param step Step between iterations.
-    void RecoEnergy(TSpline3* sp_fit, const Field<Vector>& magfield, TGraph* energy, TGraph* radius, TGraph* magnetic, double min, double max, double step);
+  /// @brief Fits cubic splines to a TGraph object.
+  /// @tparam nodes The number of nodes for the spline interpolation.
+  /// @param graph The TGraph object to fit splines to.
+  /// @param min The minimum x-coordinate value for the spline.
+  /// @param max The maximum x-coordinate value for the spline.
+  /// @return A pointer to the TSpline3 object representing the fitted spline.
+  template <int nodes>
+  TSpline3* FitSplines(TGraph* graph, double min, double max);
+
+  /// @brief Function for energy reconstruction from spline fit.
+  /// @param sp_fit Fitted splines.
+  /// @param magfield Magnetic data.
+  /// @param energy Output graph for reconstructed energy as function of coordinate.
+  /// @param radius Output graph for reconstructed radius as function of coordinate.
+  /// @param magnetic Output graph for magnetic field along fitted trajectory.
+  /// @param min Lower bound [cm].
+  /// @param max Upper bound [cm].
+  /// @param step Step between iterations.
+  void RecoEnergy(TSpline3* sp_fit, const Field<Vector>& magfield, TGraph* energy, TGraph* radius, TGraph* magnetic,
+                  double min, double max, double step);
 } // namespace X17
 
 // Templated function definitions.
+#ifndef NSPLINE_INL
 #include "NSpline.inl"
+#endif

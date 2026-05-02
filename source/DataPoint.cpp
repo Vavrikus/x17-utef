@@ -1,4 +1,7 @@
-// X17 dependencies
-#include "DataPoint.h"
+// ROOT dependencies
+#include "Rtypes.h"
 
-ClassImp(X17::DataPoint)
+// X17 dependencies
+#include "DataPoint.h" // IWYU pragma: keep
+
+ClassImp(X17::DataPoint);

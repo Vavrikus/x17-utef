@@ -13,8 +13,12 @@ rm -rf build
 mkdir build
 cd build || exit 1
 
+# Ignore files from build in clang-tidy
+echo "Checks: '-*'" > .clang-tidy
+# sed -i -e '1i\//NOLINTBEGIN' -e '$a\//NOLINTEND' X17_dict.cxx
+
 # Run CMake with Debug build type
 cmake -DCMAKE_BUILD_TYPE=Debug ..
 
-# Build with 12 threads
-make -j12
+# Build with all threads
+make -j$(nproc)

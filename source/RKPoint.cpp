@@ -1,4 +1,7 @@
-// X17 dependencies
-#include "RKPoint.h"
+// ROOT dependencies
+#include "Rtypes.h"
 
-ClassImp(X17::RKPoint)
+// X17 dependencies
+#include "RKPoint.h" // IWYU pragma: keep
+
+ClassImp(X17::RKPoint);
