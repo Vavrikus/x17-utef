@@ -1,0 +1,172 @@
+\documentclass[aspectratio=169]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{default}
+\usepackage[main=english,czech]{babel}
+%\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds}
+
+\newcommand{\nologo}{\setbeamertemplate{logo}{}}
+\newcommand{\nonav}{\setbeamertemplate{navigation symbols}{}}
+
+% Title Slide Information
+\title[TPX3Rec Refactoring]{TPX3Rec Architecture Refactoring}
+\subtitle{Modernizing the X17 Reconstruction Framework}
+\author[M.~Vavřík]{\foreignlanguage{czech}{Martin Vavřík}\vspace{0.5cm}\\martin.vavrik@utef.cvut.cz\\MFF UK \& IEAP CTU PRAGUE\\}
+\logo{\includegraphics[width=0.08\textwidth]{../images/logo.png}}
+%\institute[MFF UK]{Institute of Particle and Nuclear Physics \\ Charles University}
+\date{\today}
+\titlegraphic{\small Summary generated with the help of Gemini 3.1 Pro.}
+
+\begin{document}
+	
+	\begin{frame}
+		\titlepage
+	\end{frame}
+	
+	\begin{frame}{Motivation for Refactoring}
+		\textbf{Original Codebase Limitations:}
+		\begin{itemize}
+			\item Heavy reliance on monolithic files and disconnected primitive C-arrays.
+			\item Tight coupling between I/O, configuration, and physics logic.
+			\item Repetitive event loop boilerplate across different execution steps.
+		\end{itemize}
+		\vspace{0.5cm}
+		\textbf{New Architectural Goals:}
+		\begin{itemize}
+			\item \textbf{Encapsulation:} Group detector physics into robust structural models.
+			\item \textbf{Polymorphism:} Standardize execution via a unified \texttt{Task} interface.
+			\item \textbf{Separation of Concerns:} Isolate ROOT I/O state and \texttt{TEnv} parsing.
+			\item \textbf{Maintainability:} Prepare for safe memory management and LLVM tooling.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Modernizing the Codebase Infrastructure}
+		\textbf{Directory Standardization:}
+		\begin{itemize}
+			\item More typical names directory names for source files (\texttt{src/}) from the public API (\texttt{include/}).
+		\end{itemize}
+		
+		\vspace{0.4cm}
+		\textbf{LLVM Tooling Integration:}
+		\begin{itemize}
+			\item \textbf{\texttt{clangd}:} Custom \texttt{cmake\_wrapper.sh} maps the ROOT build, enabling accurate code-completion and jump-to-definition in VS Code.
+			\item \textbf{\texttt{clang-tidy} \& \texttt{clang-format}:} Enforces a strict, ROOT-inspired formatting standard and flags memory leaks / legacy C-patterns.
+			\item If \texttt{compile\_commands.json} are generated for ROOT, you can easily jump inside its source files to function definitions
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Data Model Evolution: Deconstructing the God Object}
+		\begin{columns}[T]
+			\begin{column}{0.48\textwidth}
+				\textbf{The Old Approach:}
+				\begin{itemize}
+					\item Relied on a monolithic \texttt{TPX3Rec\_nTuple} class containing over 100 loose arrays and branch pointers.
+					\item Memory pre-allocated simultaneously regardless of the active task.
+				\end{itemize}
+			\end{column}
+			\begin{column}{0.48\textwidth}
+				\textbf{The New Core Models:}
+				\begin{itemize}
+					\item \textbf{\texttt{Cluster}:} Encapsulates topology, local-to-global transformations, and native bounding box/track logic.
+					\item \textbf{\texttt{Coincidence}:} Aggregates clusters to compute 3D vertices, angular correlations, and target projections.
+				\end{itemize}
+			\end{column}
+		\end{columns}
+		
+		\vspace{0.5cm}
+		\textbf{Current Bottleneck \& Future Fix:} 
+		To maintain ROOT serialization compatibility, \texttt{Coincidence} currently copies raw \texttt{Cluster} data into flat vectors. Future iterations will upgrade \texttt{Coincidence} to simply hold a \texttt{std::vector<Cluster>} natively.
+	\end{frame}
+	
+	\begin{frame}{Execution Architecture: The Task Interface}
+		The central steering macro (\texttt{runTPX3Rec.cxx}) now delegates execution to isolated, derived tasks.
+		
+		\vspace{0.3cm}
+		\begin{itemize}
+			\item \textbf{\texttt{Task (Base Class):}} Owns standard file initialization, standard branching, and finalization. Defines the pure virtual \texttt{Execute()} loop.
+			\item \textbf{\texttt{SingleDet \& MergeTrees:}} Handles standalone calibrations and multi-detector file merging.
+			\item \textbf{\texttt{GetCoincidences:}} Core physics loop detecting time-correlated clusters.
+			\item \textbf{\texttt{AlignDetectors:}} Global spatial transformation and vertex generation.
+			\item \textbf{\texttt{ProcessSimulation / FilterSimulation:}} Monte Carlo pipeline integration.
+		\end{itemize}
+	\end{frame}
+	
+	{\nologo\nonav
+		\begin{frame}{Dependency Graph}
+			\begin{center}
+				\begin{tikzpicture}[
+					box/.style={rectangle, draw, rounded corners, align=center, minimum width=2.6cm, minimum height=0.8cm, fill=blue!10, font=\footnotesize},
+					data/.style={rectangle, draw, rounded corners, align=center, minimum width=2.6cm, minimum height=0.8cm, fill=green!10, font=\footnotesize},
+					util/.style={rectangle, draw, rounded corners, align=center, minimum width=2.6cm, minimum height=0.8cm, fill=orange!10, font=\footnotesize},
+					arrow/.style={-{Latex[length=2mm, width=2mm]}, thick, draw=gray!80}
+					]
+					
+					\node[box, fill=red!10, font=\footnotesize\bfseries] (main) at (3.8, 6.0) {runTPX3Rec};
+					
+					\node[box] (io) at (0.0, 4.5) {IO (Singleton)};
+					\node[box, font=\footnotesize\bfseries] (task) at (7.6, 4.5) {Task (Base)};
+					
+					\node[box] (config) at (0.0, 2.5) {Config / TechConfig};
+					\node[box] (derived) at (7.6, 2.5) {Derived Tasks \\ (Merge, Coinc...)};
+					
+					\node[data] (cluster) at (0.0, 1.0) {Cluster};
+					\node[data] (coinc) at (3.8, 1.0) {Coincidence};
+					\node[util] (math) at (7.6, 1.0) {Math / Utilities};
+					
+					\draw[arrow] (main) -- (io);
+					\draw[arrow] (main) -- (task) node[midway, above right, font=\scriptsize] {\textit{Instantiates}};
+					
+					\draw[arrow] (io) -- (config) node[midway, left, font=\scriptsize] {\textit{Owns}};
+					
+					\draw[arrow] (task) -- (io) node[midway, above, font=\scriptsize] {\textit{References}};
+					\draw[arrow] (task) -- (derived) node[midway, right, font=\scriptsize] {\textit{Inherits}};
+					
+					\draw[arrow] (derived) -- (cluster);
+					\draw[arrow] (derived) -- (coinc);
+					
+					\draw[arrow] (coinc) -- (cluster) node[midway, below, font=\scriptsize] {\textit{Aggregates}};
+					
+					\draw[arrow] (derived) -- (math);
+					\draw[arrow] (coinc) -- (math);
+					
+					\draw[arrow] (cluster) edge[bend right=20] (math);
+					
+				\end{tikzpicture}
+			\end{center}
+	\end{frame}}
+	
+	\begin{frame}{Identified Issues: Math \& Geometry}
+		During the architectural audit, several geometric anomalies and legacy C++ traps were identified for future resolution:
+		
+		\vspace{0.3cm}
+		\begin{itemize}
+			\item \textbf{Type-Safe Math (\texttt{std::abs} vs \texttt{abs}):} The C++ \texttt{abs()} function silently truncates to integers. This likely causes unwanted rounding in functions like the Hough transform (already replaced with \texttt{std::abs()}).
+			\item \textbf{Geometric Edge Cases:} 
+			\begin{itemize}
+				\item \texttt{Linearity} can currently evaluate to $< 1$ for perfectly straight diagonal tracks.
+				\item \texttt{MaxDistance} adds 1 pixel assuming alignment with the X/Y axes, skewing distances by up to $\sqrt{2}$.
+				\item \texttt{BorderHits} assumes hits lie exactly on the \texttt{GetRect} bounding box, cascading into \texttt{MaxDistance} inaccuracies.
+			\end{itemize}
+			\item \textbf{Asymmetric Cuts:} Exclusion of border tracks currently only applies to one of the two clusters in \texttt{CalculateVertex}.
+		\end{itemize}
+	\end{frame}
+	
+	{\nologo\nonav
+	\begin{frame}{Architectural Observations \& Future Roadmap}
+		Beyond the core models, the codebase review highlighted several areas where the framework's boilerplate can be further optimized:
+		
+		\vspace{0.3cm}
+		\begin{itemize}
+			\item \textbf{TChain Design Question:} Detector data is currently split across parallel \texttt{TChain} arrays. A more robust ROOT paradigm would be multiplexing the detector ID into a single \texttt{TTree}.
+			\item \textbf{Event Loop Overhead:} Functions like \texttt{SingleDet} execute redundant \texttt{SetBranchAddress} bindings on every iteration (related to converting \texttt{std::vector}s to C-style arrays).
+			\item \textbf{Code Consolidation:} Duplicate, slightly divergent implementations of \texttt{FitTrack}, \texttt{Hough2D}, and \texttt{GetTargetProjections} need to be deduplicated.
+			\item \textbf{Memory \& 3D Math Integration:} Swap manual heap allocations (\texttt{new[]}) for RAII arrays, and replace primitive variables with native \texttt{ROOT::Math} objects.
+			\item \textbf{Documentation (Doxygen):} Progressively document the new API headers (\texttt{include/}), leveraging AI-assisted generation in VS Code to expedite writing boilerplate.
+		\end{itemize}
+	\end{frame}}
+	
+\end{document}
