@@ -26,6 +26,7 @@ double find_min(T... args)
   double values[] = { args... };
   return *std::min_element(std::begin(values), std::end(values));
 }
+
 /// @brief Calculates floor of a double.
 /// @param d Double to calculate floor of.
 /// @returns The resulting floor as integer.

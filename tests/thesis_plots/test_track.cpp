@@ -376,7 +376,7 @@ namespace
     {
       using namespace X17::constants;
       double z_end = newcoords ? point.end.z() : point.end.y();
-      if (z_end > 7.5)
+      if (z_end > 7.5 && point.end.x() < xmax)
       {
         X17::Vector orig, reco_rasd;
         X17::RecoPoint reco_map, reco_map_old;
@@ -466,7 +466,7 @@ namespace
     mg_map->Draw("A");
 
     TLegend* l_map = new TLegend(0.65, 0.80, 0.93, 0.93);
-    l_map->AddEntry(xz_original, "simulation", "p");
+    l_map->AddEntry(xz_original, "simulated", "p");
     l_map->AddEntry(xz_reco_map, "reconstructed", "p");
     l_map->SetTextSize(0.05);
     l_map->Draw();
@@ -912,7 +912,7 @@ int main(int argc, char* argv[])
   // PlotRASD(track1,map9010);
   // PlotRASD(track2,map7030,true);
   // PlotRASDres2();
-  // PlotRASD(*track3,map7030,true);
+  PlotRASD(*track3, map7030, true);
 
   // PlotSpline(track2,magfield,map7030,true);
   // PlotCircle2D(track2,magfield,map7030,true);
