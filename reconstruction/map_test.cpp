@@ -44,6 +44,7 @@ int main()
   multi_loop->AddTask(new MapRecoTask("c_fit_res", true, true));    // NOLINT(misc-include-cleaner)
   multi_loop->AddTask(new MapRecoTask("c_e_fit_res", true, false)); // NOLINT(misc-include-cleaner)
   multi_loop->AddTask(new MapRecoTask("c_p_fit_res", false, true)); // NOLINT(misc-include-cleaner)
+  multi_loop->AddTask(new EdepTask());
 
   gErrorIgnoreLevel = 6001;
 

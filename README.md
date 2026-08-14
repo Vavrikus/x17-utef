@@ -102,6 +102,8 @@ The project uses the following folder structure:
         - **micro_tracks**
             - *micro_tracks.cpp* -- script for random or grid-like simulation of multiple microscopic tracks
             - *track_multi.sh*, *track_single.sh* -- scripts handling the simulation on MetaCentrum
+        - **mcs_track** 
+            - *mcs_tracks.cpp* -- Multiple Coulomb Scattering
     - **source**
         - Contains all .cpp files common to the reconstruction and simulation scripts.
     - **thesis**

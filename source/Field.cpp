@@ -47,7 +47,7 @@ namespace X17
 
       try
       {
-        if (X.empty())
+        if (!X.empty())
         {
           using namespace constants;
 

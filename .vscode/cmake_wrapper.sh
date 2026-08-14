@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Extract and source ROOT
-ROOT_SCRIPT=$(grep -m 1 "thisroot.sh" ~/.bashrc | grep -o '\S*thisroot\.sh' | tr -d "\"'")
+# Extract and source ROOT (ignoring commented lines)
+ROOT_SCRIPT=$(grep -v '^\s*#' ~/.bashrc | grep -m 1 "thisroot.sh" | grep -o '\S*thisroot\.sh' | tr -d "\"'")
 ROOT_SCRIPT="${ROOT_SCRIPT/#\~/$HOME}"
 DEF_FOLDER_JSON='{ 
       "name": "X17", 
@@ -37,8 +37,8 @@ else
     echo "Warning: Could not automatically find thisroot.sh in ~/.bashrc" >&2
 fi
 
-# Extract and source Garfield
-GARFIELD_SCRIPT=$(grep -m 1 "setupGarfield.sh" ~/.bashrc | grep -o '\S*setupGarfield\.sh' | tr -d "\"'")
+# Extract and source Garfield (ignoring commented lines)
+GARFIELD_SCRIPT=$(grep -v '^\s*#' ~/.bashrc | grep -m 1 "setupGarfield.sh" | grep -o '\S*setupGarfield\.sh' | tr -d "\"'")
 GARFIELD_SCRIPT="${GARFIELD_SCRIPT/#\~/$HOME}"
 
 if [ -f "$GARFIELD_SCRIPT" ]; then
@@ -46,6 +46,20 @@ if [ -f "$GARFIELD_SCRIPT" ]; then
     echo "Sourcing Garfield successful."
 else
     echo "Warning: Could not automatically find setupGarfield.sh in ~/.bashrc" >&2
+fi
+
+# Extract and source Geant4 (ignoring commented lines)
+GEANT_SCRIPT=$(grep -v '^\s*#' ~/.bashrc | grep -m 1 "geant4.sh" | grep -o '\S*geant4\.sh' | tr -d "\"'")
+GEANT_SCRIPT="${GEANT_SCRIPT/#\~/$HOME}"
+
+if [ -f "$GEANT_SCRIPT" ]; then
+    source "$GEANT_SCRIPT"
+    echo "Sourcing Geant4 successful."
+    # Derive Geant4 include path assuming standard <install>/bin/geant4.sh structure
+    GEANT_INCLUDE="${GEANT_SCRIPT%/*}/../include/Geant4"
+else
+    echo "Warning: Could not automatically find geant4.sh in ~/.bashrc" >&2
+    GEANT_INCLUDE=""
 fi
 
 # Generate VSCode Multi-Root Workspace dynamically
@@ -73,12 +87,13 @@ cat <<EOF > "$WORKSPACE_FILE"
     "C_Cpp.default.includePath": [
       "$(pwd)/../include",
       "$ROOTSYS/include",
-      "$GARFIELD_INSTALL/include"
+      "$GARFIELD_INSTALL/include",
+      "$GEANT_INCLUDE"
     ],
     "clangd.arguments": [
         "--background-index",
         "--header-insertion=iwyu",
-        "--query-driver=/usr/bin/gcc,/usr/bin/g++",
+        "--query-driver=/usr/bin/gcc,/usr/bin/g++"
     ]
   },
   "extensions": {

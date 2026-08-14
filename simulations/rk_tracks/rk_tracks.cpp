@@ -58,9 +58,9 @@ namespace
 
       // X17::GetRandomTrackParams(rand,electron,origin,orientation,kin_en);
       electron    = true;
-      origin      = { X17::constants::xmin, 0, 0 };
+      origin      = { X17::constants::xmin, 0, X17::constants::win_height * (-1. / 2. + i * 1. / n_tracks) };
       orientation = { 1, 0, 0 };
-      kin_en      = 3e+6 + i * 1.0 / n_tracks * (13e+6 - 3e+6);
+      kin_en      = 1e+6; // 3e+6 + i * 1.0 / n_tracks * (13e+6 - 3e+6);
 
       // The actual track simulation.
       X17::RK4<8>* track = GetTrackRK(*magfield, electron, step, kin_en, origin, orientation);
@@ -100,7 +100,7 @@ namespace
 
     X17::DefaultLayout::GetDefaultLayout().DrawPads3D(height);
 
-    TFile* outfile = new TFile("../../../data/rk_tracks/rk_tracks_forward.root", "RECREATE");
+    TFile* outfile = new TFile("../../../data/rk_tracks/rk_tracks_forward2.root", "RECREATE");
     simulated_tracks->Write();
     c_tracks->Write();
 

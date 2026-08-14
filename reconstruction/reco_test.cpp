@@ -59,7 +59,7 @@ int main()
   // loop->AddTask(new MicroCircleAndRKFitTask(t));
 
   // Loading file with Runge-Kutta tracks.
-  TFile* input_rk  = new TFile("../../data/rk_tracks/rk_tracks_forward.root");
+  TFile* input_rk  = new TFile("../../data/rk_tracks/rk_tracks_forward2.root");
   TTree* rk_tracks = static_cast<TTree*>(input_rk->Get("rk_tracks"));
   // rk_tracks->Print();
 
@@ -75,9 +75,9 @@ int main()
   loop->ProcessMulti(&track_selection);
   out_file.Close();
 
-  // TFile out_file2("../../data/rk_tracks/rk_plots_forward.root","RECREATE","Tracks from Runge-Kutta simulation fit");
-  // rk_loop->ProcessRK(rk_tracks);
-  // out_file2.Close();
+  TFile out_file2("../../data/rk_tracks/rk_plots_forward2.root", "RECREATE", "Tracks from Runge-Kutta simulation fit");
+  rk_loop->ProcessRK(rk_tracks);
+  out_file2.Close();
 
   return 0;
 }

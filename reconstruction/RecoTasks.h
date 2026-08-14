@@ -2,6 +2,7 @@
 
 // C++ dependencies
 #include <string>
+#include <TH1.h>
 
 // ROOT dependencies
 #include "TCanvas.h"
@@ -432,5 +433,50 @@ public:
       l->Draw("same");
     }
     c->Write();
+  }
+};
+
+class EdepTask : public RecoTask
+{
+  TH1F* m_hedep;
+  TH1F* m_nel;
+  double m_curr_edep = 0;
+
+public:
+  void PreTrackLoop() override
+  {
+    m_hedep = new TH1F("edep", "Energy deposition;Energy [eV];# of tracks", 100, 0, 10000);
+    m_nel   = new TH1F("nel", "Number of electrons;# of electrons in track;Count (of tracks)", 1000, 0, 1000);
+  }
+
+  void PreElectronLoop() override
+  {
+    m_curr_edep          = 0;
+    X17::TrackLoop* loop = GetLoop_();
+    m_nel->Fill(loop->curr_microtrack->points.size());
+  }
+
+  void ElectronLoop() override
+  {
+    X17::TrackLoop* loop = GetLoop_();
+
+    m_curr_edep += loop->curr_micro.e0;
+  }
+
+  void PostElectronLoop() override { m_hedep->Fill(m_curr_edep); }
+
+  void PostTrackLoop() override
+  {
+    TCanvas* c = new TCanvas("c_edep", "Energy deposition", 500, 500);
+
+    m_hedep->Draw();
+
+    c->Write();
+
+    TCanvas* c2 = new TCanvas("c_nel", "Number of electrons", 500, 500);
+
+    m_nel->Draw();
+
+    c2->Write();
   }
 };

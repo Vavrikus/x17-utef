@@ -69,6 +69,8 @@ namespace X17
       // if (std::abs(curr_microtrack->theta()) > 0.000001) continue; // ONLY FOR TEST!!!
       // if(curr_microtrack->electron) continue; // ONLY FOR TEST!!!
       ReportProgress(i, n_tracks);
+      // if (curr_microtrack->kin_energy < 7.9e+6 || curr_microtrack->kin_energy > 8.1e+6)
+      //   continue;
       // std::cout << "Track " << i+1 << " out of " << n_tracks << ".\n";
       // std::cout << "   electron: " << curr_microtrack->electron << " Ek: " << curr_microtrack->kin_energy;
       // std::cout << " origin: (" << curr_microtrack->origin.x << "," << curr_microtrack->origin.y << "," <<

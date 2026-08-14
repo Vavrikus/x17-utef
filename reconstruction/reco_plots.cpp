@@ -511,8 +511,8 @@ int main()
     label->SetTextSize(0.055);
 
     label->DrawLatex(0.68, 0.85, Form("Mean: %.2f%%", mean));
-    label->DrawLatex(0.68, 0.78, Form("FWHM: %.2f%%", fwhm));
-    label->DrawLatex(0.68, 0.71, Form("Sigma: %.2f%%", stdev));
+    // label->DrawLatex(0.68, 0.78, Form("FWHM: %.2f%%", fwhm));
+    label->DrawLatex(0.68, 0.78 /*0.71*/, Form("Sigma: %.2f%%", stdev));
     // label->DrawLatex(0.68, 0.64, Form("Skew: %.2f", skewness));
     // label->DrawLatex(0.75, 0.70, Form("Kurtosis: %.2f", kurtosis));
     c->Write();

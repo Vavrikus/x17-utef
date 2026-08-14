@@ -101,6 +101,7 @@ set(SUBDIRECTORIES
     simulations/single_track
     simulations/rk_tracks
     simulations/micro_tracks
+    simulations/mcs_tracks
     tests/magnetic_field_plot
     tests/thesis_plots
     tests/mardia_test
