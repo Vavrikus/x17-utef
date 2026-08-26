@@ -1,5 +1,7 @@
 #!/bin/bash
 
+START_DIR=$(pwd)
+
 # Get the absolute path to the directory this script is located in
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -21,4 +23,6 @@ echo "Checks: '-*'" > .clang-tidy
 cmake -DCMAKE_BUILD_TYPE=Debug ..
 
 # Build with all threads
-make -j$(nproc)
+make -j$(nproc) |& tee build.log
+
+cd $START_DIR

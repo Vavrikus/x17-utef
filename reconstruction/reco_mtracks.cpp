@@ -1,6 +1,6 @@
 // C++ dependencies
 #include <iostream>
-#include <string>
+// #include <string>
 
 // ROOT dependencies
 #include "TChain.h"
@@ -12,7 +12,7 @@
 #include "Field.h"
 #include "RecoTasks.h"
 #include "TrackLoop.h"
-#include "Utilities.h"
+// #include "Utilities.h"
 #include "Vector.h"
 
 namespace
@@ -31,21 +31,23 @@ namespace
     const X17::DriftMap* const map = reinterpret_cast<X17::DriftMap*>(map_input->Get("map"));
 
     // Loading file(s) with microscopic tracks.
-    std::string micro_tracks_folder;
+    // std::string micro_tracks_folder;
     TChain* micro_tracks = new TChain("tracks_small");
 
-    if (allTracks)
-    {
-      micro_tracks_folder = "../../data/micro_tracks/grid_01/";
-      AddFilesToTChain(micro_tracks, micro_tracks_folder + "tracks_small", ".root", 1, 2000);
-      micro_tracks_folder = "../../data/micro_tracks/grid_02/";
-      AddFilesToTChain(micro_tracks, micro_tracks_folder + "tracks_small", ".root", 1, 9702);
-    }
-    else
-    {
-      micro_tracks_folder = "../../data/micro_tracks/grid_01/";
-      micro_tracks->Add((micro_tracks_folder + "tracks_small1000.root").c_str());
-    }
+    // if (allTracks)
+    // {
+    //   micro_tracks_folder = "../../data/micro_tracks/grid_01/";
+    //   AddFilesToTChain(micro_tracks, micro_tracks_folder + "tracks_small", ".root", 1, 2000);
+    //   micro_tracks_folder = "../../data/micro_tracks/grid_02/";
+    //   AddFilesToTChain(micro_tracks, micro_tracks_folder + "tracks_small", ".root", 1, 9702);
+    // }
+    // else
+    // {
+    //   micro_tracks_folder = "../../data/micro_tracks/grid_01/";
+    //   micro_tracks->Add((micro_tracks_folder + "tracks_small1000.root").c_str());
+    // }
+
+    micro_tracks->Add("../../data/mcs_tracks/mcs_tracks3.root");
 
     std::cout << "Processing " << micro_tracks->GetEntries() << " tracks.\n";
 
@@ -72,12 +74,14 @@ namespace
     gErrorIgnoreLevel = 6001;
 
     TFile* out_file = nullptr;
-    if (allTracks)
-      out_file = new TFile((micro_tracks_folder + "../reco_tracks.root").c_str(), "RECREATE",
-                           "Tracks from microscopic simulation");
-    else
-      out_file = new TFile((micro_tracks_folder + "track_plots1000.root").c_str(), "RECREATE",
-                           "Tracks from microscopic simulation");
+    // if (allTracks)
+    //   out_file = new TFile((micro_tracks_folder + "../reco_tracks.root").c_str(), "RECREATE",
+    //                        "Tracks from microscopic simulation");
+    // else
+    //   out_file = new TFile((micro_tracks_folder + "track_plots1000.root").c_str(), "RECREATE",
+    //                        "Tracks from microscopic simulation");
+
+    out_file = new TFile("../../data/mcs_tracks/reco_tracks3.root", "RECREATE", "Tracks from map-drifted simulation");
 
     multi_loop->ProcessMulti(micro_tracks);
 

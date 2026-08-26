@@ -65,7 +65,6 @@ namespace
   double FitCorrection(bool electron, double e_sim, double e_rec, double theta, double varphi, int p = 4,
                        bool use_reco = false)
   {
-    // return 0;
     if (use_reco)
     {
       if (p == 4)
@@ -98,21 +97,35 @@ namespace
 int main()
 {
   using namespace X17::constants;
-  std::string data_folder = "../../data/micro_tracks/";
+
+  bool applyCorrection = false;
+
+  if (applyCorrection)
+    std::cout << "Linear fit correction will be applied.\n";
+  else
+    std::cout << "Linear fit correction will not be applied.\n";
+
+  // std::string data_folder = "../../data/micro_tracks/";
+  std::string data_folder  = "../../data/mcs_tracks/";
+  std::string in_filename  = "reco_tracks.root";
+  std::string out_filename = "tracks_fit.root";
+
+  std::cout << "Loading data from " << data_folder << in_filename << '\n';
+  std::cout << "Plots will be saved to " << data_folder << out_filename << '\n';
 
   // Loading file with track information.
-  TFile* input       = new TFile((data_folder + "reco_tracks.root").c_str());
+  TFile* input       = new TFile((data_folder + in_filename).c_str());
   TTree* tracks_info = static_cast<TTree*>(input->Get("tracks_info"));
 
   X17::TrackInfo* curr_info = nullptr;
   tracks_info->SetBranchAddress("track_info", &curr_info);
 
   // Output file.
-  TFile out_file((data_folder + "tracks_fit.root").c_str(), "RECREATE",
-                 "Microscopic tracks reconstruction plots"); // THe minimal simulated energy [MeV].
+  TFile out_file((data_folder + out_filename).c_str(), "RECREATE",
+                 "Microscopic tracks reconstruction plots"); // The minimal simulated energy [MeV].
 
   // Reconstruction ranges.
-  double res_min = -10;
+  double res_min = -50;
   double res_max = -res_min;
   // double res_bins = 81;
   // double res_bins_small = 51;
@@ -215,6 +228,8 @@ int main()
   for (int i = 0; i < tracks_info->GetEntries(); i++)
   {
     tracks_info->GetEntry(i);
+
+    // (*curr_info).kin_energy = (13E+6 - X17::constants::E0) / 1.0E+6;
 
     bool electron        = curr_info->electron;
     double e_sim         = curr_info->kin_energy;
@@ -463,6 +478,9 @@ int main()
 
   for (int i = 0; i < 8; i++)
   {
+    if (histos_2d[i]->GetEntries() == 0)
+      continue;
+
     TCanvas* c = new TCanvas(c_names_2d[i].c_str(), "");
     th2_c(c);
     histos_2d[i]->SetStats(false);
@@ -480,6 +498,9 @@ int main()
 
   for (int i = 0; i < 2; i++)
   {
+    if (h_deltas[i]->GetEntries() == 0)
+      continue;
+
     TCanvas* c = new TCanvas(c_names[i].c_str(), "");
     th1_c(c);
     h_deltas[i]->SetStats(false);

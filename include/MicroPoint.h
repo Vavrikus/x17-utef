@@ -17,8 +17,8 @@ namespace X17
   {
     StartPoint start; // Initial coordinates of the electron ([cm] and [ns]).
     EndPoint end;     // Final coordinates of the electron ([cm] and [ns]).
-    double e0{ 0 };   // Initial energy [eV].
-    double e1{ 0 };   // Final energy [eV].
+    double e0 = 0.0;  // Initial energy [eV].
+    double e1 = 0.0;  // Final energy [eV].
 
     /// @brief The default constructor. Initializes time to -1, everything else to 0.
     MicroPoint()

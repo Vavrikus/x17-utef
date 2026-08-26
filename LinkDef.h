@@ -1,5 +1,6 @@
 #include "Field.h"
 #include "Points.h"
+#include "TParameter.h"
 #include "Track.h" // IWYU pragma: keep
 
 template class X17::Field<X17::MapPoint>;
@@ -24,4 +25,5 @@ template class X17::Matrix<4, 4>;
 #pragma link C++ class X17::TrackMicro+;
 #pragma link C++ class X17::TrackInfo+;
 #pragma link C++ class X17::Matrix<4, 4>+;
+#pragma link C++ class TParameter<UInt_t>+;
 // clang-format on
