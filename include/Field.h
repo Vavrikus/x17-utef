@@ -15,6 +15,7 @@ namespace X17
   template <typename T>
   class Field;
   using DriftMap = Field<MapPoint>;
+  using MagField = Field<Vector>;
 
   /// @brief Rectangular field with a regular grid of values. The field is defined by its minimum
   ///        and maximum coordinates along each axis, the grid spacing, and a default value

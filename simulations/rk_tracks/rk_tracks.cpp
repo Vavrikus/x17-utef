@@ -1,4 +1,5 @@
 // C++ dependencies
+#include <memory>
 #include <vector>
 
 // ROOT dependencies
@@ -12,6 +13,7 @@
 #include "TTree.h"
 
 // X17 dependencies
+#include "AppManager.h"
 #include "Field.h"
 #include "Matrix.h"
 #include "PadLayout.h"
@@ -28,12 +30,14 @@ namespace
 {
   int rk_tracks()
   {
+    X17::AppManager man("rk_tracks", 3, "Simulate tracks using Runge-Kutta method.");
+
     constexpr int n_tracks = 25;            // The number of tracks to be simulated by Runge-Kutta.
     constexpr double step  = 1E-13 * 16.66; // The step of Runge-Kutta [s] (original times 8 MeV gamma factor).
 
     // Loading the magnetic field.
-    X17::Field<X17::Vector>* magfield
-      = X17::LoadField("../../../data/elmag/VecB2.txt", { -20, -30, -30 }, { 20, 30, 30 }, 0.5);
+
+    std::unique_ptr<X17::MagField> magfield = X17::AppManager::LoadMagField();
 
     // Some necessary variables for simulating and saving track parameters.
     TTree* simulated_tracks = new TTree("rk_tracks", "Runge-Kutta simulated tracks");

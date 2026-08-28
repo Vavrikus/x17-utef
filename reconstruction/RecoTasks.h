@@ -355,7 +355,7 @@ public:
   }
 
 public:
-  PlotSelectionTask(RKFitCircleTask* cfit, double E_max = 3.5e+6)
+  explicit PlotSelectionTask(RKFitCircleTask* cfit, double E_max = 3.5e+6)
     : m_e_max(E_max), m_cfit_energy(cfit)
   {
   }
@@ -453,7 +453,7 @@ public:
   {
     m_curr_edep          = 0;
     X17::TrackLoop* loop = GetLoop_();
-    m_nel->Fill(loop->curr_microtrack->points.size());
+    m_nel->Fill(static_cast<Double_t>(loop->curr_microtrack->points.size()));
   }
 
   void ElectronLoop() override

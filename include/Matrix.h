@@ -23,7 +23,7 @@ namespace X17
 
     /// @brief Constructor that initializes the matrix to a diagonal matrix with all elements equal to d.
     /// @param d The value to fill the diagonal with.
-    Matrix(double d)
+    explicit Matrix(double d)
     {
       for (double& element : elements)
         element = 0;
@@ -33,7 +33,7 @@ namespace X17
 
     /// @brief Constructor that initializes the matrix from an array of size M*N.
     /// @param arr The array of size M*N containing the matrix elements in row-major order.
-    Matrix(const double (&arr)[M * N]) { std::copy(std::begin(arr), std::end(arr), std::begin(elements)); }
+    explicit Matrix(const double (&arr)[M * N]) { std::copy(std::begin(arr), std::end(arr), std::begin(elements)); }
 
     /// @brief Addition operator that adds a matrix to the current matrix.
     /// @param A The matrix to add.

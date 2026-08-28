@@ -108,14 +108,14 @@ namespace X17
 
     // Z search is inverted so the stopping condition has to be inverted
     // (i_min for var == 2 is zi_tmin <--> zimax and vice versa).
-    auto should_continue = [&i_min, &i_max, &var]()
+    auto should_continue = [&i_min, &i_max, &var]
     {
       if (var == 2)
         return (i_max + 1) < i_min;
       return (i_min + 1) < i_max;
     };
 
-#ifdef DEBUG
+#ifndef NDEBUG
     // Indices for low and high values.
     int i_low[3], i_high[3];
     std::copy(std::begin(i_mid), std::end(i_mid), std::begin(i_low));
@@ -139,7 +139,7 @@ namespace X17
         i_min = i_mid[var];
       } // i_mid_is_max = false; }
 
-#ifdef DEBUG
+#ifndef NDEBUG
       i_low[var]  = i_min;
       i_high[var] = i_max;
       double low  = map.at(i_low)[var2];

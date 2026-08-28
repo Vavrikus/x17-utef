@@ -1,4 +1,5 @@
 // C++ dependencies
+#include <memory>
 #include <string>
 
 // ROOT dependencies
@@ -6,52 +7,49 @@
 #include "TTree.h"
 
 // X17 dependencies
+#include "AppManager.h"
 #include "Field.h"
 #include "RecoTasks.h"
 #include "Track.h"
 #include "TrackLoop.h"
-#include "Vector.h"
 
 int main()
 {
+  X17::AppManager man("reco_test", 2, "Testing on smaller samples and Runge-Kutta tracks.");
+
   // Loading the magnetic field data.
-  X17::Field<X17::Vector>* magfield
-    = X17::LoadField("../../data/elmag/VecB2.txt", { -20, -30, -30 }, { 20, 30, 30 }, 0.5);
+  std::unique_ptr<X17::MagField> magfield = X17::AppManager::LoadMagField();
 
   // Loading the ionization electron drift map.
-  TFile* map_input   = new TFile("../../data/ion_map/sample_2.0/map.root");
-  X17::DriftMap* map = reinterpret_cast<X17::DriftMap*>(map_input->Get("map"));
+  std::unique_ptr<X17::DriftMap> map = man.LoadMap("2.0");
 
   // Loading file microscopic tracks one by one.
   X17::TrackMicro* track_Evf_100 = nullptr;
   TTree track_selection("track_selection", "Track selection");
   track_selection.Branch("track_small", &track_Evf_100);
 
-  std::string single_track_folder = "../../data/micro_tracks/grid_01/";
+  std::string single_track_folder = "data/micro_tracks/grid_01/";
 
   // 8 MeV, min theta, min phi
-  TFile* input     = new TFile((single_track_folder + "tracks_small910.root").c_str());
-  TTree* tracks910 = static_cast<TTree*>(input->Get("tracks_small"));
+  TTree* tracks910 = man.LoadTreeFromFile(single_track_folder + "tracks_small910.root", "tracks_small");
   tracks910->SetBranchAddress("track_small", &track_Evf_100);
   tracks910->GetEntry(1);
   track_selection.Fill();
 
   // 8 MeV, zero theta, zero phi
-  TFile* input2     = new TFile((single_track_folder + "tracks_small1000.root").c_str());
-  TTree* tracks1000 = static_cast<TTree*>(input2->Get("tracks_small"));
+  TTree* tracks1000 = man.LoadTreeFromFile(single_track_folder + "tracks_small1000.root", "tracks_small");
   tracks1000->SetBranchAddress("track_small", &track_Evf_100);
   tracks1000->GetEntry(4);
   // track_selection.Fill();
 
   // 3 MeV, zero theta, zero phi
-  TFile* input3   = new TFile((single_track_folder + "tracks_small92.root").c_str());
-  TTree* tracks92 = static_cast<TTree*>(input3->Get("tracks_small"));
+  TTree* tracks92 = man.LoadTreeFromFile(single_track_folder + "tracks_small92.root", "tracks_small");
   tracks92->SetBranchAddress("track_small", &track_Evf_100);
   tracks92->GetEntry(1);
   // track_selection.Fill();
 
   // TrackLoop for single microscopic track.
-  TrackLoop* loop        = new TrackLoop(*map, magfield);
+  TrackLoop* loop        = new TrackLoop(*map, magfield.get());
   loop->make_track_plots = true;
 
   RecoPadsTask* t = new RecoPadsTask(); // NOLINT(misc-include-cleaner)
@@ -59,12 +57,11 @@ int main()
   // loop->AddTask(new MicroCircleAndRKFitTask(t));
 
   // Loading file with Runge-Kutta tracks.
-  TFile* input_rk  = new TFile("../../data/rk_tracks/rk_tracks_forward2.root");
-  TTree* rk_tracks = static_cast<TTree*>(input_rk->Get("rk_tracks"));
+  TTree* rk_tracks = man.LoadTreeFromFile("data/rk_tracks/rk_tracks_forward2.root", "rk_tracks");
   // rk_tracks->Print();
 
   // TrackLoop for Runge-Kutta simulated tracks.
-  TrackLoop* rk_loop = new TrackLoop(*map, magfield);
+  TrackLoop* rk_loop = new TrackLoop(*map, magfield.get());
   // auto t2 = new RKFitCircleTask();
   // rk_loop->AddTask(t2);
   // rk_loop->AddTask(new PlotSelectionTask(t2));

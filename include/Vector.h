@@ -107,7 +107,7 @@ namespace X17
     /// @throw std::invalid_argument if d is zero (only if DEBUG defined).
     Vector operator/(double d) const
     {
-#ifdef DEBUG
+#ifndef NDEBUG
       if (d == 0)
         throw std::invalid_argument("division by zero");
 #endif

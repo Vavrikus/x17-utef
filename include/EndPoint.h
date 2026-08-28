@@ -45,7 +45,7 @@ namespace X17
     }
 
     /// @brief Conversion constructor for static casting zero to EndPoint.
-    EndPoint(int zero)
+    explicit EndPoint(int /*zero*/)
       : point(Vector(0, 0, 0)), t(0)
     {
       assert(zero == 0);

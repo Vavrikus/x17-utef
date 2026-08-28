@@ -22,6 +22,7 @@
 #include "Garfield/ViewSignal.hh"
 
 // X17 dependencies
+#include "AppManager.h"
 #include "Points.h"
 #include "X17Utilities.h"
 
@@ -30,6 +31,7 @@ using namespace X17::constants;
 
 int main(int argc, char* argv[])
 {
+  X17::AppManager manager("single_track", 3, "Drift of ionization electrons from a single microscopic track.");
   TApplication app("app", &argc, argv);
 
   // Set the gas mixture.
@@ -38,7 +40,7 @@ int main(int argc, char* argv[])
                      30.); // std::cout << "BAD GAS COMPOSITION!!!!\n"; // Change to 70/30, set temperature, etc.
 
   // Set the output file.
-  TFile outFile("../../../data/single_track/electrons.root", "RECREATE", "Electrons from ionization track");
+  TFile outFile("data/single_track/electrons.root", "RECREATE", "Electrons from ionization track");
   TTree electrons("electrons", "Tree of initial and final points of electrons");
 
   X17::MicroPoint point;
@@ -47,8 +49,8 @@ int main(int argc, char* argv[])
   // Add magnetic and electric field.
   ComponentGrid grid;
   const double m2cm = 100.;
-  grid.LoadMagneticField("../../../data/elmag/VecB2.txt", "xyz", m2cm);
-  grid.LoadElectricField("../../../data/elmag/VecE2.txt", "xyz", false, false, m2cm);
+  grid.LoadMagneticField("data/elmag/VecB2.txt", "xyz", m2cm);
+  grid.LoadElectricField("data/elmag/VecE2.txt", "xyz", false, false, m2cm);
   grid.SetMedium(&gas);
 
   // Assemble a sensor.

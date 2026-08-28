@@ -1,4 +1,5 @@
 #define MATRIX_INL
+
 // C++ dependencies
 #include <iostream>
 
@@ -12,7 +13,7 @@ namespace X17
   template <int M, int N>
   const double& Matrix<M, N>::at(int row, int column) const
   {
-#ifdef DEBUG
+#ifndef NDEBUG
     if (row < 0 || row >= M || column < 0 || column >= N)
     {
       std::cerr << "ERROR: Invalid matrix element (" << row << "," << column << ") of " << M << "x" << N
@@ -26,7 +27,7 @@ namespace X17
   template <int M, int N>
   double& Matrix<M, N>::at(int row, int column)
   {
-#ifdef DEBUG
+#ifndef NDEBUG
     if (row < 0 || row >= M || column < 0 || column >= N)
     {
       std::cerr << "ERROR: Invalid matrix element (" << row << "," << column << ") of " << M << "x" << N

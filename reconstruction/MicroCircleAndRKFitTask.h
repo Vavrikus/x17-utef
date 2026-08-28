@@ -227,7 +227,7 @@ public:
   }
 
 public:
-  MicroCircleAndRKFitTask(RecoPadsTask* t)
+  explicit MicroCircleAndRKFitTask(RecoPadsTask* t)
     : m_reco_task(t)
   {
   }

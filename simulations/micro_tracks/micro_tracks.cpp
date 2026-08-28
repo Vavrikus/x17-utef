@@ -22,6 +22,7 @@
 #include "Garfield/ViewSignal.hh"
 
 // X17 dependencies
+#include "AppManager.h"
 #include "Points.h"
 #include "Track.h"
 #include "TrackJob.h"
@@ -36,6 +37,8 @@ using namespace X17::constants;
 // For random simulation of one track run with no parameters.
 int main(int argc, char* argv[])
 {
+  X17::AppManager man("micro_tracks", 3, "Simulation of microscopic tracks.");
+
   // Set parameters.
   X17::TrackJob job;
   job.SetParameters(argc, argv);

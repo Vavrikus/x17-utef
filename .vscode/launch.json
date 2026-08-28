@@ -208,6 +208,25 @@
             "ignoreFailures": true
           }
         ]
+      },
+
+      {
+        "name": "(gdb) Launch mcs_tracks",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/build/simulations/mcs_tracks/mcs_tracks",
+        "args": [],
+        "cwd": "${workspaceFolder}/build/simulations/mcs_tracks/",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          }
+        ]
       }
     ]
   }

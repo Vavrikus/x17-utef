@@ -1,5 +1,6 @@
 // C++ dependencies
 #include <cmath>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -19,7 +20,9 @@
 #include "TTree.h"
 
 // X17 dependencies
+#include "AppManager.h"
 #include "LinearFit.h"
+#include "Logger.h"
 #include "Track.h"
 #include "Utilities.h"
 #include "X17Utilities.h"
@@ -98,15 +101,17 @@ int main()
 {
   using namespace X17::constants;
 
+  X17::AppManager man("reco_plots", 2, "Plots for reconstruction evaluation.");
+
   bool applyCorrection = false;
 
   if (applyCorrection)
-    std::cout << "Linear fit correction will be applied.\n";
+    X17::Logger::Get().Essential("Linear fit correction will be applied.\n");
   else
-    std::cout << "Linear fit correction will not be applied.\n";
+    X17::Logger::Get().Essential("Linear fit correction will not be applied.\n");
 
-  // std::string data_folder = "../../data/micro_tracks/";
-  std::string data_folder  = "../../data/mcs_tracks/";
+  // std::string data_folder = "data/micro_tracks/";
+  std::string data_folder  = "data/mcs_tracks/";
   std::string in_filename  = "reco_tracks.root";
   std::string out_filename = "tracks_fit.root";
 
@@ -114,8 +119,7 @@ int main()
   std::cout << "Plots will be saved to " << data_folder << out_filename << '\n';
 
   // Loading file with track information.
-  TFile* input       = new TFile((data_folder + in_filename).c_str());
-  TTree* tracks_info = static_cast<TTree*>(input->Get("tracks_info"));
+  TTree* tracks_info = man.LoadTreeFromFile(data_folder + in_filename, "tracks_info");
 
   X17::TrackInfo* curr_info = nullptr;
   tracks_info->SetBranchAddress("track_info", &curr_info);

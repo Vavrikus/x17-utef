@@ -367,7 +367,7 @@ public:
   }
 
 public:
-  RKFitCircleTask(const int& bins = 100)
+  explicit RKFitCircleTask(const int& bins = 100)
     : m_bins(bins)
   {
   }

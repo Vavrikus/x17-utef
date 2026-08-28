@@ -43,7 +43,7 @@ public:
 protected:
   /// @brief The constructor of MapTask.
   /// @param map A pointer to the ionization electron drift map.
-  MapTask(const X17::DriftMap& map)
+  explicit MapTask(const X17::DriftMap& map)
     : m_map(map)
   {
   }

@@ -29,7 +29,7 @@ namespace X17
   public:
     /// @brief Constructor for NSpline.
     /// @param nodes_x An array of N doubles representing the x-coordinates of the nodes.
-    NSpline(const double nodes_x[N])
+    explicit NSpline(const double nodes_x[N])
     {
       for (int i = 0; i < N; ++i)
         this->m_nodes_x[i] = nodes_x[i];

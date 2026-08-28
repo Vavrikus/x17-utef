@@ -1,5 +1,6 @@
 // C++ dependencies
 #include <iostream>
+#include <memory>
 // #include <string>
 
 // ROOT dependencies
@@ -9,26 +10,27 @@
 #include "TTree.h"
 
 // X17 dependencies
+#include "AppManager.h"
 #include "Field.h"
 #include "RecoTasks.h"
 #include "TrackLoop.h"
 // #include "Utilities.h"
-#include "Vector.h"
 
 namespace
 {
-  int reco_track()
+  int reco_mtracks()
   {
+    // Setting up the application.
+    X17::AppManager man("reco_mtracks", 2, "Reconstruction of microscopic tracks.");
+
     // Which files to choose
     bool allTracks = true;
 
     // Loading the magnetic field data.
-    X17::Field<X17::Vector>* magfield
-      = X17::LoadField("../../data/elmag/VecB2.txt", { -20, -30, -30 }, { 20, 30, 30 }, 0.5);
+    std::unique_ptr<X17::MagField> magfield = X17::AppManager::LoadMagField();
 
     // Loading the ionization electron drift map.
-    TFile* map_input               = new TFile("../../data/ion_map/sample_2.0/map.root");
-    const X17::DriftMap* const map = reinterpret_cast<X17::DriftMap*>(map_input->Get("map"));
+    std::unique_ptr<X17::DriftMap> map = man.LoadMap("2.0");
 
     // Loading file(s) with microscopic tracks.
     // std::string micro_tracks_folder;
@@ -52,7 +54,7 @@ namespace
     std::cout << "Processing " << micro_tracks->GetEntries() << " tracks.\n";
 
     // TrackLoop for multiple microscopic tracks.
-    TrackLoop* multi_loop        = new TrackLoop(*map, magfield);
+    TrackLoop* multi_loop        = new TrackLoop(*map, magfield.get());
     multi_loop->make_track_plots = !allTracks;
 
     if (!allTracks)
@@ -86,13 +88,9 @@ namespace
     multi_loop->ProcessMulti(micro_tracks);
 
     out_file->Close();
-    map_input->Close();
 
     delete out_file;
-    delete map_input;
 
-    delete magfield;
-    delete map;
     delete micro_tracks;
     delete multi_loop;
 
@@ -102,5 +100,5 @@ namespace
 
 int main()
 {
-  return reco_track();
+  return reco_mtracks();
 }

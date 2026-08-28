@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -27,10 +28,10 @@
 #include "TPolyLine3D.h"
 #include "TSpline.h"
 #include "TStyle.h"
-#include "TSystem.h"
 #include "TTree.h"
 
 // X17 dependencies
+#include "AppManager.h"
 #include "CircleFit2D.h"
 #include "Color.h"
 #include "Field.h"
@@ -865,18 +866,16 @@ namespace
 
 int main(int argc, char* argv[])
 {
+  X17::AppManager man("test_track", 3, "Track-related thesis plots.");
+
   TApplication app("app", &argc, argv);
-  std::cout << "Working directory: " << gSystem->WorkingDirectory() << '\n';
 
   int orange_index = TColor::GetFreeColorIndex();
   TColor* orange   = new TColor(orange_index, 1, 0.6, 0);
 
-  X17::Field<X17::Vector>* magfield
-    = X17::LoadField("../../../data/elmag/VecB2.txt", { -20, -30, -30 }, { 20, 30, 30 }, 0.5);
-  TFile* map_input       = new TFile("../../../data/ion_map/sample_1.0/map.root");
-  TFile* map_input2      = new TFile("../../../data/ion_map/sample_2.0/map.root");
-  X17::DriftMap* map9010 = reinterpret_cast<X17::DriftMap*>(map_input->Get("map"));
-  X17::DriftMap* map7030 = reinterpret_cast<X17::DriftMap*>(map_input2->Get("map"));
+  std::unique_ptr<X17::MagField> magfield = X17::AppManager::LoadMagField();
+  std::unique_ptr<X17::DriftMap> map9010  = man.LoadMap("1.0");
+  std::unique_ptr<X17::DriftMap> map7030  = man.LoadMap("2.0");
 
   X17::TrackMicro track1 = LoadTrack("original");
   // PlotDriftXZ(track1);
@@ -889,8 +888,7 @@ int main(int argc, char* argv[])
   // PlotDriftYZ(track2,"drift_yz_7030.png",true);
 
   // 8 MeV, zero theta, zero phi electron track
-  TFile* input            = new TFile("../../../data/micro_tracks/grid_01/tracks_small1000.root");
-  TTree* t_tracks         = static_cast<TTree*>(input->Get("tracks_small"));
+  TTree* t_tracks         = man.LoadTreeFromFile("data/micro_tracks/grid_01/tracks_small1000.root", "tracks_small");
   X17::TrackMicro* track3 = nullptr;
   t_tracks->SetBranchAddress("track_small", &track3);
   t_tracks->GetEntry(4);
@@ -912,7 +910,7 @@ int main(int argc, char* argv[])
   // PlotRASD(track1,map9010);
   // PlotRASD(track2,map7030,true);
   // PlotRASDres2();
-  PlotRASD(*track3, map7030, true);
+  PlotRASD(*track3, map7030.get(), true);
 
   // PlotSpline(track2,magfield,map7030,true);
   // PlotCircle2D(track2,magfield,map7030,true);

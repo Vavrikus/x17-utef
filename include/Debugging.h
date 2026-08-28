@@ -3,6 +3,10 @@
 // C++ dependencies
 #include <functional>
 #include <iostream>
+#include <string>
+
+// X17 dependencies
+#include "Logger.h"
 
 /// @brief Returns a callback function that prints to std::cout when the value changes.
 /// @tparam T The type of the value being watched.
@@ -12,7 +16,10 @@ template <typename T>
 auto coutCallback(const std::string& name)
 {
   return [name](const T& oldVal, const T& newVal)
-  { std::cout << name << " changed from " << oldVal << " to " << newVal << "\n"; };
+  {
+    std::string msg = name + " changed from " + std::to_string(oldVal) + " to " + std::to_string(newVal);
+    X17::Logger::Get().Debug(msg);
+  };
 }
 
 /// @brief A class that watches a value and calls a callback function when the value changes.
@@ -31,12 +38,13 @@ public:
   {
     if (m_callback)
       m_callback(m_value, m_value);
-    std::cout << "Watched object destroyed\n";
+
+    X17::Logger::Get().Debug("Watched object destroyed.");
   }
 
   /// @brief Constructs a Watched object with the given value.
   /// @param value The value to watch.
-  Watched(const T& value)
+  explicit Watched(const T& value)
     : m_value(value)
   {
   }
@@ -58,7 +66,7 @@ public:
 
   /// @brief Returns the value being watched.
   /// @return The value being watched.
-  operator const T&() const { return m_value; }
+  explicit operator const T&() const { return m_value; }
 
   /// @brief Returns the value being watched.
   /// @return The value being watched.

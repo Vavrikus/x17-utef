@@ -138,7 +138,7 @@ public:
   void PostTrackLoop() override { m_tracks_info->Write(); }
 
 public:
-  MicroFitAndSaveTask(RecoPadsTask* t)
+  explicit MicroFitAndSaveTask(RecoPadsTask* t)
     : m_reco_task(t)
   {
   }

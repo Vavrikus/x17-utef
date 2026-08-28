@@ -304,7 +304,7 @@ public:
   }
 
 public:
-  RecoPadsTask(double pad_height = -2.5)
+  explicit RecoPadsTask(double pad_height = -2.5)
     : m_height(pad_height)
   {
   }

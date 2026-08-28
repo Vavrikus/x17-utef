@@ -1,5 +1,6 @@
 // C++ dependencies
 #include <iostream>
+#include <memory>
 #include <string>
 
 // ROOT dependencies
@@ -9,35 +10,35 @@
 #include "TTree.h"
 
 // X17 dependencies
+#include "AppManager.h"
 #include "Field.h"
 #include "RecoTasks.h" // IWYU pragma: keep
 #include "TrackLoop.h"
 #include "Utilities.h"
-#include "Vector.h"
 
 int main()
 {
+  X17::AppManager man("map_test", 2, "Testing the drift map reconstruction.");
+
   // Loading the magnetic field data.
-  X17::Field<X17::Vector>* magfield
-    = X17::LoadField("../../data/elmag/VecB2.txt", { -20, -30, -30 }, { 20, 30, 30 }, 0.5);
+  std::unique_ptr<X17::MagField> magfield = X17::AppManager::LoadMagField();
 
   // Loading the ionization electron drift map.
-  TFile* map_input               = new TFile("../../data/ion_map/sample_2.0/map.root");
-  const X17::DriftMap* const map = reinterpret_cast<X17::DriftMap*>(map_input->Get("map"));
+  std::unique_ptr<X17::DriftMap> map = man.LoadMap("2.0");
 
   // Loading file(s) with microscopic tracks.
   std::string micro_tracks_folder;
   TChain* micro_tracks = new TChain("tracks_small");
 
-  micro_tracks_folder = "../../data/micro_tracks/grid_01/";
+  micro_tracks_folder = "data/micro_tracks/grid_01/";
   AddFilesToTChain(micro_tracks, micro_tracks_folder + "tracks_small", ".root", 1, 2000);
-  micro_tracks_folder = "../../data/micro_tracks/grid_02/";
+  micro_tracks_folder = "data/micro_tracks/grid_02/";
   AddFilesToTChain(micro_tracks, micro_tracks_folder + "tracks_small", ".root", 1, 9702);
 
   std::cout << "Processing " << micro_tracks->GetEntries() << " tracks.\n";
 
   // TrackLoop for multiple microscopic tracks.
-  TrackLoop* multi_loop        = new TrackLoop(*map, magfield);
+  TrackLoop* multi_loop        = new TrackLoop(*map, magfield.get());
   multi_loop->make_track_plots = false;
   // multi_loop->AddTask(new MapRecoCompareTask("c_oldnew_res",true,true));
   multi_loop->AddTask(new RecoPadsTask());                          // NOLINT(misc-include-cleaner)
@@ -54,13 +55,9 @@ int main()
   multi_loop->ProcessMulti(micro_tracks);
 
   out_file->Close();
-  map_input->Close();
 
   delete out_file;
-  delete map_input;
 
-  delete magfield;
-  delete map;
   delete micro_tracks;
   delete multi_loop;
 

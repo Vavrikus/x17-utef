@@ -24,7 +24,7 @@ class Hist_YX_DX : public MapTask // NOLINT(readability-identifier-naming)
   std::vector<TH2F*> m_v_yx_dx;
 
 public:
-  Hist_YX_DX(const X17::DriftMap& map)
+  explicit Hist_YX_DX(const X17::DriftMap& map)
     : MapTask(map)
   {
   }
@@ -57,7 +57,7 @@ class Hist_YX_DY : public MapTask // NOLINT(readability-identifier-naming)
   std::vector<TH2F*> m_v_yx_dy;
 
 public:
-  Hist_YX_DY(const X17::DriftMap& map)
+  explicit Hist_YX_DY(const X17::DriftMap& map)
     : MapTask(map)
   {
   }
@@ -277,7 +277,7 @@ class Graph_ZT : public MapTask // NOLINT(readability-identifier-naming)
   TGraph* m_g_zt;
 
 public:
-  Graph_ZT(const X17::DriftMap& map)
+  explicit Graph_ZT(const X17::DriftMap& map)
     : MapTask(map)
   {
   }
@@ -316,7 +316,7 @@ class Graph_XZ : public MapTask // NOLINT(readability-identifier-naming)
   std::vector<TArrow*> m_v_g_xz_arrows;
 
 public:
-  Graph_XZ(const X17::DriftMap& map)
+  explicit Graph_XZ(const X17::DriftMap& map)
     : MapTask(map)
   {
   }
@@ -414,7 +414,7 @@ class Hist_XZ_T1 : public MapTask // NOLINT(readability-identifier-naming)
   TH2F* m_xz_t1;
 
 public:
-  Hist_XZ_T1(const X17::DriftMap& map)
+  explicit Hist_XZ_T1(const X17::DriftMap& map)
     : MapTask(map)
   {
   }
