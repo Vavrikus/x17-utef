@@ -82,7 +82,7 @@
         "type": "cppdbg",
         "request": "launch",
         "program": "${workspaceFolder}/build/simulations/micro_tracks/micro_tracks",
-        "args": [],
+        "args": ["1000", "1", "1"],
         "cwd": "${workspaceFolder}/build/simulations/micro_tracks/",
         "environment": [],
         "externalConsole": false,

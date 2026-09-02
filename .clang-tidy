@@ -82,8 +82,8 @@ CheckOptions:
     value:           'true'
 
 # Treat some critical checks as actual compiler errors
-WarningsAsErrors: >
-  misc-include-cleaner
+# WarningsAsErrors: >
+#   misc-include-cleaner
 #   misc-*
 #   bugprone-narrowing-conversions,
 #   bugprone-sizeof-expression

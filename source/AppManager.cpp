@@ -71,11 +71,16 @@ namespace X17
 
   AppManager::~AppManager()
   {
-    m_output_tree->Write();
-    m_output_file->Close();
+    if (m_output_file)
+    {
+      m_output_tree->Write();
+      m_output_file->Close();
+    }
+
     for (auto& file : m_open_files)
       file->Close();
   }
+
   std::unique_ptr<MagField> AppManager::LoadMagField()
   {
     return std::unique_ptr<MagField>(X17::LoadField("data/elmag/VecB2.txt", { -20, -30, -30 }, { 20, 30, 30 }, 0.5));
@@ -149,6 +154,14 @@ namespace X17
 
   TTree* AppManager::CreateOutputTree(const string& filename, const string& tree_name, const string& tree_title)
   {
+    if (m_output_file)
+    {
+      Logger::Get().Info(std::string("Replacing existing output tree ") + m_output_tree->GetName() + " in "
+                         + m_output_file->GetName() + ".");
+      m_output_tree->Write();
+      m_output_file->Close();
+    }
+
     Logger::Get().Info("Creating output tree: " + tree_name + " in " + filename + ".");
     m_output_file = std::make_unique<TFile>(filename.c_str(), "RECREATE");
     m_output_tree = new TTree(tree_name.c_str(), tree_title.c_str());
@@ -156,17 +169,24 @@ namespace X17
     return m_output_tree;
   }
 
-  std::unique_ptr<TRandom3> AppManager::CreateRNG(UInt_t seed)
+  std::unique_ptr<TRandom3> AppManager::CreateRNG(UInt_t seed, bool allow_unsaved_seed)
   {
     if (seed == 0)
       seed = std::random_device{}();
     X17::Logger::Get().Info("Setting TRandom3 seed: " + std::to_string(seed));
 
     if (!m_output_file)
-      Logger::Get().Fatal("No output file set, cannot save seed.");
-
-    TParameter<UInt_t> pSeed("seed", seed);
-    pSeed.Write();
+    {
+      if (allow_unsaved_seed)
+        Logger::Get().Warning("No output file set, seed will not be saved.");
+      else
+        Logger::Get().Fatal("No output file set, cannot save seed.");
+    }
+    else
+    {
+      TParameter<UInt_t> pSeed("seed", seed);
+      pSeed.Write();
+    }
 
     return std::make_unique<TRandom3>(seed);
   }

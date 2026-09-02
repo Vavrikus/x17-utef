@@ -37,14 +37,14 @@ namespace X17
 
     void SetLogLevel(LogLevel level) { m_log_level = level; }
 
-    void Log(LogLevel level, const std::string& message) const;
-    void Debug(const std::string& message) const { Log(LogLevel::Debug, message); }
-    void Info(const std::string& message) const { Log(LogLevel::Info, message); }
-    void Essential(const std::string& message) const { Log(LogLevel::Essential, message); }
-    void Warning(const std::string& message) const { Log(LogLevel::Warning, message); }
-    void Error(const std::string& message) const { Log(LogLevel::Error, message); }
-    void Fatal(const std::string& message) const { Log(LogLevel::Fatal, message); }
-    void Print(const std::string& message) const { Log(LogLevel::Plain, message); }
+    Logger& Log(LogLevel level, const std::string& message);
+    Logger& Debug(const std::string& message) { return Log(LogLevel::Debug, message); }
+    Logger& Info(const std::string& message) { return Log(LogLevel::Info, message); }
+    Logger& Essential(const std::string& message) { return Log(LogLevel::Essential, message); }
+    Logger& Warning(const std::string& message) { return Log(LogLevel::Warning, message); }
+    Logger& Error(const std::string& message) { return Log(LogLevel::Error, message); }
+    Logger& Fatal(const std::string& message) { return Log(LogLevel::Fatal, message); }
+    Logger& Print(const std::string& message) { return Log(LogLevel::Plain, message); }
 
     void PushIndent(int increment = 1) { m_indent += increment; }
     void PopIndent(int decrement = 1) { m_indent -= decrement; }
@@ -65,6 +65,8 @@ namespace X17
   private:
     LogLevel m_log_level = LogLevel::Info;
     int m_indent         = 0;
+
+    LogLevel m_last_level = LogLevel::Debug; ///< The last non-plain log level.
   };
 } // namespace X17
 

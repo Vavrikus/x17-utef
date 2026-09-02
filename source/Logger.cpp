@@ -20,15 +20,21 @@ namespace X17
     std::cout << left_bracket << now_str << right_bracket << " ";
   }
 
-  void Logger::Log(LogLevel level, const std::string& message) const
+  Logger& Logger::Log(LogLevel level, const std::string& message)
   {
+    if (level != LogLevel::Plain)
+      m_last_level = level;
+    else if (m_last_level < m_log_level)
+      return *this;
+
+    if (level < m_log_level)
+      return *this;
+
     for (int i = 0; i < m_indent; i++)
       std::cout << "  ";
 
     if (level != LogLevel::Plain)
-    {
       PrintTime(true);
-    }
 
     switch (level)
     {
@@ -61,5 +67,7 @@ namespace X17
 
     if (level == LogLevel::Fatal)
       std::exit(1);
+
+    return *this;
   }
 } // namespace X17

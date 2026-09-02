@@ -2,10 +2,12 @@
 #include <cmath>
 #include <filesystem>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
 // ROOT dependencies
+#include "Logger.h"
 #include "TFile.h"
 #include "TRandom3.h"
 #include "TTree.h"
@@ -23,9 +25,9 @@
 
 // X17 dependencies
 #include "AppManager.h"
+#include "JobManager.h"
 #include "Points.h"
 #include "Track.h"
-#include "TrackJob.h"
 #include "Utilities.h"
 #include "Vector.h"
 #include "X17Utilities.h"
@@ -38,27 +40,65 @@ using namespace X17::constants;
 int main(int argc, char* argv[])
 {
   X17::AppManager man("micro_tracks", 3, "Simulation of microscopic tracks.");
+  X17::Logger& logger      = X17::Logger::Get();
+  X17::JobManager& job_man = X17::JobManager::Get(); // Job manager for parallel jobs.
 
-  // Set parameters.
-  X17::TrackJob job;
-  job.SetParameters(argc, argv);
+  bool random_params;
+
+  int iterations = 1;
+
+  if (argc == 1)
+  {
+    random_params = true;
+    logger.Essential("Running random generation of a single track, no extra parameters needed.");
+  }
+  else if (argc == 2)
+  {
+    random_params = true;
+    iterations    = std::stoi(argv[1]);
+    logger.Essential("Running random generation of " + std::to_string(iterations) + " tracks.");
+  }
+  else
+  {
+    random_params = false;
+
+    // Check the number of paramaters passed to main function.
+    if (argc < 4)
+      logger.Fatal("Missing arguments in ion_electrons. Correct arguments: max_id, id, iterations.");
+
+    // Set parameters of this job.
+    int max_id = std::stoi(argv[1]);
+    int id     = std::stoi(argv[2]);
+    iterations = std::stoi(argv[3]);
+
+    // Set parameters.
+    int energy_bins = 11;
+    job_man.RegisterParameterSteps("Ekin", 3e+6, 13e+6, energy_bins);
+    int angle_bins   = 21;
+    double theta_max = std::atan((X17::constants::win_height / 2) / X17::constants::xmin);
+    job_man.RegisterParameterSteps("theta", -theta_max, theta_max, angle_bins);
+    double phi_max = std::atan((X17::constants::win_width / 2) / X17::constants::xmin);
+    job_man.RegisterParameterSteps("phi", -phi_max, phi_max, angle_bins);
+    job_man.RegisterParameterSteps("charge", -1, 1, 2);
+
+    if (id > max_id)
+      logger.Fatal("Parameter id cannot be bigger than max_id.\n");
+
+    job_man.Initialize(max_id, id, iterations);
+  }
 
   // Set the output files.
-  std::string folder_path = std::filesystem::current_path().string();     // Get the current working directory.
+  std::string folder_path = std::filesystem::current_path().string() + "/build/simulations/micro_tracks";
   std::string outPath     = GetNextFilePath(folder_path, "tracks_full");  // Big file containing the drift lines.
   std::string outPath2    = GetNextFilePath(folder_path, "tracks_small"); // Small file without the drift lines.
-  std::cout << "Full output will be saved to: " + outPath + "\n";
-  std::cout << "Small output will be saved to: " + outPath2 + "\n";
+  logger.Essential("Full output will be saved to: " + outPath);
+  logger.Essential("Small output will be saved to: " + outPath2);
 
-  TFile outFile(outPath.c_str(), "RECREATE", "Tracks from microscopic simulation (with drift lines)");
-
-  TTree tracks("tracks_full", "Tree of simulated microscopic tracks (with drift lines)");
-  TTree tracks2("tracks_small", "Tree of simulated microscopic tracks (no drift lines)");
+  TTree* tracks
+    = man.CreateOutputTree(outPath, "tracks_full", "Tree of simulated microscopic tracks (with drift lines)");
 
   X17::TrackMicro microtrack;
-  X17::TrackMicro microtrack2;
-  tracks.Branch("track_full", &microtrack);
-  tracks2.Branch("track_small", &microtrack2);
+  tracks->Branch("track_full", &microtrack);
 
   // Set the gas mixture.
   MediumMagboltz gas;
@@ -67,8 +107,8 @@ int main(int argc, char* argv[])
   // Add magnetic and electric field.
   ComponentGrid grid;
   const double m2cm = 100.;
-  grid.LoadMagneticField("../../../data/elmag/VecB2.txt", "xyz", m2cm);
-  grid.LoadElectricField("../../../data/elmag/VecE2.txt", "xyz", false, false, m2cm);
+  grid.LoadMagneticField("data/elmag/VecB2.txt", "xyz", m2cm);
+  grid.LoadElectricField("data/elmag/VecE2.txt", "xyz", false, false, m2cm);
   grid.SetMedium(&gas);
 
   // Assemble a sensor.
@@ -85,39 +125,51 @@ int main(int argc, char* argv[])
   aval.EnableDriftLines();
 
   // Random number generator for the simulation.
-  TRandom3* rand = new TRandom3(0);
+  std::unique_ptr<TRandom3> rand = man.CreateRNG();
+
+  logger.Info("Starting simulation.").PushIndent();
+
+  int min_set = random_params ? 1 : job_man.GetMinIndex();
+  int max_set = random_params ? 1 : job_man.GetMaxIndex();
 
   // Loop over the tracks. Generate each track as many times as is the given number of iterations.
-  for (int i = job.min_set; i <= job.max_set; i++)
-    for (int j = 0; j < job.iterations; j++)
+  for (int i = min_set; i <= max_set; i++)
+    for (int j = 0; j < iterations; j++)
     {
       std::vector<X17::MicroPoint> points;
       std::vector<std::vector<X17::DriftLinePoint>> driftlines;
 
-      // Generate random initial parameters of the track.
+      // Track parameters.
       bool electron;
       X17::Vector origin, orientation;
-      double kin_en;
+      double kin_en, theta, phi;
 
       // Get initial track parameters (random or grid-like).
-      if (job.random)
-        X17::GetRandomTrackParams(rand, electron, origin, orientation, kin_en);
+      if (random_params)
+        X17::GetRandomTrackParams(rand.get(), electron, origin, orientation, kin_en);
       else
-        job.GetTrackParameters(i, electron, origin, orientation, kin_en);
+      {
+        electron = job_man.GetParameterValue("charge", i) < 0;
+        theta    = job_man.GetParameterValue("theta", i);
+        phi      = job_man.GetParameterValue("phi", i);
+        kin_en   = job_man.GetParameterValue("Ekin", i);
 
-      std::cout << "TRACK No." << i << ", iteration " << j + 1 << ":\n";
-      std::cout << "   electron: " << electron << " Ek: " << kin_en << " origin: (" << origin.x << "," << origin.y
-                << "," << origin.z << ")\n";
-      std::cout << "   orientation: (" << orientation.x << "," << orientation.y << "," << orientation.z << ")\n";
-      std::cout << "   theta: " << asin(orientation.z)
-                << " phi: " << acos(orientation.x / cos(asin(orientation.z))) * sign(orientation.y) << "\n";
+        orientation = { std::cos(phi) * std::cos(theta), std::sin(phi) * std::cos(theta), std::sin(theta) };
+
+        // Setting the origin point from the orientation vector (assuming straight line motion from (0,0,0)).
+        origin = orientation * X17::constants::xmin / (std::cos(phi) * std::cos(theta));
+      }
+
+      logger.Print("TRACK No." + std::to_string(i) + ", iteration " + std::to_string(j + 1) + ":").PushIndent();
+      std::string particle = electron ? "electron" : "positron";
+      logger.Print("particle:    " + particle);
+      logger.Print("origin:      " + origin.ToString());
+      logger.Print("orientation: " + orientation.ToString());
+      job_man.PrintParameterValues(i).PopIndent();
 
       // Simulate an ionizing particle using Heed.
       TrackHeed track;
-      if (electron)
-        track.SetParticle("electron");
-      else
-        track.SetParticle("positron");
+      track.SetParticle(particle);
 
       track.SetKineticEnergy(kin_en); // Set the particle kinetic energy [eV].
       track.SetSensor(&sensor);
@@ -189,24 +241,34 @@ int main(int argc, char* argv[])
         // break; // Only for fast testing (simulates only one electron)!!!
       }
 
-      microtrack  = X17::TrackMicro(electron, points, origin, orientation, kin_en, driftlines);
-      microtrack2 = X17::TrackMicro(electron, points, origin, orientation, kin_en, {});
+      microtrack = X17::TrackMicro(electron, points, origin, orientation, kin_en, driftlines);
 
-      tracks.Fill();
-      tracks2.Fill();
+      tracks->Fill();
     }
 
-  // Write the file with complete data.
-  outFile.cd();
-  tracks.Write();
-  outFile.Close();
+  logger.PopIndent();
 
-  // Write the file with no drift lines.
-  TFile outFile2(outPath2.c_str(), "RECREATE", "Tracks from microscopic simulation (no drift lines)");
+  // 1. Deactivate the driftlines branch.
+  tracks->SetBranchStatus("*driftlines*", false);
 
-  outFile2.cd();
-  tracks2.Write();
+  // 2. Open the second file manually to avoid triggering AppManager's auto-cleanup.
+  TFile outFile2(outPath2.c_str(), "RECREATE");
+  outFile2.cd(); // explicitly set gDirectory to the new file
+
+  // 3. Clone the tree. CloneTree() automatically attaches the new tree to gDirectory (outFile2).
+  TTree* tracks2 = tracks->CloneTree();
+  tracks2->SetName("tracks_small");
+  tracks2->SetTitle("Tree of simulated microscopic tracks (no drift lines)");
+
+  // 4. Write and close the small file.
+  tracks2->Write();
   outFile2.Close();
+
+  // 5. Re-enable the branch on the original tree so AppManager::~AppManager()
+  // writes the final buffer of the full tree correctly when the program exits.
+  tracks->SetBranchStatus("*driftlines*", true);
+
+  man.GetOutputFile()->cd();
 
   return 0;
 }

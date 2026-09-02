@@ -2,6 +2,11 @@
 
 // C++ dependencies
 #include <cmath>
+#include <string>
+
+#ifndef NDEBUG
+#include <stdexcept>
+#endif
 
 // ROOT dependencies
 #include "Rtypes.h"
@@ -28,6 +33,13 @@ namespace X17
     Vector(double x, double y, double z) noexcept
       : x(x), y(y), z(z)
     {
+    }
+
+    /// @brief Convert this vector to a string representation.
+    /// @return A string representation of the vector.
+    [[nodiscard]] std::string ToString() const
+    {
+      return "(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")";
     }
 
     /// @brief Compute the square of the magnitude of this vector.

@@ -27,6 +27,8 @@ namespace X17
     /// @brief Destructor. Writes the output tree and closes the ROOT files.
     ~AppManager();
 
+    [[nodiscard]] TFile* GetOutputFile() const { return m_output_file.get(); }
+
     static std::unique_ptr<MagField> LoadMagField();
 
     std::unique_ptr<DriftMap> LoadMap(const std::string& version);
@@ -38,8 +40,9 @@ namespace X17
 
     /// @brief Creates a ROOT random number generator.
     /// @param seed The seed for the random number generator. If not provided or set to 0, a random seed will be used.
+    /// @param allow_unsaved_seed If false, program will exit if the seed cannot be saved.
     /// @return A unique pointer to the random number generator.
-    std::unique_ptr<TRandom3> CreateRNG(UInt_t seed = 0);
+    std::unique_ptr<TRandom3> CreateRNG(UInt_t seed = 0, bool allow_unsaved_seed = false);
 
   private:
     /// @brief Sets the working directory to the root of the project.
@@ -52,6 +55,6 @@ namespace X17
 
     std::vector<std::unique_ptr<TFile>> m_open_files;
     std::unique_ptr<TFile> m_output_file;
-    TTree* m_output_tree;
+    TTree* m_output_tree = nullptr;
   };
 } // namespace X17
