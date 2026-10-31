@@ -1,5 +1,5 @@
 # ########################################################################################
-cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 project(X17)
 
 # We want to export the compile commands for clangd
@@ -7,10 +7,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # So that repeated builds don't silence warnings
 set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
 
-# Set the C++ standard (C++23 not supported in old versions of CMake)
-set(CMAKE_CXX_STANDARD 20)
+# Set the C++ standard
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(ROOT_CXX_FLAGS "-std=c++20")
+set(ROOT_CXX_FLAGS "-std=c++23")
 
 # Set default build type to Release if not specified
 if(NOT CMAKE_BUILD_TYPE)

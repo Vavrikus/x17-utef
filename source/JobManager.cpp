@@ -1,5 +1,8 @@
 // C++ dependencies
 #include <algorithm>
+#include <cmath>
+#include <cstddef>
+#include <string>
 #include <utility>
 
 // X17 dependencies

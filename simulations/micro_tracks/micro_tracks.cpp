@@ -44,7 +44,6 @@ int main(int argc, char* argv[])
   X17::JobManager& job_man = X17::JobManager::Get(); // Job manager for parallel jobs.
 
   bool random_params;
-
   int iterations = 1;
 
   if (argc == 1)

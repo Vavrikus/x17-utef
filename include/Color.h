@@ -1,5 +1,8 @@
 #pragma once
 
+// C++ dependencies
+#include <cmath>
+
 // ROOT dependencies
 #include "TColor.h"
 #include "TROOT.h"

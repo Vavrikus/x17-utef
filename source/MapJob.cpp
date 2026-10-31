@@ -1,5 +1,4 @@
 // C++ dependencies
-#include <cmath>
 #include <iostream>
 #include <string>
 

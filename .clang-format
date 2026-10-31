@@ -1,8 +1,8 @@
-# Formatting style for clang-format inspired by ROOT. 
+# Formatting style for clang-format inspired by ROOT.
 
 # Basics:
 #BasedOnStyle:  LLVM
-Standard: c++17
+Standard: c++23
 IndentWidth: 2
 TabWidth: 2
 ColumnLimit: 120
@@ -27,6 +27,10 @@ Cpp11BracedListStyle: Block
 IndentCaseLabels: true
 IndentWrappedFunctionNames: true
 NamespaceIndentation: All
+
+# C++20 concepts
+RequiresClausePosition: OwnLine
+IndentRequiresClause: false
 
 # When are line breaks allowed:
 AllowAllParametersOfDeclarationOnNextLine: true  # Don't force all parameters to be on a new line.
@@ -55,6 +59,7 @@ KeepEmptyLines:
   AtStartOfFile: false
 MaxEmptyLinesToKeep: 1
 ReflowComments: Always
+
 # Penalties for breaking lines:
 PenaltyBreakBeforeFirstCallParameter: 19
 PenaltyBreakComment: 300
@@ -62,6 +67,7 @@ PenaltyBreakFirstLessLess: 120
 PenaltyBreakString: 1000
 PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 100
+
 # These would make debugging harder.
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortIfStatementsOnASingleLine: false
@@ -72,7 +78,18 @@ AllowShortLoopsOnASingleLine: false
 SpaceAfterCStyleCast: true
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeCaseColon: false
-SpaceBeforeParens: ControlStatements
+SpaceBeforeParens: Custom
+SpaceBeforeParensOptions:
+  AfterControlStatements: true
+  AfterForeachMacros: true
+  AfterFunctionDefinitionName: false
+  AfterFunctionDeclarationName: false
+  AfterIfMacros: true
+  AfterOverloadedOperator: false
+  AfterPlacementOperator: true
+  AfterRequiresInClause: true
+  AfterRequiresInExpression: true
+  BeforeNonEmptyParentheses: false
 SpacesBeforeTrailingComments: 1
 SpacesInAngles: Never
 SpacesInContainerLiterals: true
