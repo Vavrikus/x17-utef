@@ -3,9 +3,11 @@ export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
 
 # setting home alias for x17 directory
 alias home='cd /storage/projects/utefx17/martin;pwd'
+alias x17='cd /storage/projects/utefx17;pwd'
 
 # garfield directory
-export GARFIELD_HOME='/storage/projects/utefx17/SourceCode/garfield_2603'
+# export GARFIELD_HOME='/storage/projects/utefx17/SourceCode/garfield_2603'
+export GARFIELD_HOME='/storage/projects/utefx17/SourceCode/garfield/automatic/garfield'
 
 # If not running interactively, don't do anything
 case $- in
@@ -23,7 +25,8 @@ if [[ -f /etc/profile.d/30_meta_modules.sh ]]; then
     module add cmake/3.23.1-gcc-10.2.1-gxvea6z
 
     #sourcing Geant4
-    source /storage/projects/utefx17/SourceCode/geant4/geant4-v11.0.3-install/bin/geant4.sh
+    #source /storage/projects/utefx17/SourceCode/geant4/geant4-v11.0.3-install/bin/geant4.sh
+    source /storage/projects/utefx17/SourceCode/geant4/automatic/geant4-install/bin/geant4.sh
 
     #sourcing Garfield
     source $GARFIELD_HOME/install/share/Garfield/setupGarfield.sh
@@ -35,8 +38,9 @@ fi
 
 # sourcing ROOT (causes annoying version info errors)
 # (also only on META)
-if [[ -f /storage/projects/utefx17/SourceCode/ROOT/root_v6.36/root_install/bin/thisroot.sh ]]; then
-   source /storage/projects/utefx17/SourceCode/ROOT/root_v6.36/root_install/bin/thisroot.sh
+if [[ -f /storage/projects/utefx17/SourceCode/ROOT/automatic/root_install/bin/thisroot.sh ]]; then
+#    source /storage/projects/utefx17/SourceCode/ROOT/root_v6.36/root_install/bin/thisroot.sh
+    source /storage/projects/utefx17/SourceCode/ROOT/automatic/root_install/bin/thisroot.sh
 fi
 # source old ROOT if needed
 alias oldroot="source /storage/projects/utefx17/SourceCode/ROOT/install/bin/thisroot.sh"

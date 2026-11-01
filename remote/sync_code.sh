@@ -5,15 +5,12 @@ i="meta"
 
 echo "Connecting to ${i}"
 
-# ssh ${i} '
-#     cd /storage/projects/utefx17/martin
-#     mkdir -p electron_positron_tracks/build
-#     mkdir -p mag_data
-#     mkdir -p electron_positron_tracks/data
-# '
-
 rsync bashrc.sh ${i}":~/.bashrc" --progress
 rsync bash_profile.sh ${i}":~/.bash_profile" --progress 
+rsync rebuild_root.sh ${i}":/storage/projects/utefx17/SourceCode/ROOT/automatic" --progress
+rsync install_qt.sh ${i}":/storage/projects/utefx17/SourceCode/qt/automatic" --progress
+rsync rebuild_geant.sh ${i}":/storage/projects/utefx17/SourceCode/geant4/automatic" --progress
+rsync rebuild_garfield.sh ${i}":/storage/projects/utefx17/SourceCode/garfield/automatic" --progress
 
 cd ..
-rsync include source simulations reconstruction tests LinkDef.h CMakeLists.txt ${i}":/storage/projects/utefx17/martin" --progress --recursive
+rsync include source simulations reconstruction tests LinkDef.h CMakeLists.txt ${i}":/storage/projects/utefx17/martin" --info=progress2 --recursive
