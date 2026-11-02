@@ -4,6 +4,7 @@ export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
 # setting home alias for x17 directory
 alias home='cd /storage/projects/utefx17/martin;pwd'
 alias x17='cd /storage/projects/utefx17;pwd'
+alias x17sim='cd /storage/projects/utefx17/SourceCode/X17geant4;pwd'
 
 # garfield directory
 # export GARFIELD_HOME='/storage/projects/utefx17/SourceCode/garfield_2603'
