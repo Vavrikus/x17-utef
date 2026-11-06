@@ -106,9 +106,9 @@ int main()
   bool applyCorrection = false;
 
   if (applyCorrection)
-    X17::Logger::Get().Essential("Linear fit correction will be applied.\n");
+    X17_LOGGER.Essential("Linear fit correction will be applied.\n");
   else
-    X17::Logger::Get().Essential("Linear fit correction will not be applied.\n");
+    X17_LOGGER.Essential("Linear fit correction will not be applied.\n");
 
   // std::string data_folder = "data/micro_tracks/";
   std::string data_folder  = "data/mcs_tracks/";

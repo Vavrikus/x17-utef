@@ -2,7 +2,6 @@
 
 // C++ dependencies
 #include <functional>
-#include <iostream>
 #include <string>
 
 // X17 dependencies
@@ -18,7 +17,7 @@ auto coutCallback(const std::string& name)
   return [name](const T& oldVal, const T& newVal)
   {
     std::string msg = name + " changed from " + std::to_string(oldVal) + " to " + std::to_string(newVal);
-    X17::Logger::Get().Debug(msg);
+    X17_LOGGER.Debug(msg);
   };
 }
 
@@ -39,7 +38,7 @@ public:
     if (m_callback)
       m_callback(m_value, m_value);
 
-    X17::Logger::Get().Debug("Watched object destroyed.");
+    X17_LOGGER.Debug("Watched object destroyed.");
   }
 
   /// @brief Constructs a Watched object with the given value.

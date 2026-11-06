@@ -4,8 +4,6 @@ project(X17)
 
 # We want to export the compile commands for clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-# So that repeated builds don't silence warnings
-set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
 
 # Set the C++ standard
 set(CMAKE_CXX_STANDARD 23)
@@ -15,6 +13,16 @@ set(ROOT_CXX_FLAGS "-std=c++23")
 # Set default build type to Release if not specified
 if(NOT CMAKE_BUILD_TYPE)
 set(CMAKE_BUILD_TYPE Release)
+endif()
+
+# Enable compiler caching for local development (Debug/RelWithDebInfo), skip for Release
+# So that repeated builds don't silence warnings
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Release")
+    find_program(CCACHE_PROGRAM ccache)
+    if(CCACHE_PROGRAM)
+        message(STATUS "ccache found: Enabling compiler cache.")
+        set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+    endif()
 endif()
 
 # Enable debug symbols and disable optimization for Debug build type

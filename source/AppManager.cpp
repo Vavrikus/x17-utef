@@ -127,18 +127,18 @@ namespace X17
 
       fs::current_path(fs::weakly_canonical(target_dir));
 
-      Logger::Get().Info("Setting working directory to " + target_dir.string());
+      X17_LOGGER.Info("Setting working directory to " + target_dir.string());
     }
     catch (const std::exception& e)
     {
       std::string msg = "Failed to set working directory: " + string(e.what());
-      Logger::Get().Error(msg);
+      X17_LOGGER.Error(msg);
     }
   }
 
   std::unique_ptr<DriftMap> AppManager::LoadMap(const string& version)
   {
-    Logger::Get().Info("Loading map: " + version + ".");
+    X17_LOGGER.Info("Loading map: " + version + ".");
     TFile* map_input = TFile::Open(("data/ion_map/sample_" + version + "/map.root").c_str(), "READ");
     m_open_files.emplace_back(map_input);
     return std::unique_ptr<DriftMap>(reinterpret_cast<X17::DriftMap*>(map_input->Get("map")));
@@ -146,7 +146,7 @@ namespace X17
 
   TTree* AppManager::LoadTreeFromFile(const string& filename, const string& tree_name)
   {
-    Logger::Get().Essential("Loading tree: " + tree_name + " from " + filename + ".");
+    X17_LOGGER.Essential("Loading tree: " + tree_name + " from " + filename + ".");
     TFile* tree_input = TFile::Open(filename.c_str(), "READ");
     m_open_files.emplace_back(tree_input);
     return static_cast<TTree*>(tree_input->Get(tree_name.c_str()));
@@ -156,13 +156,13 @@ namespace X17
   {
     if (m_output_file)
     {
-      Logger::Get().Info(std::string("Replacing existing output tree ") + m_output_tree->GetName() + " in "
-                         + m_output_file->GetName() + ".");
+      X17_LOGGER.Info(std::string("Replacing existing output tree ") + m_output_tree->GetName() + " in "
+                      + m_output_file->GetName() + ".");
       m_output_tree->Write();
       m_output_file->Close();
     }
 
-    Logger::Get().Info("Creating output tree: " + tree_name + " in " + filename + ".");
+    X17_LOGGER.Info("Creating output tree: " + tree_name + " in " + filename + ".");
     m_output_file = std::make_unique<TFile>(filename.c_str(), "RECREATE");
     m_output_tree = new TTree(tree_name.c_str(), tree_title.c_str());
     m_output_tree->SetDirectory(m_output_file.get());
@@ -173,14 +173,14 @@ namespace X17
   {
     if (seed == 0)
       seed = std::random_device{}();
-    X17::Logger::Get().Info("Setting TRandom3 seed: " + std::to_string(seed));
+    X17_LOGGER.Info("Setting TRandom3 seed: " + std::to_string(seed));
 
     if (!m_output_file)
     {
       if (allow_unsaved_seed)
-        Logger::Get().Warning("No output file set, seed will not be saved.");
+        X17_LOGGER.Warning("No output file set, seed will not be saved.");
       else
-        Logger::Get().Fatal("No output file set, cannot save seed.");
+        X17_LOGGER.Fatal("No output file set, cannot save seed.");
     }
     else
     {

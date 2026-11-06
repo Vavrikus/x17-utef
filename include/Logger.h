@@ -6,6 +6,8 @@
 #include <sstream>
 #include <string>
 
+#define X17_LOGGER X17::Logger::Get()
+
 namespace X17
 {
   template <typename T>

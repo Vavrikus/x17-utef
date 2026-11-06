@@ -7,6 +7,7 @@
 
 // X17 dependencies
 #include "JobManager.h"
+#include "Logger.h"
 
 namespace X17
 {
@@ -14,7 +15,7 @@ namespace X17
                                              double step_size)
   {
     if (m_initialized)
-      Logger::Get().Fatal("Registering job parameter with step size after manager initialization.");
+      X17_LOGGER.Fatal("Registering job parameter with step size after manager initialization.");
     m_parameters.emplace_back(name, min_bound, max_bound, step_size, std::ceil((max_bound - min_bound) / step_size));
     m_max_name_length = std::max<std::size_t>(name.length(), m_max_name_length);
   }
@@ -22,7 +23,7 @@ namespace X17
   void JobManager::RegisterParameterSteps(const std::string& name, double min_bound, double max_bound, int steps)
   {
     if (m_initialized)
-      Logger::Get().Fatal("Registering job parameter with number of steps after manager initialization.");
+      X17_LOGGER.Fatal("Registering job parameter with number of steps after manager initialization.");
     m_parameters.emplace_back(name, min_bound, max_bound, (max_bound - min_bound) / (steps - 1), steps);
     m_max_name_length = std::max<std::size_t>(name.length(), m_max_name_length);
   }
@@ -45,15 +46,15 @@ namespace X17
     }
     else
     {
-      Logger::Get().Fatal("JobManager::Initialize: Cost function not implemented.");
+      X17_LOGGER.Fatal("JobManager::Initialize: Cost function not implemented.");
     }
 
-    Logger::Get()
+    X17_LOGGER
       .Essential(std::string("Initializing job ") + std::to_string(m_id) + " of " + std::to_string(m_max_id) + ".")
       .PushIndent();
-    Logger::Get().Print("Processing items " + std::to_string(m_min_index) + " to " + std::to_string(m_max_index)
-                        + " out of " + std::to_string(m_total_items) + ".");
-    Logger::Get().Print("Parameters:").PushIndent();
+    X17_LOGGER.Print("Processing items " + std::to_string(m_min_index) + " to " + std::to_string(m_max_index)
+                     + " out of " + std::to_string(m_total_items) + ".");
+    X17_LOGGER.Print("Parameters:").PushIndent();
     PrintParameters().PopIndent(2);
 
     m_initialized = true;
