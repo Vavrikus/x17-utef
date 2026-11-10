@@ -21,6 +21,7 @@
 /data/micro_tracks/random_02/*.root
 /data/micro_tracks/grid_01/tracks_full1000.root
 /data/mcs_tracks/test/mcs_tracks*.root
+/data/mcs_tracks/test/mcs_*MeV.root
 
 # No unsorted new data
 /data/clustering/new/
