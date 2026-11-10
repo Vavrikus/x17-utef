@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR" || exit 1
 
@@ -40,7 +42,13 @@ fi
 echo "Architecture string found: $QT_ARCH"
 
 echo "=== Downloading Qt $QT_VERSION binaries ==="
+mkdir -p "$QT_DIR"
 python -m aqt install-qt linux desktop "$QT_VERSION" "$QT_ARCH" --outputdir "$QT_DIR"
+
+echo "=== Fixing project group permissions ==="
+chgrp -R utefx17 "$QT_DIR"
+chmod -R u+rwX,g+rwX "$QT_DIR"
+find "$QT_DIR" -type d -exec chmod g+s {} +
 
 echo "=== Linking Latest Installation ==="
 # Create a permanent 'latest' symlink so other scripts don't need hardcoded version strings
@@ -52,3 +60,4 @@ rm -rf aqt_env
 
 echo "Qt6 installation complete at: $QT_DIR/$QT_VERSION/$QT_ARCH"
 echo "Symlinked to: $QT_DIR/latest"
+```

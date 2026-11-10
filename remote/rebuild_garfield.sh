@@ -5,6 +5,8 @@ START_DIR=$(pwd)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR" || exit 1
 
+PROJECT_GROUP="utefx17"
+
 # 1. Parameter Parsing
 DO_FETCH=false
 DO_CONFIGURE=false
@@ -39,14 +41,14 @@ fi
 if $DO_FETCH; then
     echo "=== Fetching Source ==="
     cd "$SCRIPT_DIR/garfield" || exit 1
-    
+
     git config core.trustctime false
     git config core.checkstat minimal
-    
+
     git checkout master
     git fetch origin master
     git merge FETCH_HEAD --ff-only
-    
+
     cd "$SCRIPT_DIR" || exit 1
 fi
 
@@ -55,27 +57,27 @@ if $DO_CONFIGURE || $DO_BUILD || $DO_INSTALL; then
     echo "=== Preparing SCRATCHDIR ==="
     mkdir -p "$SCRATCHDIR/tmp"
     export TMPDIR="$SCRATCHDIR/tmp"
-    
+
     echo "Syncing source..."
     # Exclude build and install directories so we don't unnecessarily copy them as source files
     rsync -a --info=progress2 --exclude='build' --exclude='install' "$SCRIPT_DIR/garfield/" "$SCRATCHDIR/garfield/" || exit 1
-    
+
     if [ -d "$SCRIPT_DIR/garfield/build" ]; then
         echo "Restoring previous build directory to SCRATCHDIR..."
         mkdir -p "$SCRATCHDIR/garfield/build"
         rsync -a --info=progress2 "$SCRIPT_DIR/garfield/build/" "$SCRATCHDIR/garfield/build/"
-        
+
         # Purge hardcoded absolute paths from previous PBS jobs
         find "$SCRATCHDIR/garfield/build" -name "CMakeCache.txt" -delete
         find "$SCRATCHDIR/garfield/build" -name "CMakeFiles" -type d -exec rm -rf {} +
-        
+
         if $DO_BUILD; then
             DO_CONFIGURE=true
         fi
     else
         mkdir -p "$SCRATCHDIR/garfield/build"
     fi
-    
+
     source /etc/profile.d/30_meta_modules.sh
     module add cmake/3.23.1-gcc-10.2.1-gxvea6z
     source /storage/projects/utefx17/SourceCode/ROOT/automatic/root_install/bin/thisroot.sh
@@ -89,8 +91,7 @@ if $DO_CONFIGURE; then
 
     LOCAL_QT_CMAKE="$SCRIPT_DIR/../../qt/automatic/qt6/6.11.3/gcc_64/lib/cmake"
 
-    # Replaced $GARFIELD_HOME with ".." to ensure CMake reads source files from the fast scratch disk 
-    # instead of traversing back to the network drive if GARFIELD_HOME is set in your environment.
+    # Use scratch for build files and project storage for the eventual installation.
     cmake \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX="$SCRIPT_DIR/garfield/install" \
@@ -105,24 +106,39 @@ if $DO_BUILD; then
     echo "=== Building ==="
     cd "$SCRATCHDIR/garfield/build" || exit 1
     cmake --build . -j "${PBS_NPROCS:-1}" || exit 3
-    
+
     echo "Syncing build directory back to network storage..."
     mkdir -p "$SCRIPT_DIR/garfield/build"
-    rsync -a --delete --info=progress2 "$SCRATCHDIR/garfield/build/" "$SCRIPT_DIR/garfield/build/" || exit 3
+
+    # Scratch -> project: ensure correct group ownership and permissions.
+    sync_with_group "$PROJECT_GROUP" \
+        "$SCRATCHDIR/garfield/build/" \
+        "$SCRIPT_DIR/garfield/build/" \
+        --delete --info=progress2 || exit 3
 fi
 
 # --- INSTALL ---
 if $DO_INSTALL; then
     echo "=== Installing ==="
     cd "$SCRATCHDIR/garfield/build" || exit 1
-    
+
+    # Back up the previous installation.
     if [ -d "$SCRIPT_DIR/garfield/install" ]; then
         rm -rf "$SCRIPT_DIR/garfield/install_old"
         mv "$SCRIPT_DIR/garfield/install" "$SCRIPT_DIR/garfield/install_old"
     fi
-    
-    cmake --install . || exit 4
-    
+
+    # Install locally on scratch first.
+    cmake --install . --prefix "$SCRATCHDIR/garfield/install" || exit 4
+
+    echo "Syncing installation to project directory..."
+
+    # Scratch -> project: ensure correct group ownership and permissions.
+    sync_with_group "$PROJECT_GROUP" \
+        "$SCRATCHDIR/garfield/install/" \
+        "$SCRIPT_DIR/garfield/install/" \
+        --info=progress2 || exit 4
+
     echo "Garfield++ installation completed successfully."
 fi
 

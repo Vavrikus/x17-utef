@@ -1,16 +1,54 @@
 #!/bin/bash
-cd $(dirname $0)
+set -e
 
-i="meta"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
 
-echo "Connecting to ${i}"
+REMOTE="meta"
+PROJECT="/storage/projects/utefx17"
 
-rsync bashrc.sh ${i}":~/.bashrc" --progress
-rsync bash_profile.sh ${i}":~/.bash_profile" --progress 
-rsync rebuild_root.sh ${i}":/storage/projects/utefx17/SourceCode/ROOT/automatic" --progress
-rsync install_qt.sh ${i}":/storage/projects/utefx17/SourceCode/qt/automatic" --progress
-rsync rebuild_geant.sh ${i}":/storage/projects/utefx17/SourceCode/geant4/automatic" --progress
-rsync rebuild_garfield.sh ${i}":/storage/projects/utefx17/SourceCode/garfield/automatic" --progress
+# Apply the same ownership and permission policy as sync_with_group.
+RSYNC_GROUP_OPTS=(
+    --no-owner
+    --no-group
+    --chown=:utefx17
+    --chmod=ug=rwX
+)
 
+echo "Connecting to ${REMOTE}"
+
+# User configuration
+rsync -a --progress \
+    bashrc.sh "${REMOTE}:~/.bashrc"
+
+rsync -a --progress \
+    bash_profile.sh "${REMOTE}:~/.bash_profile"
+
+# Build scripts
+rsync -a "${RSYNC_GROUP_OPTS[@]}" --progress \
+    rebuild_root.sh \
+    "${REMOTE}:${PROJECT}/SourceCode/ROOT/automatic/"
+
+rsync -a "${RSYNC_GROUP_OPTS[@]}" --progress \
+    install_qt.sh \
+    "${REMOTE}:${PROJECT}/SourceCode/qt/automatic/"
+
+rsync -a "${RSYNC_GROUP_OPTS[@]}" --progress \
+    rebuild_geant.sh \
+    "${REMOTE}:${PROJECT}/SourceCode/geant4/automatic/"
+
+rsync -a "${RSYNC_GROUP_OPTS[@]}" --progress \
+    rebuild_garfield.sh \
+    "${REMOTE}:${PROJECT}/SourceCode/garfield/automatic/"
+
+# Project source code
 cd ..
-rsync include source simulations reconstruction tests LinkDef.h CMakeLists.txt rebuild_meta.sh ${i}":/storage/projects/utefx17/martin" --info=progress2 --recursive --delete
+
+rsync -a "${RSYNC_GROUP_OPTS[@]}" \
+    --info=progress2 \
+    --delete \
+    include source simulations reconstruction tests \
+    LinkDef.h CMakeLists.txt rebuild_meta.sh \
+    "${REMOTE}:${PROJECT}/martin/"
+
+echo "Done."
