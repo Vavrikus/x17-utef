@@ -26,7 +26,6 @@ namespace X17
                            + std::to_string(m_ymin) + ", " + std::to_string(m_ymax) + "], z: [" + std::to_string(m_zmin)
                            + ", " + std::to_string(m_zmax) + "].";
       throw std::out_of_range("Cannot read field out of bounds." + coordinates + bounds);
-      // std::cerr << "Cannot read field out of bounds." << coordinates << bounds << std::endl;
     }
 
     // Check if any of the coordinates is invalid.

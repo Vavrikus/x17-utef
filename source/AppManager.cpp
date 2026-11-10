@@ -74,6 +74,7 @@ namespace X17
     if (m_output_file)
     {
       m_output_tree->Write();
+      m_output_file->Purge();
       m_output_file->Close();
     }
 
